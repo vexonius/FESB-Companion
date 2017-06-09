@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.inject(this);
 
-        /**Realm incicijalizacija too awesome */
+        /**Realm incicijalizacija  */
         Realm.init(this);
         Realm.setDefaultConfiguration(mainRealmConfig);
 
