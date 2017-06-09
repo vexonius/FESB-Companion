@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        id="@+id/left_tab"
+        title="Home"
+        icon="@drawable/mail"
+        barColorWhenSelected="#0088ff"
+
+        ></tab>
+
+    <tab
+        id="@+id/home_tab"
+        title="Home"
+        icon="@drawable/home"
+        barColorWhenSelected="#FF6F00FF"
+        ></tab>
+
+    <tam
+        id="@+id/right_tab"
+        title="Home"
+        icon="@drawable/schedule"
+        barColorWhenSelected="#404040"
+        ></tam>
+</tabs>

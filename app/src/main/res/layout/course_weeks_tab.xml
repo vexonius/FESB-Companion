@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
+    android:paddingBottom="@dimen/bottom_navigation_height">
+
+    <FrameLayout
+        android:id="@+id/frame_list_week"
+        android:paddingTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/course_week_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:smoothScrollbar="true"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbarSize="5dp"
+        android:scrollbarThumbVertical="@color/_20white"
+        android:layout_marginBottom="3dp"
+        android:visibility="invisible" />
+
+    <ProgressBar
+        android:id="@+id/course_week_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:interpolator="@android:interpolator/linear"
+        android:progress="@android:integer/config_mediumAnimTime"
+        android:indeterminate="true"
+        android:progressTint="@color/colorAccent"
+        android:visibility="visible"/>
+
+    </FrameLayout>
+
+</RelativeLayout>

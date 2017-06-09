@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
+    android:paddingBottom="@dimen/bottom_navigation_height">
+
+<FrameLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <LinearLayout
+        android:id="@+id/linear_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="6">
+        <LinearLayout
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ponedjeljak"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:background="@color/colorPrimary"
+                android:padding="5dp"
+                android:textSize="10dp"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerPon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+    <LinearLayout
+
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Utorak"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:background="@color/colorPrimary"
+            android:padding="5dp"
+            android:textSize="10dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerUto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+    <LinearLayout
+
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Srijeda"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:background="@color/colorPrimary"
+            android:padding="5dp"
+            android:textSize="10dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerSri"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+    <LinearLayout
+
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Četvrtak"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:background="@color/colorPrimary"
+            android:padding="5dp"
+            android:textSize="10dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerCet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+    <LinearLayout
+
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Petak"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:background="@color/colorPrimary"
+            android:padding="5dp"
+            android:textSize="10dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerPet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/linearSub"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Subota"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:background="@color/colorPrimary"
+                android:padding="5dp"
+                android:textSize="10dp"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerSub"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+    </LinearLayout>
+  <ProgressBar
+      android:id="@+id/raspored_progress"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:visibility="invisible"
+      android:indeterminate="true"
+      android:progressTint="@color/colorAccent"
+      />
+
+</FrameLayout>
+
+    <Button
+        android:id="@+id/odaberiDan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/button_blue"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="Odaberi tjedan"
+        android:textColor="@color/white"
+        android:layout_marginBottom="20dp"/>
+
+    <com.google.android.gms.ads.NativeExpressAdView
+        android:id="@+id/adViewleft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        ads:adSize="FULL_WIDTHx80">
+    </com.google.android.gms.ads.NativeExpressAdView>
+</RelativeLayout>

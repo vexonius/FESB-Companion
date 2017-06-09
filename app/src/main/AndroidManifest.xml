@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tstudioz.fax.fme">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ikona_round"
+        android:label="FESB Companion"
+        android:screenOrientation="portrait"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".activities.LoginActivity"
+                  android:theme="@style/AppTheme.Simple">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.PredmetActivity"
+            android:screenOrientation="portrait"
+            android:label="ELEKTRONIKA"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.NoteActivity"
+            android:label=""
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:screenOrientation="portrait"
+            android:label="FESB Companion"
+            android:theme="@style/AppTheme"/>
+    </application>
+
+</manifest>

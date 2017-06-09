@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="60dp"
+    android:background="@color/colorPrimaryDark">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/progress_attend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="visible"/>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nested_attend"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textZimskiSem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="14dp"
+                android:text="ZIMSKI SEMESTAR"
+                android:textColor="@color/_20white"
+                android:textAllCaps="true"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerZimski"
+                android:layout_below="@+id/textZimskiSem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarSize="5dp"
+                android:scrollbarThumbVertical="@color/_20white"
+                android:layout_marginLeft="5dp"
+                android:visibility="visible" >
+            </android.support.v7.widget.RecyclerView>
+
+            <TextView
+                android:id="@+id/textLitnjiSem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/recyclerZimski"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="14dp"
+                android:text="LJETNI SEMESTAR"
+                android:textColor="@color/_20white"
+                android:textAllCaps="true"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerLItnji"
+                android:layout_below="@+id/textLitnjiSem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:smoothScrollbar="true"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarSize="5dp"
+                android:layout_marginLeft="5dp"
+                android:scrollbarThumbVertical="@color/_20white"
+                android:visibility="visible" >
+            </android.support.v7.widget.RecyclerView>
+
+        </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
+    </FrameLayout>
+
+</RelativeLayout>

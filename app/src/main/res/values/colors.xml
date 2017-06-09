@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#2f3031</color>
+    <color name="colorPrimaryDark">#252526</color>
+    <color name="deepBlue">#00C4FF</color>
+    <color name="colorAccent">#00C4FF</color>
+    <color name="home_color">#ffffff</color>
+    <color name="white">#ffffff</color>
+    <color name="_20white">#70ffffff</color>
+    <color name="_10white">#26FFFFFF</color>
+    <color name="left_color">#006735</color>
+    <color name="right_color">#263238</color>
+    <color name="my_color">#1d1d1d</color>
+
+    //bottomNavigation
+    <color name="inactive">#6e6e6e</color>
+    
+    //Boje za svaku vrstu predavanja
+    <color name="red_nice">#ff5252</color>
+    <color name="blue_nice">#29B6F6</color>
+    <color name="green_nice">#64DD17</color>
+    <color name="purple_nice">#BA68C8</color>
+    <color name="grey_nice">#757575</color>
+    <color name="purple_dark">#7B1FA2</color>
+
+    //Boje adapter itema
+    <color name="silver">#7e7e7e</color>
+
+    <color name="grey_new">#9a9a9a</color>
+
+    <array name="rainbow">
+        <item>@color/colorAccent</item>
+        <item>@color/red_nice</item>
+        <item>@color/_10white</item>
+    </array>
+
+</resources>

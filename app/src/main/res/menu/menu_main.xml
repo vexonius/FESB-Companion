@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/refresMe"
+        app:showAsAction="always"
+        android:title="Osvježi"
+        android:icon="@drawable/refresh"/>
+
+    <item android:id="@+id/logout"
+        android:orderInCategory="1"
+        android:title="Odjava"/>
+
+    <item android:id="@+id/about"
+        android:orderInCategory="2"
+        android:title="O aplikaciji"/>
+
+    <item android:id="@+id/legal"
+        android:orderInCategory="3"
+        android:title="Licence"/>
+
+</menu>

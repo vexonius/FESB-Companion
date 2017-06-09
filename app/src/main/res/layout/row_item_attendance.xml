@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rounded_grey"
+    android:layout_margin="4dp"
+    android:paddingBottom="10dp"
+    android:elevation="10dp">
+
+    <TextView
+        android:id="@+id/predmetName"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="predmet"
+        android:maxLines="2"
+        android:layout_marginRight="12sp"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="12dp"
+        />
+
+    <TextView
+        android:id="@+id/predmetType"
+        android:layout_below="@+id/predmetName"
+        android:layout_marginLeft="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Auditorne vježbe"
+        android:textColor="@color/_20white"
+        android:textSize="12dp"
+        android:layout_marginBottom="15dp"
+        />
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/chart"
+        android:layout_below="@+id/predmetType"
+        android:layout_width="match_parent"
+        android:layout_height="145dp" />
+
+    <TextView
+        android:id="@+id/dolazakNum"
+        android:layout_below="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1/10"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:textSize="12dp"
+        android:textAlignment="center"
+        />
+
+</RelativeLayout>

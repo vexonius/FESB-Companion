@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+
+    <item android:drawable="@color/colorPrimaryDark"/>
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/start_logo" />
+    </item>
+
+    <item>
+        <bitmap android:src="@drawable/poweredby"
+            android:gravity="bottom">
+            </bitmap>
+    </item>
+</layer-list>

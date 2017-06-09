@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/bottom_navigation_height"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:background="@color/colorPrimaryDark"
+    android:layout_marginBottom="2dp">
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relative_parent_home"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:background="@color/colorPrimaryDark">
+
+  <FrameLayout
+      android:id="@+id/frameLayout"
+      android:background="@color/colorPrimary"
+      android:layout_width="match_parent"
+      android:layout_height="180dp"
+      android:layout_margin="10dp">
+
+      <ProgressBar
+          android:id="@+id/progressCircle"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:interpolator="@android:interpolator/linear"
+          android:progress="@android:integer/config_mediumAnimTime"
+          android:indeterminate="true"
+          android:progressTint="@color/colorAccent"
+          android:visibility="visible"
+          />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:id="@+id/card_home"
+        android:background="@color/colorPrimary"
+        android:elevation="5dp"
+        android:visibility="invisible">
+
+        <TextView
+            android:id="@+id/txtloc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Split"
+            android:textColor="#ffffff"
+            android:textSize="16dp"
+            android:paddingTop="6dp"
+            android:gravity="center_horizontal" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:id="@+id/prije"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.55"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/vrijeme_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:layout_margin="10dp" />
+
+                </RelativeLayout>
+
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="0.45"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/temperatura_vrijednost"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text=""
+                    android:paddingBottom="0dp"
+                    android:textColor="#FF00C4FF"
+                    android:gravity="center_horizontal"
+                    android:textSize="65dp" />
+
+                <TextView
+                    android:id="@+id/opis"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:paddingBottom="10dp"
+                    android:textColor="#ffffff"
+                    android:gravity="center_horizontal"
+                    android:textSize="13dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_gravity="center">
+
+
+                        <TextView
+                            android:id="@+id/trenutni_vjetar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="center"
+                            android:text=""
+                            android:textSize="12dp"
+                            android:textColor="#ffffff" />
+
+                        <ImageView
+                            android:id="@+id/vjetrovito"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_below="@+id/trenutni_vjetar"
+                            android:src="@drawable/wind"
+                            android:scaleType="centerInside"/>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center">
+
+
+                        <TextView
+                            android:id="@+id/vlaznost_vrijednost"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textSize="12dp"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff"
+                            />
+
+                        <ImageView
+                            android:id="@+id/vlaznost"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:paddingTop="3dp"
+                            android:layout_below="@+id/vlaznost_vrijednost"
+                            android:layout_centerHorizontal="true"
+                            android:src="@drawable/vlaga"
+                            android:scaleType="centerInside"
+                            />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center">
+
+
+                        <TextView
+                            android:id="@+id/oborine_vrijednost"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textSize="12dp"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff"
+                            />
+
+                        <ImageView
+                            android:id="@+id/oborine"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_below="@+id/oborine_vrijednost"
+                            android:layout_centerHorizontal="true"
+                            android:src="@drawable/oborine"
+                            android:scaleType="centerInside"
+                            />
+
+                    </RelativeLayout>
+
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+  </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/task"
+        android:layout_below="@+id/frameLayout"
+        android:layout_height="100dp"
+        android:layout_width="match_parent"
+        android:background="#2ecc71"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:gravity="center"
+        android:clickable="true">
+
+            <TextView
+                android:id="@+id/taskText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="7dp"
+                android:text="Trenutno nema bilješki"
+                android:textSize="16dp"
+                android:scrollbarStyle="outsideInset"
+                android:scrollbarThumbVertical="@color/_20white"
+                android:scrollbarSize="5dp"
+                android:textAlignment="center"
+                android:clickable="true"
+                android:textStyle="normal"
+                android:maxLines = "100"
+                android:scrollbars = "vertical"
+                android:textColor="#ffffff"/>
+    </RelativeLayout>
+
+    <com.google.android.gms.ads.NativeExpressAdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/task"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        ads:adSize="FULL_WIDTHx80">
+    </com.google.android.gms.ads.NativeExpressAdView>
+
+
+    <TextView
+        android:id="@+id/pr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DANAŠNJA PREDAVANJA"
+        android:layout_marginTop="10dp"
+        android:textStyle="bold"
+        android:textSize="13dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="3dp"
+        android:layout_below="@+id/adView"
+        android:textColor="#cacaca"/>
+
+    <FrameLayout
+        android:id="@+id/frame_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/pr">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:smoothScrollbar="true"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbarSize="5dp"
+            android:scrollbarThumbVertical="@color/_20white"
+            android:layout_marginBottom="3dp"
+            android:layout_marginTop="3dp"
+            android:visibility="invisible" />
+
+            <ProgressBar
+                android:id="@+id/list_progressbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:interpolator="@android:interpolator/linear"
+                android:progress="@android:integer/config_mediumAnimTime"
+                android:indeterminate="true"
+                android:progressTint="@color/colorAccent"
+                android:visibility="visible"/>
+
+        <RelativeLayout
+            android:id="@+id/nema_predavanja"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:layout_marginTop="10dp"
+            android:visibility="invisible">
+
+            <ImageView
+                android:id="@+id/smile"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:src="@drawable/smiley"
+                android:scaleType="fitCenter"
+                android:paddingTop="20dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/smile"
+                android:layout_marginTop="15dp"
+                android:textAlignment="center"
+                android:text="Odmori se, danas nemaš obaveza!"
+                android:paddingBottom="20dp"
+                android:textColor="#cacaca"
+                android:textSize="14dp"/>
+        </RelativeLayout>
+
+    </FrameLayout>
+
+</RelativeLayout>
+
+    </android.support.v4.widget.NestedScrollView>
