@@ -127,8 +127,6 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("FESB Companion");
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#262626")));
-
         Typeface tflight = Typeface.createFromAsset(this.getAssets(), "fonts/OpenSans-Regular.ttf");
 
 
