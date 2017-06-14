@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="60dp"
+    android:paddingBottom="57dp"
     android:background="@color/colorPrimaryDark">
 
     <FrameLayout
@@ -26,7 +26,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+           >
 
             <TextView
                 android:id="@+id/textZimskiSem"
@@ -75,7 +76,8 @@
                 android:scrollbarSize="5dp"
                 android:layout_marginLeft="5dp"
                 android:scrollbarThumbVertical="@color/_20white"
-                android:visibility="visible" >
+                android:visibility="visible"
+                android:paddingBottom="4dp">
             </android.support.v7.widget.RecyclerView>
 
         </RelativeLayout>

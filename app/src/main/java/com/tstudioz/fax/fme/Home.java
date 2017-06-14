@@ -118,14 +118,12 @@ public class Home extends Fragment{
 
                    */
 
-       /**     try {
+     /**       try {
                 start();
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-
       */
-
 
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -205,8 +203,6 @@ public class Home extends Fragment{
 
         showList();
         updateWeatherWhenOffline();
-
-
     }
 
     private void getForecast(String url) {
@@ -337,11 +333,6 @@ public class Home extends Fragment{
         return isAvailable;
     }
 
-    private void alertUserAboutError() {
-        AlertDialogFragment dialog = new AlertDialogFragment();
-        dialog.show(getActivity().getFragmentManager(), "error_dialog");
-    }
-
     public void updateWeatherWhenOffline(){
         mProgressCircle.setVisibility(View.GONE);
         mCardHome.setVisibility(View.VISIBLE);
@@ -384,6 +375,13 @@ public class Home extends Fragment{
 
     public void showSnacOffline(){
         Snackbar snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
+        View vjuz = snack.getView();
+        vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
+        snack.show();
+    }
+
+    public void alertUserAboutError(){
+        Snackbar snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške pri dohvaćanju prognoze", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.show();

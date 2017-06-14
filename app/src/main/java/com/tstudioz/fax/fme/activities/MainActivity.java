@@ -146,6 +146,8 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.addItem(item4);
         bottomNavigation.addItem(item2);
 
+        bottomNavigation.setBehaviorTranslationEnabled(false);
+
         bottomNavigation.setDefaultBackgroundColor(Color.parseColor("#2f3031"));
         bottomNavigation.setForceTint(true);
         bottomNavigation.setTitleTypeface(tflight);
