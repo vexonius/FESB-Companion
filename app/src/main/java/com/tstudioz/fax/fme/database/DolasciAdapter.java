@@ -28,12 +28,13 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 
-public class DolasciAdapter extends RecyclerView.Adapter<DolasciAdapter.DolazakViewHolder> {
+public class DolasciAdapter extends RecyclerView.Adapter<DolasciAdapter.DolazakViewHolder> implements RealmChangeListener{
     private RealmResults<Dolazak> mDolazak;
     Typeface regulartf;
 
     public DolasciAdapter(RealmResults<Dolazak> dolazak) {
         this.mDolazak = dolazak;
+        mDolazak.addChangeListener(this);
     }
 
     @Override
@@ -119,6 +120,11 @@ public class DolasciAdapter extends RecyclerView.Adapter<DolasciAdapter.DolazakV
 
             chart = (PieChart) itemView.findViewById(R.id.chart);
         }
+    }
+
+    @Override
+    public void onChange(Object element) {
+        notifyDataSetChanged();
     }
 
 }

@@ -72,8 +72,6 @@ import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
     public String date = null;
     public AlertDialog alertDialog;
 
@@ -89,8 +87,6 @@ public class MainActivity extends AppCompatActivity {
             .schemaVersion(5)
             .deleteRealmIfMigrationNeeded()
             .build();
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,10 +117,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(nazad);
         }
 
-
-
-
-
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("FESB Companion");
         Typeface tflight = Typeface.createFromAsset(this.getAssets(), "fonts/OpenSans-Regular.ttf");
@@ -152,17 +144,13 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigation.setAccentColor(Color.parseColor("#FFFFFF"));
         bottomNavigation.setInactiveColor(Color.parseColor("#6e6e6e"));
-        //bottomNavigation.setUseElevation(true);
+        bottomNavigation.setUseElevation(true);
         bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_HIDE);
-
-
         bottomNavigation.setCurrentItem(3);
-
 
         final Home hf = new Home();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
         ft.replace(R.id.frame, hf);
         ft.addToBackStack(null);
         ft.commit();
@@ -219,14 +207,10 @@ public class MainActivity extends AppCompatActivity {
                         ft.commit();
                         getSupportActionBar().setTitle("Mail");
                         break;
-
-
                 }
                 return true;
             }
         });
-
-
     }
 
     @Override
@@ -546,7 +530,7 @@ public class MainActivity extends AppCompatActivity {
     private void displayLicensesAlertDialog() {
         WebView view = (WebView) LayoutInflater.from(getApplicationContext()).inflate(R.layout.licence_view, null);
         view.loadUrl("file:///android_asset/legal.html");
-        alertDialog = new AlertDialog.Builder(this, R.style.Theme_AppCompat)
+        alertDialog = new AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert)
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();

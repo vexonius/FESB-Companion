@@ -78,6 +78,7 @@ public class Prisutnost extends Fragment {
 
     public static String TAG = "Prisutnost.class";
     private Snackbar snack;
+    DolasciAdapter winterAdapter, summerAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -89,13 +90,13 @@ public class Prisutnost extends Fragment {
         ButterKnife.inject(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("logasync", "ovo je onCreateView");
-            }
-        });
+        Log.d("logasync", "ovo je onCreateView");
 
+        showRecyclerviewWinterSem();
+        showRecyclerviewSummerSem();
+
+        mNested.setVisibility(View.INVISIBLE);
+        mProgress.setVisibility(View.VISIBLE);
         startFetching();
 
         return view;
@@ -109,11 +110,15 @@ public class Prisutnost extends Fragment {
 
 
 
-    public class FetchPrisutnost extends AsyncTask<String, Void, String> {
+  /**  public class FetchPrisutnost extends AsyncTask<String, Void, String> {
 
 
         @Override
         protected String doInBackground(String... params) {
+
+  */
+
+  public void fetchPrisutnost(){
 
             final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
 
@@ -123,15 +128,8 @@ public class Prisutnost extends Fragment {
                     .cookieJar(cookieJar)
                     .build();
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d("logasync", "ovo je pocetak asynca");
-                }
-            });
-
             Request request = new Request.Builder()
-                    .url("https://korisnik.fesb.unist.hr/prijava?returnURL=https://elearning.fesb.unist.hr/login/index.php")
+                    .url("https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb.unist.hr")
                     .get()
                     .build();
 
@@ -155,9 +153,8 @@ public class Prisutnost extends Fragment {
                             .build();
 
                     final Request rq = new Request.Builder()
-                            .url("https://korisnik.fesb.unist.hr/prijava?returnURL=https://elearning.fesb.unist.hr/login/index.php")
+                            .url("https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb.unist.hr")
                             .post(formData)
-                            .get()
                             .build();
 
                     Call call0 = okHttpClient.newCall(rq);
@@ -172,6 +169,7 @@ public class Prisutnost extends Fragment {
 
                             Request request = new Request.Builder()
                                     .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
+                                    .get()
                                     .build();
 
                             Call call1 = okHttpClient.newCall(request);
@@ -183,9 +181,6 @@ public class Prisutnost extends Fragment {
 
                                 @Override
                                 public void onResponse(Call call, Response response) throws IOException {
-
-
-
                                     Document doc = Jsoup.parse(response.body().string());
 
                                     Element zimski = doc.select("div.semster.winter").first();
@@ -262,12 +257,6 @@ public class Prisutnost extends Fragment {
 
                                     Elements litnjiKolegiji = litnjaPredavanja.select("a");
 
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Log.d("logasync", "ovo je sredina asynca");
-                                        }
-                                    });
 
                                     for (final Element element : litnjiKolegiji) {
 
@@ -326,11 +315,19 @@ public class Prisutnost extends Fragment {
 
                                     mRealm.commitTransaction();
 
-
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
                                             Log.d("logasync", "ovo je kraj asynca");
+                                        }
+                                    });
+
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            updateAdapters();
+                                            mProgress.setVisibility(View.INVISIBLE);
+                                            mNested.setVisibility(View.VISIBLE);
                                         }
                                     });
 
@@ -345,37 +342,6 @@ public class Prisutnost extends Fragment {
                 }
             });
 
-            return "Done";
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            mNested.setVisibility(View.INVISIBLE);
-            mProgress.setVisibility(View.VISIBLE);
-           getActivity().runOnUiThread(new Runnable() {
-               @Override
-               public void run() {
-                   Log.d("logasync", "ovo je onpreexecute");
-               }
-           });
-
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showRecyclerviewWinterSem();
-                    showRecyclerviewSummerSem();
-                    mProgress.setVisibility(View.INVISIBLE);
-                    mNested.setVisibility(View.VISIBLE);
-                }
-            });
-
-        }
 
     }
 
@@ -384,13 +350,10 @@ public class Prisutnost extends Fragment {
         Realm mRealm = Realm.getInstance(realmConfig);
         RealmResults<Dolazak> dolasciWinter = mRealm.where(Dolazak.class).equalTo("semestar", 1).findAll();
 
-        if (dolasciWinter.isEmpty()) {
-            Log.d("message", "doslaci su prazni");
-        } else {
-            zRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-            DolasciAdapter adapter = new DolasciAdapter(dolasciWinter);
-            zRecyclerview.setAdapter(adapter);
-        }
+        zRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+         winterAdapter = new DolasciAdapter(dolasciWinter);
+        zRecyclerview.setAdapter(winterAdapter);
+
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -406,13 +369,10 @@ public class Prisutnost extends Fragment {
         Realm mRealm = Realm.getInstance(realmConfig);
         RealmResults<Dolazak> dolasciSummer = mRealm.where(Dolazak.class).equalTo("semestar", 2).findAll();
 
-        if (dolasciSummer.isEmpty()) {
-            Log.d("message", "doslaci su prazni");
-        } else {
-            lRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-            DolasciAdapter ladapter = new DolasciAdapter(dolasciSummer);
-            lRecyclerview.setAdapter(ladapter);
-        }
+        lRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        summerAdapter= new DolasciAdapter(dolasciSummer);
+        lRecyclerview.setAdapter(summerAdapter);
+
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -423,6 +383,12 @@ public class Prisutnost extends Fragment {
 
     }
 
+    public void updateAdapters(){
+        winterAdapter.notifyDataSetChanged();
+        summerAdapter.notifyDataSetChanged();
+    }
+
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.refresMe).setVisible(false);
@@ -431,7 +397,8 @@ public class Prisutnost extends Fragment {
 
     public void startFetching(){
         if(isNetworkAvailable()) {
-            new FetchPrisutnost().execute();
+          //  new FetchPrisutnost().execute();
+            fetchPrisutnost();
         }else {
             showSnacOffline();
         }

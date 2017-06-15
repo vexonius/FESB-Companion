@@ -70,6 +70,7 @@ public class Kolegiji extends Fragment {
 
 
     private Activity activity;
+    CoursesAdapter kolegijiAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -83,7 +84,8 @@ public class Kolegiji extends Fragment {
         ButterKnife.inject(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        new FetchCourses().execute();
+        showList();
+        fetchCourses();
 
         return  view;
     }
@@ -94,14 +96,10 @@ public class Kolegiji extends Fragment {
         super.onPrepareOptionsMenu(menu);
     }
 
-    public class FetchCourses extends AsyncTask<String, Void, String> {
+    public void fetchCourses(){
 
 
-        @Override
-        protected String doInBackground(String... params) {
-
-            CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
-
+             CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
 
              final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
                     .followRedirects(true)
@@ -169,35 +167,22 @@ public class Kolegiji extends Fragment {
 
                             mRealm.commitTransaction();
 
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateList();
+                                    progress.setVisibility(View.INVISIBLE);
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                }
+                            });
 
                         }
                     });
                 }
             });
 
-            return "Done";
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showList();
-
-                }
-            });
 
 
-
-        }
     }
 
     public void showList(){
@@ -205,24 +190,19 @@ public class Kolegiji extends Fragment {
         Realm realm = Realm.getInstance(realmConfig);
         RealmResults<Kolegij> rezultati = realm.where(Kolegij.class).findAll();
 
-
-        if (rezultati.isEmpty()) {
-            recyclerView.setVisibility(View.INVISIBLE);
-            progress.setVisibility(View.VISIBLE);
-        } else{
-
-            CoursesAdapter adapter = new CoursesAdapter(rezultati);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setAdapter(adapter);
-
-            progress.setVisibility(View.INVISIBLE);
-            recyclerView.setVisibility(View.VISIBLE);
-
-        }
-
+        kolegijiAdapter = new CoursesAdapter(rezultati);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(kolegijiAdapter);
 
     }
+
+    public void updateList(){
+        kolegijiAdapter.notifyDataSetChanged();
+    }
+
+
+
 
     @Override
     public void onStop(){
@@ -341,77 +321,5 @@ public class Kolegiji extends Fragment {
 
 
     }
-
-    public void showCourseWeeksToMe(){
-
-
-
-   //    final Realm mRealm = Realm.getInstance(realmConfig);
-
-   //    final RealmResults<KolegijTjedan> tjedni = mRealm.where(KolegijTjedan.class).findAll();
-
-   //    if(!tjedni.isEmpty()) {
-   //        CourseWeeksAdapter adapter = new CourseWeeksAdapter(tjedni);
-   //        recyclerView.setAdapter(adapter);
-   //    }
-
-
-
-      // progress.setVisibility(View.INVISIBLE);
-      // recyclerView.setVisibility(View.VISIBLE);
-
-    }
-
-
-/**
-    public static class FetchCourseContent extends AsyncTask<String, Void, String>{
-
-        @Override
-        protected String doInBackground(String...params){
-
-            String courseUrl = params[0];
-
-
-            final Request request = new Request.Builder()
-                    .url(courseUrl)
-                    .get()
-                    .build();
-
-            Call newCall = okHttpClient.newCall(request);
-            newCall.enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.d("odgovor", "neuspjesno");
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-
-                    Document document = Jsoup.parse(response.body().string());
-                    Log.d("helo", document.html());
-
-                }
-            });
-
-
-
-
-            return "done";
-        }
-
-        @Override
-        protected void onPreExecute(){
-
-        }
-
-        @Override
-        protected void onPostExecute(String result){
-
-
-        }
-
-    }
-
-*/
 
 }

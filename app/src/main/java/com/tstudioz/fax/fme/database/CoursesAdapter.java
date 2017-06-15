@@ -82,9 +82,6 @@ public class CoursesAdapter extends RecyclerView.Adapter<CoursesAdapter.CoursesV
         }
 
 
-
-
-
 }
 
 
