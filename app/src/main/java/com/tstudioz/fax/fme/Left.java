@@ -85,6 +85,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
             .build();
 
     Snackbar snack;
+    EmployeeRVAdapterTable adapterPonTemp, adapterUtoTemp, adapterSriTemp, adapterCetTemp, adapterPetTemp, adapterSubTemp;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -186,28 +187,35 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         String sDay = sday.format(kal.getTime());
         String sYear = syear.format(kal.getTime());
 
-        //Toast.makeText(getContext(), "Ponediljak: " + mMonth + " " + mDay + " " + mYear, Toast.LENGTH_SHORT).show();
-        //Toast.makeText(getContext(), "Subota: " + sMonth + " " + sDay + " " + sYear, Toast.LENGTH_SHORT).show();
-
-        new MojRaspored().execute(mMonth, mDay, mYear, sMonth, sDay, sYear);
+        mojRaspored(mMonth, mDay, mYear, sMonth, sDay, sYear);
         mOdaberiDan.setText("Raspored za " + mDay + "." + mMonth + " - " + sDay + "." + sMonth);
 
-        fetchMeSomething(kal);
     }
 
-    private class MojRaspored extends AsyncTask<String, Void, String> {
+    public void mojRaspored(String mMonth, String mDay, String mYear, String sMonth, String sDay, String sYear) {
 
-        @Override
-        protected String doInBackground(String... params) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mLinearParent.setVisibility(View.INVISIBLE);
+                    mRasporedProgress.setVisibility(View.VISIBLE);
+                    showPonTemp();
+                    showUtoTemp();
+                    showSriTemp();
+                    showCetTemp();
+                    showPetTemp();
+                    showSubTemp();
+
+                }
+            });
 
             Realm rlm = Realm.getInstance(CredRealmCf);
             Korisnik kor = rlm.where(Korisnik.class).findFirst();
 
-
             OkHttpClient client = new OkHttpClient();
 
             final Request request = new Request.Builder()
-                    .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + params[0] + "%2F" +  params[1] + "%2F" + params[2] + "%2022%3A44%3A48&MaxDate=" + params[3] + "%2F" + params[4] + "%2F" + params[5] + "%2022%3A44%3A48")
+                    .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + mMonth + "%2F" +  mDay + "%2F" + mYear + "%2022%3A44%3A48&MaxDate=" + sMonth + "%2F" + sDay + "%2F" + sYear + "%2022%3A44%3A48")
                     .get()
                     .build();
 
@@ -225,257 +233,103 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
                         String kod = String.valueOf(response.code());
 
-
                         if (response.code() == 500) {
-                            cancel(true);
 
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(getActivity(), "Došlo je do pogreške. Pokušajte ponovno.", Toast.LENGTH_SHORT).show();
+                                    showSnackError();
                                 }
                             });
 
-                        }
+                        } else {
 
-                        Document doc = Jsoup.parse(response.body().string());
+                            Document doc = Jsoup.parse(response.body().string());
 
-                        Realm trealm = Realm.getInstance(tempRealm);
-                        trealm.beginTransaction();
-                        RealmResults<Predavanja> svaPredavanja = trealm.where(Predavanja.class).findAll();
-                        svaPredavanja.deleteAllFromRealm();
-                        trealm.commitTransaction();
+                            Realm trealm = Realm.getInstance(tempRealm);
+                            trealm.beginTransaction();
+                            RealmResults<Predavanja> svaPredavanja = trealm.where(Predavanja.class).findAll();
+                            svaPredavanja.deleteAllFromRealm();
+                            trealm.commitTransaction();
 
-                        if (response.isSuccessful()) {
-
-
-                            Log.d("moj odgovor ", "ODGOVOR JE USPJESAN");
-
-                            Elements elements = doc.select("div.event");
+                            if (response.isSuccessful()) {
 
 
-                            try {
+                                Log.d("moj odgovor ", "ODGOVOR JE USPJESAN");
 
-                                trealm.beginTransaction();
-
-                                for (final Element e : elements) {
+                                Elements elements = doc.select("div.event");
 
 
-                                    Predavanja predavanja = trealm.createObject(Predavanja.class, UUID.randomUUID().toString());
+                                try {
 
-                                    if (e.hasAttr("data-id")) {
-                                        String attr = e.attr("data-id");
-                                        predavanja.setObjectId(Integer.parseInt(attr));
+                                    trealm.beginTransaction();
+
+                                    for (final Element e : elements) {
+
+
+                                        Predavanja predavanja = trealm.createObject(Predavanja.class, UUID.randomUUID().toString());
+
+                                        if (e.hasAttr("data-id")) {
+                                            String attr = e.attr("data-id");
+                                            predavanja.setObjectId(Integer.parseInt(attr));
+                                        }
+
+                                        predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
+                                        predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
+                                        predavanja.setRasponVremena(e.select("div.timespan").text());
+                                        predavanja.setGrupa(e.select("span.group.normal").text());
+                                        predavanja.setGrupaShort(e.select("span.group.short").text());
+                                        predavanja.setDvorana(e.select("span.resource").text());
+                                        predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
+                                        predavanja.setProfesor(e.select("div.detailItem.user").text());
+
+
                                     }
 
-                                    predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
-                                    predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
-                                    predavanja.setRasponVremena(e.select("div.timespan").text());
-                                    predavanja.setGrupa(e.select("span.group.normal").text());
-                                    predavanja.setGrupaShort(e.select("span.group.short").text());
-                                    predavanja.setDvorana(e.select("span.resource").text());
-                                    predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
-                                    predavanja.setProfesor(e.select("div.detailItem.user").text());
+                                    trealm.commitTransaction();
 
+
+                                } finally {
+
+                                    trealm.close();
 
                                 }
-
-                                trealm.commitTransaction();
 
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        showPonTemp();
+                                        updateTemporaryWeek();
+
+                                        if(adapterSubTemp.getItemCount() > 0) {
+                                            mLinearParent.setWeightSum(6);
+                                            mLinearSub.setVisibility(View.VISIBLE);
+                                            mLinearParent.invalidate();
+                                        }else {
+                                            mLinearSub.setVisibility(View.INVISIBLE);
+                                            mLinearParent.setWeightSum(5);
+                                            mLinearParent.invalidate();
+                                        }
+
+                                        mRasporedProgress.setVisibility(View.INVISIBLE);
+                                        mLinearParent.setVisibility(View.VISIBLE);
                                     }
                                 });
-
-                            } finally {
-
-                                trealm.close();
-
                             }
-
-
                         }
-                    } catch (IOException e) {
-                        Log.e(TAG, "Exception caught: ", e);
-                    }
-
-
-                }
-            });
-
-
-        return "str";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-
-                    showPonTemp();
-                    showUtoTemp();
-                    showSriTemp();
-                    showCetTemp();
-                    showPetTemp();
-                    showSubTemp();
-
-                    mRasporedProgress.setVisibility(View.INVISIBLE);
-                    mLinearParent.setVisibility(View.VISIBLE);
-
-
-                }
-            });
-
-
-
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-            mLinearParent.setVisibility(View.INVISIBLE);
-            mRasporedProgress.setVisibility(View.VISIBLE);
-
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-        }
-    }
-
-    public void fetchMeSomething(Calendar calS){
-
-        /**
-         *
-         *
-        Realm rlm = Realm.getInstance(CredRealmCf);
-        Korisnik kor = rlm.where(Korisnik.class).findFirst();
-
-
-
-        Log.d("pon funkcija", calM.getTime() + smonth.format(calM.getTime()) + sday.format(calM.getTime()) + syear.format(calM.getTime()));
-        Log.d("sub funkcija", kalendarjebeniglupiodjebimivisestimjebenimsranjima.getTime() + smonth.format(kalendarjebeniglupiodjebimivisestimjebenimsranjima.getTime()) + sday.format(kalendarjebeniglupiodjebimivisestimjebenimsranjima.getTime()) + syear.format(kalendarjebeniglupiodjebimivisestimjebenimsranjima.getTime()));
-
-        OkHttpClient client = new OkHttpClient();
-
-        final Request request = new Request.Builder()
-                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + dfmonth.format(c.getTime()) + "%2F" +  dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" + smonth.format(s.getTime()) + "%2F" + sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
-                .get()
-                .build();
-
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "Exception caught", e);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
-                try {
-
-                    String kod = String.valueOf(response.code());
-
-
-                    if (response.code() == 500) {
-
-                   //     Toast.makeText(getActivity(), "Došlo je do pogreške. Pokušajte ponovno.", Toast.LENGTH_SHORT).show();
-
-                    }
-
-                    Document doc = Jsoup.parse(response.body().string());
-                    Log.e("moj kod", doc.body().text());
-
-                    Realm trealm = Realm.getInstance(tempRealm);
-                    trealm.beginTransaction();
-                    RealmResults<Predavanja> svaPredavanja = trealm.where(Predavanja.class).findAll();
-                    svaPredavanja.deleteAllFromRealm();
-                    trealm.commitTransaction();
-
-                    if (response.isSuccessful()) {
-
-
-                        Log.d("moj odgovor ", "ODGOVOR JE USPJESAN");
-
-                        Elements elements = doc.select("div.event");
-
-
-                        try {
-
-                            trealm.beginTransaction();
-
-                            for (final Element e : elements) {
-
-
-                                Predavanja predavanja = trealm.createObject(Predavanja.class, UUID.randomUUID().toString());
-
-                                if (e.hasAttr("data-id")) {
-                                    String attr = e.attr("data-id");
-                                    predavanja.setObjectId(Integer.parseInt(attr));
-                                }
-
-                                predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
-                                predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
-                                predavanja.setRasponVremena(e.select("div.timespan").text());
-                                predavanja.setGrupa(e.select("span.group.normal").text());
-                                predavanja.setGrupaShort(e.select("span.group.short").text());
-                                predavanja.setDvorana(e.select("span.resource").text());
-                                predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
-                                predavanja.setProfesor(e.select("div.detailItem.user").text());
-
-
-                            }
-
-                            trealm.commitTransaction();
-
-
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    showPonTemp();
-                                    showUtoTemp();
-                                    showSriTemp();
-                                    showCetTemp();
-                                    showPetTemp();
-                                    showSubTemp();
-
-                                    Toast.makeText(getActivity(), "ovo je kraj responsa", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-
-                        } finally {
-
-                            trealm.close();
-
+                        } catch(IOException e){
+                            Log.e(TAG, "Exception caught: ", e);
                         }
 
-
                     }
-                } catch (IOException e) {
-                    Log.e(TAG, "Exception caught: ", e);
-                }
 
 
-            }
-
-        });
-
-  */
-
-    }
+            });
+        }
 
     public void showPon(){
 
         Realm.init(getActivity().getBaseContext());
         Realm mrealm = Realm.getDefaultInstance();
-
-
 
         mrealm.beginTransaction();
         RealmResults<Predavanja> rezulatiPon = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
@@ -485,9 +339,6 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         mRecyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerPon.setHasFixedSize(true);
         mRecyclerPon.setAdapter(adapter);
-
-
-
 
     }
 
@@ -499,13 +350,10 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         RealmResults<Predavanja> rezulatiPon1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
         trealm.commitTransaction();
 
-        EmployeeRVAdapterTable adapter = new EmployeeRVAdapterTable(rezulatiPon1);
+        adapterPonTemp = new EmployeeRVAdapterTable(rezulatiPon1);
         mRecyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerPon.setHasFixedSize(true);
-        mRecyclerPon.setAdapter(adapter);
-
-
-
+        mRecyclerPon.setAdapter(adapterPonTemp);
 
     }
 
@@ -534,10 +382,10 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         RealmResults<Predavanja> rezulatiUto1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
         trealm.commitTransaction();
 
-        EmployeeRVAdapterTable adapter2 = new EmployeeRVAdapterTable(rezulatiUto1);
+        adapterUtoTemp = new EmployeeRVAdapterTable(rezulatiUto1);
         recyclerUto.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerUto.setHasFixedSize(true);
-        recyclerUto.setAdapter(adapter2);
+        recyclerUto.setAdapter(adapterUtoTemp);
 
     }
 
@@ -566,10 +414,10 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         RealmResults<Predavanja> rezulatiSri1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
         trealm.commitTransaction();
 
-        EmployeeRVAdapterTable adapter3 = new EmployeeRVAdapterTable(rezulatiSri1);
+        adapterSriTemp = new EmployeeRVAdapterTable(rezulatiSri1);
         recyclerSri.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerSri.setHasFixedSize(true);
-        recyclerSri.setAdapter(adapter3);
+        recyclerSri.setAdapter(adapterSriTemp);
 
     }
 
@@ -597,10 +445,10 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         RealmResults<Predavanja> rezulatiCet1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
         trealm.commitTransaction();
 
-        EmployeeRVAdapterTable adapter4 = new EmployeeRVAdapterTable(rezulatiCet1);
+        adapterCetTemp = new EmployeeRVAdapterTable(rezulatiCet1);
         recyclerCet.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerCet.setHasFixedSize(true);
-        recyclerCet.setAdapter(adapter4);
+        recyclerCet.setAdapter(adapterCetTemp);
 
     }
 
@@ -622,17 +470,16 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showPetTemp(){
 
-
         Realm trealm = Realm.getInstance(tempRealm);
 
         trealm.beginTransaction();
         RealmResults<Predavanja> rezulatiPet1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
         trealm.commitTransaction();
 
-        EmployeeRVAdapterTable adapter5 = new EmployeeRVAdapterTable(rezulatiPet1);
+        adapterPetTemp = new EmployeeRVAdapterTable(rezulatiPet1);
         mRecyclerPet.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerPet.setHasFixedSize(true);
-        mRecyclerPet.setAdapter(adapter5);
+        mRecyclerPet.setAdapter(adapterPetTemp);
 
     }
 
@@ -661,29 +508,39 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showSubTemp(){
 
-
-
-
         Realm trealm = Realm.getInstance(tempRealm);
 
         trealm.beginTransaction();
         RealmResults<Predavanja> rezulatiSub1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
         trealm.commitTransaction();
 
-        if(!rezulatiSub1.isEmpty()) {
 
-                    mLinearParent.setWeightSum(6);
-                    mLinearSub.setVisibility(View.VISIBLE);
-                    mLinearParent.invalidate();
 
-            EmployeeRVAdapterTable adapter6 = new EmployeeRVAdapterTable(rezulatiSub1);
+     /**       mLinearParent.setWeightSum(6);
+            mLinearSub.setVisibility(View.VISIBLE);
+            mLinearParent.invalidate();
+
+      */
+
+            adapterSubTemp = new EmployeeRVAdapterTable(rezulatiSub1);
             mRecyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
-            mRecyclerSub.setAdapter(adapter6);
-        }else{
-                    mLinearSub.setVisibility(View.INVISIBLE);
-                    mLinearParent.setWeightSum(5);
-                    mLinearParent.invalidate();
-        }
+            mRecyclerSub.setAdapter(adapterSubTemp);
+
+       /**     mLinearSub.setVisibility(View.INVISIBLE);
+            mLinearParent.setWeightSum(5);
+            mLinearParent.invalidate();
+
+        */
+
+    }
+
+    public void updateTemporaryWeek(){
+        adapterPonTemp.notifyDataSetChanged();
+        adapterUtoTemp.notifyDataSetChanged();
+        adapterSriTemp.notifyDataSetChanged();
+        adapterCetTemp.notifyDataSetChanged();
+        adapterPetTemp.notifyDataSetChanged();
+        adapterSubTemp.notifyDataSetChanged();
     }
 
 
@@ -720,6 +577,13 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
             }
         });
         snack.setActionTextColor(getResources().getColor(R.color.white));
+        snack.show();
+    }
+
+    public void showSnackError(){
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške pri dohvaćanju rasporeda", Snackbar.LENGTH_SHORT);
+        View vjuzs = snack.getView();
+        vjuzs.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.show();
     }
 
