@@ -68,25 +68,43 @@
                 android:padding="10dp"
                 android:hint="Lozinka"/>
 
-            <Button
-                android:id="@+id/login_button"
+            <FrameLayout
+                android:id="@+id/framebutton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="80dp"
                 android:layout_below="@+id/login_pass"
-                android:layout_marginRight="80dp"
-                android:background="@drawable/button_blue"
-                android:textColor="@color/white"
-                android:padding="15dp"
-                android:text="Prijava"/>
+                android:layout_marginRight="80dp" >
+
+                <ProgressBar
+                    android:id="@+id/progress_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:progressTint="@color/white"
+                    android:indeterminate="true"
+                    android:layout_gravity="center_horizontal"
+                     android:visibility="invisible"
+                    />
+
+                <Button
+                    android:id="@+id/login_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_blue"
+                    android:textColor="@color/white"
+                    android:padding="15dp"
+                    android:text="Prijava" />
+
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/login_pomoc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:layout_below="@+id/login_button"
+                android:layout_below="@+id/framebutton"
                 android:layout_centerHorizontal="true"
                 android:textAlignment="center"
                 android:textColor="@color/white"
@@ -94,9 +112,6 @@
                 android:textSize="11dp"
                 android:text="Pomoć"/>
         </RelativeLayout>
-
-
-
     </FrameLayout>
 
 

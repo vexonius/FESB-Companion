@@ -12,8 +12,10 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".activities.LoginActivity"
-                  android:theme="@style/AppTheme.Simple">
+        <activity
+            android:name=".activities.LoginActivity"
+            android:theme="@style/AppTheme.Simple"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,20 +24,28 @@
         </activity>
         <activity
             android:name=".activities.PredmetActivity"
-            android:screenOrientation="portrait"
             android:label="ELEKTRONIKA"
             android:parentActivityName=".activities.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.NoteActivity"
             android:label=""
             android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activities.MainActivity"
-            android:screenOrientation="portrait"
             android:label="FESB Companion"
-            android:theme="@style/AppTheme"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
+            />
+        <activity
+            android:name=".activities.CourseActivity"
+            android:parentActivityName=".activities.MainActivity"
+            android:label=" "
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

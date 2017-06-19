@@ -10,9 +10,6 @@ import com.tstudioz.fax.fme.R;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-/**
- * Created by amarthus on 09-May-17.
- */
 
 public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.CoursesWeeksViewHolder> implements RealmChangeListener {
     private RealmResults<KolegijTjedan> tjedni;
@@ -60,8 +57,6 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
             mWeekDesc = (TextView) itemView.findViewById(R.id.tjedanOpis);
             regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Regular.ttf");
             mWeekDesc.setTypeface(regulartf);
-
-
             itemView.setOnClickListener(this);
         }
 
@@ -70,19 +65,12 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
 
 
         }
-
-
     }
-
 
     @Override
     public void onChange(Object element) {
         notifyDataSetChanged();
     }
-
-
-
-
 
 }
 

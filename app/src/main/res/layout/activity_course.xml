@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.tstudioz.fax.fme.activities.CourseActivity"
+    android:background="@color/colorPrimaryDark">
+
+    <FrameLayout
+        android:id="@+id/course_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="24dp"
+            android:text="Prazna activity"
+            android:textColor="@color/white"
+            android:textAlignment="center"/>
+    </FrameLayout>
+
+</RelativeLayout>

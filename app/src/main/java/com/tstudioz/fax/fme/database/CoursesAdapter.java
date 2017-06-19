@@ -2,6 +2,8 @@ package com.tstudioz.fax.fme.database;
 
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.activities.CourseActivity;
 import com.tstudioz.fax.fme.activities.MainActivity;
 import com.tstudioz.fax.fme.fragments.Kolegiji;
 
@@ -65,10 +68,13 @@ public class CoursesAdapter extends RecyclerView.Adapter<CoursesAdapter.CoursesV
 
         @Override
         public void onClick(View view) {
-         //   Kolegij course = kolegijs.get(getAdapterPosition());
-         //   Toast.makeText(view.getContext(), course.getLink(), Toast.LENGTH_SHORT).show();
-//
-         //   new Kolegiji().fetchCourseContent(course.getLink(), view.getContext());
+            Context context = view.getContext();
+            Kolegij kolegiji = kolegijs.get(getAdapterPosition());
+
+            Intent intent = new Intent(context, CourseActivity.class);
+            intent.putExtra("kolegij", kolegiji.getName());
+            intent.putExtra("link_na_kolegij", kolegiji.getLink());
+            context.startActivity(intent);
 
         }
 

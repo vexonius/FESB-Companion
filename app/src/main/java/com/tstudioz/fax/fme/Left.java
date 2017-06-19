@@ -5,7 +5,6 @@ package com.tstudioz.fax.fme;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -20,8 +19,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
-
 
 import com.google.android.gms.ads.NativeExpressAdView;
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog;
@@ -234,7 +231,6 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
                         String kod = String.valueOf(response.code());
 
                         if (response.code() == 500) {
-
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -514,23 +510,9 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         RealmResults<Predavanja> rezulatiSub1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
         trealm.commitTransaction();
 
-
-
-     /**       mLinearParent.setWeightSum(6);
-            mLinearSub.setVisibility(View.VISIBLE);
-            mLinearParent.invalidate();
-
-      */
-
-            adapterSubTemp = new EmployeeRVAdapterTable(rezulatiSub1);
-            mRecyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
-            mRecyclerSub.setAdapter(adapterSubTemp);
-
-       /**     mLinearSub.setVisibility(View.INVISIBLE);
-            mLinearParent.setWeightSum(5);
-            mLinearParent.invalidate();
-
-        */
+         adapterSubTemp = new EmployeeRVAdapterTable(rezulatiSub1);
+         mRecyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
+         mRecyclerSub.setAdapter(adapterSubTemp);
 
     }
 

@@ -103,10 +103,6 @@ public class MainActivity extends AppCompatActivity {
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
 
-
- /**       SharedPreferences sharedPref1 = PreferenceManager.getDefaultSharedPreferences(this);
-        final String user = sharedPref1.getString("korisnik", null);
-  */
         Realm realmLog = Realm.getInstance(CredRealmCf);
 
         if (!realmLog.isEmpty()) {
@@ -162,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 switch (position) {
-
                     default:
 
                     case 0:
@@ -325,12 +320,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-         //   SharedPreferences sharedPref2 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        //    final String user = sharedPref2.getString("korisnik", null);
-
             Realm rlm = Realm.getInstance(CredRealmCf);
             Korisnik kor = rlm.where(Korisnik.class).findFirst();
-
 
             // Get calendar set to current date and time
             Calendar c = Calendar.getInstance();

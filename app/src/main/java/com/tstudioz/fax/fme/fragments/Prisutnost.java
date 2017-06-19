@@ -5,13 +5,11 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,7 +18,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-
 
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
@@ -57,7 +54,6 @@ import okhttp3.Response;
 
 public class Prisutnost extends Fragment {
 
-
     final RealmConfiguration realmConfig = new RealmConfiguration.Builder()
             .name("prisutnost.realm")
             .schemaVersion(10)
@@ -86,11 +82,8 @@ public class Prisutnost extends Fragment {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.prisutnost_tab, container, false);
 
-
         ButterKnife.inject(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        Log.d("logasync", "ovo je onCreateView");
 
         showRecyclerviewWinterSem();
         showRecyclerviewSummerSem();
@@ -108,16 +101,6 @@ public class Prisutnost extends Fragment {
 
     }
 
-
-
-  /**  public class FetchPrisutnost extends AsyncTask<String, Void, String> {
-
-
-        @Override
-        protected String doInBackground(String... params) {
-
-  */
-
   public void fetchPrisutnost(){
 
             final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
@@ -127,21 +110,6 @@ public class Prisutnost extends Fragment {
                     .followSslRedirects(true)
                     .cookieJar(cookieJar)
                     .build();
-
-            Request request = new Request.Builder()
-                    .url("https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb.unist.hr")
-                    .get()
-                    .build();
-
-            Call call = okHttpClient.newCall(request);
-            call.enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.d("pogreska", "failure");
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
 
                     Realm cRealm = Realm.getInstance(CredRealmCf);
                     Korisnik korisnik = cRealm.where(Korisnik.class).findFirst();
@@ -243,7 +211,6 @@ public class Prisutnost extends Fragment {
 
                                                             mDolazak.setTotal(Integer.parseInt(max));
 
-
                                                         }
                                                     }
                                                 });
@@ -318,13 +285,6 @@ public class Prisutnost extends Fragment {
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Log.d("logasync", "ovo je kraj asynca");
-                                        }
-                                    });
-
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
                                             updateAdapters();
                                             mProgress.setVisibility(View.INVISIBLE);
                                             mNested.setVisibility(View.VISIBLE);
@@ -338,11 +298,6 @@ public class Prisutnost extends Fragment {
                         }
                     });
 
-
-                }
-            });
-
-
     }
 
     public void showRecyclerviewWinterSem() {
@@ -351,16 +306,9 @@ public class Prisutnost extends Fragment {
         RealmResults<Dolazak> dolasciWinter = mRealm.where(Dolazak.class).equalTo("semestar", 1).findAll();
 
         zRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-         winterAdapter = new DolasciAdapter(dolasciWinter);
+        winterAdapter = new DolasciAdapter(dolasciWinter);
         zRecyclerview.setAdapter(winterAdapter);
 
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("logasync", "ovo je recycler winter");
-            }
-        });
 
     }
 
@@ -372,14 +320,6 @@ public class Prisutnost extends Fragment {
         lRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         summerAdapter= new DolasciAdapter(dolasciSummer);
         lRecyclerview.setAdapter(summerAdapter);
-
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("logasync", "ovo je recycler summer");
-            }
-        });
 
     }
 
@@ -397,7 +337,6 @@ public class Prisutnost extends Fragment {
 
     public void startFetching(){
         if(isNetworkAvailable()) {
-          //  new FetchPrisutnost().execute();
             fetchPrisutnost();
         }else {
             showSnacOffline();
@@ -409,12 +348,12 @@ public class Prisutnost extends Fragment {
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.setAction("PONOVI", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        snack.dismiss();
-                        startFetching();
-                    }
-                });
+            @Override
+            public void onClick(View v) {
+                snack.dismiss();
+                startFetching();
+            }
+        });
         snack.setActionTextColor(getResources().getColor(R.color.white));
         snack.show();
     }

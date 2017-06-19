@@ -4,7 +4,6 @@ package com.tstudioz.fax.fme.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,14 +15,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.CourseWeeksAdapter;
-import com.tstudioz.fax.fme.database.CoursesAdapter;
-import com.tstudioz.fax.fme.database.Kolegij;
 import com.tstudioz.fax.fme.database.KolegijTjedan;
+import com.tstudioz.fax.fme.database.Korisnik;
+
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -55,19 +55,23 @@ public class CourseWeek extends Fragment {
             .schemaVersion(9)
             .build();
 
+    public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
+            .name("encrypted.realm")
+            .schemaVersion(5)
+            .deleteRealmIfMigrationNeeded()
+            .build();
+
+    CourseWeeksAdapter adapter;
 
     @InjectView(R.id.course_week_rv) RecyclerView mRecyclerView;
     @InjectView(R.id.course_week_progress) ProgressBar mProgress;
-
-
-    public Activity activity;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //set the layout you want to display in First Fragment
+        String link = getArguments().getString("link_kolegija");
         View view = inflater.inflate(R.layout.course_weeks_tab,
                 container, false);
 
@@ -75,34 +79,136 @@ public class CourseWeek extends Fragment {
         ButterKnife.inject(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        final Realm mRealm = Realm.getInstance(realmConfig);
+        Log.d("link", link);
 
-        final RealmResults<KolegijTjedan> tjedni = mRealm.where(KolegijTjedan.class).findAll();
-
-
-
-        if(!tjedni.isEmpty()) {
-            CourseWeeksAdapter adapter = new CourseWeeksAdapter(tjedni);
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setAdapter(adapter);
-
-
-             mProgress.setVisibility(View.INVISIBLE);
-             mRecyclerView.setVisibility(View.VISIBLE);
-        }
+        fetchCourseContent(link);
 
         return  view;
     }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.refresMe).setVisible(false);
-        super.onPrepareOptionsMenu(menu);
+    public void fetchCourseContent(final String url){
+
+        CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mRecyclerView.setVisibility(View.INVISIBLE);
+                mProgress.setVisibility(View.VISIBLE);
+                showWeeks();
+            }
+        });
+
+
+        final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .cookieJar(cookieJar)
+                .build();
+
+        Realm tRealm = Realm.getInstance(CredRealmCf);
+        Korisnik korisnik = tRealm.where(Korisnik.class).findFirst();
+
+        final RequestBody formData = new FormBody.Builder()
+                .add("Username", korisnik.getUsername())
+                .add("Password", korisnik.getLozinka())
+                .add("IsRememberMeChecked", "true")
+                .build();
+
+        Request rq = new Request.Builder()
+                .url("https://korisnik.fesb.unist.hr/prijava?returnURL=https://elearning.fesb.unist.hr/login/index.php")
+                .post(formData)
+                .build();
+
+
+        Call call = okHttpClient.newCall(rq);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("pogreska", "failure");
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                Request request = new Request.Builder()
+                        .url(url)
+                        .get()
+                        .build();
+
+                Call call1 = okHttpClient.newCall(request);
+                call1.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.d("pogreska", "failure");
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+
+                        Document doc = Jsoup.parse(response.body().string());
+
+                        final Realm mRealm = Realm.getInstance(realmConfig);
+                        final RealmResults<KolegijTjedan> tjedni = mRealm.where(KolegijTjedan.class).findAll();
+                        mRealm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                tjedni.deleteAllFromRealm();
+                            }
+                        });
+                        try {
+
+                            Element content = doc.select("div.course-content").first();
+                            Elements welements = content.getElementsByClass("weekdates");
+                            Elements selements = content.getElementsByClass("section main clearfix");
+                            Elements delements = content.getElementsByClass("no-overflow");
+
+
+                            mRealm.beginTransaction();
+
+                            for (Element element : selements) {
+
+                                KolegijTjedan kolegijTjedan = mRealm.createObject(KolegijTjedan.class);
+
+                                kolegijTjedan.setTjedan(element.select("div.content > h3").text());
+                                kolegijTjedan.setOpis(element.getElementsByClass("no-overflow").first().text());
+
+                            }
+
+                            mRealm.commitTransaction();
+
+                        }finally {
+                            mRealm.close();
+                        }
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
+                                mProgress.setVisibility(View.INVISIBLE);
+                                mRecyclerView.setVisibility(View.VISIBLE);
+                            }
+                        });
+
+
+
+                    }
+
+                });
+            }
+        });
+
     }
 
+    public void showWeeks(){
+        final Realm mRealm = Realm.getInstance(realmConfig);
+        final RealmResults<KolegijTjedan> tjedni = mRealm.where(KolegijTjedan.class).findAll();
 
+        adapter = new CourseWeeksAdapter(tjedni);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setAdapter(adapter);
 
+    }
 
     @Override
     public void onStop(){
@@ -110,14 +216,4 @@ public class CourseWeek extends Fragment {
         Realm rlm = Realm.getInstance(realmConfig);
         rlm.close();
     }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-            activity = (Activity) context;
-
-    }
-
-
-
 }

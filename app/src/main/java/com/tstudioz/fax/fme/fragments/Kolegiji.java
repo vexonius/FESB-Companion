@@ -68,15 +68,12 @@ public class Kolegiji extends Fragment {
     @InjectView(R.id.kolegiji_rv) RecyclerView recyclerView;
     @InjectView(R.id.kolegij_progress) ProgressBar progress;
 
-
-    private Activity activity;
     CoursesAdapter kolegijiAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //set the layout you want to display in First Fragment
         View view = inflater.inflate(R.layout.kolegiji_tab,
                 container, false);
 
@@ -106,21 +103,6 @@ public class Kolegiji extends Fragment {
                     .followSslRedirects(true)
                     .cookieJar(cookieJar)
                     .build();
-
-            Request request = new Request.Builder()
-                    .url("https://korisnik.fesb.unist.hr/prijava?returnURL=https://elearning.fesb.unist.hr/login/index.php")
-                    .get()
-                    .build();
-
-            Call call = okHttpClient.newCall(request);
-            call.enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.d("pogreska", "failure");
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
 
                     Realm credRealm = Realm.getInstance(CredRealmCf);
                     Korisnik kor = credRealm.where(Korisnik.class).findFirst();
@@ -178,11 +160,6 @@ public class Kolegiji extends Fragment {
 
                         }
                     });
-                }
-            });
-
-
-
     }
 
     public void showList(){
@@ -201,125 +178,11 @@ public class Kolegiji extends Fragment {
         kolegijiAdapter.notifyDataSetChanged();
     }
 
-
-
-
     @Override
     public void onStop(){
         super.onStop();
         Realm rlm = Realm.getInstance(realmConfig);
         rlm.close();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-            activity = (Activity) context;
-
-    }
-
-
-
-    public void fetchCourseContent(final String url, Context context){
-
-        CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context));
-
-
-        final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
-                .followRedirects(true)
-                .followSslRedirects(true)
-                .cookieJar(cookieJar)
-                .build();
-
-        final RequestBody formData = new FormBody.Builder()
-                .add("Username", "temer00")
-                .add("Password", "Jc72028N")
-                .add("IsRememberMeChecked", "true")
-                .build();
-
-        final Request rq = new Request.Builder()
-                .url("https://korisnik.fesb.unist.hr/prijava")
-                .post(formData)
-                .get()
-                .build();
-
-        Call call = okHttpClient.newCall(rq);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("pogreska", "failure");
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
-
-
-                Request request = new Request.Builder()
-                        .url(url)
-                        .build();
-
-                Call call1 = okHttpClient.newCall(request);
-                call1.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        Log.d("pogreska", "failure");
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-
-                        Document doc = Jsoup.parse(response.body().string());
-                      //  Log.d("uradi mi to", doc.body().text());
-
-                        Element content = doc.select("div.course-content").first();
-
-                        Elements welements = content.getElementsByClass("weekdates");
-
-                        Elements selements = content.select("li.section");
-
-                        Elements delements = content.getElementsByClass("no-overflow");
-
-                          final Realm mRealm = Realm.getInstance(realmConfig);
-                          mRealm.beginTransaction();
-
-
-
-                          for(Element element : selements){
-
-                              KolegijTjedan kolegijTjedan = mRealm.createObject(KolegijTjedan.class);
-
-                              if(content.hasClass("weekdates")) {
-                                  kolegijTjedan.setTjedan(element.getElementsByClass("weekdates").first().text());
-                              }
-
-                              if(content.hasClass("no-overflow")) {
-                                  kolegijTjedan.setOpis(element.getElementsByClass("no-overflow").first().text());
-                              }
-
-
-                          }
-
-                        mRealm.commitTransaction();
-
-
-
-                        Log.d("prvi element", welements.first().text());
-                        Log.d("drugi element", delements.first().text());
-                        Log.d("glavni element", selements.first().toString());
-
-
-
-
-
-                    }
-
-                  });
-            }
-        });
-
-
-
     }
 
 }

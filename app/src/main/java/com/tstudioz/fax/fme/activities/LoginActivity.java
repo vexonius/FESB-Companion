@@ -13,21 +13,42 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.tstudioz.fax.fme.CircularAnim;
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.database.Kolegij;
 import com.tstudioz.fax.fme.database.Korisnik;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.CookieJar;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -63,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
         final RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.relative_login);
 
 
-        Button but = (Button)findViewById(R.id.login_button);
+        final Button but = (Button)findViewById(R.id.login_button);
         but.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,8 +133,6 @@ public class LoginActivity extends AppCompatActivity {
                                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                     }
                                 });
-
-
                     }
 
                 }else {
