@@ -171,7 +171,8 @@ public class CourseWeek extends Fragment {
                                 KolegijTjedan kolegijTjedan = mRealm.createObject(KolegijTjedan.class);
 
                                 kolegijTjedan.setTjedan(element.select("div.content > h3").text());
-                                kolegijTjedan.setOpis(element.getElementsByClass("no-overflow").first().text());
+
+                                kolegijTjedan.setOpis(element.select("div.summary").first().text());
 
                             }
 

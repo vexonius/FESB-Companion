@@ -19,7 +19,7 @@
        android:layout_marginRight="20dp"
        android:textSize="14dp"
        android:text="Tjedan"
-       android:textColor="@color/white"/>
+       android:textColor="@color/blue_nice"/>
 
     <TextView
         android:id="@+id/tjedanOpis"

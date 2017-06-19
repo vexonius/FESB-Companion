@@ -31,4 +31,8 @@ public class CourseActivity extends AppCompatActivity {
                 ft.addToBackStack(null);
                 ft.commit();
     }
+
+    public void onBackPressed(){
+        finish();
+    }
 }
