@@ -17,10 +17,7 @@
         android:layout_height="62dp"
         android:orientation="horizontal"
         android:background="#00c4ff"
-        android:gravity="center"
-        >
-
-
+        android:gravity="center">
         </RelativeLayout>
 
     <RelativeLayout
@@ -40,8 +37,9 @@
         android:layout_height="wrap_content"
         android:text="ELEKTRONIKA"
         android:paddingTop="8dp"
-        android:paddingLeft="10dp"
+        android:paddingLeft="14dp"
         android:paddingRight="10dp"
+        android:textAllCaps="true"
         android:paddingBottom="2dp"
         android:textStyle="bold"
         android:textColor="@color/cardview_light_background"
@@ -54,9 +52,9 @@
         android:layout_below="@+id/name"
         android:text="8.15 - 11.00"
         android:paddingBottom="5dp"
-        android:paddingLeft="10dp"
+        android:paddingLeft="14dp"
         android:textStyle="normal"
-        android:textColor="@color/cardview_light_background"
+        android:textColor="@color/_20white"
         android:textSize="12dp"/>
 
         <TextView
@@ -69,7 +67,7 @@
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:textStyle="normal"
-            android:textColor="@color/cardview_light_background"
+            android:textColor="@color/_20white"
             android:textSize="12dp"/>
 
         <TextView
@@ -82,7 +80,7 @@
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:textStyle="normal"
-            android:textColor="@color/cardview_light_background"
+            android:textColor="@color/_20white"
             android:textSize="12dp"/>
         <TextView
             android:id="@+id/seperator1"
@@ -94,7 +92,7 @@
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:textStyle="normal"
-            android:textColor="@color/cardview_light_background"
+            android:textColor="@color/_20white"
             android:textSize="12dp"/>
         <TextView
             android:id="@+id/mjesto"
@@ -106,7 +104,7 @@
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:textStyle="normal"
-            android:textColor="@color/cardview_light_background"
+            android:textColor="@color/_20white"
             android:textSize="12dp"/>
     </RelativeLayout>
 

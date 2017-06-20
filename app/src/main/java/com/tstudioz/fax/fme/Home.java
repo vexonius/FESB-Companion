@@ -357,8 +357,6 @@ public class Home extends Fragment{
         RealmResults<Predavanja> rezultati = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
         mrealm.commitTransaction();
 
-
-
         if (rezultati.isEmpty()) {
             recyclerView.setVisibility(View.INVISIBLE);
             np.setVisibility(View.VISIBLE);

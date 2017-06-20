@@ -23,6 +23,7 @@ public class EmployeeRVAdapter extends RecyclerView.Adapter<EmployeeRVAdapter.Em
     private RealmResults<Predavanja> mEmployees;
     Typeface boldtf;
     Typeface regulartf;
+    Typeface lighttf;
 
 
     public EmployeeRVAdapter(RealmResults<Predavanja> employee) {
@@ -41,7 +42,7 @@ public class EmployeeRVAdapter extends RecyclerView.Adapter<EmployeeRVAdapter.Em
 
         Predavanja predavanja = mEmployees.get(position);
         holder.name.setText(predavanja.getPredmetPredavanja());
-        holder.name.setTypeface(boldtf);
+        holder.name.setTypeface(regulartf);
 
         holder.type.setText(predavanja.getRasponVremena());
 
@@ -92,8 +93,9 @@ public class EmployeeRVAdapter extends RecyclerView.Adapter<EmployeeRVAdapter.Em
         public EmployeeViewHolder(View itemView) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.name);
+            lighttf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Light.ttf");
             boldtf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Bold.ttf");
-            name.setTypeface(boldtf);
+            name.setTypeface(regulartf);
 
             type = (TextView) itemView.findViewById(R.id.type);
             regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Regular.ttf");

@@ -31,10 +31,11 @@
                 android:layout_height="wrap_content"
                 android:text="Ponedjeljak"
                 android:textAlignment="center"
+                android:singleLine="true"
                 android:textColor="@color/white"
                 android:background="@color/colorPrimary"
                 android:padding="5dp"
-                android:textSize="9dp"/>
+                android:textSize="10dp"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerPon"
