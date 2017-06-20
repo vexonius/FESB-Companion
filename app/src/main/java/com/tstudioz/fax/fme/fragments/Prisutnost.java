@@ -85,11 +85,9 @@ public class Prisutnost extends Fragment {
         ButterKnife.inject(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        showRecyclerviewWinterSem();
-        showRecyclerviewSummerSem();
-
         mNested.setVisibility(View.INVISIBLE);
         mProgress.setVisibility(View.VISIBLE);
+
         startFetching();
 
         return view;
@@ -110,6 +108,21 @@ public class Prisutnost extends Fragment {
                     .followSslRedirects(true)
                     .cookieJar(cookieJar)
                     .build();
+
+                    final Realm nRealm = Realm.getInstance(realmConfig);
+                    final RealmResults<Dolazak> svaPrisutnost = nRealm.where(Dolazak.class).findAll();
+
+                    nRealm.beginTransaction();
+                    svaPrisutnost.deleteAllFromRealm();
+                    nRealm.commitTransaction();
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showRecyclerviewWinterSem();
+                            showRecyclerviewSummerSem();
+                        }
+                    });
 
                     Realm cRealm = Realm.getInstance(CredRealmCf);
                     Korisnik korisnik = cRealm.where(Korisnik.class).findFirst();
@@ -159,11 +172,6 @@ public class Prisutnost extends Fragment {
                                     Elements zimskiKolegiji = zimskaPredavanja.select("a");
 
                                     final Realm mRealm = Realm.getInstance(realmConfig);
-                                    final RealmResults<Dolazak> svaPrisutnost = mRealm.where(Dolazak.class).findAll();
-
-                                    mRealm.beginTransaction();
-                                    svaPrisutnost.deleteAllFromRealm();
-                                    mRealm.commitTransaction();
 
                                     mRealm.beginTransaction();
 

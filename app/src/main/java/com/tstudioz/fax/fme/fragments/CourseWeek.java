@@ -159,9 +159,8 @@ public class CourseWeek extends Fragment {
                         try {
 
                             Element content = doc.select("div.course-content").first();
-                            Elements welements = content.getElementsByClass("weekdates");
                             Elements selements = content.getElementsByClass("section main clearfix");
-                            Elements delements = content.getElementsByClass("no-overflow");
+
 
 
                             mRealm.beginTransaction();
@@ -188,8 +187,6 @@ public class CourseWeek extends Fragment {
                                 mRecyclerView.setVisibility(View.VISIBLE);
                             }
                         });
-
-
 
                     }
 

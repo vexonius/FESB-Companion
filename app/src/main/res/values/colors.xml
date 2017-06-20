@@ -8,6 +8,7 @@
     <color name="white">#ffffff</color>
     <color name="_20white">#70ffffff</color>
     <color name="_10white">#26FFFFFF</color>
+    <color name="_70white">#aeffffff</color>
     <color name="left_color">#006735</color>
     <color name="right_color">#263238</color>
     <color name="my_color">#1d1d1d</color>

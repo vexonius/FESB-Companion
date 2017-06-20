@@ -20,5 +20,8 @@
     <string name="native_left">ca-app-pub-5944203368510130/6801293807</string>
     <string name="interstitial_note">ca-app-pub-5944203368510130/2813576206</string>
     <string name="petak">petak</string>
+    <string name="odmori_se">Odmori se, danas nemaš obaveza!</string>
+    <string name="danasnja_predavanja">DANAŠNJA PREDAVANJA</string>
+    <string name="nema_biljeski">Trenutno nema bilješki</string>
 
 </resources>

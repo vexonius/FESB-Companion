@@ -23,6 +23,7 @@
 
   <FrameLayout
       android:id="@+id/frameLayout"
+      android:elevation="8dp"
       android:background="@color/colorPrimary"
       android:layout_width="match_parent"
       android:layout_height="180dp"
@@ -37,16 +38,15 @@
           android:progress="@android:integer/config_mediumAnimTime"
           android:indeterminate="true"
           android:progressTint="@color/colorAccent"
-          android:visibility="visible"
-          />
+          android:visibility="visible" />
 
     <RelativeLayout
+        android:id="@+id/card_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
-        android:id="@+id/card_home"
         android:background="@color/colorPrimary"
-        android:elevation="5dp"
+        android:foreground="?android:attr/selectableItemBackground"
         android:visibility="invisible">
 
         <TextView
@@ -86,8 +86,6 @@
 
                 </RelativeLayout>
 
-
-
             </LinearLayout>
 
             <LinearLayout
@@ -124,13 +122,11 @@
                     android:orientation="horizontal"
                     android:weightSum="3">
 
-
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:layout_gravity="center">
-
 
                         <TextView
                             android:id="@+id/trenutni_vjetar"
@@ -166,8 +162,7 @@
                             android:text=""
                             android:textSize="12dp"
                             android:textAlignment="center"
-                            android:textColor="#ffffff"
-                            />
+                            android:textColor="#ffffff" />
 
                         <ImageView
                             android:id="@+id/vlaznost"
@@ -177,8 +172,7 @@
                             android:layout_below="@+id/vlaznost_vrijednost"
                             android:layout_centerHorizontal="true"
                             android:src="@drawable/vlaga"
-                            android:scaleType="centerInside"
-                            />
+                            android:scaleType="centerInside" />
 
                     </RelativeLayout>
 
@@ -187,7 +181,6 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center">
-
 
                         <TextView
                             android:id="@+id/oborine_vrijednost"
@@ -211,8 +204,6 @@
 
                     </RelativeLayout>
 
-
-
                 </LinearLayout>
 
             </LinearLayout>
@@ -232,6 +223,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         android:gravity="center"
+        android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true">
 
             <TextView
@@ -239,7 +231,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="7dp"
-                android:text="Trenutno nema bilješki"
+                android:text="@string/nema_biljeski"
                 android:textSize="16dp"
                 android:scrollbarStyle="outsideInset"
                 android:scrollbarThumbVertical="@color/_20white"
@@ -266,7 +258,7 @@
         android:id="@+id/pr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="DANAŠNJA PREDAVANJA"
+        android:text="@string/danasnja_predavanja"
         android:layout_marginTop="10dp"
         android:textStyle="bold"
         android:textSize="13dp"
@@ -327,7 +319,7 @@
                 android:layout_below="@+id/smile"
                 android:layout_marginTop="15dp"
                 android:textAlignment="center"
-                android:text="Odmori se, danas nemaš obaveza!"
+                android:text="@string/odmori_se"
                 android:paddingBottom="20dp"
                 android:textColor="#cacaca"
                 android:textSize="14dp"/>
