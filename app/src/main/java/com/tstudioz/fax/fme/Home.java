@@ -115,15 +115,14 @@ public class Home extends Fragment{
                     .build();
             adView.loadAd(request);
         }
-
                    */
 
-     /**       try {
+          try {
                 start();
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-      */
+
 
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -168,7 +167,6 @@ public class Home extends Fragment{
                 Intent newIntent = new Intent(getActivity(), NoteActivity.class);
                 startActivity(newIntent);
 
-
             }
         });
 
@@ -190,10 +188,8 @@ public class Home extends Fragment{
         });
 
 
-
         setHasOptionsMenu(true);
         return view;
-
 
     }
 

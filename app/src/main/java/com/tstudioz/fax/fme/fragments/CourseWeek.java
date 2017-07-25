@@ -77,8 +77,6 @@ public class CourseWeek extends Fragment {
         ButterKnife.inject(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        Log.d("link", link);
-
         fetchCourseContent(link);
 
         return  view;

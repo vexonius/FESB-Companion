@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     public String date = null;
     public AlertDialog alertDialog;
+    public long back_pressed;
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
             .name("glavni.realm")
@@ -307,11 +308,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-            if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
-                getSupportFragmentManager().popBackStack();
-            } else {
+            if (back_pressed + 2000 > System.currentTimeMillis()){
                 finish();
+            } else {
+                Snackbar mSnack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Pritisnite nazad za izlazak iz aplikacije", Snackbar.LENGTH_SHORT);
+                View viewto = mSnack.getView();
+                viewto.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.grey_nice));
+                mSnack.show();
             }
+
+            back_pressed= System.currentTimeMillis();
         }
 
 

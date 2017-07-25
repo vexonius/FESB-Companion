@@ -245,7 +245,7 @@ public class Prisutnost extends Fragment {
                                         callonme1.enqueue(new Callback() {
                                             @Override
                                             public void onFailure(Call call, IOException e) {
-                                                Log.d("pogreska", "failure");
+                                                showSnackError();
                                             }
 
                                             @Override
@@ -356,6 +356,21 @@ public class Prisutnost extends Fragment {
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.setAction("PONOVI", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snack.dismiss();
+                startFetching();
+            }
+        });
+        snack.setActionTextColor(getResources().getColor(R.color.white));
+        snack.show();
+    }
+
+    public void showSnackError(){
+        snack=Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške", Snackbar.LENGTH_LONG);
+        View okvir = snack.getView();
+        okvir.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
+        snack.setAction(("PONOVI"), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 snack.dismiss();
