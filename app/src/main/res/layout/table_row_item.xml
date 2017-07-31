@@ -39,7 +39,7 @@
         android:textAlignment="center"
         android:layout_below="@+id/table_name"
         android:text="8.15 - 11.00"
-        android:maxLines="1"
+        android:singleLine="true"
         android:textStyle="normal"
         android:textColor="@color/white"
         android:textSize="11dp"/>
@@ -51,6 +51,7 @@
             android:textAlignment="center"
             android:layout_below="@+id/table_type"
             android:text="A100"
+            android:singleLine="true"
             android:paddingBottom="5dp"
             android:textStyle="normal"
             android:textColor="@color/cardview_light_background"

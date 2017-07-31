@@ -12,9 +12,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tstudioz.fax.fme.CircularAnim;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.CourseActivity;
+import com.tstudioz.fax.fme.activities.LoginActivity;
 import com.tstudioz.fax.fme.activities.MainActivity;
+import com.tstudioz.fax.fme.fragments.CourseWeek;
 import com.tstudioz.fax.fme.fragments.Kolegiji;
 
 import io.realm.RealmChangeListener;
@@ -68,19 +71,25 @@ public class CoursesAdapter extends RecyclerView.Adapter<CoursesAdapter.CoursesV
 
         @Override
         public void onClick(View view) {
-            Context context = view.getContext();
+            final Context context = view.getContext();
             Kolegij kolegiji = kolegijs.get(getAdapterPosition());
 
-            Intent intent = new Intent(context, CourseActivity.class);
+            final Intent intent = new Intent(context, CourseActivity.class);
             intent.putExtra("kolegij", kolegiji.getName());
             intent.putExtra("link_na_kolegij", kolegiji.getLink());
-            context.startActivity(intent);
+          //  context.startActivity(intent);
+
+            CircularAnim.fullActivity((MainActivity)(view.getContext()), view)
+                    .colorOrImageRes(R.color.colorPrimaryDark)
+                    .go(new CircularAnim.OnAnimationEndListener() {
+                        @Override
+                        public void onAnimationEnd() {
+                            context.startActivity(intent);
+                        }
+                    });
 
         }
-
-
     }
-
 
         @Override
         public void onChange(Object element) {

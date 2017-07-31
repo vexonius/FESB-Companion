@@ -31,7 +31,12 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
     public void onBindViewHolder(CoursesWeeksViewHolder holder, int position) {
 
         KolegijTjedan tjedan = tjedni.get(position);
-        holder.mWeek.setText(tjedan.getTjedan());
+
+        if(tjedan.getTjedan().isEmpty()) {
+            holder.mWeek.setVisibility(View.GONE);
+        }else{
+            holder.mWeek.setText(tjedan.getTjedan());
+        }
         holder.mWeekDesc.setText(tjedan.getOpis());
         holder.mWeek.setTypeface(lighttf);
         holder.mWeekDesc.setTypeface(regulartf);

@@ -168,6 +168,21 @@ public class CourseWeek extends Fragment {
                                 kolegijTjedan.setTjedan(element.select("div.content > h3").text());
                                 kolegijTjedan.setOpis(element.select("div.summary").first().text());
 
+                               if(element.hasClass("section img-text")) {
+                                   Element docs_section = element.getElementsByClass("section img-text").first();
+
+                                   Log.d("dokumenti ", docs_section.text());
+
+                                   if(docs_section.hasClass("activity url modtype_url")) {
+                                       Elements docs = docs_section.getElementsByClass("activity url modtype_url");
+
+
+
+
+                                   }
+
+                               }
+
                             }
 
                             mRealm.commitTransaction();

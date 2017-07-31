@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setInactiveColor(Color.parseColor("#6e6e6e"));
         bottomNavigation.setUseElevation(true);
         bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_HIDE);
-        bottomNavigation.setCurrentItem(3);
+        bottomNavigation.setCurrentItem(0);
 
         final Home hf = new Home();
 
@@ -213,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
+        /**
         final AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
@@ -223,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("FESB Companion");
         bottomNavigation.setCurrentItem(0);
+
+         */
 
     }
 
@@ -285,6 +288,9 @@ public class MainActivity extends AppCompatActivity {
                     cookieSyncMngr.stopSync();
                     cookieSyncMngr.sync();
                 }
+
+            AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
+            bottomNavigation.setCurrentItem(0);
 
             Intent nazadaNaLogin = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(nazadaNaLogin);
