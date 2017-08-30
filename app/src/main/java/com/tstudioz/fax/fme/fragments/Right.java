@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme;
+package com.tstudioz.fax.fme.fragments;
 
 
 import android.app.Activity;
@@ -17,6 +17,8 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.tstudioz.fax.fme.R;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;

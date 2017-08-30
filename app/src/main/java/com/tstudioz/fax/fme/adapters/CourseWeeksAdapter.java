@@ -1,20 +1,27 @@
-package com.tstudioz.fax.fme.database;
+package com.tstudioz.fax.fme.adapters;
 
+import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.database.KolegijTjedan;
+import com.tstudioz.fax.fme.database.Materijal;
+
 import io.realm.RealmChangeListener;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 
 public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.CoursesWeeksViewHolder> implements RealmChangeListener {
+
     private RealmResults<KolegijTjedan> tjedni;
     Typeface regulartf, lighttf;
-
+    private static RecyclerView materialRecycler;
 
     public CourseWeeksAdapter(RealmResults<KolegijTjedan> tjedan) {
         this.tjedni = tjedan;
@@ -31,6 +38,8 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
     public void onBindViewHolder(CoursesWeeksViewHolder holder, int position) {
 
         KolegijTjedan tjedan = tjedni.get(position);
+        holder.matAdapter = new MaterialsAdapter(tjedan.getMaterijali());
+        materialRecycler.setAdapter(holder.matAdapter);
 
         if(tjedan.getTjedan().isEmpty()) {
             holder.mWeek.setVisibility(View.GONE);
@@ -51,6 +60,7 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
 
     public class CoursesWeeksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView mWeek, mWeekDesc;
+        private MaterialsAdapter matAdapter;
 
 
         public CoursesWeeksViewHolder(final View itemView) {
@@ -62,6 +72,12 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
             mWeekDesc = (TextView) itemView.findViewById(R.id.tjedanOpis);
             regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Regular.ttf");
             mWeekDesc.setTypeface(regulartf);
+
+            Context context = itemView.getContext();
+            materialRecycler = (RecyclerView)itemView.findViewById(R.id.mat_recyc);
+            materialRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+            materialRecycler.hasFixedSize();
+
             itemView.setOnClickListener(this);
         }
 

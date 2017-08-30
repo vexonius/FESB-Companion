@@ -1,10 +1,12 @@
-package com.tstudioz.fax.fme;
+package com.tstudioz.fax.fme.util;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+
+import com.tstudioz.fax.fme.R;
 
 
 public class NetworkDialogFragment extends DialogFragment {

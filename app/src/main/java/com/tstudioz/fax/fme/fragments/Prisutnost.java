@@ -23,7 +23,7 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.database.DolasciAdapter;
+import com.tstudioz.fax.fme.adapters.DolasciAdapter;
 import com.tstudioz.fax.fme.database.Dolazak;
 import com.tstudioz.fax.fme.database.Korisnik;
 
@@ -169,123 +169,131 @@ public class Prisutnost extends Fragment {
                                     Element zimskaPredavanja = zimski.select("div.body.clearfix").first();
                                     Element litnjaPredavanja = litnji.select("div.body.clearfix").first();
 
-                                    Elements zimskiKolegiji = zimskaPredavanja.select("a");
-
                                     final Realm mRealm = Realm.getInstance(realmConfig);
-
                                     mRealm.beginTransaction();
 
-                                    for (final Element element : zimskiKolegiji) {
+                                    if(doc.select("#studentGeneralReportTable > div.semster.winter > div.emptyList")==null){
+                                        Elements zimskiKolegiji = zimskaPredavanja.select("a");
 
-                                        Request request = new Request.Builder()
-                                                .url("https://raspored.fesb.unist.hr" + element.attr("href").toString())
-                                                .get()
-                                                .build();
 
-                                        Call callonme = okHttpClient.newCall(request);
-                                        callonme.enqueue(new Callback() {
-                                            @Override
-                                            public void onFailure(Call call, IOException e) {
-                                                Log.d("pogreska", "failure");
-                                            }
 
-                                            @Override
-                                            public void onResponse(Call call, Response response) throws IOException {
 
-                                                final Realm nekiRealm = Realm.getInstance(realmConfig);
 
-                                                Document document = Jsoup.parse(response.body().string());
-                                                Element content = document.getElementsByClass("courseCategories").first();
-                                                final Elements kategorije = content.select("div.courseCategory");
+                                        for (final Element element : zimskiKolegiji) {
 
-                                                nekiRealm.executeTransaction(new Realm.Transaction() {
-                                                    @Override
-                                                    public void execute(Realm realm) {
-                                                        for (Element kat : kategorije) {
-                                                            final Dolazak mDolazak = nekiRealm.createObject(Dolazak.class, UUID.randomUUID().toString());
+                                            Request request = new Request.Builder()
+                                                    .url("https://raspored.fesb.unist.hr" + element.attr("href").toString())
+                                                    .get()
+                                                    .build();
 
-                                                            mDolazak.setSemestar(1);
-                                                            mDolazak.setPredmet(element.select("div.cellContent").first().text());
-                                                            mDolazak.setVrsta(kat.getElementsByClass("name").first().text());
-                                                            mDolazak.setAttended(Integer.parseInt(kat.select("div.attended > span.num").first().text()));
-                                                            mDolazak.setAbsent(Integer.parseInt(kat.select("div.absent > span.num").first().text()));
-                                                            mDolazak.setRequired(kat.select("div.required-attendance > span").first().text());
+                                            Call callonme = okHttpClient.newCall(request);
+                                            callonme.enqueue(new Callback() {
+                                                @Override
+                                                public void onFailure(Call call, IOException e) {
+                                                    Log.d("pogreska", "failure");
+                                                }
 
-                                                            String string = kat.select("div.required-attendance > span").first().text();
-                                                            StringTokenizer st = new StringTokenizer(string, " ");
-                                                            String ric1 = st.nextToken();
-                                                            String ric2 = st.nextToken();
-                                                            String max = st.nextToken();
+                                                @Override
+                                                public void onResponse(Call call, Response response) throws IOException {
 
-                                                            mDolazak.setTotal(Integer.parseInt(max));
+                                                    final Realm nekiRealm = Realm.getInstance(realmConfig);
 
+                                                    Document document = Jsoup.parse(response.body().string());
+                                                    Element content = document.getElementsByClass("courseCategories").first();
+                                                    final Elements kategorije = content.select("div.courseCategory");
+
+                                                    nekiRealm.executeTransaction(new Realm.Transaction() {
+                                                        @Override
+                                                        public void execute(Realm realm) {
+                                                            for (Element kat : kategorije) {
+                                                                final Dolazak mDolazak = nekiRealm.createObject(Dolazak.class, UUID.randomUUID().toString());
+
+                                                                mDolazak.setSemestar(1);
+                                                                mDolazak.setPredmet(element.select("div.cellContent").first().text());
+                                                                mDolazak.setVrsta(kat.getElementsByClass("name").first().text());
+                                                                mDolazak.setAttended(Integer.parseInt(kat.select("div.attended > span.num").first().text()));
+                                                                mDolazak.setAbsent(Integer.parseInt(kat.select("div.absent > span.num").first().text()));
+                                                                mDolazak.setRequired(kat.select("div.required-attendance > span").first().text());
+
+                                                                String string = kat.select("div.required-attendance > span").first().text();
+                                                                StringTokenizer st = new StringTokenizer(string, " ");
+                                                                String ric1 = st.nextToken();
+                                                                String ric2 = st.nextToken();
+                                                                String max = st.nextToken();
+
+                                                                mDolazak.setTotal(Integer.parseInt(max));
+
+                                                            }
                                                         }
-                                                    }
-                                                });
+                                                    });
 
 
-                                            }
-                                        });
+                                                }
+                                            });
 
+
+                                        }
 
                                     }
 
-                                    Elements litnjiKolegiji = litnjaPredavanja.select("a");
+                                    if(doc.select("#studentGeneralReportTable > div.semster.summer > div.emptyList")==null) {
+                                        Elements litnjiKolegiji = litnjaPredavanja.select("a");
 
 
-                                    for (final Element element : litnjiKolegiji) {
+                                        for (final Element element : litnjiKolegiji) {
 
 
-                                        Request request = new Request.Builder()
-                                                .url("https://raspored.fesb.unist.hr" + element.attr("href").toString())
-                                                .get()
-                                                .build();
+                                            Request request = new Request.Builder()
+                                                    .url("https://raspored.fesb.unist.hr" + element.attr("href").toString())
+                                                    .get()
+                                                    .build();
 
-                                        Call callonme1 = okHttpClient.newCall(request);
-                                        callonme1.enqueue(new Callback() {
-                                            @Override
-                                            public void onFailure(Call call, IOException e) {
-                                                showSnackError();
-                                            }
+                                            Call callonme1 = okHttpClient.newCall(request);
+                                            callonme1.enqueue(new Callback() {
+                                                @Override
+                                                public void onFailure(Call call, IOException e) {
+                                                    showSnackError();
+                                                }
 
-                                            @Override
-                                            public void onResponse(Call call, Response response) throws IOException {
+                                                @Override
+                                                public void onResponse(Call call, Response response) throws IOException {
 
-                                                final Realm nekiRealm = Realm.getInstance(realmConfig);
+                                                    final Realm nekiRealm = Realm.getInstance(realmConfig);
 
-                                                Document document = Jsoup.parse(response.body().string());
-                                                Element content = document.getElementsByClass("courseCategories").first();
-                                                final Elements kategorije = content.select("div.courseCategory");
+                                                    Document document = Jsoup.parse(response.body().string());
+                                                    Element content = document.getElementsByClass("courseCategories").first();
+                                                    final Elements kategorije = content.select("div.courseCategory");
 
-                                                nekiRealm.executeTransaction(new Realm.Transaction() {
-                                                    @Override
-                                                    public void execute(Realm realm) {
-                                                        for (Element kat : kategorije) {
-                                                            final Dolazak mDolazak = nekiRealm.createObject(Dolazak.class, UUID.randomUUID().toString());
+                                                    nekiRealm.executeTransaction(new Realm.Transaction() {
+                                                        @Override
+                                                        public void execute(Realm realm) {
+                                                            for (Element kat : kategorije) {
+                                                                final Dolazak mDolazak = nekiRealm.createObject(Dolazak.class, UUID.randomUUID().toString());
 
-                                                            mDolazak.setSemestar(2);
-                                                            mDolazak.setPredmet(element.select("div.cellContent").first().text());
-                                                            mDolazak.setVrsta(kat.getElementsByClass("name").first().text());
-                                                            mDolazak.setAttended(Integer.parseInt(kat.select("div.attended > span.num").first().text()));
-                                                            mDolazak.setAbsent(Integer.parseInt(kat.select("div.absent > span.num").first().text()));
-                                                            mDolazak.setRequired(kat.select("div.required-attendance > span").first().text());
+                                                                mDolazak.setSemestar(2);
+                                                                mDolazak.setPredmet(element.select("div.cellContent").first().text());
+                                                                mDolazak.setVrsta(kat.getElementsByClass("name").first().text());
+                                                                mDolazak.setAttended(Integer.parseInt(kat.select("div.attended > span.num").first().text()));
+                                                                mDolazak.setAbsent(Integer.parseInt(kat.select("div.absent > span.num").first().text()));
+                                                                mDolazak.setRequired(kat.select("div.required-attendance > span").first().text());
 
-                                                            String string = kat.select("div.required-attendance > span").first().text();
-                                                            StringTokenizer st = new StringTokenizer(string, " ");
-                                                            String ric1 = st.nextToken();
-                                                            String ric2 = st.nextToken();
-                                                            String max = st.nextToken();
+                                                                String string = kat.select("div.required-attendance > span").first().text();
+                                                                StringTokenizer st = new StringTokenizer(string, " ");
+                                                                String ric1 = st.nextToken();
+                                                                String ric2 = st.nextToken();
+                                                                String max = st.nextToken();
 
-                                                            mDolazak.setTotal(Integer.parseInt(max));
+                                                                mDolazak.setTotal(Integer.parseInt(max));
 
+                                                            }
                                                         }
-                                                    }
-                                                });
+                                                    });
 
 
-                                            }
-                                        });
+                                                }
+                                            });
 
+                                        }
                                     }
 
                                     mRealm.commitTransaction();

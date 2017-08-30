@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.database;
+package com.tstudioz.fax.fme.adapters;
 
 
 
@@ -10,15 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.tstudioz.fax.fme.CircularAnim;
+import com.tstudioz.fax.fme.database.Kolegij;
+import com.tstudioz.fax.fme.util.CircularAnim;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.CourseActivity;
-import com.tstudioz.fax.fme.activities.LoginActivity;
 import com.tstudioz.fax.fme.activities.MainActivity;
-import com.tstudioz.fax.fme.fragments.CourseWeek;
-import com.tstudioz.fax.fme.fragments.Kolegiji;
 
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
@@ -77,7 +74,7 @@ public class CoursesAdapter extends RecyclerView.Adapter<CoursesAdapter.CoursesV
             final Intent intent = new Intent(context, CourseActivity.class);
             intent.putExtra("kolegij", kolegiji.getName());
             intent.putExtra("link_na_kolegij", kolegiji.getLink());
-          //  context.startActivity(intent);
+
 
             CircularAnim.fullActivity((MainActivity)(view.getContext()), view)
                     .colorOrImageRes(R.color.colorPrimaryDark)

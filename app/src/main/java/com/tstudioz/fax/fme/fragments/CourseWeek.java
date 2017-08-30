@@ -18,9 +18,10 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.database.CourseWeeksAdapter;
+import com.tstudioz.fax.fme.adapters.CourseWeeksAdapter;
 import com.tstudioz.fax.fme.database.KolegijTjedan;
 import com.tstudioz.fax.fme.database.Korisnik;
+import com.tstudioz.fax.fme.database.Materijal;
 
 
 import org.jsoup.Jsoup;
@@ -168,16 +169,26 @@ public class CourseWeek extends Fragment {
                                 kolegijTjedan.setTjedan(element.select("div.content > h3").text());
                                 kolegijTjedan.setOpis(element.select("div.summary").first().text());
 
-                               if(element.hasClass("section img-text")) {
-                                   Element docs_section = element.getElementsByClass("section img-text").first();
+                               if(element.getElementsByClass("section img-text").first()!=null) {
+                                   Element modz = element.getElementsByClass("section img-text").first();
+                                //   Element sect = modz.getElementsByClass("activity url modtype_url").first();
+                                //   Element docs_section = sect.getElementsByClass("mod-indent").first();
+                                //   Element spenk = docs_section.select("a > span").first();
 
-                                   Log.d("dokumenti ", docs_section.text());
+                                   Elements sections = modz.select("div.mod-indent");
 
-                                   if(docs_section.hasClass("activity url modtype_url")) {
-                                       Elements docs = docs_section.getElementsByClass("activity url modtype_url");
+                                   for(Element sekcija : sections){
+                                       Materijal materijal = mRealm.createObject(Materijal.class);
+                                       materijal.setImeMtarijala(sekcija.select("span.instancename").text());
+                                       Log.d("linkz", sekcija.select("span.instancename").text());
 
+                                       materijal.setVrsta(sekcija.select("span.accesshide ").text());
+                                       Log.d("linkz", sekcija.select("span.accesshide ").text());
 
+                                       materijal.setUrl(sekcija.select("a").attr("href"));
+                                       Log.d("textzz", sekcija.select("a").attr("href"));
 
+                                       kolegijTjedan.materijali.add(materijal);
 
                                    }
 

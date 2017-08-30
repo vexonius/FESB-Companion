@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme;
+package com.tstudioz.fax.fme.util;
 
         import android.animation.Animator;
         import android.animation.AnimatorListenerAdapter;

@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme;
+package com.tstudioz.fax.fme.fragments;
 
 
 import android.content.Context;
@@ -18,21 +18,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.google.android.gms.ads.NativeExpressAdView;
+import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.NoteActivity;
-import com.tstudioz.fax.fme.database.EmployeeRVAdapter;
+import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter;
 import com.tstudioz.fax.fme.database.Predavanja;
 import com.tstudioz.fax.fme.weather.Current;
 import com.tstudioz.fax.fme.weather.Forecast;

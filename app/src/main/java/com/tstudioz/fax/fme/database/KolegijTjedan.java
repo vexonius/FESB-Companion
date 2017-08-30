@@ -12,11 +12,11 @@ public class KolegijTjedan extends RealmObject{
 
     public String opis;
     public String tjedan;
-    public RealmList<Materijali> materijali;
+    public RealmList<Materijal> materijali;
 
 
 
-    public void setMaterijali(RealmList<Materijali> materijali) {
+    public void setMaterijali(RealmList<Materijal> materijali) {
         this.materijali = materijali;
     }
 
@@ -29,7 +29,7 @@ public class KolegijTjedan extends RealmObject{
     }
 
 
-    public RealmList<Materijali> getMaterijali() {
+    public RealmList<Materijal> getMaterijali() {
         return materijali;
     }
 

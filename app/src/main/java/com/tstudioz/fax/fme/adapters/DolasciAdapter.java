@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.database;
+package com.tstudioz.fax.fme.adapters;
 
 
 
@@ -11,15 +11,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.database.Dolazak;
 
 import java.util.ArrayList;
 import java.util.List;

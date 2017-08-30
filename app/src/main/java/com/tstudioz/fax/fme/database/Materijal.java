@@ -6,7 +6,7 @@ import io.realm.RealmObject;
  * Created by amarthus on 09-May-17.
  */
 
-public class Materijali extends RealmObject {
+public class Materijal extends RealmObject {
 
     public String url;
     public String vrsta;

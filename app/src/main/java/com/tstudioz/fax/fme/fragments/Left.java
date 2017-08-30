@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme;
+package com.tstudioz.fax.fme.fragments;
 
 
 
@@ -23,7 +23,8 @@ import android.widget.ProgressBar;
 import com.google.android.gms.ads.NativeExpressAdView;
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog;
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog;
-import com.tstudioz.fax.fme.database.EmployeeRVAdapterTable;
+import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.adapters.EmployeeRVAdapterTable;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
 
@@ -548,7 +549,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     }
 
     public void showSnacOffline(){
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Prikazuje se raspored ovog tjedna. Za odabir drugog tjedna potrebna je internetska veza.", Snackbar.LENGTH_INDEFINITE);
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani.\nPrikazuje se raspored ovog tjedna.", Snackbar.LENGTH_INDEFINITE);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.setAction("OSVJEŽI", new View.OnClickListener() {

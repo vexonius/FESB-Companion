@@ -1,10 +1,7 @@
 package com.tstudioz.fax.fme.fragments;
 
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 
@@ -22,9 +19,8 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.database.CoursesAdapter;
+import com.tstudioz.fax.fme.adapters.CoursesAdapter;
 import com.tstudioz.fax.fme.database.Kolegij;
-import com.tstudioz.fax.fme.database.KolegijTjedan;
 import com.tstudioz.fax.fme.database.Korisnik;
 
 import org.jsoup.Jsoup;

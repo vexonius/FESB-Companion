@@ -34,11 +34,11 @@ import android.widget.Toast;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
-import com.tstudioz.fax.fme.Home;
-import com.tstudioz.fax.fme.Left;
+import com.tstudioz.fax.fme.fragments.Home;
+import com.tstudioz.fax.fme.fragments.Left;
 import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.Right;
-import com.tstudioz.fax.fme.database.EmployeeRVAdapter;
+import com.tstudioz.fax.fme.fragments.Right;
+import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
 import com.tstudioz.fax.fme.fragments.Prisutnost;
@@ -288,9 +288,6 @@ public class MainActivity extends AppCompatActivity {
                     cookieSyncMngr.stopSync();
                     cookieSyncMngr.sync();
                 }
-
-            AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
-            bottomNavigation.setCurrentItem(0);
 
             Intent nazadaNaLogin = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(nazadaNaLogin);

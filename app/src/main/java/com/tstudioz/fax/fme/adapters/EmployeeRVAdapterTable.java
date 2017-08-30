@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.database;
+package com.tstudioz.fax.fme.adapters;
 
 /**
  * Created by amarthus on 25-Mar-17.
@@ -14,9 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.database.Predavanja;
 
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
