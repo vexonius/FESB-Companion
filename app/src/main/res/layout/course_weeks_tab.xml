@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout
+    android:id="@+id/relative_course_tab"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -17,9 +18,9 @@
         android:id="@+id/course_week_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:smoothScrollbar="true"
-        android:scrollbarStyle="outsideOverlay"
-        android:scrollbarSize="5dp"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical"
+        android:scrollbarSize="7dp"
         android:scrollbarThumbVertical="@color/_20white"
         android:visibility="visible" />
 

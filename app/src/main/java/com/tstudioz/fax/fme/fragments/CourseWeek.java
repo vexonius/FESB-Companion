@@ -181,23 +181,28 @@ public class CourseWeek extends Fragment {
                                    Elements sections = modz.select("div.mod-indent");
 
                                    for(Element sekcija : sections){
-                                       Materijal materijal = mRealm.createObject(Materijal.class);
-                                       materijal.setImeMtarijala(sekcija.select("span.instancename").text());
-                                       Log.d("linkz", sekcija.select("span.instancename").text());
 
-                                       if (sekcija.getElementsByClass("activityicon").first()!=null) {
-                                           Element ikona = sekcija.getElementsByClass("activityicon").first();
-                                           materijal.setIkonaUrl(ikona.attr("src"));
-                                           Log.d("linkz", ikona.attr("src"));
+                                       if((!sekcija.select("span.instancename").text().equals("News forum"))) {
+                                           if (!sekcija.select("span.instancename").text().isEmpty()) {
+                                               Materijal materijal = mRealm.createObject(Materijal.class);
+                                               materijal.setImeMtarijala(sekcija.select("span.instancename").text());
+                                               Log.d("linkz", sekcija.select("span.instancename").text());
+
+                                               if (sekcija.getElementsByClass("activityicon").first() != null) {
+                                                   Element ikona = sekcija.getElementsByClass("activityicon").first();
+                                                   materijal.setIkonaUrl(ikona.attr("src"));
+                                                   Log.d("linkz", ikona.attr("src"));
+                                               }
+
+                                               materijal.setVrsta(sekcija.select("span.accesshide ").text());
+                                               Log.d("linkz", sekcija.select("span.accesshide ").text());
+
+                                               materijal.setUrl(sekcija.select("a").attr("href"));
+                                               Log.d("textzz", sekcija.select("a").attr("href"));
+
+                                               kolegijTjedan.materijali.add(materijal);
+                                           }
                                        }
-
-                                       materijal.setVrsta(sekcija.select("span.accesshide ").text());
-                                       Log.d("linkz", sekcija.select("span.accesshide ").text());
-
-                                       materijal.setUrl(sekcija.select("a").attr("href"));
-                                       Log.d("textzz", sekcija.select("a").attr("href"));
-
-                                       kolegijTjedan.materijali.add(materijal);
 
                                    }
 

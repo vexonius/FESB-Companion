@@ -5,6 +5,7 @@ package com.tstudioz.fax.fme.adapters;
 import android.graphics.Typeface;
 import android.media.Image;
 import android.provider.ContactsContract;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,27 +50,27 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
             switch (materijal.getIkonaUrl()) {
                 case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpdf&rev=305":
                     holder.icon.setImageResource(R.drawable.pdf);
-                    holder.download.setVisibility(View.VISIBLE);
+                    holder.download.setImageResource(R.drawable.download);
                     break;
                 case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fword&rev=305":
                     holder.icon.setImageResource(R.drawable.word);
-                    holder.download.setVisibility(View.VISIBLE);
+                    holder.download.setImageResource(R.drawable.download);
                     break;
                 case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocm&rev=305":
                     holder.icon.setImageResource(R.drawable.word);
-                    holder.download.setVisibility(View.VISIBLE);
+                    holder.download.setImageResource(R.drawable.download);
                     break;
                 case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocx&rev=305":
                     holder.icon.setImageResource(R.drawable.word);
-                    holder.download.setVisibility(View.VISIBLE);
+                    holder.download.setImageResource(R.drawable.download);
                     break;
                 case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpptx&rev=305":
                     holder.icon.setImageResource(R.drawable.ppt);
-                    holder.download.setVisibility(View.VISIBLE);
+                    holder.download.setImageResource(R.drawable.download);
                     break;
                 case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fxlsx&rev=305":
                     holder.icon.setImageResource(R.drawable.excel);
-                    holder.download.setVisibility(View.VISIBLE);
+                    holder.download.setImageResource(R.drawable.download);
                     break;
                 case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=folder":
                     holder.icon.setImageResource(R.drawable.folder);
@@ -98,7 +99,10 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                     break;
                 case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fzip&rev=305":
                     holder.icon.setImageResource(R.drawable.archive);
-                    holder.download.setVisibility(View.VISIBLE);
+                    holder.download.setImageResource(R.drawable.download);
+                    break;
+                case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fimage&rev=305":
+                    holder.icon.setImageResource(R.drawable.imagelink);
                     break;
                 default: holder.icon.setImageResource(R.drawable.unknown);
                     break;
@@ -137,6 +141,7 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
         @Override
         public void onClick(View view) {
+            Snackbar.make(view, materials.get(getAdapterPosition()).getUrl(), Snackbar.LENGTH_SHORT).show();
         }
     }
 
