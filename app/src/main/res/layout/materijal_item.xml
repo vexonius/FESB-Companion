@@ -8,18 +8,19 @@
     
     <ImageView
         android:id="@+id/mat_src"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/pdf"/>
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        />
 
     <TextView
         android:id="@+id/mat_text"
         android:layout_toRightOf="@+id/mat_src"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="25dp"
         android:singleLine="true"
         android:text="primjer 001"
-        android:layout_marginLeft="5dp"
+        android:paddingRight="25dp"
+        android:layout_marginLeft="10dp"
         android:gravity="center_vertical"
         android:textColor="@color/white"
         android:textSize="14dp"/>
@@ -28,8 +29,8 @@
         android:id="@+id/mat_dl"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:src="@drawable/download"/>
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        />
 
 </RelativeLayout>

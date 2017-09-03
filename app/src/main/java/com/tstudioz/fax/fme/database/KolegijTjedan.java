@@ -9,12 +9,14 @@ import io.realm.RealmObject;
 
 public class KolegijTjedan extends RealmObject{
 
-
+    public int index;
     public String opis;
     public String tjedan;
     public RealmList<Materijal> materijali;
 
-
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
     public void setMaterijali(RealmList<Materijal> materijali) {
         this.materijali = materijali;
@@ -31,6 +33,10 @@ public class KolegijTjedan extends RealmObject{
 
     public RealmList<Materijal> getMaterijali() {
         return materijali;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public String getOpis() {

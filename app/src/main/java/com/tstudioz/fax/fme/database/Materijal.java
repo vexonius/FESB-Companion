@@ -11,6 +11,7 @@ public class Materijal extends RealmObject {
     public String url;
     public String vrsta;
     public String imeMtarijala;
+    public String ikonaUrl;
 
     public void setImeMtarijala(String imeMtarijala) {
         this.imeMtarijala = imeMtarijala;
@@ -24,6 +25,10 @@ public class Materijal extends RealmObject {
         this.vrsta = vrsta;
     }
 
+    public void setIkonaUrl(String ikonaUrl) {
+        this.ikonaUrl = ikonaUrl;
+    }
+
     public String getImeMtarijala() {
         return imeMtarijala;
     }
@@ -34,5 +39,9 @@ public class Materijal extends RealmObject {
 
     public String getVrsta() {
         return vrsta;
+    }
+
+    public String getIkonaUrl() {
+        return ikonaUrl;
     }
 }

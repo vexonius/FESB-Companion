@@ -37,7 +37,10 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
     @Override
     public void onBindViewHolder(CoursesWeeksViewHolder holder, int position) {
 
+        holder.setIsRecyclable(false);
+
         KolegijTjedan tjedan = tjedni.get(position);
+
         holder.matAdapter = new MaterialsAdapter(tjedan.getMaterijali());
         materialRecycler.setAdapter(holder.matAdapter);
 

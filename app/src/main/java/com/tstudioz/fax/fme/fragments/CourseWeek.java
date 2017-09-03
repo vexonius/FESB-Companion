@@ -62,6 +62,7 @@ public class CourseWeek extends Fragment {
 
     CourseWeeksAdapter adapter;
 
+
     @InjectView(R.id.course_week_rv) RecyclerView mRecyclerView;
     @InjectView(R.id.course_week_progress) ProgressBar mProgress;
 
@@ -162,9 +163,11 @@ public class CourseWeek extends Fragment {
 
                             mRealm.beginTransaction();
 
+                            int i = 0;
                             for (Element element : selements) {
 
                                 KolegijTjedan kolegijTjedan = mRealm.createObject(KolegijTjedan.class);
+                                kolegijTjedan.setIndex(i++);
 
                                 kolegijTjedan.setTjedan(element.select("div.content > h3").text());
                                 kolegijTjedan.setOpis(element.select("div.summary").first().text());
@@ -181,6 +184,12 @@ public class CourseWeek extends Fragment {
                                        Materijal materijal = mRealm.createObject(Materijal.class);
                                        materijal.setImeMtarijala(sekcija.select("span.instancename").text());
                                        Log.d("linkz", sekcija.select("span.instancename").text());
+
+                                       if (sekcija.getElementsByClass("activityicon").first()!=null) {
+                                           Element ikona = sekcija.getElementsByClass("activityicon").first();
+                                           materijal.setIkonaUrl(ikona.attr("src"));
+                                           Log.d("linkz", ikona.attr("src"));
+                                       }
 
                                        materijal.setVrsta(sekcija.select("span.accesshide ").text());
                                        Log.d("linkz", sekcija.select("span.accesshide ").text());
