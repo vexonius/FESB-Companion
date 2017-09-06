@@ -31,8 +31,8 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -61,8 +61,8 @@ public class Kolegiji extends Fragment {
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    @InjectView(R.id.kolegiji_rv) RecyclerView recyclerView;
-    @InjectView(R.id.kolegij_progress) ProgressBar progress;
+    @BindView(R.id.kolegiji_rv) RecyclerView recyclerView;
+    @BindView(R.id.kolegij_progress) ProgressBar progress;
 
     CoursesAdapter kolegijiAdapter;
 
@@ -74,7 +74,7 @@ public class Kolegiji extends Fragment {
                 container, false);
 
         setHasOptionsMenu(true);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         showList();

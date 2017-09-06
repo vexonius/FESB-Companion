@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setElevation(0.0f);
         setContentView(R.layout.activity_main);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         /**Realm incicijalizacija  */
         Realm.init(this);
@@ -251,11 +251,7 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
 
-            return true;
-        }
         if (id == R.id.logout) {
             SharedPreferences mySPrefs = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
             SharedPreferences.Editor editor = mySPrefs.edit();

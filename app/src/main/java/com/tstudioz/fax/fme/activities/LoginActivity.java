@@ -20,25 +20,21 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.tstudioz.fax.fme.util.CircularAnim;
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.util.CircularAnim;
 import com.tstudioz.fax.fme.database.Korisnik;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-
 public class LoginActivity extends AppCompatActivity {
-
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
 
         /**Realm inicijalizacija*/
         Realm.init(this);

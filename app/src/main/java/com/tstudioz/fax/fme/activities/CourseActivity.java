@@ -1,7 +1,9 @@
 package com.tstudioz.fax.fme.activities;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
+import android.os.StrictMode;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,8 +26,15 @@ public class CourseActivity extends AppCompatActivity {
         imeKolegija = imeKolegija.substring(0, imeKolegija.length()-5);
         getSupportActionBar().setTitle(imeKolegija);
 
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        }
+
+        if (shouldAskPermissions()) {
+            askPermissions();
         }
 
         Bundle bundle = new Bundle();
@@ -54,4 +63,19 @@ public class CourseActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    protected boolean shouldAskPermissions() {
+        return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
+    }
+
+    @TargetApi(23)
+    protected void askPermissions() {
+        String[] permissions = {
+                "android.permission.READ_EXTERNAL_STORAGE",
+                "android.permission.WRITE_EXTERNAL_STORAGE"
+        };
+        int requestCode = 200;
+        requestPermissions(permissions, requestCode);
+    }
+
 }

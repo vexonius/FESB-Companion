@@ -31,8 +31,8 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -63,8 +63,8 @@ public class CourseWeek extends Fragment {
     CourseWeeksAdapter adapter;
 
 
-    @InjectView(R.id.course_week_rv) RecyclerView mRecyclerView;
-    @InjectView(R.id.course_week_progress) ProgressBar mProgress;
+    @BindView(R.id.course_week_rv) RecyclerView mRecyclerView;
+    @BindView(R.id.course_week_progress) ProgressBar mProgress;
 
 
     @Override
@@ -76,7 +76,7 @@ public class CourseWeek extends Fragment {
                 container, false);
 
         setHasOptionsMenu(true);
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         fetchCourseContent(link);
@@ -190,12 +190,85 @@ public class CourseWeek extends Fragment {
 
                                                if (sekcija.getElementsByClass("activityicon").first() != null) {
                                                    Element ikona = sekcija.getElementsByClass("activityicon").first();
-                                                   materijal.setIkonaUrl(ikona.attr("src"));
+
+                                                   switch (ikona.attr("src")) {
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpdf&rev=305":
+                                                           materijal.setIcon(R.drawable.pdf);
+                                                           materijal.setVrsta("pdf");
+                                                           materijal.setDownloadable(1);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fword&rev=305":
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocm&rev=305":
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocx&rev=305":
+                                                           materijal.setIcon(R.drawable.word);
+                                                           materijal.setVrsta("docx");
+                                                           materijal.setDownloadable(1);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpptx&rev=305":
+                                                           materijal.setIcon(R.drawable.ppt);
+                                                           materijal.setVrsta("ppt");
+                                                           materijal.setDownloadable(1);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fxlsx&rev=305":
+                                                           materijal.setIcon(R.drawable.excel);
+                                                           materijal.setVrsta("xlsx");
+                                                           materijal.setDownloadable(1);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=folder":
+                                                           materijal.setIcon(R.drawable.folder);
+                                                           materijal.setVrsta("folder");
+                                                           materijal.setDownloadable(0);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Ftext&rev=305":
+                                                           materijal.setIcon(R.drawable.txt);
+                                                           materijal.setVrsta("txt");
+                                                           materijal.setDownloadable(1);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=choice":
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=quiz":
+                                                           materijal.setIcon(R.drawable.quiz);
+                                                           materijal.setVrsta("quiz");
+                                                           materijal.setDownloadable(0);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=assignment":
+                                                           materijal.setIcon(R.drawable.assign);
+                                                           materijal.setVrsta("assign");
+                                                           materijal.setDownloadable(0);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fhtml&rev=305":
+                                                           materijal.setIcon(R.drawable.link);
+                                                           materijal.setVrsta("link");
+                                                           materijal.setDownloadable(0);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=page":
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fweb&rev=305":
+                                                           materijal.setIcon(R.drawable.link);
+                                                           materijal.setVrsta("link");
+                                                           materijal.setDownloadable(0);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fzip&rev=305":
+                                                           materijal.setIcon(R.drawable.archive);
+                                                           materijal.setVrsta("zip");
+                                                           materijal.setDownloadable(1);
+                                                           break;
+                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fimage&rev=305":
+                                                           materijal.setIcon(R.drawable.imagelink);
+                                                           materijal.setVrsta("png");
+                                                           materijal.setDownloadable(1);
+                                                           break;
+                                                       default:
+                                                           materijal.setIcon(R.drawable.unknown);
+                                                           materijal.setVrsta("unknown");
+                                                           materijal.setDownloadable(0);
+                                                           break;
+                                                   }
+
+
                                                    Log.d("linkz", ikona.attr("src"));
                                                }
 
-                                               materijal.setVrsta(sekcija.select("span.accesshide ").text());
-                                               Log.d("linkz", sekcija.select("span.accesshide ").text());
+                                          //     materijal.setVrsta(sekcija.select("span.accesshide ").text());
+                                          //     Log.d("linkz", sekcija.select("span.accesshide ").text());
 
                                                materijal.setUrl(sekcija.select("a").attr("href"));
                                                Log.d("textzz", sekcija.select("a").attr("href"));

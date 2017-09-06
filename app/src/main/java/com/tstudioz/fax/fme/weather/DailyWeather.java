@@ -12,23 +12,17 @@ import android.widget.TextView;
 
 import com.tstudioz.fax.fme.R;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
-
 
 
 public class DailyWeather extends Fragment {
 
-    @InjectView(R.id.poweredBy)
-    ImageView mPoweredBy;
-    @InjectView(R.id.temperaturaDaily)
-    TextView mtemperaturaDaily;
-    @InjectView(R.id.vlaznost_vrijednost1)
-    TextView mvlaznost_vrijednost1;
-    @InjectView(R.id.oborine_vrijednost1)
-    TextView moborine_vrijednost1;
-    @InjectView(R.id.trenutni_vjetar1)
-    TextView mtrenutni_vjetar1;
+    @BindView(R.id.poweredBy) ImageView mPoweredBy;
+    @BindView(R.id.temperaturaDaily) TextView mtemperaturaDaily;
+    @BindView(R.id.vlaznost_vrijednost1) TextView mvlaznost_vrijednost1;
+    @BindView(R.id.oborine_vrijednost1) TextView moborine_vrijednost1;
+    @BindView(R.id.trenutni_vjetar1) TextView mtrenutni_vjetar1;
 
 
     @Override
@@ -38,7 +32,7 @@ public class DailyWeather extends Fragment {
         View view = inflater.inflate(R.layout.daily,
                 container, false);
 
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
 
         Bundle bundle = this.getArguments();

@@ -36,8 +36,8 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -67,10 +67,10 @@ public class Prisutnost extends Fragment {
             .build();
 
 
-    @InjectView(R.id.recyclerZimski) RecyclerView zRecyclerview;
-    @InjectView(R.id.recyclerLItnji) RecyclerView lRecyclerview;
-    @InjectView(R.id.progress_attend) ProgressBar mProgress;
-    @InjectView(R.id.nested_attend) NestedScrollView mNested;
+    @BindView(R.id.recyclerZimski) RecyclerView zRecyclerview;
+    @BindView(R.id.recyclerLItnji) RecyclerView lRecyclerview;
+    @BindView(R.id.progress_attend) ProgressBar mProgress;
+    @BindView(R.id.nested_attend) NestedScrollView mNested;
 
     public static String TAG = "Prisutnost.class";
     private Snackbar snack;
@@ -82,7 +82,7 @@ public class Prisutnost extends Fragment {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.prisutnost_tab, container, false);
 
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         mNested.setVisibility(View.INVISIBLE);

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" 
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="10dp"
     android:background="@android:color/transparent"
     android:gravity="center_vertical">
@@ -19,18 +20,38 @@
         android:layout_height="25dp"
         android:singleLine="true"
         android:text="primjer 001"
-        android:paddingRight="25dp"
+        android:paddingRight="29dp"
         android:layout_marginLeft="10dp"
         android:gravity="center_vertical"
         android:textColor="@color/white"
         android:textSize="14dp"/>
 
-    <ImageView
-        android:id="@+id/mat_dl"
+    <FrameLayout
+        android:id="@+id/mat_frame"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        />
+        android:layout_width="25dp"
+        android:layout_height="25dp">
+
+        <ImageView
+            android:id="@+id/mat_dl"
+            android:layout_gravity="center"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+
+        <com.mikhaellopez.circularprogressbar.CircularProgressBar
+            android:id="@+id/mat_progress"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            app:cpb_background_progressbar_color="@color/_10white"
+            app:cpb_background_progressbar_width="1dp"
+            app:cpb_progressbar_color="@color/blue_nice"
+            app:cpb_progressbar_width="3dp" />
+
+
+
+    </FrameLayout>
 
 </RelativeLayout>

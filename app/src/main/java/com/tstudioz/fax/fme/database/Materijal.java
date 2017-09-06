@@ -11,7 +11,8 @@ public class Materijal extends RealmObject {
     public String url;
     public String vrsta;
     public String imeMtarijala;
-    public String ikonaUrl;
+    public int icon;
+    public int downloadable;
 
     public void setImeMtarijala(String imeMtarijala) {
         this.imeMtarijala = imeMtarijala;
@@ -25,8 +26,12 @@ public class Materijal extends RealmObject {
         this.vrsta = vrsta;
     }
 
-    public void setIkonaUrl(String ikonaUrl) {
-        this.ikonaUrl = ikonaUrl;
+    public void setIcon(int icon) {
+        this.icon = icon;
+    }
+
+    public void setDownloadable(int downloadable) {
+        this.downloadable = downloadable;
     }
 
     public String getImeMtarijala() {
@@ -38,10 +43,13 @@ public class Materijal extends RealmObject {
     }
 
     public String getVrsta() {
-        return vrsta;
+        return vrsta; }
+
+    public int getIcon() {
+        return icon;
     }
 
-    public String getIkonaUrl() {
-        return ikonaUrl;
+    public int getDownloadable() {
+        return downloadable;
     }
 }

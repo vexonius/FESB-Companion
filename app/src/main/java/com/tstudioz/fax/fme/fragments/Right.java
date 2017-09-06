@@ -20,17 +20,18 @@ import android.widget.Toast;
 
 import com.tstudioz.fax.fme.R;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+
 
 
 public class Right extends Fragment {
 
 
     final String url = "https://login.microsoftonline.com/login.srf?wa=wsignin1.0&rpsnv=4&ct=1484490683&rver=6.7.6640.0&wp=MBI_SSL&wreply=https%3a%2f%2foutlook.office365.com";
-    @InjectView(R.id.no_conn) TextView noConn;
-    @InjectView(R.id.web) WebView webView;
-    @InjectView(R.id.btn_refresh) Button btnRefresh;
+    @BindView(R.id.no_conn) TextView noConn;
+    @BindView(R.id.web) WebView webView;
+    @BindView(R.id.btn_refresh) Button btnRefresh;
 
 
     @Override
@@ -43,7 +44,7 @@ public class Right extends Fragment {
                 container, false);
         setHasOptionsMenu(true);
 
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         //web
         webView = (WebView) view.findViewById(R.id.web);

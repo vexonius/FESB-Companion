@@ -39,8 +39,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.UUID;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -56,16 +56,16 @@ import static android.content.ContentValues.TAG;
 
 public class Left extends Fragment implements DatePickerDialog.OnDateSetListener{
 
-    @InjectView(R.id.recyclerPon) RecyclerView mRecyclerPon;
-    @InjectView(R.id.recyclerUto) RecyclerView recyclerUto;
-    @InjectView(R.id.recyclerSri) RecyclerView recyclerSri;
-    @InjectView(R.id.recyclerCet) RecyclerView recyclerCet;
-    @InjectView(R.id.recyclerPet) RecyclerView mRecyclerPet;
-    @InjectView(R.id.recyclerSub) RecyclerView mRecyclerSub;
-    @InjectView(R.id.linear_parent) LinearLayout mLinearParent;
-    @InjectView(R.id.linearSub) LinearLayout mLinearSub;
-    @InjectView(R.id.odaberiDan) Button mOdaberiDan;
-    @InjectView(R.id.raspored_progress) ProgressBar mRasporedProgress;
+    @BindView(R.id.recyclerPon) RecyclerView mRecyclerPon;
+    @BindView(R.id.recyclerUto) RecyclerView recyclerUto;
+    @BindView(R.id.recyclerSri) RecyclerView recyclerSri;
+    @BindView(R.id.recyclerCet) RecyclerView recyclerCet;
+    @BindView(R.id.recyclerPet) RecyclerView mRecyclerPet;
+    @BindView(R.id.recyclerSub) RecyclerView mRecyclerSub;
+    @BindView(R.id.linear_parent) LinearLayout mLinearParent;
+    @BindView(R.id.linearSub) LinearLayout mLinearSub;
+    @BindView(R.id.odaberiDan) Button mOdaberiDan;
+    @BindView(R.id.raspored_progress) ProgressBar mRasporedProgress;
 
 
     final Realm mrealm = Realm.getDefaultInstance();
@@ -94,7 +94,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
                 container, false);
 
 
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         getActivity().runOnUiThread(new Runnable() {
             @Override

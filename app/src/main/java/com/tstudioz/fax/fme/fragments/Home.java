@@ -43,8 +43,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import okhttp3.Call;
@@ -68,20 +68,20 @@ public class Home extends Fragment{
 
     private Forecast mForecast;
 
-    @InjectView(R.id.temperatura_vrijednost) TextView mTemperatureLabel;
-    @InjectView(R.id.vlaznost_vrijednost) TextView mHumidityValue;
-    @InjectView(R.id.opis) TextView mSummaryLabel;
-    @InjectView(R.id.vrijeme_image) ImageView mIconImageView;
-    @InjectView(R.id.oborine_vrijednost) TextView mPrecipValue;
-    @InjectView(R.id.trenutni_vjetar) TextView mWindLabel;
-    @InjectView(R.id.card_home) RelativeLayout mCardHome;
-    @InjectView(R.id.progressCircle) ProgressBar mProgressCircle;
-    @InjectView(R.id.task) RelativeLayout mtask;
-    @InjectView(R.id.taskText) TextView mtasktext;
-    @InjectView(R.id.list_progressbar) ProgressBar pbar1;
-    @InjectView(R.id.rv) RecyclerView recyclerView;
-    @InjectView(R.id.nema_predavanja) RelativeLayout np;
-    @InjectView(R.id.relative_parent_home) RelativeLayout parentRelative;
+    @BindView(R.id.temperatura_vrijednost) TextView mTemperatureLabel;
+    @BindView(R.id.vlaznost_vrijednost) TextView mHumidityValue;
+    @BindView(R.id.opis) TextView mSummaryLabel;
+    @BindView(R.id.vrijeme_image) ImageView mIconImageView;
+    @BindView(R.id.oborine_vrijednost) TextView mPrecipValue;
+    @BindView(R.id.trenutni_vjetar) TextView mWindLabel;
+    @BindView(R.id.card_home) RelativeLayout mCardHome;
+    @BindView(R.id.progressCircle) ProgressBar mProgressCircle;
+    @BindView(R.id.task) RelativeLayout mtask;
+    @BindView(R.id.taskText) TextView mtasktext;
+    @BindView(R.id.list_progressbar) ProgressBar pbar1;
+    @BindView(R.id.rv) RecyclerView recyclerView;
+    @BindView(R.id.nema_predavanja) RelativeLayout np;
+    @BindView(R.id.relative_parent_home) RelativeLayout parentRelative;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,7 +95,7 @@ public class Home extends Fragment{
 
         setHasOptionsMenu(true);
 
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
