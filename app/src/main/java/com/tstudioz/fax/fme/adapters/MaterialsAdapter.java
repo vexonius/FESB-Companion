@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -43,7 +44,6 @@ import java.io.IOException;
 
 import io.github.lizhangqu.coreprogress.ProgressHelper;
 import io.github.lizhangqu.coreprogress.ProgressUIListener;
-import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import okhttp3.Call;
@@ -63,6 +63,7 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
     Typeface regulartf;
     private String doc_name;
     private String doc_ext;
+    private String url;
 
 
     public MaterialsAdapter(RealmList<Materijal> material) {
@@ -91,75 +92,7 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
             holder.download.setImageResource(R.drawable.open_in_browser);
         }
 
-      //  if (materijal.getIkonaUrl()!=null) {
-      //      switch (materijal.getIkonaUrl()) {
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpdf&rev=305":
-      //              holder.icon.setImageResource(R.drawable.pdf);
-      //              holder.download.setImageResource(R.drawable.download);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fword&rev=305":
-      //              holder.icon.setImageResource(R.drawable.word);
-      //              holder.download.setImageResource(R.drawable.download);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocm&rev=305":
-      //              holder.icon.setImageResource(R.drawable.word);
-      //              holder.download.setImageResource(R.drawable.download);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocx&rev=305":
-      //              holder.icon.setImageResource(R.drawable.word);
-      //              holder.download.setImageResource(R.drawable.download);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpptx&rev=305":
-      //              holder.icon.setImageResource(R.drawable.ppt);
-      //              holder.download.setImageResource(R.drawable.download);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fxlsx&rev=305":
-      //              holder.icon.setImageResource(R.drawable.excel);
-      //              holder.download.setImageResource(R.drawable.download);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=folder":
-      //              holder.icon.setImageResource(R.drawable.folder);
-      //              holder.download.setImageResource(R.drawable.open_in_browser);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Ftext&rev=305":
-      //              holder.icon.setImageResource(R.drawable.txt);
-      //              holder.download.setVisibility(View.VISIBLE);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=choice":
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=quiz":
-      //              holder.icon.setImageResource(R.drawable.quiz);
-      //              holder.download.setImageResource(R.drawable.open_in_browser);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=assignment":
-      //              holder.icon.setImageResource(R.drawable.assign);
-      //              holder.download.setImageResource(R.drawable.open_in_browser);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fhtml&rev=305":
-      //              holder.icon.setImageResource(R.drawable.link);
-      //              holder.download.setImageResource(R.drawable.open_in_browser);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=page":
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fweb&rev=305":
-      //              holder.icon.setImageResource(R.drawable.link);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fzip&rev=305":
-      //              holder.icon.setImageResource(R.drawable.archive);
-      //              holder.download.setImageResource(R.drawable.download);
-      //              break;
-      //          case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fimage&rev=305":
-      //              holder.icon.setImageResource(R.drawable.imagelink);
-      //              break;
-      //          default: holder.icon.setImageResource(R.drawable.unknown);
-      //              break;
-      //      }
-      //
-      //
-      //
-      //  }
-
-
-
-        }
+    }
 
 
     @Override
@@ -192,122 +125,154 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
             final Context context = view.getContext();
 
-            download.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
+            doc_name = materials.get(getAdapterPosition()).getImeMtarijala();
+            doc_ext = materials.get(getAdapterPosition()).getVrsta();
+             String chromeurl = materials.get(getAdapterPosition()).getUrl();
 
-            doc_name=materials.get(getAdapterPosition()).getImeMtarijala();
-            doc_ext=materials.get(getAdapterPosition()).getVrsta();
+            if (materials.get(getAdapterPosition()).getDownloadable() == 0) {
 
-            CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(view.getContext()));
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent customTabsIntent = builder.setToolbarColor(context.getResources().getColor(R.color.colorPrimaryDark)).build();
+                customTabsIntent.launchUrl(view.getContext(), Uri.parse("https://korisnik.fesb.unist.hr/prijava?returnUrl=" + chromeurl));
 
-            final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
-                    .followRedirects(true)
-                    .followSslRedirects(true)
-                    .cookieJar(cookieJar)
-                    .build();
-
-            Request rq = new Request.Builder()
-                    .url(materials.get(getAdapterPosition()).getUrl())
-                    .get()
-                    .build();
+            } else {
 
 
-            Call call = okHttpClient.newCall(rq);
-            call.enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.d("material_adapter", "failure");
-                }
+                CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(view.getContext()));
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
+                download.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
 
-                    Document doc = Jsoup.parse(response.body().string());
-                 //   Log.d("material_ad_body", doc.body().text());
+                final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+                        .followRedirects(true)
+                        .followSslRedirects(true)
+                        .cookieJar(cookieJar)
+                        .build();
 
-                    Element element = doc.select("div.region-content").first();
-                    final Element links = element.select("a[href]").first();
-                    Snackbar.make(view, links.attr("href"), Snackbar.LENGTH_SHORT).show();
-                    Log.d("link za doc", links.attr("href"));
+                final Request rq = new Request.Builder()
+                        .url(materials.get(getAdapterPosition()).getUrl())
+                        .get()
+                        .build();
 
 
+                Call call = okHttpClient.newCall(rq);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.d("material_adapter", "failure");
+                    }
 
-                    Request.Builder builder = new Request.Builder()
-                    .url(links.attr("href"))
-                    .get();
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
 
-                    Call callDown = okHttpClient.newCall(builder.build());
-                    callDown.enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-                            Log.e("TAG", "=============onFailure===============");
-                            e.printStackTrace();
-                        }
+                        Document doc = Jsoup.parse(response.body().string());
+                        //   Log.d("material_ad_body", doc.body().text());
 
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            Log.e("TAG", "=============onResponse===============");
-                            Log.e("TAG", "request headers:" + response.request().headers());
-                            Log.e("TAG", "response headers:" + response.headers());
+                        switch (doc_ext) {
 
-                            //your original response body
-                            ResponseBody body = response.body();
-                            //wrap the original response body with progress
-                            ResponseBody responseBody = ProgressHelper.withProgress(body, new ProgressUIListener() {
+                            case "pdf":
 
-                                //if you don't need this method, don't override this methd. It isn't an abstract method, just an empty method.
-                                @Override
-                                public void onUIProgressStart(long totalBytes) {
-                                    super.onUIProgressStart(totalBytes);
-                                    Log.e("TAG", "onUIProgressStart:" + totalBytes);
-                                }
+                                Element element = doc.select("div.region-content").first();
+                                final Element links = element.select("a[href]").first();
+                                Snackbar.make(view, links.attr("href"), Snackbar.LENGTH_SHORT).show();
+                         //       Log.d("link za doc", links.attr("href"));
+                                url = links.attr("href");
+                                break;
 
-                                @Override
-                                public void onUIProgressChanged(long numBytes, long totalBytes, float percent, float speed) {
-                                    Log.e("TAG", "=============start===============");
-                                    Log.e("TAG", "numBytes:" + numBytes);
-                                    Log.e("TAG", "totalBytes:" + totalBytes);
-                                    Log.e("TAG", "percent:" + percent);
-                                    Log.e("TAG", "speed:" + speed);
-                                    Log.e("TAG", "============= end ===============");
+                            case "docx":
+                            case "txt":
+                            case "pptx":
+                            case "xlsx":
+                            case "zip":
+                                url = rq.url().toString();
+                                break;
 
-                                    progressBar.setProgressWithAnimation((int) (100 * percent), 600);
-                                   //  downloadInfo.setText("numBytes:" + numBytes + " bytes" + "\ntotalBytes:" + totalBytes + " bytes" + "\npercent:" + percent * 100 + " %" + "\nspeed:" + speed * 1000 / 1024 / 1024 + " MB/秒");
-                                }
+                            case "jpg":
+                                Element elementx = doc.select("div.region-content").first();
 
-                                //if you don't need this method, don't override this methd. It isn't an abstract method, just an empty method.
-                                @Override
-                                public void onUIProgressFinish() {
-                                    super.onUIProgressFinish();
-                                    Log.e("TAG", "onUIProgressFinish:");
-                                    Toast.makeText(view.getContext(), "Finished", Toast.LENGTH_SHORT).show();
-                                    progressBar.setVisibility(View.INVISIBLE);
-                                    download.setVisibility(View.VISIBLE);
-                                    download.setImageResource(R.drawable.checked);
-                                }
+                                final Element src = elementx.select("img[src]").first();
+                                Snackbar.make(view, src.attr("src"), Snackbar.LENGTH_SHORT).show();
+                           //      Log.d("link za doc", src.attr("src"));
+                                url = src.attr("src");
 
-                            });
-                            //read the body to file
-                            BufferedSource source = responseBody.source();
-                            File outFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + doc_name + "." + doc_ext);
-                            outFile.delete();
-                            outFile.getParentFile().mkdirs();
-                            outFile.createNewFile();
-                            BufferedSink sink = Okio.buffer(Okio.sink(outFile));
-                            source.readAll(sink);
-                            sink.flush();
-                            source.close();
-
-                            showDocSnack(view,doc_name,doc_ext,outFile);
+                                break;
 
                         }
-                    });
+
+                        Request.Builder builder = new Request.Builder()
+                                .url(url)
+                                .get();
+
+                        Call callDown = okHttpClient.newCall(builder.build());
+                        callDown.enqueue(new Callback() {
+                            @Override
+                            public void onFailure(Call call, IOException e) {
+                      //          Log.e("TAG", "=============onFailure===============");
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+                       //         Log.e("TAG", "=============onResponse===============");
+                       //         Log.e("TAG", "request headers:" + response.request().headers());
+                       //         Log.e("TAG", "response headers:" + response.headers());
+
+                                ResponseBody body = response.body();
+                                //wrap the original response body with progress
+                                ResponseBody responseBody = ProgressHelper.withProgress(body, new ProgressUIListener() {
+
+                                    //if you don't need this method, don't override this methd. It isn't an abstract method, just an empty method.
+                                    @Override
+                                    public void onUIProgressStart(long totalBytes) {
+                                        super.onUIProgressStart(totalBytes);
+                       //                 Log.e("TAG", "onUIProgressStart:" + totalBytes);
+                                    }
+
+                                    @Override
+                                    public void onUIProgressChanged(long numBytes, long totalBytes, float percent, float speed) {
+                           //             Log.e("TAG", "=============start===============");
+                           //             Log.e("TAG", "numBytes:" + numBytes);
+                           //             Log.e("TAG", "totalBytes:" + totalBytes);
+                           //             Log.e("TAG", "percent:" + percent);
+                           //             Log.e("TAG", "speed:" + speed);
+                           //             Log.e("TAG", "============= end ===============");
+
+                                        progressBar.setProgressWithAnimation((int) (100 * percent), 300);
+                                    }
+
+                                    //if you don't need this method, don't override this methd. It isn't an abstract method, just an empty method.
+                                    @Override
+                                    public void onUIProgressFinish() {
+                                        super.onUIProgressFinish();
+                            //            Log.e("TAG", "onUIProgressFinish:");
+                                        progressBar.setVisibility(View.INVISIBLE);
+                                        download.setVisibility(View.VISIBLE);
+                                        download.setImageResource(R.drawable.checked);
+                                    }
+
+                                });
+                                //read the body to file
+                                BufferedSource source = responseBody.source();
+                                File outFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + doc_name + "." + doc_ext);
+                                outFile.delete();
+                                outFile.getParentFile().mkdirs();
+                                outFile.createNewFile();
+                                BufferedSink sink = Okio.buffer(Okio.sink(outFile));
+                                source.readAll(sink);
+                                sink.flush();
+                                source.close();
+
+                                showDocSnack(view, doc_name, doc_ext, outFile);
+
+                            }
+                        });
 
 
+                    }
 
-                }
+                });
 
-            });
+            }
 
         }
     }
@@ -318,7 +283,7 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
         }
 
         private void showDocSnack(View mView, String name, final String extension, final File file){
-            Snackbar snackbar = Snackbar.make(mView, "Dokument " + name + extension + "je preuzet.",Snackbar.LENGTH_LONG);
+            Snackbar snackbar = Snackbar.make(mView, "Dokument " + name + "." + extension + " je preuzet.",Snackbar.LENGTH_LONG);
             snackbar.setAction("OTVORI", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relative_course_ac"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.tstudioz.fax.fme.activities.CourseActivity"

@@ -206,7 +206,7 @@ public class CourseWeek extends Fragment {
                                                            break;
                                                        case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpptx&rev=305":
                                                            materijal.setIcon(R.drawable.ppt);
-                                                           materijal.setVrsta("ppt");
+                                                           materijal.setVrsta("pptx");
                                                            materijal.setDownloadable(1);
                                                            break;
                                                        case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fxlsx&rev=305":
@@ -253,7 +253,7 @@ public class CourseWeek extends Fragment {
                                                            break;
                                                        case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fimage&rev=305":
                                                            materijal.setIcon(R.drawable.imagelink);
-                                                           materijal.setVrsta("png");
+                                                           materijal.setVrsta("jpg");
                                                            materijal.setDownloadable(1);
                                                            break;
                                                        default:
@@ -288,14 +288,19 @@ public class CourseWeek extends Fragment {
                         }finally {
                             mRealm.close();
                         }
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.notifyDataSetChanged();
-                                mProgress.setVisibility(View.INVISIBLE);
-                                mRecyclerView.setVisibility(View.VISIBLE);
-                            }
-                        });
+
+                        if(getActivity() != null) {
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.notifyDataSetChanged();
+                                    mProgress.setVisibility(View.INVISIBLE);
+                                    mRecyclerView.setVisibility(View.VISIBLE);
+                                }
+                            });
+
+                        }
 
                     }
 
