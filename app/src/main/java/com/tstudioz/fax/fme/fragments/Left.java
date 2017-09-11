@@ -68,8 +68,6 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     @BindView(R.id.raspored_progress) ProgressBar mRasporedProgress;
 
 
-    final Realm mrealm = Realm.getDefaultInstance();
-
     final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
             .schemaVersion(5)
@@ -81,6 +79,8 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
             .schemaVersion(12)
             .deleteRealmIfMigrationNeeded()
             .build();
+
+    Realm rlm, prealm, ptrealm, urealm, utrealm, srealm, strealm, crealm, ctrealm, petrealm, pettrealm, subrealm,subtrealm;
 
     Snackbar snack;
     EmployeeRVAdapterTable adapterPonTemp, adapterUtoTemp, adapterSriTemp, adapterCetTemp, adapterPetTemp, adapterSubTemp;
@@ -207,7 +207,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
                 }
             });
 
-            Realm rlm = Realm.getInstance(CredRealmCf);
+            rlm = Realm.getInstance(CredRealmCf);
             Korisnik kor = rlm.where(Korisnik.class).findFirst();
 
             OkHttpClient client = new OkHttpClient();
@@ -325,12 +325,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showPon(){
 
-        Realm.init(getActivity().getBaseContext());
-        Realm mrealm = Realm.getDefaultInstance();
+        prealm = Realm.getDefaultInstance();
 
-        mrealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiPon = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
-        mrealm.commitTransaction();
+        prealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiPon = prealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
+        prealm.commitTransaction();
 
         EmployeeRVAdapterTable adapter = new EmployeeRVAdapterTable(rezulatiPon);
         mRecyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -341,11 +340,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showPonTemp(){
 
-        Realm trealm = Realm.getInstance(tempRealm);
+        ptrealm = Realm.getInstance(tempRealm);
 
-        trealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiPon1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
-        trealm.commitTransaction();
+        ptrealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiPon1 = ptrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
+        ptrealm.commitTransaction();
 
         adapterPonTemp = new EmployeeRVAdapterTable(rezulatiPon1);
         mRecyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -356,12 +355,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showUto(){
 
-        Realm.init(getActivity().getBaseContext());
-        Realm mrealm = Realm.getDefaultInstance();
+        urealm = Realm.getDefaultInstance();
 
-        mrealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiUto = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
-        mrealm.commitTransaction();
+        urealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiUto = urealm.where(Predavanja.class).contains("detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
+        urealm.commitTransaction();
 
         EmployeeRVAdapterTable adapter2 = new EmployeeRVAdapterTable(rezulatiUto);
         recyclerUto.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -372,12 +370,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showUtoTemp() {
 
+        utrealm = Realm.getInstance(tempRealm);
 
-        Realm trealm = Realm.getInstance(tempRealm);
-
-        trealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiUto1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
-        trealm.commitTransaction();
+        utrealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiUto1 = utrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
+        utrealm.commitTransaction();
 
         adapterUtoTemp = new EmployeeRVAdapterTable(rezulatiUto1);
         recyclerUto.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -388,12 +385,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showSri(){
 
-        Realm.init(getActivity().getBaseContext());
-        Realm mrealm = Realm.getDefaultInstance();
+        srealm = Realm.getDefaultInstance();
 
-        mrealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiSri = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
-        mrealm.commitTransaction();
+        srealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiSri = srealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
+        srealm.commitTransaction();
 
         EmployeeRVAdapterTable adapter3 = new EmployeeRVAdapterTable(rezulatiSri);
         recyclerSri.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -404,12 +400,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showSriTemp(){
 
+        strealm = Realm.getInstance(tempRealm);
 
-        Realm trealm = Realm.getInstance(tempRealm);
-
-        trealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiSri1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
-        trealm.commitTransaction();
+        strealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiSri1 = strealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
+        strealm.commitTransaction();
 
         adapterSriTemp = new EmployeeRVAdapterTable(rezulatiSri1);
         recyclerSri.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -420,12 +415,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showCet(){
 
-        Realm.init(getActivity().getBaseContext());
-        Realm mrealm = Realm.getDefaultInstance();
+        crealm = Realm.getDefaultInstance();
 
-        mrealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiCet = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
-        mrealm.commitTransaction();
+        crealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiCet = crealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
+        crealm.commitTransaction();
 
         EmployeeRVAdapterTable adapter4 = new EmployeeRVAdapterTable(rezulatiCet);
         recyclerCet.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -436,11 +430,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showCetTemp( ){
 
-        Realm trealm = Realm.getInstance(tempRealm);
+        ctrealm = Realm.getInstance(tempRealm);
 
-        trealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiCet1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
-        trealm.commitTransaction();
+        ctrealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiCet1 = ctrealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
+        ctrealm.commitTransaction();
 
         adapterCetTemp = new EmployeeRVAdapterTable(rezulatiCet1);
         recyclerCet.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -451,12 +445,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showPet(){
 
-        Realm.init(getActivity().getBaseContext());
-        Realm mrealm = Realm.getDefaultInstance();
+        petrealm = Realm.getDefaultInstance();
 
-        mrealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiPet = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
-        mrealm.commitTransaction();
+        petrealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiPet = petrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
+        petrealm.commitTransaction();
 
         EmployeeRVAdapterTable adapter5 = new EmployeeRVAdapterTable(rezulatiPet);
         mRecyclerPet.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -467,11 +460,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showPetTemp(){
 
-        Realm trealm = Realm.getInstance(tempRealm);
+        pettrealm = Realm.getInstance(tempRealm);
 
-        trealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiPet1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
-        trealm.commitTransaction();
+        pettrealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiPet1 = pettrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
+        pettrealm.commitTransaction();
 
         adapterPetTemp = new EmployeeRVAdapterTable(rezulatiPet1);
         mRecyclerPet.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -482,12 +475,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showSub() {
 
-        Realm.init(getActivity().getBaseContext());
-        Realm mrealm = Realm.getDefaultInstance();
+        subrealm = Realm.getDefaultInstance();
 
-        mrealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiSub = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
-        mrealm.commitTransaction();
+        subrealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiSub = subrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
+        subrealm.commitTransaction();
 
         if (rezulatiSub.isEmpty()) {
             mLinearSub.setVisibility(View.GONE);
@@ -505,11 +497,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void showSubTemp(){
 
-        Realm trealm = Realm.getInstance(tempRealm);
+        subtrealm = Realm.getInstance(tempRealm);
 
-        trealm.beginTransaction();
-        RealmResults<Predavanja> rezulatiSub1 = trealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
-        trealm.commitTransaction();
+        subtrealm.beginTransaction();
+        RealmResults<Predavanja> rezulatiSub1 = subtrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
+        subtrealm.commitTransaction();
 
          adapterSubTemp = new EmployeeRVAdapterTable(rezulatiSub1);
          mRecyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -574,6 +566,50 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         super.onStop();
         if(snack!=null){
             snack.dismiss();
+        }
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if(rlm!=null) {
+            rlm.close();
+        }
+        if(prealm!=null) {
+            prealm.close();
+        }
+        if (ptrealm!=null) {
+            ptrealm.close();
+        }
+        if(urealm!=null) {
+            urealm.close();
+        }
+        if(utrealm!=null) {
+            utrealm.close();
+        }
+        if (srealm!=null){
+            srealm.close();
+        }
+        if (strealm!=null){
+            strealm.close();
+        }
+        if(crealm!=null) {
+            crealm.close();
+        }
+        if(ctrealm!=null){
+            ctrealm.close();
+        }
+        if(petrealm!=null){
+            petrealm.close();
+        }
+        if(pettrealm!=null){
+            pettrealm.close();
+        }
+        if(subrealm!=null) {
+            subrealm.close();
+        }
+        if(subtrealm!=null){
+        subtrealm.close();
         }
     }
 }

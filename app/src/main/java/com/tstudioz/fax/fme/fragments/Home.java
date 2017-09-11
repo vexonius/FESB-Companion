@@ -67,6 +67,9 @@ public class Home extends Fragment{
     double mLongitude = 16.469252;
 
     private Forecast mForecast;
+    Snackbar snack;
+
+    Realm mrealm;
 
     @BindView(R.id.temperatura_vrijednost) TextView mTemperatureLabel;
     @BindView(R.id.vlaznost_vrijednost) TextView mHumidityValue;
@@ -88,10 +91,10 @@ public class Home extends Fragment{
                              Bundle savedInstanceState) {
 
         Realm.init(getActivity().getApplicationContext());
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Set the layout you want to display in First Fragment
-        View view = inflater.inflate(R.layout.home_tab,
-                container, false);
+        View view = inflater.inflate(R.layout.home_tab, container, false);
 
         setHasOptionsMenu(true);
 
@@ -121,9 +124,6 @@ public class Home extends Fragment{
                 e.printStackTrace();
             }
 
-
-
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Setting custom fonts
         TextView textLokacija = (TextView) view.findViewById(R.id.txtloc);
@@ -239,7 +239,6 @@ public class Home extends Fragment{
 
     private void start() throws IOException, JSONException {
 
-
         // make call to server
         // get your own API KEY from developer.forecast.io and fill it in.
         final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude;
@@ -339,13 +338,12 @@ public class Home extends Fragment{
         mSummaryLabel.setText(sharedPref.getString("zadnji_opis", "-"));
         mIconImageView.setImageResource((sharedPref.getInt("imageId", R.drawable.clouds)));
 
-
     }
 
     public void showList() {
 
         Realm.init(getActivity().getBaseContext());
-        Realm mrealm = Realm.getDefaultInstance();
+        mrealm = Realm.getDefaultInstance();
 
         mrealm.beginTransaction();
         RealmResults<Predavanja> rezultati = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
@@ -366,17 +364,25 @@ public class Home extends Fragment{
     }
 
     public void showSnacOffline(){
-        Snackbar snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.show();
     }
 
     public void alertUserAboutError(){
-        Snackbar snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške pri dohvaćanju prognoze", Snackbar.LENGTH_LONG);
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške pri dohvaćanju prognoze", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.show();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if(mrealm!=null){
+        mrealm.close();
+        }
     }
 
 }

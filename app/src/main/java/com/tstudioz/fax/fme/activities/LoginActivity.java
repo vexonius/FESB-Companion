@@ -24,17 +24,28 @@ import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.util.CircularAnim;
 import com.tstudioz.fax.fme.database.Korisnik;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
 public class LoginActivity extends AppCompatActivity {
 
+    @BindView(R.id.login_button) Button but;
+    @BindView(R.id.relative_login) RelativeLayout relativeLayout;
+    @BindView(R.id.login_text) EditText editText;
+    @BindView(R.id.login_pass) EditText pass;
+    @BindView(R.id.login_pomoc) TextView loginHelp;
+
+    Snackbar snack;
+    Realm mLogRealm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        ButterKnife.bind(this);
 
         /**Realm inicijalizacija*/
         Realm.init(this);
@@ -54,26 +65,16 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         }
 
-        final RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.relative_login);
-
-
-        final Button but = (Button)findViewById(R.id.login_button);
         but.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if(isNetworkAvailable()==true) {
-                    EditText editText = (EditText)findViewById(R.id.login_text);
                     final String username = editText.getText().toString();
-
-                    EditText pass = (EditText)findViewById(R.id.login_pass);
                     final String password = pass.getText().toString();
 
                     if(username.isEmpty() || password.isEmpty()){
-                        Snackbar snack = Snackbar.make(relativeLayout, "Niste unijeli korisničke podatke", Snackbar.LENGTH_SHORT);
-                        View snackBarView = snack.getView();
-                        snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
-                        snack.show();
+                       showNoDataSnack();
 
                     }else{
 
@@ -82,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putBoolean("loged_in", true);
                         editor.commit();
 
-                       final Realm mLogRealm = Realm.getInstance(loginRealmCf);
+                        mLogRealm = Realm.getInstance(loginRealmCf);
 
                         mLogRealm.executeTransaction(new Realm.Transaction() {
                             @Override
@@ -110,18 +111,12 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                 }else {
-
-                    Snackbar snackbar = Snackbar.make(relativeLayout, "Niste povezani", Snackbar.LENGTH_SHORT);
-                    View snackBarView2 = snackbar.getView();
-                    snackBarView2.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
-                    snackbar.show();
-
+                    showNoConnSnack();
 
                 }
             }
         });
 
-        TextView loginHelp = (TextView)findViewById(R.id.login_pomoc);
         loginHelp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -158,5 +153,28 @@ public class LoginActivity extends AppCompatActivity {
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
     }
+
+    public void showNoDataSnack(){
+        snack = Snackbar.make(relativeLayout, "Niste unijeli korisničke podatke", Snackbar.LENGTH_SHORT);
+        View snackBarView = snack.getView();
+        snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
+        snack.show();
+    }
+
+    public void showNoConnSnack(){
+        snack = Snackbar.make(relativeLayout, "Niste povezani!", Snackbar.LENGTH_SHORT);
+        View snackBarView2 = snack.getView();
+        snackBarView2.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
+        snack.show();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if(mLogRealm!=null) {
+            mLogRealm.close();
+        }
+    }
+
 
 }

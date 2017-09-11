@@ -26,7 +26,6 @@ public class CourseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // getSupportActionBar().setElevation(0.0f);
         setContentView(R.layout.activity_course);
 
         Intent intent = getIntent();
@@ -114,7 +113,6 @@ public class CourseActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
 
                 } else {
 

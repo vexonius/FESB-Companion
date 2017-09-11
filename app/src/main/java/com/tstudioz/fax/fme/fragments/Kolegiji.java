@@ -65,6 +65,8 @@ public class Kolegiji extends Fragment {
     @BindView(R.id.kolegij_progress) ProgressBar progress;
 
     CoursesAdapter kolegijiAdapter;
+    Realm credRealm;
+    Realm realm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -100,7 +102,7 @@ public class Kolegiji extends Fragment {
                     .cookieJar(cookieJar)
                     .build();
 
-                    Realm credRealm = Realm.getInstance(CredRealmCf);
+                    credRealm = Realm.getInstance(CredRealmCf);
                     Korisnik kor = credRealm.where(Korisnik.class).findFirst();
 
                     final RequestBody formData = new FormBody.Builder()
@@ -131,19 +133,26 @@ public class Kolegiji extends Fragment {
                             Elements elements = content.select("div.column.c1");
 
                             final Realm mRealm = Realm.getInstance(realmConfig);
-                            mRealm.beginTransaction();
 
-                            mRealm.deleteAll();
+                            try {
+                                mRealm.beginTransaction();
 
-                            for(Element el : elements){
+                                mRealm.deleteAll();
 
-                                Kolegij kg = mRealm.createObject(Kolegij.class);
-                                kg.setName(el.text());
-                                kg.setLink(el.select("a").first().attr("href"));
+                                for(Element el : elements){
 
+                                    Kolegij kg = mRealm.createObject(Kolegij.class);
+                                    kg.setName(el.text());
+                                    kg.setLink(el.select("a").first().attr("href"));
+
+                                }
+
+                                mRealm.commitTransaction();
+                            }finally {
+                                mRealm.close();
                             }
 
-                            mRealm.commitTransaction();
+
 
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
@@ -160,7 +169,7 @@ public class Kolegiji extends Fragment {
 
     public void showList(){
 
-        Realm realm = Realm.getInstance(realmConfig);
+        realm = Realm.getInstance(realmConfig);
         RealmResults<Kolegij> rezultati = realm.where(Kolegij.class).findAll();
 
         kolegijiAdapter = new CoursesAdapter(rezultati);
@@ -175,10 +184,14 @@ public class Kolegiji extends Fragment {
     }
 
     @Override
-    public void onStop(){
-        super.onStop();
-        Realm rlm = Realm.getInstance(realmConfig);
-        rlm.close();
+    public void onDestroy(){
+        super.onDestroy();
+
+        if(credRealm!=null)
+        credRealm.close();
+
+        if(realm!=null)
+        realm.close();
     }
 
 }

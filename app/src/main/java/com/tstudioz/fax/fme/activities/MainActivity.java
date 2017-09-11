@@ -76,6 +76,12 @@ public class MainActivity extends AppCompatActivity {
     public AlertDialog alertDialog;
     public long back_pressed;
 
+    Realm mainealm;
+    Realm realmLog;
+    Realm rlmLog;
+
+    Snackbar snack;
+
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
             .name("glavni.realm")
             .schemaVersion(3)
@@ -104,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
 
-        Realm realmLog = Realm.getInstance(CredRealmCf);
+         realmLog = Realm.getInstance(CredRealmCf);
 
         if (!realmLog.isEmpty()) {
             new MojRaspored().execute();
@@ -213,27 +219,20 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        /**
-        final AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
-        Home hf = new Home();
-        ft.replace(R.id.frame, hf);
-        ft.addToBackStack(null);
-        ft.commit();
-
-        getSupportActionBar().setTitle("FESB Companion");
-        bottomNavigation.setCurrentItem(0);
-
-         */
-
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Realm rl = Realm.getInstance(mainRealmConfig);
-        rl.close();
+
+        if(realmLog!=null)
+        realmLog.close();
+
+        if(rlmLog!=null)
+        rlmLog.close();
+
+        if(mainealm!=null)
+        mainealm.close();
     }
 
 
@@ -258,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean("loged_in", false);
             editor.apply();
 
-            final Realm rlmLog = Realm.getInstance(CredRealmCf);
+            rlmLog = Realm.getInstance(CredRealmCf);
             rlmLog.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -307,16 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-            if (back_pressed + 2000 > System.currentTimeMillis()){
-                finish();
-            } else {
-                Snackbar mSnack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Pritisnite nazad za izlazak iz aplikacije", Snackbar.LENGTH_SHORT);
-                View viewto = mSnack.getView();
-                viewto.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.grey_nice));
-                mSnack.show();
-            }
-
-            back_pressed= System.currentTimeMillis();
+            exitApp();
         }
 
 
@@ -485,14 +475,14 @@ public class MainActivity extends AppCompatActivity {
     public void showList() {
 
         Realm.init(getBaseContext());
-        Realm mrealm = Realm.getInstance(mainRealmConfig);
+        mainealm = Realm.getInstance(mainRealmConfig);
         ProgressBar pbar1 = (ProgressBar) findViewById(R.id.list_progressbar);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv);
         RelativeLayout np = (RelativeLayout)findViewById(R.id.nema_predavanja);
 
-        mrealm.beginTransaction();
-        RealmResults<Predavanja> rezultati = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
-        mrealm.commitTransaction();
+        mainealm.beginTransaction();
+        RealmResults<Predavanja> rezultati = mainealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
+        mainealm.commitTransaction();
 
         if (rezultati.isEmpty()) {
             recyclerView.setVisibility(View.INVISIBLE);
@@ -540,10 +530,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showSnacOffline(){
-        Snackbar snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
+        snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
         snack.show();
+    }
+
+    public void exitApp(){
+        if (back_pressed + 2000 > System.currentTimeMillis()){
+            finish();
+        } else {
+            snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Pritisnite nazad za izlazak iz aplikacije", Snackbar.LENGTH_SHORT);
+            View viewto = snack.getView();
+            viewto.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.grey_nice));
+            snack.show();
+        }
+        back_pressed= System.currentTimeMillis();
     }
 
 }

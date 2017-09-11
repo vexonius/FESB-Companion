@@ -60,8 +60,9 @@ public class CourseWeek extends Fragment {
             .deleteRealmIfMigrationNeeded()
             .build();
 
+    Realm tRealm;
+    Realm wRealm;
     CourseWeeksAdapter adapter;
-
 
     @BindView(R.id.course_week_rv) RecyclerView mRecyclerView;
     @BindView(R.id.course_week_progress) ProgressBar mProgress;
@@ -104,7 +105,7 @@ public class CourseWeek extends Fragment {
                 .cookieJar(cookieJar)
                 .build();
 
-        Realm tRealm = Realm.getInstance(CredRealmCf);
+        tRealm = Realm.getInstance(CredRealmCf);
         Korisnik korisnik = tRealm.where(Korisnik.class).findFirst();
 
         final RequestBody formData = new FormBody.Builder()
@@ -146,7 +147,7 @@ public class CourseWeek extends Fragment {
 
                         Document doc = Jsoup.parse(response.body().string());
 
-                        final Realm mRealm = Realm.getInstance(realmConfig);
+                        Realm mRealm = Realm.getInstance(realmConfig);
                         final RealmResults<KolegijTjedan> tjedni = mRealm.where(KolegijTjedan.class).findAll();
                         mRealm.executeTransaction(new Realm.Transaction() {
                             @Override
@@ -311,8 +312,8 @@ public class CourseWeek extends Fragment {
     }
 
     public void showWeeks(){
-        final Realm mRealm = Realm.getInstance(realmConfig);
-        final RealmResults<KolegijTjedan> tjedni = mRealm.where(KolegijTjedan.class).findAll();
+        wRealm = Realm.getInstance(realmConfig);
+        final RealmResults<KolegijTjedan> tjedni = wRealm.where(KolegijTjedan.class).findAll();
 
         adapter = new CourseWeeksAdapter(tjedni);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -324,7 +325,11 @@ public class CourseWeek extends Fragment {
     @Override
     public void onStop(){
         super.onStop();
-        Realm rlm = Realm.getInstance(realmConfig);
-        rlm.close();
+
+        if(tRealm!=null)
+        tRealm.close();
+
+        if (wRealm!=null)
+        wRealm.close();
     }
 }
