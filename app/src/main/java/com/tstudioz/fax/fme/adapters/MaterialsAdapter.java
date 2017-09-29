@@ -1,16 +1,11 @@
 package com.tstudioz.fax.fme.adapters;
 
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
-import android.provider.ContactsContract;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -20,24 +15,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import com.tstudioz.fax.fme.R;
-
 import com.tstudioz.fax.fme.database.Materijal;
-
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -127,7 +116,7 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
             doc_name = materials.get(getAdapterPosition()).getImeMtarijala();
             doc_ext = materials.get(getAdapterPosition()).getVrsta();
-             String chromeurl = materials.get(getAdapterPosition()).getUrl();
+            String chromeurl = materials.get(getAdapterPosition()).getUrl();
 
             if (materials.get(getAdapterPosition()).getDownloadable() == 0) {
 
@@ -174,7 +163,7 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
                                 Element element = doc.select("div.region-content").first();
                                 final Element links = element.select("a[href]").first();
-                                Snackbar.make(view, links.attr("href"), Snackbar.LENGTH_SHORT).show();
+                         //
                          //       Log.d("link za doc", links.attr("href"));
                                 url = links.attr("href");
                                 break;
@@ -191,7 +180,6 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                                 Element elementx = doc.select("div.region-content").first();
 
                                 final Element src = elementx.select("img[src]").first();
-                                Snackbar.make(view, src.attr("src"), Snackbar.LENGTH_SHORT).show();
                            //      Log.d("link za doc", src.attr("src"));
                                 url = src.attr("src");
 

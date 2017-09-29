@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         /**Realm incicijalizacija  */
-        Realm.init(this);
         Realm.setDefaultConfiguration(mainRealmConfig);
 
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
@@ -112,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
          realmLog = Realm.getInstance(CredRealmCf);
 
-        if (!realmLog.isEmpty()) {
+        if (realmLog!=null) {
             new MojRaspored().execute();
         } else {
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show();

@@ -10,24 +10,42 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.util.CircularAnim;
 import com.tstudioz.fax.fme.database.Korisnik;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.CookieJar;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -36,9 +54,16 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.login_text) EditText editText;
     @BindView(R.id.login_pass) EditText pass;
     @BindView(R.id.login_pomoc) TextView loginHelp;
+    @BindView(R.id.progress_login) ProgressBar bar;
 
     Snackbar snack;
     Realm mLogRealm;
+
+    final RealmConfiguration loginRealmCf = new RealmConfiguration.Builder()
+            .name("encrypted.realm")
+            .schemaVersion(5)
+            .deleteRealmIfMigrationNeeded()
+            .build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +72,14 @@ public class LoginActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        /**Realm inicijalizacija*/
-        Realm.init(this);
+        SharedPreferences sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+        Boolean prvi_put = sharedPreferences.getBoolean("first_open", true);
 
-       final RealmConfiguration loginRealmCf = new RealmConfiguration.Builder()
-                .name("encrypted.realm")
-                .schemaVersion(5)
-                .deleteRealmIfMigrationNeeded()
-                .build();
+        if(prvi_put==true) {
+            startActivity(new Intent(LoginActivity.this, Welcome.class));
+        }
 
-        SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-        Boolean prijavljen = sharedPref.getBoolean("loged_in", false);
+        Boolean prijavljen = sharedPreferences.getBoolean("loged_in", false);
 
         if(prijavljen==true){
             Intent nwIntent = new Intent(LoginActivity.this, MainActivity.class);
@@ -77,42 +99,13 @@ public class LoginActivity extends AppCompatActivity {
                        showNoDataSnack();
 
                     }else{
-
-                        SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-                        SharedPreferences.Editor editor =  sharedPref.edit();
-                        editor.putBoolean("loged_in", true);
-                        editor.commit();
-
-                        mLogRealm = Realm.getInstance(loginRealmCf);
-
-                        mLogRealm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                Korisnik user = mLogRealm.createObject(Korisnik.class);
-                                user.setUsername(username);
-                                user.setLozinka(password);
-                            }
-                        });
-
-                        if (view != null) {
-                            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                        }
-
-                        CircularAnim.fullActivity(LoginActivity.this, view)
-                                .colorOrImageRes(R.color.colorAccent)
-                                .go(new CircularAnim.OnAnimationEndListener() {
-                                    @Override
-                                    public void onAnimationEnd() {
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                        finish();
-                                    }
-                                });
+                        bar.bringToFront();
+                        bar.setVisibility(View.VISIBLE);
+                        but.setText(" ");
+                        validateUser(username, password, view);
                     }
-
                 }else {
                     showNoConnSnack();
-
                 }
             }
         });
@@ -166,6 +159,113 @@ public class LoginActivity extends AppCompatActivity {
         View snackBarView2 = snack.getView();
         snackBarView2.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
         snack.show();
+    }
+
+    public void showErrorSnack(){
+        snack = Snackbar.make(relativeLayout, "Uneseni podatci su pogrešni!", Snackbar.LENGTH_SHORT);
+        View snackBarView3 = snack.getView();
+        snackBarView3.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
+        snack.show();
+    }
+
+     public void validateUser(final String user, final String pass, final View mView){
+
+         final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(this));
+
+         final HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+         logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+
+        final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .cookieJar(cookieJar)
+                .addInterceptor(logging)
+                .build();
+
+         final RequestBody formData = new FormBody.Builder()
+                 .add("Username", user)
+                 .add("Password", pass)
+                 .add("IsRememberMeChecked", "true")
+                 .build();
+
+         final Request rq = new Request.Builder()
+                 .url("https://korisnik.fesb.unist.hr/prijava")
+                 .post(formData)
+               //  .get()
+                 .build();
+
+         Call call0 = okHttpClient.newCall(rq);
+         call0.enqueue(new Callback() {
+             @Override
+             public void onFailure(Call call, IOException e) {
+                 Log.d("pogreska", "failure");
+             }
+
+             @Override
+             public void onResponse(Call call, Response response) throws IOException {
+
+                 Log.e("koji kurac", response.request().url().toString());
+
+         Log.e("konacni url", response.toString());
+
+                if(response.request().url().toString().equals("https://korisnik.fesb.unist.hr/")){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            register(user, pass, mView);
+                        }
+                    });
+
+                }
+                else {
+                 runOnUiThread(new Runnable() {
+                     @Override
+                     public void run() {
+                         showErrorSnack();
+                         bar.setVisibility(View.INVISIBLE);
+                         but.setText("PRIJAVA");
+                     }
+                 });
+                }
+
+
+            }
+        });
+
+    }
+
+    public void register(final String username, final String password, View nView){
+
+        SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+        SharedPreferences.Editor editor =  sharedPref.edit();
+        editor.putBoolean("loged_in", true);
+        editor.commit();
+
+        mLogRealm = Realm.getInstance(loginRealmCf);
+
+        mLogRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Korisnik user = mLogRealm.createObject(Korisnik.class);
+                user.setUsername(username);
+                user.setLozinka(password);
+            }
+        });
+
+        if (nView != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(nView.getWindowToken(), 0);
+        }
+
+        CircularAnim.fullActivity(LoginActivity.this, nView)
+                .colorOrImageRes(R.color.colorAccent)
+                .go(new CircularAnim.OnAnimationEndListener() {
+                    @Override
+                    public void onAnimationEnd() {
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    }
+                });
     }
 
     @Override

@@ -8,12 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.KolegijTjedan;
-import com.tstudioz.fax.fme.database.Materijal;
 
 import io.realm.RealmChangeListener;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 

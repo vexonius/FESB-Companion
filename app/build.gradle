@@ -10,7 +10,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 26
         versionCode 7
-        versionName "1.7.30_beta"
+        versionName "1.8.00_beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -49,5 +49,14 @@ dependencies {
     compile 'io.github.lizhangqu:coreprogress:1.0.2'
     compile 'com.mikhaellopez:circularprogressbar:1.1.1'
     compile 'com.android.support:customtabs:26.0.2'
+    compile 'com.github.apl-devs:appintro:v4.2.2'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     testCompile 'junit:junit:4.12'
+}
+
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.code.findbugs:jsr305:3.0.2'
+    }
 }

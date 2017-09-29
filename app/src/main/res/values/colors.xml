@@ -35,4 +35,10 @@
         <item>@color/_10white</item>
     </array>
 
+    <!-- Screens background color-->
+    <color name="welcome1">#f64c73</color>
+    <color name="welcome2">#20d2bb</color>
+    <color name="welcome3">#3395ff</color>
+    <color name="welcome4">#c873f4</color>
+
 </resources>
