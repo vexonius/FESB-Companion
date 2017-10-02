@@ -81,10 +81,12 @@
                     android:id="@+id/progress_login"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:progressTint="@color/white"
+                    android:background="@drawable/button_blue"
                     android:indeterminate="true"
                     android:layout_gravity="center_horizontal|center_vertical"
-                    android:visibility="visible"
+                    android:visibility="invisible"
+                    android:indeterminateTint="@color/white"
+                    android:indeterminateTintMode="src_in"
                     />
 
                 <Button

@@ -176,7 +176,8 @@ public class Prisutnost extends Fragment {
                                  try {
                                      mRealm.beginTransaction();
 
-                                     if (doc.select("#studentGeneralReportTable > div.semster.winter > div.emptyList") == null) {
+                                     if(zimski.getElementsByClass("emptyList").first()==null) {
+
                                          Elements zimskiKolegiji = zimskaPredavanja.select("a");
 
 
@@ -234,10 +235,11 @@ public class Prisutnost extends Fragment {
 
 
                                          }
-
                                      }
 
-                                     if (doc.select("#studentGeneralReportTable > div.semster.summer > div.emptyList") == null) {
+
+                                     if(litnji.getElementsByClass("emptyList").first()==null) {
+
                                          Elements litnjiKolegiji = litnjaPredavanja.select("a");
 
 
@@ -289,7 +291,6 @@ public class Prisutnost extends Fragment {
                                                              }
                                                          }
                                                      });
-
 
                                                  }
                                              });

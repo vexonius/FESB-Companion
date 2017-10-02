@@ -127,42 +127,47 @@ public class Kolegiji extends Fragment {
                         public void onResponse(Call call, Response response) throws IOException {
 
                             Document doc = Jsoup.parse(response.body().string());
-                            Log.d("Uspjeh", doc.html());
+                            Log.d("Uspjeh", doc.body().toString());
 
                             Element content = doc.getElementById("inst17149");
-                            Elements elements = content.select("div.column.c1");
 
-                            final Realm mRealm = Realm.getInstance(realmConfig);
+                            if (content.select("div.column.c1") != null) {
+                                Elements elements = content.select("div.column.c1");
 
-                            try {
-                                mRealm.beginTransaction();
+                                final Realm mRealm = Realm.getInstance(realmConfig);
 
-                                mRealm.deleteAll();
+                                try {
+                                    mRealm.beginTransaction();
 
-                                for(Element el : elements){
+                                    mRealm.deleteAll();
 
-                                    Kolegij kg = mRealm.createObject(Kolegij.class);
-                                    kg.setName(el.text());
-                                    kg.setLink(el.select("a").first().attr("href"));
+                                    for (Element el : elements) {
+                                        if (el != null) {
 
+                                            Kolegij kg = mRealm.createObject(Kolegij.class);
+                                            kg.setName(el.text());
+                                            kg.setLink(el.select("a").first().attr("href"));
+
+                                        }
+
+                                    }
+
+                                    mRealm.commitTransaction();
+                                } finally {
+                                    mRealm.close();
                                 }
 
-                                mRealm.commitTransaction();
-                            }finally {
-                                mRealm.close();
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        updateList();
+                                        progress.setVisibility(View.INVISIBLE);
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                    }
+                                });
+
                             }
-
-
-
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    updateList();
-                                    progress.setVisibility(View.INVISIBLE);
-                                    recyclerView.setVisibility(View.VISIBLE);
-                                }
-                            });
-
                         }
                     });
     }

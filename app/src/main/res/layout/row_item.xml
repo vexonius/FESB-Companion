@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relative_home_row_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
@@ -17,9 +18,9 @@
     <RelativeLayout
         android:id="@+id/textBox"
         android:layout_width="20dp"
-        android:layout_height="62dp"
+        android:layout_height="60dp"
         android:elevation="10dp"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:background="#00c4ff"
         android:gravity="center">
         </RelativeLayout>

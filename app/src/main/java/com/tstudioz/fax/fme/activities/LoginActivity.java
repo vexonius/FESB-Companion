@@ -28,8 +28,6 @@ import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.util.CircularAnim;
 import com.tstudioz.fax.fme.database.Korisnik;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 
@@ -45,7 +43,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.logging.HttpLoggingInterceptor;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -99,9 +96,8 @@ public class LoginActivity extends AppCompatActivity {
                        showNoDataSnack();
 
                     }else{
-                        bar.bringToFront();
                         bar.setVisibility(View.VISIBLE);
-                        but.setText(" ");
+                        but.setVisibility(View.INVISIBLE);
                         validateUser(username, password, view);
                     }
                 }else {
@@ -172,14 +168,11 @@ public class LoginActivity extends AppCompatActivity {
 
          final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(this));
 
-         final HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-         logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
         final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
                 .followRedirects(true)
                 .followSslRedirects(true)
                 .cookieJar(cookieJar)
-                .addInterceptor(logging)
                 .build();
 
          final RequestBody formData = new FormBody.Builder()
@@ -223,7 +216,7 @@ public class LoginActivity extends AppCompatActivity {
                      public void run() {
                          showErrorSnack();
                          bar.setVisibility(View.INVISIBLE);
-                         but.setText("PRIJAVA");
+                         but.setVisibility(View.VISIBLE);
                      }
                  });
                 }
