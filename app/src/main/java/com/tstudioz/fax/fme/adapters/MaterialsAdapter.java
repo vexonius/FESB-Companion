@@ -163,9 +163,13 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
                                 Element element = doc.select("div.region-content").first();
                                 final Element links = element.select("a[href]").first();
-                         //
-                         //       Log.d("link za doc", links.attr("href"));
-                                url = links.attr("href");
+                                if(links !=null){
+                                    url = links.attr("href");
+                                }else {
+                                    url = rq.url().toString();
+                                }
+
+
                                 break;
 
                             case "docx":
@@ -225,7 +229,7 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                            //             Log.e("TAG", "speed:" + speed);
                            //             Log.e("TAG", "============= end ===============");
 
-                                        progressBar.setProgressWithAnimation((int) (100 * percent), 300);
+                                        progressBar.setProgressWithAnimation((int) (100 * percent), 200);
                                     }
 
                                     //if you don't need this method, don't override this methd. It isn't an abstract method, just an empty method.

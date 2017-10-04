@@ -118,12 +118,12 @@ public class Home extends Fragment{
         }
                    */
 
-          try {
-                start();
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
-            }
-
+     /**     try {
+     /*          start();
+     /*      } catch (IOException | JSONException e) {
+     /*          e.printStackTrace();
+     /*      }
+     */
 
         //Setting custom fonts
         TextView textLokacija = (TextView) view.findViewById(R.id.txtloc);

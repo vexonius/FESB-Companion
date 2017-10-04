@@ -108,206 +108,211 @@ public class CourseWeek extends Fragment {
         tRealm = Realm.getInstance(CredRealmCf);
         Korisnik korisnik = tRealm.where(Korisnik.class).findFirst();
 
-        final RequestBody formData = new FormBody.Builder()
-                .add("Username", korisnik.getUsername())
-                .add("Password", korisnik.getLozinka())
-                .add("IsRememberMeChecked", "true")
-                .build();
+        try {
 
-        Request rq = new Request.Builder()
-                .url("https://korisnik.fesb.unist.hr/prijava?returnURL=https://elearning.fesb.unist.hr/login/index.php")
-                .post(formData)
-                .build();
+            final RequestBody formData = new FormBody.Builder()
+                    .add("Username", korisnik.getUsername())
+                    .add("Password", korisnik.getLozinka())
+                    .add("IsRememberMeChecked", "true")
+                    .build();
 
-
-        Call call = okHttpClient.newCall(rq);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("pogreska", "failure");
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
-                Request request = new Request.Builder()
-                        .url(url)
-                        .get()
-                        .build();
-
-                Call call1 = okHttpClient.newCall(request);
-                call1.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        Log.d("pogreska", "failure");
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-
-                        Document doc = Jsoup.parse(response.body().string());
-
-                        Realm mRealm = Realm.getInstance(realmConfig);
-                        final RealmResults<KolegijTjedan> tjedni = mRealm.where(KolegijTjedan.class).findAll();
-                        mRealm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                tjedni.deleteAllFromRealm();
-                            }
-                        });
-                        try {
-
-                            Element content = doc.select("div.course-content").first();
-                            Elements selements = content.getElementsByClass("section main clearfix");
+            Request rq = new Request.Builder()
+                    .url("https://korisnik.fesb.unist.hr/prijava?returnURL=https://elearning.fesb.unist.hr/login/index.php")
+                    .post(formData)
+                    .build();
 
 
+            Call call = okHttpClient.newCall(rq);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("pogreska", "failure");
+                }
 
-                            mRealm.beginTransaction();
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
 
-                            int i = 0;
-                            for (Element element : selements) {
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .get()
+                            .build();
 
-                                KolegijTjedan kolegijTjedan = mRealm.createObject(KolegijTjedan.class);
-                                kolegijTjedan.setIndex(i++);
-
-                                kolegijTjedan.setTjedan(element.select("div.content > h3").text());
-                                kolegijTjedan.setOpis(element.select("div.summary").first().text());
-
-                               if(element.getElementsByClass("section img-text").first()!=null) {
-                                   Element modz = element.getElementsByClass("section img-text").first();
-                                //   Element sect = modz.getElementsByClass("activity url modtype_url").first();
-                                //   Element docs_section = sect.getElementsByClass("mod-indent").first();
-                                //   Element spenk = docs_section.select("a > span").first();
-
-                                   Elements sections = modz.select("div.mod-indent");
-
-                                   for(Element sekcija : sections){
-
-                                       if((!sekcija.select("span.instancename").text().equals("News forum"))) {
-                                           if (!sekcija.select("span.instancename").text().isEmpty()) {
-                                               Materijal materijal = mRealm.createObject(Materijal.class);
-                                               materijal.setImeMtarijala(sekcija.select("span.instancename").text());
-                                               Log.d("linkz", sekcija.select("span.instancename").text());
-
-                                               if (sekcija.getElementsByClass("activityicon").first() != null) {
-                                                   Element ikona = sekcija.getElementsByClass("activityicon").first();
-
-                                                   switch (ikona.attr("src")) {
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpdf&rev=305":
-                                                           materijal.setIcon(R.drawable.pdf);
-                                                           materijal.setVrsta("pdf");
-                                                           materijal.setDownloadable(1);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fword&rev=305":
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocm&rev=305":
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocx&rev=305":
-                                                           materijal.setIcon(R.drawable.word);
-                                                           materijal.setVrsta("docx");
-                                                           materijal.setDownloadable(1);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpptx&rev=305":
-                                                           materijal.setIcon(R.drawable.ppt);
-                                                           materijal.setVrsta("pptx");
-                                                           materijal.setDownloadable(1);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fxlsx&rev=305":
-                                                           materijal.setIcon(R.drawable.excel);
-                                                           materijal.setVrsta("xlsx");
-                                                           materijal.setDownloadable(1);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=folder":
-                                                           materijal.setIcon(R.drawable.folder);
-                                                           materijal.setVrsta("folder");
-                                                           materijal.setDownloadable(0);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Ftext&rev=305":
-                                                           materijal.setIcon(R.drawable.txt);
-                                                           materijal.setVrsta("txt");
-                                                           materijal.setDownloadable(1);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=choice":
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=quiz":
-                                                           materijal.setIcon(R.drawable.quiz);
-                                                           materijal.setVrsta("quiz");
-                                                           materijal.setDownloadable(0);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=assignment":
-                                                           materijal.setIcon(R.drawable.assign);
-                                                           materijal.setVrsta("assign");
-                                                           materijal.setDownloadable(0);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fhtml&rev=305":
-                                                           materijal.setIcon(R.drawable.link);
-                                                           materijal.setVrsta("link");
-                                                           materijal.setDownloadable(0);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=page":
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fweb&rev=305":
-                                                           materijal.setIcon(R.drawable.link);
-                                                           materijal.setVrsta("link");
-                                                           materijal.setDownloadable(0);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fzip&rev=305":
-                                                           materijal.setIcon(R.drawable.archive);
-                                                           materijal.setVrsta("zip");
-                                                           materijal.setDownloadable(1);
-                                                           break;
-                                                       case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fimage&rev=305":
-                                                           materijal.setIcon(R.drawable.imagelink);
-                                                           materijal.setVrsta("jpg");
-                                                           materijal.setDownloadable(1);
-                                                           break;
-                                                       default:
-                                                           materijal.setIcon(R.drawable.unknown);
-                                                           materijal.setVrsta("unknown");
-                                                           materijal.setDownloadable(0);
-                                                           break;
-                                                   }
-
-
-                                                   Log.d("linkz", ikona.attr("src"));
-                                               }
-
-                                          //     materijal.setVrsta(sekcija.select("span.accesshide ").text());
-                                          //     Log.d("linkz", sekcija.select("span.accesshide ").text());
-
-                                               materijal.setUrl(sekcija.select("a").attr("href"));
-                                               Log.d("textzz", sekcija.select("a").attr("href"));
-
-                                               kolegijTjedan.materijali.add(materijal);
-                                           }
-                                       }
-
-                                   }
-
-                               }
-
-                            }
-
-                            mRealm.commitTransaction();
-
-                        }finally {
-                            mRealm.close();
+                    Call call1 = okHttpClient.newCall(request);
+                    call1.enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            Log.d("pogreska", "failure");
                         }
 
-                        if(getActivity() != null) {
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
 
-                            getActivity().runOnUiThread(new Runnable() {
+                            Document doc = Jsoup.parse(response.body().string());
+
+                            Realm mRealm = Realm.getInstance(realmConfig);
+                            final RealmResults<KolegijTjedan> tjedni = mRealm.where(KolegijTjedan.class).findAll();
+                            mRealm.executeTransaction(new Realm.Transaction() {
                                 @Override
-                                public void run() {
-                                    adapter.notifyDataSetChanged();
-                                    mProgress.setVisibility(View.INVISIBLE);
-                                    mRecyclerView.setVisibility(View.VISIBLE);
+                                public void execute(Realm realm) {
+                                    tjedni.deleteAllFromRealm();
                                 }
                             });
+                            try {
+
+                                Element content = doc.select("div.course-content").first();
+                                Elements selements = content.getElementsByClass("section main clearfix");
+
+
+                                mRealm.beginTransaction();
+
+                                int i = 0;
+                                for (Element element : selements) {
+
+                                    KolegijTjedan kolegijTjedan = mRealm.createObject(KolegijTjedan.class);
+                                    kolegijTjedan.setIndex(i++);
+
+                                    kolegijTjedan.setTjedan(element.select("div.content > h3").text());
+                                    kolegijTjedan.setOpis(element.select("div.summary").first().text());
+
+                                    if (element.getElementsByClass("section img-text").first() != null) {
+                                        Element modz = element.getElementsByClass("section img-text").first();
+                                        //   Element sect = modz.getElementsByClass("activity url modtype_url").first();
+                                        //   Element docs_section = sect.getElementsByClass("mod-indent").first();
+                                        //   Element spenk = docs_section.select("a > span").first();
+
+                                        Elements sections = modz.select("div.mod-indent");
+
+                                        for (Element sekcija : sections) {
+
+                                            if ((!sekcija.select("span.instancename").text().equals("News forum"))) {
+                                                if (!sekcija.select("span.instancename").text().isEmpty()) {
+                                                    Materijal materijal = mRealm.createObject(Materijal.class);
+                                                    materijal.setImeMtarijala(sekcija.select("span.instancename").text());
+                                                    Log.d("linkz", sekcija.select("span.instancename").text());
+
+                                                    if (sekcija.getElementsByClass("activityicon").first() != null) {
+                                                        Element ikona = sekcija.getElementsByClass("activityicon").first();
+
+                                                        switch (ikona.attr("src")) {
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpdf&rev=305":
+                                                                materijal.setIcon(R.drawable.pdf);
+                                                                materijal.setVrsta("pdf");
+                                                                materijal.setDownloadable(1);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fword&rev=305":
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocm&rev=305":
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fdocx&rev=305":
+                                                                materijal.setIcon(R.drawable.word);
+                                                                materijal.setVrsta("docx");
+                                                                materijal.setDownloadable(1);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpptx&rev=305":
+                                                                materijal.setIcon(R.drawable.ppt);
+                                                                materijal.setVrsta("pptx");
+                                                                materijal.setDownloadable(1);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fxlsx&rev=305":
+                                                                materijal.setIcon(R.drawable.excel);
+                                                                materijal.setVrsta("xlsx");
+                                                                materijal.setDownloadable(1);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=folder":
+                                                                materijal.setIcon(R.drawable.folder);
+                                                                materijal.setVrsta("folder");
+                                                                materijal.setDownloadable(0);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Ftext&rev=305":
+                                                                materijal.setIcon(R.drawable.txt);
+                                                                materijal.setVrsta("txt");
+                                                                materijal.setDownloadable(1);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=choice":
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=quiz":
+                                                                materijal.setIcon(R.drawable.quiz);
+                                                                materijal.setVrsta("quiz");
+                                                                materijal.setDownloadable(0);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=assignment":
+                                                                materijal.setIcon(R.drawable.assign);
+                                                                materijal.setVrsta("assign");
+                                                                materijal.setDownloadable(0);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fhtml&rev=305":
+                                                                materijal.setIcon(R.drawable.link);
+                                                                materijal.setVrsta("link");
+                                                                materijal.setDownloadable(0);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=icon&rev=305&component=page":
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fweb&rev=305":
+                                                                materijal.setIcon(R.drawable.link);
+                                                                materijal.setVrsta("link");
+                                                                materijal.setDownloadable(0);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fzip&rev=305":
+                                                                materijal.setIcon(R.drawable.archive);
+                                                                materijal.setVrsta("zip");
+                                                                materijal.setDownloadable(1);
+                                                                break;
+                                                            case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fimage&rev=305":
+                                                                materijal.setIcon(R.drawable.imagelink);
+                                                                materijal.setVrsta("jpg");
+                                                                materijal.setDownloadable(1);
+                                                                break;
+                                                            default:
+                                                                materijal.setIcon(R.drawable.unknown);
+                                                                materijal.setVrsta("unknown");
+                                                                materijal.setDownloadable(0);
+                                                                break;
+                                                        }
+
+
+                                                        Log.d("linkz", ikona.attr("src"));
+                                                    }
+
+                                                    //     materijal.setVrsta(sekcija.select("span.accesshide ").text());
+                                                    //     Log.d("linkz", sekcija.select("span.accesshide ").text());
+
+                                                    materijal.setUrl(sekcija.select("a").attr("href"));
+                                                    Log.d("textzz", sekcija.select("a").attr("href"));
+
+                                                    kolegijTjedan.materijali.add(materijal);
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                                mRealm.commitTransaction();
+
+                            } finally {
+                                mRealm.close();
+                            }
+
+                            if (getActivity() != null) {
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapter.notifyDataSetChanged();
+                                        mProgress.setVisibility(View.INVISIBLE);
+                                        mRecyclerView.setVisibility(View.VISIBLE);
+                                    }
+                                });
+
+                            }
 
                         }
 
-                    }
+                    });
+                }
+            });
 
-                });
-            }
-        });
+        } finally {
+            tRealm.close();
+        }
 
     }
 
@@ -315,21 +320,21 @@ public class CourseWeek extends Fragment {
         wRealm = Realm.getInstance(realmConfig);
         final RealmResults<KolegijTjedan> tjedni = wRealm.where(KolegijTjedan.class).findAll();
 
-        adapter = new CourseWeeksAdapter(tjedni);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setAdapter(adapter);
+        try {
+            adapter = new CourseWeeksAdapter(tjedni);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            mRecyclerView.setHasFixedSize(true);
+            mRecyclerView.setAdapter(adapter);
+        } finally {
+            wRealm.close();
+        }
+
 
     }
 
     @Override
-    public void onStop(){
-        super.onStop();
+    public void onDestroy(){
+        super.onDestroy();
 
-        if(tRealm!=null)
-        tRealm.close();
-
-        if (wRealm!=null)
-        wRealm.close();
     }
 }
