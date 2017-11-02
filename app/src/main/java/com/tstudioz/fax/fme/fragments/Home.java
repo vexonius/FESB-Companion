@@ -60,6 +60,7 @@ import static android.content.ContentValues.TAG;
 public class Home extends Fragment{
 
     public String date = null;
+    private NativeExpressAdView adView;
 
     String myApiKey = "e39d50a0b9c65d5c7f2739eff093e6f5";
 
@@ -97,26 +98,15 @@ public class Home extends Fragment{
         View view = inflater.inflate(R.layout.home_tab, container, false);
 
         setHasOptionsMenu(true);
-
         ButterKnife.bind(this, view);
+
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
 
-        NativeExpressAdView adView = (NativeExpressAdView)view.findViewById(R.id.adView);
-
-    //    if(!isNetworkAvailable()){
-            adView.setVisibility(View.GONE);
-     /*   }else{
-
-            adView.setVisibility(View.VISIBLE);
-            AdRequest request = new AdRequest.Builder()
-                    .addTestDevice("0F0806B7833336104F00247BA81C120D")
-                    .build();
-            adView.loadAd(request);
-        }
-                   */
+        adView = (NativeExpressAdView)view.findViewById(R.id.adView);
+        loadAds();
 
      /**     try {
      /*          start();
@@ -124,6 +114,8 @@ public class Home extends Fragment{
      /*          e.printStackTrace();
      /*      }
      */
+
+     // TODO maknit ponovne inicijalizacije textviewa za postavit font i odijelit sve u funkciju
 
         //Setting custom fonts
         TextView textLokacija = (TextView) view.findViewById(R.id.txtloc);
@@ -185,7 +177,6 @@ public class Home extends Fragment{
             }
         });
 
-
         setHasOptionsMenu(true);
         return view;
 
@@ -218,7 +209,6 @@ public class Home extends Fragment{
 
                 try {
                     String jsonData = response.body().string();
-                    Log.v(TAG, jsonData);
                     if (response.isSuccessful()) {
                         mForecast = parseForecastDetails(jsonData);
                         getActivity().runOnUiThread(new Runnable() {
@@ -266,7 +256,6 @@ public class Home extends Fragment{
         String pPrecip = current.getPrecipChance() + "%";
         String pSummary = current.getSummary();
 
-
         mTemperatureLabel.setText(pTemperatura);
         mHumidityValue.setText(pHumidity);
         mPrecipValue.setText(pPrecip);
@@ -289,7 +278,6 @@ public class Home extends Fragment{
 
     private Forecast parseForecastDetails(String jsonData) throws JSONException {
         Forecast forecast = new Forecast();
-
         forecast.setCurrent(getCurrentDetails(jsonData));
 
         return forecast;
@@ -312,6 +300,21 @@ public class Home extends Fragment{
         //current.setTimeZone(timezone);
 
         return current;
+    }
+
+    public void loadAds(){
+
+        //    if(!isNetworkAvailable()){
+        adView.setVisibility(View.GONE);
+     /*   }else{
+
+            adView.setVisibility(View.VISIBLE);
+            AdRequest request = new AdRequest.Builder()
+                    .addTestDevice("0F0806B7833336104F00247BA81C120D")
+                    .build();
+            adView.loadAd(request);
+        }
+                   */
     }
 
     private boolean isNetworkAvailable() {
@@ -341,13 +344,8 @@ public class Home extends Fragment{
     }
 
     public void showList() {
-
-        Realm.init(getActivity().getBaseContext());
         mrealm = Realm.getDefaultInstance();
-
-        mrealm.beginTransaction();
         RealmResults<Predavanja> rezultati = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
-        mrealm.commitTransaction();
 
         if (rezultati.isEmpty()) {
             recyclerView.setVisibility(View.INVISIBLE);

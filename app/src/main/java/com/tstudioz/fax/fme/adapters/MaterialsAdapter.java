@@ -54,7 +54,6 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
     private String doc_ext;
     private String url;
 
-
     public MaterialsAdapter(RealmList<Materijal> material) {
         this.materials = material;
         materials.addChangeListener(this);
@@ -111,7 +110,6 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
         @Override
         public void onClick(final View view) {
 
-
             final Context context = view.getContext();
 
             doc_name = materials.get(getAdapterPosition()).getImeMtarijala();
@@ -125,8 +123,6 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                 customTabsIntent.launchUrl(view.getContext(), Uri.parse("https://korisnik.fesb.unist.hr/prijava?returnUrl=" + chromeurl));
 
             } else {
-
-
                 CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(view.getContext()));
 
                 download.setVisibility(View.INVISIBLE);
@@ -143,7 +139,6 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                         .get()
                         .build();
 
-
                 Call call = okHttpClient.newCall(rq);
                 call.enqueue(new Callback() {
                     @Override
@@ -155,21 +150,18 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                     public void onResponse(Call call, Response response) throws IOException {
 
                         Document doc = Jsoup.parse(response.body().string());
-                        //   Log.d("material_ad_body", doc.body().text());
 
+                    try {
                         switch (doc_ext) {
-
                             case "pdf":
 
                                 Element element = doc.select("div.region-content").first();
                                 final Element links = element.select("a[href]").first();
-                                if(links !=null){
+                                if (links != null) {
                                     url = links.attr("href");
-                                }else {
+                                } else {
                                     url = rq.url().toString();
                                 }
-
-
                                 break;
 
                             case "docx":
@@ -184,12 +176,15 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                                 Element elementx = doc.select("div.region-content").first();
 
                                 final Element src = elementx.select("img[src]").first();
-                           //      Log.d("link za doc", src.attr("src"));
                                 url = src.attr("src");
-
                                 break;
-
                         }
+
+                    } catch (Exception exp){
+                        Log.d("Download link exc", exp.toString());
+                        okHttpClient.dispatcher().cancelAll();
+                        showErrorSnack(view, "Došlo je do problema pri preuzimanju datoteke");
+                    }
 
                         Request.Builder builder = new Request.Builder()
                                 .url(url)
@@ -199,36 +194,22 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                         callDown.enqueue(new Callback() {
                             @Override
                             public void onFailure(Call call, IOException e) {
-                      //          Log.e("TAG", "=============onFailure===============");
                                 e.printStackTrace();
                             }
 
                             @Override
                             public void onResponse(Call call, Response response) throws IOException {
-                       //         Log.e("TAG", "=============onResponse===============");
-                       //         Log.e("TAG", "request headers:" + response.request().headers());
-                       //         Log.e("TAG", "response headers:" + response.headers());
-
                                 ResponseBody body = response.body();
                                 //wrap the original response body with progress
                                 ResponseBody responseBody = ProgressHelper.withProgress(body, new ProgressUIListener() {
-
                                     //if you don't need this method, don't override this methd. It isn't an abstract method, just an empty method.
                                     @Override
                                     public void onUIProgressStart(long totalBytes) {
                                         super.onUIProgressStart(totalBytes);
-                       //                 Log.e("TAG", "onUIProgressStart:" + totalBytes);
                                     }
 
                                     @Override
                                     public void onUIProgressChanged(long numBytes, long totalBytes, float percent, float speed) {
-                           //             Log.e("TAG", "=============start===============");
-                           //             Log.e("TAG", "numBytes:" + numBytes);
-                           //             Log.e("TAG", "totalBytes:" + totalBytes);
-                           //             Log.e("TAG", "percent:" + percent);
-                           //             Log.e("TAG", "speed:" + speed);
-                           //             Log.e("TAG", "============= end ===============");
-
                                         progressBar.setProgressWithAnimation((int) (100 * percent), 200);
                                     }
 
@@ -236,36 +217,40 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                                     @Override
                                     public void onUIProgressFinish() {
                                         super.onUIProgressFinish();
-                            //            Log.e("TAG", "onUIProgressFinish:");
                                         progressBar.setVisibility(View.INVISIBLE);
                                         download.setVisibility(View.VISIBLE);
                                         download.setImageResource(R.drawable.checked);
                                     }
 
                                 });
-                                //read the body to file
-                                BufferedSource source = responseBody.source();
-                                File outFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + doc_name + "." + doc_ext);
-                                outFile.delete();
-                                outFile.getParentFile().mkdirs();
-                                outFile.createNewFile();
-                                BufferedSink sink = Okio.buffer(Okio.sink(outFile));
-                                source.readAll(sink);
-                                sink.flush();
-                                source.close();
 
-                                showDocSnack(view, doc_name, doc_ext, outFile);
+                                //read the body to file
+                                try {
+                                    BufferedSource source = responseBody.source();
+                                    File outFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + doc_name + "." + doc_ext);
+                                    outFile.delete();
+                                    outFile.getParentFile().mkdirs();
+                                    outFile.createNewFile();
+                                    BufferedSink sink = Okio.buffer(Okio.sink(outFile));
+                                    source.readAll(sink);
+                                    sink.flush();
+                                    source.close();
+
+                                    // TODO okruzit otvaranje dokumenta sa try catch
+                                    showDocSnack(view, doc_name, doc_ext, outFile);
+                                } catch (Exception exc){
+                                    // TODO popravit no suitable view for snackbar
+                                    Log.d("Download error", exc.toString());
+                                    showErrorSnack(view, "Došlo je do pogreške pri preuzimanju");
+                                }
 
                             }
                         });
 
-
                     }
-
                 });
 
             }
-
         }
     }
 
@@ -286,6 +271,12 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                 }
             });
             snackbar.show();
+        }
+
+        private void showErrorSnack(View mView, String errorMsg){
+            Snackbar snackbar = Snackbar.make(mView, errorMsg, Snackbar.LENGTH_LONG);
+            snackbar.show();
+
         }
 
 }

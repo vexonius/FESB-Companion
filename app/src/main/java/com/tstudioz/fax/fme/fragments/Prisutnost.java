@@ -53,13 +53,13 @@ import okhttp3.Response;
 
 public class Prisutnost extends Fragment {
 
-    final RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+    public RealmConfiguration realmConfig = new RealmConfiguration.Builder()
             .name("prisutnost.realm")
             .schemaVersion(10)
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
+    public RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
             .schemaVersion(5)
             .deleteRealmIfMigrationNeeded()
@@ -71,9 +71,11 @@ public class Prisutnost extends Fragment {
     @BindView(R.id.nested_attend) NestedScrollView mNested;
 
     private Snackbar snack;
-    DolasciAdapter winterAdapter, summerAdapter;
+    private DolasciAdapter winterAdapter, summerAdapter;
 
-    Realm nRealm, cRealm, sRealm, wRealm;
+    private Realm nRealm, cRealm, sRealm, wRealm;
+
+    private OkHttpClient okHttpClient;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -102,7 +104,7 @@ public class Prisutnost extends Fragment {
 
             final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
 
-            final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+            okHttpClient = new OkHttpClient().newBuilder()
                     .followRedirects(true)
                     .followSslRedirects(true)
                     .cookieJar(cookieJar)
@@ -415,6 +417,9 @@ public class Prisutnost extends Fragment {
         if(snack!=null){
             snack.dismiss();
         }
+
+        if(okHttpClient!=null)
+            okHttpClient.dispatcher().cancelAll();
     }
 
     @Override

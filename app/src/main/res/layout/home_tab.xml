@@ -24,6 +24,7 @@
   <FrameLayout
       android:id="@+id/frameLayout"
       android:elevation="8dp"
+      android:layout_below="@+id/iksica_promo"
       android:background="@color/colorPrimary"
       android:layout_width="match_parent"
       android:layout_height="180dp"

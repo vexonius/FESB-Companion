@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -56,7 +55,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.UUID;
 
-import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -65,7 +63,6 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
 
 import static android.content.ContentValues.TAG;
 
@@ -76,11 +73,13 @@ public class MainActivity extends AppCompatActivity {
     public AlertDialog alertDialog;
     public long back_pressed;
 
-    Realm mainealm;
-    Realm realmLog;
-    Realm rlmLog;
+    private  AHBottomNavigation bottomNavigation;
 
-    Snackbar snack;
+    private Realm mainealm;
+    private Realm realmLog;
+    private Realm rlmLog;
+
+    private Snackbar snack;
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
             .name("glavni.realm")
@@ -95,36 +94,51 @@ public class MainActivity extends AppCompatActivity {
             .deleteRealmIfMigrationNeeded()
             .build();
 
+    /**
+     *  TODO async updatanje podataka
+     */
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0.0f);
         setContentView(R.layout.activity_main);
 
-        ButterKnife.bind(this);
-
-        /**Realm incicijalizacija  */
         Realm.setDefaultConfiguration(mainRealmConfig);
+        realmLog = Realm.getInstance(CredRealmCf);
 
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
 
-         realmLog = Realm.getInstance(CredRealmCf);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("FESB Companion");
 
+        checkUser();
+        setUpBottomNav();
+        setDefaultScreen();
+        setFragmentTab();
+
+    }
+
+    public void checkUser(){
         if (realmLog!=null) {
             new MojRaspored().execute();
         } else {
+            SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+            SharedPreferences.Editor editor =  sharedPref.edit();
+            editor.putBoolean("loged_in", false);
+            editor.commit();
+
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show();
+
             Intent nazad = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(nazad);
         }
+    }
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("FESB Companion");
-        Typeface tflight = Typeface.createFromAsset(this.getAssets(), "fonts/OpenSans-Regular.ttf");
-
-
-        final AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
+    public void setUpBottomNav(){
+        bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
 
         AHBottomNavigationItem item0 = new AHBottomNavigationItem(getString(R.string.homie), R.drawable.home, R.color.home_color);
         AHBottomNavigationItem item1 = new AHBottomNavigationItem(getString(R.string.left), R.drawable.schedule, R.color.left_color);
@@ -139,25 +153,25 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.addItem(item2);
 
         bottomNavigation.setBehaviorTranslationEnabled(false);
-
         bottomNavigation.setDefaultBackgroundColor(Color.parseColor("#2f3031"));
         bottomNavigation.setForceTint(true);
-        bottomNavigation.setTitleTypeface(tflight);
-
         bottomNavigation.setAccentColor(Color.parseColor("#FFFFFF"));
         bottomNavigation.setInactiveColor(Color.parseColor("#6e6e6e"));
         bottomNavigation.setUseElevation(true);
         bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_HIDE);
         bottomNavigation.setCurrentItem(0);
+    }
 
+    public void setDefaultScreen(){
         final Home hf = new Home();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame, hf);
         ft.addToBackStack(null);
         ft.commit();
+    }
 
-        /** Set listeners  */
+    public void setFragmentTab(){
         bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
@@ -214,26 +228,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if(realmLog!=null)
-        realmLog.close();
-
-        if(rlmLog!=null)
-        rlmLog.close();
-
-        if(mainealm!=null)
-        mainealm.close();
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -244,63 +238,49 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-
         if (id == R.id.logout) {
-            SharedPreferences mySPrefs = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-            SharedPreferences.Editor editor = mySPrefs.edit();
-            editor.putBoolean("loged_in", false);
-            editor.apply();
-
-            rlmLog = Realm.getInstance(CredRealmCf);
-            rlmLog.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    rlmLog.deleteAll();
-                }
-            });
-
-            WebView wb = (WebView)findViewById(R.id.web);
-
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                    Log.d(TAG, "Using clearCookies code for API >=" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
-                    CookieManager.getInstance().removeAllCookies(null);
-                    CookieManager.getInstance().flush();
-                } else
-                {
-                    Log.d(TAG, "Using clearCookies code for API <" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
-                    CookieSyncManager cookieSyncMngr=CookieSyncManager.createInstance(getApplicationContext());
-                    cookieSyncMngr.startSync();
-                    CookieManager cookieManager=CookieManager.getInstance();
-                    cookieManager.removeAllCookie();
-                    cookieManager.removeSessionCookie();
-                    cookieSyncMngr.stopSync();
-                    cookieSyncMngr.sync();
-                }
+            userLogOut();
+            deleteWebViewCookies();
 
             Intent nazadaNaLogin = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(nazadaNaLogin);
         }
+
         if (id == R.id.refresMe) {
-            if (isNetworkAvailable() == true) {
+            if (isNetworkAvailable()) {
                 new MojRaspored().execute();
             } else {
                 showSnacOffline();
             }
         }
+
         if (id == R.id.legal) {
             displayLicensesAlertDialog();
         }
+
         if (id == R.id.about) {
             appInfo();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void deleteWebViewCookies(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            CookieManager.getInstance().removeAllCookies(null);
+            CookieManager.getInstance().flush();
+        } else
+        {
+            CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(getApplicationContext());
+            cookieSyncMngr.startSync();
+            CookieManager cookieManager=CookieManager.getInstance();
+            cookieManager.removeAllCookie();
+            cookieManager.removeSessionCookie();
+            cookieSyncMngr.stopSync();
+            cookieSyncMngr.sync();
+        }
     }
 
     @Override
@@ -337,7 +317,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d("sub", smonth.format(s.getTime()) + sday.format(s.getTime()) + syear.format(s.getTime()));
 
             OkHttpClient client = new OkHttpClient();
-
             final Request request = new Request.Builder()
                     .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" +  dfmonth.format(c.getTime())  + "%2F" +  dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" + smonth.format(s.getTime()) + "%2F" +  sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
                     .get()
@@ -354,10 +333,6 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(Call call, Response response) throws IOException {
 
                     try {
-
-                        String kod = String.valueOf(response.code());
-                        Log.d("moj kod", kod);
-
                         if(response.code()==500){
                             cancel(true);
 
@@ -380,10 +355,8 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Pogrešno korisničko ime!", Toast.LENGTH_SHORT).show();
                                 }
                             });
-
                             Intent noviIntent = new Intent(MainActivity.this, LoginActivity.class);
                             startActivity(noviIntent);
-
                         }
 
                         Document doc = Jsoup.parse(response.body().string());
@@ -394,20 +367,11 @@ public class MainActivity extends AppCompatActivity {
                         realm.commitTransaction();
 
                         if (response.isSuccessful()) {
-
-
-                            Log.e("moj odgovor ", "ODGOVOR JE USPJESAN");
-
                             Elements elements = doc.select("div.event");
 
-
                             try {
-
                                 realm.beginTransaction();
-
                                 for (final Element e : elements) {
-
-
                                     Predavanja predavanja = realm.createObject(Predavanja.class, UUID.randomUUID().toString());
 
                                     if (e.hasAttr("data-id")) {
@@ -423,25 +387,15 @@ public class MainActivity extends AppCompatActivity {
                                     predavanja.setDvorana(e.select("span.resource").text());
                                     predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
                                     predavanja.setProfesor(e.select("div.detailItem.user").text());
-
-
                                 }
-
                                 realm.commitTransaction();
-
-
                             } finally {
-
                                 realm.close();
-
                             }
-
-
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Exception caught: ", e);
                     }
-
                 }
             });
 
@@ -472,32 +426,41 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void showList() {
+        ProgressBar pbar1 = (ProgressBar) findViewById (R.id.list_progressbar);
+        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.rv);
+        RelativeLayout np = (RelativeLayout) findViewById(R.id.nema_predavanja);
 
-        Realm.init(getBaseContext());
         mainealm = Realm.getInstance(mainRealmConfig);
-        ProgressBar pbar1 = (ProgressBar) findViewById(R.id.list_progressbar);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv);
-        RelativeLayout np = (RelativeLayout)findViewById(R.id.nema_predavanja);
-
-        mainealm.beginTransaction();
         RealmResults<Predavanja> rezultati = mainealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
-        mainealm.commitTransaction();
 
         if (rezultati.isEmpty()) {
             recyclerView.setVisibility(View.INVISIBLE);
             np.setVisibility(View.VISIBLE);
         } else{
-
             EmployeeRVAdapter adapter = new EmployeeRVAdapter(rezultati);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setHasFixedSize(true);
             recyclerView.setAdapter(adapter);
 
-
             pbar1.setVisibility(View.INVISIBLE);
             recyclerView.setVisibility(View.VISIBLE);
         }
 
+    }
+
+    public void userLogOut(){
+        SharedPreferences mySPrefs = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+        SharedPreferences.Editor editor = mySPrefs.edit();
+        editor.putBoolean("loged_in", false);
+        editor.apply();
+
+        rlmLog = Realm.getInstance(CredRealmCf);
+        rlmLog.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                rlmLog.deleteAll();
+            }
+        });
     }
 
     private boolean isNetworkAvailable() {
@@ -545,6 +508,26 @@ public class MainActivity extends AppCompatActivity {
             snack.show();
         }
         back_pressed= System.currentTimeMillis();
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if(realmLog!=null)
+            realmLog.close();
+
+        if(rlmLog!=null)
+            rlmLog.close();
+
+        if(mainealm!=null)
+            mainealm.close();
     }
 
 }

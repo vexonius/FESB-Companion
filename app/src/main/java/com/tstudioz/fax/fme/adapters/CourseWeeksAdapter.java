@@ -86,7 +86,6 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
         @Override
         public void onClick(View view) {
 
-
         }
     }
 

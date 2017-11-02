@@ -69,20 +69,7 @@ public class LoginActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-        Boolean prvi_put = sharedPreferences.getBoolean("first_open", true);
-
-        if(prvi_put==true) {
-            startActivity(new Intent(LoginActivity.this, Welcome.class));
-        }
-
-        Boolean prijavljen = sharedPreferences.getBoolean("loged_in", false);
-
-        if(prijavljen==true){
-            Intent nwIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(nwIntent);
-            finish();
-        }
+        isUserLoggedIn();
 
         but.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                     final String password = pass.getText().toString();
 
                     if(username.isEmpty() || password.isEmpty()){
-                       showNoDataSnack();
+                       showErrorSnack("Niste unijeli korisničke podatke");
 
                     }else{
                         bar.setVisibility(View.VISIBLE);
@@ -101,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
                         validateUser(username, password, view);
                     }
                 }else {
-                    showNoConnSnack();
+                    showErrorSnack("Niste povezani");
                 }
             }
         });
@@ -112,6 +99,23 @@ public class LoginActivity extends AppCompatActivity {
                 helpMe();
             }
         });
+    }
+
+    public void isUserLoggedIn(){
+        SharedPreferences sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+        Boolean prvi_put = sharedPreferences.getBoolean("first_open", true);
+
+        if(prvi_put) {
+            startActivity(new Intent(LoginActivity.this, Welcome.class));
+        }
+
+        Boolean prijavljen = sharedPreferences.getBoolean("loged_in", false);
+
+        if(prijavljen){
+            Intent nwIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(nwIntent);
+            finish();
+        }
     }
 
 
@@ -143,24 +147,10 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(a);
     }
 
-    public void showNoDataSnack(){
-        snack = Snackbar.make(relativeLayout, "Niste unijeli korisničke podatke", Snackbar.LENGTH_SHORT);
-        View snackBarView = snack.getView();
-        snackBarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
-        snack.show();
-    }
-
-    public void showNoConnSnack(){
-        snack = Snackbar.make(relativeLayout, "Niste povezani!", Snackbar.LENGTH_SHORT);
+    public void showErrorSnack(String message){
+        snack = Snackbar.make(relativeLayout, message, Snackbar.LENGTH_SHORT);
         View snackBarView2 = snack.getView();
         snackBarView2.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
-        snack.show();
-    }
-
-    public void showErrorSnack(){
-        snack = Snackbar.make(relativeLayout, "Uneseni podatci su pogrešni!", Snackbar.LENGTH_SHORT);
-        View snackBarView3 = snack.getView();
-        snackBarView3.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
         snack.show();
     }
 
@@ -197,10 +187,6 @@ public class LoginActivity extends AppCompatActivity {
              @Override
              public void onResponse(Call call, Response response) throws IOException {
 
-                 Log.e("koji kurac", response.request().url().toString());
-
-         Log.e("konacni url", response.toString());
-
                 if(response.request().url().toString().equals("https://korisnik.fesb.unist.hr/")){
                     runOnUiThread(new Runnable() {
                         @Override
@@ -208,19 +194,17 @@ public class LoginActivity extends AppCompatActivity {
                             register(user, pass, mView);
                         }
                     });
-
                 }
                 else {
                  runOnUiThread(new Runnable() {
                      @Override
                      public void run() {
-                         showErrorSnack();
+                         showErrorSnack("Uneseni podatci su pogrešni!");
                          bar.setVisibility(View.INVISIBLE);
                          but.setVisibility(View.VISIBLE);
                      }
                  });
                 }
-
 
             }
         });
@@ -235,7 +219,6 @@ public class LoginActivity extends AppCompatActivity {
         editor.commit();
 
         mLogRealm = Realm.getInstance(loginRealmCf);
-
         mLogRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

@@ -60,9 +60,11 @@ public class CourseWeek extends Fragment {
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    Realm tRealm;
-    Realm wRealm;
-    CourseWeeksAdapter adapter;
+    private Realm tRealm;
+    private Realm wRealm;
+    private CourseWeeksAdapter adapter;
+
+    private OkHttpClient okHttpClient;
 
     @BindView(R.id.course_week_rv) RecyclerView mRecyclerView;
     @BindView(R.id.course_week_progress) ProgressBar mProgress;
@@ -99,7 +101,7 @@ public class CourseWeek extends Fragment {
         });
 
 
-        final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+        okHttpClient = new OkHttpClient().newBuilder()
                 .followRedirects(true)
                 .followSslRedirects(true)
                 .cookieJar(cookieJar)
@@ -157,12 +159,11 @@ public class CourseWeek extends Fragment {
                                     tjedni.deleteAllFromRealm();
                                 }
                             });
-                            try {
 
                                 Element content = doc.select("div.course-content").first();
                                 Elements selements = content.getElementsByClass("section main clearfix");
 
-
+                            try {
                                 mRealm.beginTransaction();
 
                                 int i = 0;
@@ -176,10 +177,6 @@ public class CourseWeek extends Fragment {
 
                                     if (element.getElementsByClass("section img-text").first() != null) {
                                         Element modz = element.getElementsByClass("section img-text").first();
-                                        //   Element sect = modz.getElementsByClass("activity url modtype_url").first();
-                                        //   Element docs_section = sect.getElementsByClass("mod-indent").first();
-                                        //   Element spenk = docs_section.select("a > span").first();
-
                                         Elements sections = modz.select("div.mod-indent");
 
                                         for (Element sekcija : sections) {
@@ -188,7 +185,6 @@ public class CourseWeek extends Fragment {
                                                 if (!sekcija.select("span.instancename").text().isEmpty()) {
                                                     Materijal materijal = mRealm.createObject(Materijal.class);
                                                     materijal.setImeMtarijala(sekcija.select("span.instancename").text());
-                                                    Log.d("linkz", sekcija.select("span.instancename").text());
 
                                                     if (sekcija.getElementsByClass("activityicon").first() != null) {
                                                         Element ikona = sekcija.getElementsByClass("activityicon").first();
@@ -264,35 +260,26 @@ public class CourseWeek extends Fragment {
                                                                 materijal.setDownloadable(0);
                                                                 break;
                                                         }
-
-
-                                                        Log.d("linkz", ikona.attr("src"));
                                                     }
 
-                                                    //     materijal.setVrsta(sekcija.select("span.accesshide ").text());
-                                                    //     Log.d("linkz", sekcija.select("span.accesshide ").text());
-
                                                     materijal.setUrl(sekcija.select("a").attr("href"));
-                                                    Log.d("textzz", sekcija.select("a").attr("href"));
-
                                                     kolegijTjedan.materijali.add(materijal);
                                                 }
                                             }
-
                                         }
-
                                     }
-
                                 }
 
                                 mRealm.commitTransaction();
+
+                            } catch (Exception ex){
+                                Log.e("Exception found", ex.toString());
 
                             } finally {
                                 mRealm.close();
                             }
 
                             if (getActivity() != null) {
-
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -328,13 +315,18 @@ public class CourseWeek extends Fragment {
         } finally {
             wRealm.close();
         }
-
-
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
 
+    }
+
+    public void onStop(){
+        super.onStop();
+        if(okHttpClient!=null){
+            okHttpClient.dispatcher().cancelAll();
+        }
     }
 }

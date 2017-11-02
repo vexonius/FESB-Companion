@@ -21,7 +21,7 @@ import com.tstudioz.fax.fme.R;
 
 public class NoteActivity  extends AppCompatActivity {
 
-    InterstitialAd mInterstitialAd;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,13 +94,10 @@ public class NoteActivity  extends AppCompatActivity {
 
     public void onBackPressed(){
         super.onBackPressed();
-
-
-
     }
+
     private void requestNewInterstitial() {
     /**    AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("0F0806B7833336104F00247BA81C120D")
                 .build();
 
         mInterstitialAd.loadAd(adRequest);

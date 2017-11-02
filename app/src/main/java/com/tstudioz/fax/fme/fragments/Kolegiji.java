@@ -64,9 +64,10 @@ public class Kolegiji extends Fragment {
     @BindView(R.id.kolegiji_rv) RecyclerView recyclerView;
     @BindView(R.id.kolegij_progress) ProgressBar progress;
 
-    CoursesAdapter kolegijiAdapter;
-    Realm credRealm;
-    Realm realm;
+    private CoursesAdapter kolegijiAdapter;
+    private Realm credRealm;
+    private Realm realm;
+    private OkHttpClient okHttpClient;
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -96,7 +97,7 @@ public class Kolegiji extends Fragment {
 
              CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
 
-             final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+             okHttpClient = new OkHttpClient().newBuilder()
                     .followRedirects(true)
                     .followSslRedirects(true)
                     .cookieJar(cookieJar)
@@ -127,7 +128,6 @@ public class Kolegiji extends Fragment {
                         public void onResponse(Call call, Response response) throws IOException {
 
                             Document doc = Jsoup.parse(response.body().string());
-                            Log.d("Uspjeh", doc.body().toString());
 
                             Element content = doc.getElementById("inst17149");
 
@@ -197,6 +197,15 @@ public class Kolegiji extends Fragment {
 
         if(realm!=null)
         realm.close();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+
+        if(okHttpClient!=null){
+            okHttpClient.dispatcher().cancelAll();
+        }
     }
 
 }

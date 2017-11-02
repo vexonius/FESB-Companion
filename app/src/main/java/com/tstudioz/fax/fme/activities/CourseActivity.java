@@ -14,10 +14,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.gms.ads.InterstitialAd;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.fragments.CourseWeek;
 
 public class CourseActivity extends AppCompatActivity {
+
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +28,7 @@ public class CourseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_course);
 
         Intent intent = getIntent();
+
         String imeKolegija = intent.getStringExtra("kolegij");
         imeKolegija = imeKolegija.substring(0, imeKolegija.length()-5);
         getSupportActionBar().setTitle(imeKolegija);
@@ -32,20 +36,16 @@ public class CourseActivity extends AppCompatActivity {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
         }
 
         if (shouldAskPermissions()) {
             askPermissions();
-
         }
 
         Bundle bundle = new Bundle();
         bundle.putString("link_kolegija", intent.getStringExtra("link_na_kolegij"));
-
-
 
         final CourseWeek cw = new CourseWeek();
         cw.setArguments(bundle);
@@ -53,10 +53,34 @@ public class CourseActivity extends AppCompatActivity {
                 ft.replace(R.id.course_content, cw);
                 ft.addToBackStack(null);
                 ft.commit();
+
+        /**   mInterstitialAd = new InterstitialAd(this);
+         mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
+
+         mInterstitialAd.setAdListener(new AdListener() {
+        @Override
+        public void onAdClosed() {
+        requestNewInterstitial();
+        finish();
+        }
+        });
+
+         requestNewInterstitial();
+
+         */
     }
 
     public void onBackPressed(){
+        //  mInterstitialAd.show();
+
+        //Privremeno dok je testiranje
         finish();
+    }
+
+    public void onPause(){
+        super.onPause();
+
+        //  mInterstitialAd.show();
     }
 
     @Override
@@ -118,6 +142,15 @@ public class CourseActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    private void requestNewInterstitial() {
+        /**    AdRequest adRequest = new AdRequest.Builder()
+         .build();
+
+         mInterstitialAd.loadAd(adRequest);
+
+         */
     }
 
 }
