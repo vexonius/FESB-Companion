@@ -27,6 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.NativeExpressAdView;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.NoteActivity;
@@ -103,15 +104,14 @@ public class Home extends Fragment{
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
 
-        adView = (NativeExpressAdView)view.findViewById(R.id.adView);
-        loadAds();
+       // adView = (NativeExpressAdView)view.findViewById(R.id.adView);
+       // loadAds();
 
-     /**     try {
-     /*          start();
-     /*      } catch (IOException | JSONException e) {
-     /*          e.printStackTrace();
-     /*      }
-     */
+        try {
+            start();
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
 
         setFancyFonts();
         loadNotes();
@@ -241,17 +241,16 @@ public class Home extends Fragment{
 
     public void loadAds(){
 
-        //    if(!isNetworkAvailable()){
+            if(!isNetworkAvailable()){
         adView.setVisibility(View.GONE);
-     /*   }else{
+       }else{
 
             adView.setVisibility(View.VISIBLE);
             AdRequest request = new AdRequest.Builder()
-                    .addTestDevice("0F0806B7833336104F00247BA81C120D")
                     .build();
             adView.loadAd(request);
         }
-                   */
+
     }
 
     private boolean isNetworkAvailable() {

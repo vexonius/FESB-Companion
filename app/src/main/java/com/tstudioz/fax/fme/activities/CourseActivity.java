@@ -14,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.fragments.CourseWeek;
@@ -53,33 +55,27 @@ public class CourseActivity extends AppCompatActivity {
                 ft.addToBackStack(null);
                 ft.commit();
 
-        /**   mInterstitialAd = new InterstitialAd(this);
-         mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
+      //   mInterstitialAd = new InterstitialAd(this);
+      //   mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
+//
+      //   mInterstitialAd.setAdListener(new AdListener() {
+      //  @Override
+      //  public void onAdClosed() {
+      //  requestNewInterstitial();
+      //  finish();
+      //  }
+      //  });
+//
+      //   requestNewInterstitial();
 
-         mInterstitialAd.setAdListener(new AdListener() {
-        @Override
-        public void onAdClosed() {
-        requestNewInterstitial();
-        finish();
-        }
-        });
 
-         requestNewInterstitial();
-
-         */
     }
 
+    @Override
     public void onBackPressed(){
-        //  mInterstitialAd.show();
+      //  mInterstitialAd.show();
 
-        //Privremeno dok je testiranje
         finish();
-    }
-
-    public void onPause(){
-        super.onPause();
-
-        //  mInterstitialAd.show();
     }
 
     @Override
@@ -144,12 +140,12 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     private void requestNewInterstitial() {
-        /**    AdRequest adRequest = new AdRequest.Builder()
-         .build();
+      //  AdRequest adRequest = new AdRequest.Builder()
+      //          .build();
+//
+      //   mInterstitialAd.loadAd(adRequest);
 
-         mInterstitialAd.loadAd(adRequest);
 
-         */
     }
 
 }

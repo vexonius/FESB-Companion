@@ -41,21 +41,18 @@ public class NoteActivity  extends AppCompatActivity {
 
         et.setSelection(et.getText().length());
 
-     /**   mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                requestNewInterstitial();
-                finish();
-            }
-        });
-
-        requestNewInterstitial();
-
-      */
-
+    //    mInterstitialAd = new InterstitialAd(this);
+    //    mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/2813576206");
+//
+    //    mInterstitialAd.setAdListener(new AdListener() {
+    //        @Override
+    //        public void onAdClosed() {
+    //            requestNewInterstitial();
+    //            finish();
+    //        }
+    //    });
+//
+    //    requestNewInterstitial();
     }
 
     @Override
@@ -97,14 +94,9 @@ public class NoteActivity  extends AppCompatActivity {
     }
 
     private void requestNewInterstitial() {
-    /**    AdRequest adRequest = new AdRequest.Builder()
-                .build();
-
-        mInterstitialAd.loadAd(adRequest);
-
-     */
+       // AdRequest adRequest = new AdRequest.Builder()
+       //         .build();
+       // mInterstitialAd.loadAd(adRequest);
     }
-
-
 }
 
