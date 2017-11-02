@@ -236,7 +236,6 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                                     sink.flush();
                                     source.close();
 
-                                    // TODO okruzit otvaranje dokumenta sa try catch
                                     showDocSnack(view, doc_name, doc_ext, outFile);
                                 } catch (Exception exc){
                                     // TODO popravit no suitable view for snackbar

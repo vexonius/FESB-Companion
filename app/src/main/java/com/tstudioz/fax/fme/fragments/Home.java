@@ -75,6 +75,8 @@ public class Home extends Fragment{
     @BindView(R.id.temperatura_vrijednost) TextView mTemperatureLabel;
     @BindView(R.id.vlaznost_vrijednost) TextView mHumidityValue;
     @BindView(R.id.opis) TextView mSummaryLabel;
+    @BindView(R.id.txtloc) TextView lokacija;
+    @BindView(R.id.pr) TextView danp;
     @BindView(R.id.vrijeme_image) ImageView mIconImageView;
     @BindView(R.id.oborine_vrijednost) TextView mPrecipValue;
     @BindView(R.id.trenutni_vjetar) TextView mWindLabel;
@@ -91,16 +93,12 @@ public class Home extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Realm.init(getActivity().getApplicationContext());
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        //Set the layout you want to display in First Fragment
         View view = inflater.inflate(R.layout.home_tab, container, false);
 
         setHasOptionsMenu(true);
         ButterKnife.bind(this, view);
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
@@ -115,71 +113,10 @@ public class Home extends Fragment{
      /*      }
      */
 
-     // TODO maknit ponovne inicijalizacije textviewa za postavit font i odijelit sve u funkciju
+        setFancyFonts();
+        loadNotes();
 
-        //Setting custom fonts
-        TextView textLokacija = (TextView) view.findViewById(R.id.txtloc);
-        Typeface type = Typeface.createFromAsset(getActivity().getAssets(), "fonts/OpenSans-Light.ttf");
-        textLokacija.setTypeface(type);
-
-        TextView textVjetar = (TextView)view.findViewById(R.id.trenutni_vjetar);
-        Typeface typev = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Light.ttf");
-        textVjetar.setTypeface(typev);
-
-        TextView textvlaga = (TextView)view.findViewById(R.id.vlaznost_vrijednost);
-        Typeface typevl = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Light.ttf");
-        textvlaga.setTypeface(typevl);
-
-        TextView textoborine = (TextView)view.findViewById(R.id.oborine_vrijednost);
-        Typeface typeob = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Light.ttf");
-        textoborine.setTypeface(typeob);
-
-        TextView tasks = (TextView)view.findViewById(R.id.taskText);
-        Typeface typeta = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Regular.ttf");
-        tasks.setTypeface(typeta);
-
-        TextView tempe = (TextView)view.findViewById(R.id.temperatura_vrijednost);
-        Typeface typete = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Bold.ttf");
-        tempe.setTypeface(typete);
-
-        TextView danp = (TextView)view.findViewById(R.id.pr);
-        Typeface typeap = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Regular.ttf");
-        danp.setTypeface(typeap);
-
-        TextView opisfont = (TextView)view.findViewById(R.id.opis);
-        Typeface typeop = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Regular.ttf");
-        opisfont.setTypeface(typeop);
-
-
-        mtask.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent newIntent = new Intent(getActivity(), NoteActivity.class);
-                startActivity(newIntent);
-
-            }
-        });
-
-
-        String tekstic = sharedPref.getString("mojtext", "Trenutno nema bilješki");
-        if(!tekstic.isEmpty()){
-            mtasktext.setText(tekstic);
-        }else{
-            mtasktext.setText("Trenutno nema bilješki");
-        }
-        mtasktext.setMovementMethod(new ScrollingMovementMethod());
-
-        mtasktext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent newIntent = new Intent(getActivity(), NoteActivity.class);
-                startActivity(newIntent);
-            }
-        });
-
-        setHasOptionsMenu(true);
         return view;
-
     }
 
     @Override
@@ -359,6 +296,50 @@ public class Home extends Fragment{
             pbar1.setVisibility(View.INVISIBLE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void setFancyFonts(){
+        Typeface typeLight = Typeface.createFromAsset(getActivity().getAssets(), "fonts/OpenSans-Light.ttf");
+        lokacija.setTypeface(typeLight);
+        mWindLabel.setTypeface(typeLight);
+        mHumidityValue.setTypeface(typeLight);
+        mPrecipValue.setTypeface(typeLight);
+
+        Typeface typeRegular = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Regular.ttf");
+        mtasktext.setTypeface(typeRegular);
+        danp.setTypeface(typeRegular);
+        mSummaryLabel.setTypeface(typeRegular);
+
+        Typeface typeBold = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Bold.ttf");
+        mTemperatureLabel.setTypeface(typeBold);
+    }
+
+    public void loadNotes(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String tekstic = sharedPref.getString("mojtext", "Trenutno nema bilješki");
+
+        if(!tekstic.isEmpty()){
+            mtasktext.setText(tekstic);
+        } else {
+            mtasktext.setText("Trenutno nema bilješki");
+        }
+
+        mtasktext.setMovementMethod(new ScrollingMovementMethod());
+        mtasktext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent newIntent = new Intent(getActivity(), NoteActivity.class);
+                startActivity(newIntent);
+            }
+        });
+
+        mtask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent newIntent = new Intent(getActivity(), NoteActivity.class);
+                startActivity(newIntent);
+            }
+        });
     }
 
     public void showSnacOffline(){

@@ -271,8 +271,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             CookieManager.getInstance().removeAllCookies(null);
             CookieManager.getInstance().flush();
-        } else
-        {
+        } else {
             CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(getApplicationContext());
             cookieSyncMngr.startSync();
             CookieManager cookieManager=CookieManager.getInstance();
