@@ -30,7 +30,6 @@ public class CourseActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         String imeKolegija = intent.getStringExtra("kolegij");
-        imeKolegija = imeKolegija.substring(0, imeKolegija.length()-5);
         getSupportActionBar().setTitle(imeKolegija);
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
