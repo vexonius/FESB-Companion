@@ -1,11 +1,16 @@
 package com.tstudioz.fax.fme.fragments;
 
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -65,9 +70,9 @@ public class Kolegiji extends Fragment {
     @BindView(R.id.kolegij_progress) ProgressBar progress;
 
     private CoursesAdapter kolegijiAdapter;
-    private Realm credRealm;
-    private Realm realm;
+    private Realm credRealm, realm, mRealm;
     private OkHttpClient okHttpClient;
+    private Snackbar snack;
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -81,7 +86,12 @@ public class Kolegiji extends Fragment {
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         showList();
-        fetchCourses();
+
+        if(isNetworkAvailable()) {
+            fetchCourses();
+        } else {
+            showSnacOffline();
+        }
 
         return  view;
     }
@@ -94,7 +104,6 @@ public class Kolegiji extends Fragment {
 
     public void fetchCourses(){
 
-
              CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
 
              okHttpClient = new OkHttpClient().newBuilder()
@@ -104,6 +113,7 @@ public class Kolegiji extends Fragment {
                     .build();
 
                     credRealm = Realm.getInstance(CredRealmCf);
+                    mRealm = Realm.getInstance(realmConfig);
                     Korisnik kor = credRealm.where(Korisnik.class).findFirst();
 
                     final RequestBody formData = new FormBody.Builder()
@@ -129,45 +139,55 @@ public class Kolegiji extends Fragment {
 
                             Document doc = Jsoup.parse(response.body().string());
 
-                            Element content = doc.getElementById("inst17149");
+                            try {
+                                Element content = doc.getElementById("inst17149");
 
-                            if (content.select("div.column.c1") != null) {
-                                Elements elements = content.select("div.column.c1");
+                                if (content.select("div.column.c1") != null) {
+                                    Elements elements = content.select("div.column.c1");
 
-                                final Realm mRealm = Realm.getInstance(realmConfig);
+                                    mRealm.executeTransaction(new Realm.Transaction() {
+                                        @Override
+                                        public void execute(Realm realm) {
+                                            mRealm.deleteAll();
+                                        }
+                                    });
 
-                                try {
-                                    mRealm.beginTransaction();
 
-                                    mRealm.deleteAll();
-
-                                    for (Element el : elements) {
+                                    for (final Element el : elements) {
                                         if (el != null) {
+                                            mRealm.executeTransaction(new Realm.Transaction() {
+                                                @Override
+                                                public void execute(Realm realm) {
+                                                    Kolegij kg = mRealm.createObject(Kolegij.class);
+                                                    kg.setName(el.text());
+                                                    kg.setLink(el.select("a").first().attr("href"));
+                                                }
+                                            });
 
-                                            Kolegij kg = mRealm.createObject(Kolegij.class);
-                                            kg.setName(el.text());
-                                            kg.setLink(el.select("a").first().attr("href"));
 
                                         }
 
                                     }
+                                }
 
-                                    mRealm.commitTransaction();
-                                } finally {
+                                }catch(Exception ex){
+                                    Log.d("Exception kolegiji", ex.getMessage());
+                                    ex.printStackTrace();
+                                } finally{
                                     mRealm.close();
                                 }
 
 
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        updateList();
-                                        progress.setVisibility(View.INVISIBLE);
-                                        recyclerView.setVisibility(View.VISIBLE);
-                                    }
-                                });
-
-                            }
+                                if (getActivity() != null) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            updateList();
+                                            progress.setVisibility(View.INVISIBLE);
+                                            recyclerView.setVisibility(View.VISIBLE);
+                                        }
+                                    });
+                                }
                         }
                     });
     }
@@ -186,6 +206,32 @@ public class Kolegiji extends Fragment {
 
     public void updateList(){
         kolegijiAdapter.notifyDataSetChanged();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
+        boolean isAvailable = false;
+        if (networkInfo != null && networkInfo.isConnected()) {
+            isAvailable = true;
+        }
+        return isAvailable;
+    }
+
+    public void showSnacOffline(){
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_INDEFINITE);
+        View vjuz = snack.getView();
+        vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
+        snack.setAction("PONOVI", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snack.dismiss();
+                fetchCourses();
+            }
+        });
+        snack.setActionTextColor(getResources().getColor(R.color.white));
+        snack.show();
     }
 
     @Override
