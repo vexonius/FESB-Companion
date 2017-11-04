@@ -2,6 +2,8 @@ package com.tstudioz.fax.fme.Application;
 
 import android.app.Application;
 
+import com.appnext.base.Appnext;
+
 import io.realm.Realm;
 
 /**
@@ -13,5 +15,6 @@ public class FESBCompanion extends Application {
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
+        Appnext.init(this);
     }
 }
