@@ -113,7 +113,6 @@ public class Kolegiji extends Fragment {
                     .build();
 
                     credRealm = Realm.getInstance(CredRealmCf);
-                    mRealm = Realm.getInstance(realmConfig);
                     Korisnik kor = credRealm.where(Korisnik.class).findFirst();
 
                     final RequestBody formData = new FormBody.Builder()
@@ -138,6 +137,7 @@ public class Kolegiji extends Fragment {
                         public void onResponse(Call call, Response response) throws IOException {
 
                             Document doc = Jsoup.parse(response.body().string());
+                            mRealm = Realm.getInstance(realmConfig);
 
                             try {
                                 Element content = doc.getElementById("inst17149");
