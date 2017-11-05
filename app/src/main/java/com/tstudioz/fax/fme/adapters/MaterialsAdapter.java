@@ -238,7 +238,6 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
                                     showDocSnack(view, doc_name, doc_ext, outFile);
                                 } catch (Exception exc){
-                                    // TODO popravit no suitable view for snackbar
                                     Log.d("Download error", exc.toString());
                                     showErrorSnack(view, "Došlo je do pogreške pri preuzimanju");
                                 }

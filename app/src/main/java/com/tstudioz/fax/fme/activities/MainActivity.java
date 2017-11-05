@@ -94,10 +94,6 @@ public class MainActivity extends AppCompatActivity {
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    /**
-     *  TODO async updatanje podataka
-     */
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

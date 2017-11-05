@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:text="FESB Companion 1.0"/>
+        android:text="FESB Companion 2.0"/>
     <TextView
         android:id="@+id/copyright"
         android:layout_width="match_parent"
@@ -37,6 +37,6 @@
         android:textColor="#cacaca"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:text="Posebne zahvale A.Č., N.B., I.Ž. i I.Ž."/>
+        android:text="Posebne zahvale A.Č., N.B., I.Ž., I.Ž., Vuki"/>
 
 </RelativeLayout>
