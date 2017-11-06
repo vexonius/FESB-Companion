@@ -87,12 +87,7 @@ public class Kolegiji extends Fragment {
 
         showList();
 
-        if(isNetworkAvailable()) {
-            fetchCourses();
-        } else {
-            showSnacOffline();
-        }
-
+       startFetching();
         return  view;
     }
 
@@ -100,6 +95,14 @@ public class Kolegiji extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.refresMe).setVisible(false);
         super.onPrepareOptionsMenu(menu);
+    }
+
+    public void startFetching(){
+        if(isNetworkAvailable()) {
+            fetchCourses();
+        } else {
+            showSnacOffline();
+        }
     }
 
     public void fetchCourses(){
@@ -227,7 +230,7 @@ public class Kolegiji extends Fragment {
             @Override
             public void onClick(View v) {
                 snack.dismiss();
-                fetchCourses();
+                startFetching();
             }
         });
         snack.setActionTextColor(getResources().getColor(R.color.white));
@@ -251,6 +254,10 @@ public class Kolegiji extends Fragment {
 
         if(okHttpClient!=null){
             okHttpClient.dispatcher().cancelAll();
+        }
+
+        if(snack!=null){
+            snack.dismiss();
         }
     }
 

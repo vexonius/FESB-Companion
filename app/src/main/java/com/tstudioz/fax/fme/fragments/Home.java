@@ -138,7 +138,6 @@ public class Home extends Fragment{
         super.onResume();
 
         showList();
-        updateWeatherWhenOffline();
     }
 
     private void getForecast(String url) {
@@ -188,7 +187,6 @@ public class Home extends Fragment{
             getForecast(forecastUrl);
         } else {
            showSnacOffline();
-            updateWeatherWhenOffline();
         }
 
     }
