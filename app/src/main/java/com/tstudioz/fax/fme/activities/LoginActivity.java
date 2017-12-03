@@ -158,7 +158,6 @@ public class LoginActivity extends AppCompatActivity {
 
          final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(this));
 
-
         final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
                 .followRedirects(true)
                 .followSslRedirects(true)
@@ -174,7 +173,6 @@ public class LoginActivity extends AppCompatActivity {
          final Request rq = new Request.Builder()
                  .url("https://korisnik.fesb.unist.hr/prijava")
                  .post(formData)
-               //  .get()
                  .build();
 
          Call call0 = okHttpClient.newCall(rq);

@@ -17,19 +17,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.appnext.appnextsdk.API.AppnextAPI;
-import com.appnext.appnextsdk.API.AppnextAd;
-import com.appnext.appnextsdk.API.AppnextAdRequest;
-import com.bumptech.glide.Glide;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.DolasciAdapter;
 import com.tstudioz.fax.fme.database.Dolazak;
@@ -41,7 +35,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
@@ -58,8 +51,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 
 public class Prisutnost extends Fragment {
@@ -80,21 +71,14 @@ public class Prisutnost extends Fragment {
     @BindView(R.id.recyclerLItnji) RecyclerView lRecyclerview;
     @BindView(R.id.progress_attend) ProgressBar mProgress;
     @BindView(R.id.nested_attend) NestedScrollView mNested;
-    @BindView(R.id.banner_view) RelativeLayout bannerView;
-    @BindView(R.id.banner_title) TextView bannerTitle;
-    @BindView(R.id.banner_rating) TextView bannerRating;
-    @BindView(R.id.banner_install) TextView bannerInstall;
-    @BindView(R.id.banner_privacy) ImageView bannerPrivacy;
-    @BindView(R.id.banner_icon) ImageView bannerIcon;
-    @BindView(R.id.banner_click) View bannerClick;
 
     private Snackbar snack;
     private DolasciAdapter winterAdapter, summerAdapter;
     private Realm nRealm, cRealm, sRealm, wRealm;
     private OkHttpClient okHttpClient;
 
-    public AppnextAPI bannerAppnextAPI;
-    public AppnextAd banner_ad;
+    private AdView mAdView;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -108,8 +92,10 @@ public class Prisutnost extends Fragment {
         mNested.setVisibility(View.INVISIBLE);
         mProgress.setVisibility(View.VISIBLE);
 
+        mAdView = view.findViewById(R.id.adView);
+
         startFetching();
-        loadNativeAd();
+        loadAds();
 
         return view;
     }
@@ -389,6 +375,11 @@ public class Prisutnost extends Fragment {
         summerAdapter.notifyDataSetChanged();
     }
 
+    public void loadAds(){
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+    }
+
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -402,47 +393,6 @@ public class Prisutnost extends Fragment {
         }else {
             showSnacOffline();
         }
-    }
-
-    public void loadNativeAd(){
-        // Make sure to use your own Placement ID as created in www.appnext.com
-        bannerAppnextAPI = new AppnextAPI(getActivity(), "4dbb81b8-938c-4f77-b816-a70b40f8a8d0");
-        bannerAppnextAPI.setAdListener(new AppnextAPI.AppnextAdListener() {
-            @Override
-            public void onAdsLoaded(ArrayList<AppnextAd> arrayList) {
-                banner_ad = arrayList.get(0);
-
-                Glide.with(getActivity()).load(banner_ad.getImageURL()).transition(withCrossFade()).into(bannerIcon);
-                bannerTitle.setText(banner_ad.getAdTitle());
-                bannerRating.setText(banner_ad.getStoreRating());
-                bannerInstall.setText(banner_ad.getButtonText());
-                bannerView.setVisibility(View.VISIBLE);
-                bannerClick.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        bannerAppnextAPI.adClicked(banner_ad);
-                    }
-                });
-                bannerPrivacy.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        bannerAppnextAPI.privacyClicked(banner_ad);
-                    }
-                });
-
-                bannerAppnextAPI.adImpression(banner_ad);
-            }
-
-            @Override
-            public void onError(String s) {
-                bannerView.setVisibility(View.GONE);
-                Log.d("Ad loading error", s);
-            }
-        });
-        // In this example we're loading only one ad for the banner using the setCount(1) function in the ad request
-        // This is an optional usage. To load more ads either don't use the fucntion or call it with a different value: setCount(x)
-        bannerAppnextAPI.loadAds(new AppnextAdRequest());
-
     }
 
     public void showSnacOffline(){
@@ -513,9 +463,7 @@ public class Prisutnost extends Fragment {
 
         if(wRealm!=null)
             wRealm.close();
-
-        if(bannerAppnextAPI!=null)
-            bannerAppnextAPI.finish();
+            wRealm.close();
     }
 
 }

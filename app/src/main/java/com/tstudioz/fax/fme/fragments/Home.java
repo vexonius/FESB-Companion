@@ -26,13 +26,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-
-import com.appnext.appnextsdk.API.AppnextAPI;
-import com.appnext.appnextsdk.API.AppnextAd;
-import com.appnext.appnextsdk.API.AppnextAdRequest;
-import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.NativeExpressAdView;
+import com.google.android.gms.ads.AdView;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.NoteActivity;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter;
@@ -46,7 +42,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import butterknife.BindView;
@@ -61,8 +56,6 @@ import okhttp3.Response;
 
 
 import static android.content.ContentValues.TAG;
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-
 
 public class Home extends Fragment{
 
@@ -77,9 +70,7 @@ public class Home extends Fragment{
     Snackbar snack;
     Realm mrealm;
 
-    public AppnextAPI bannerAppnextAPI;
-    public AppnextAd banner_ad;
-
+    private AdView homeAdView;
 
 
     @BindView(R.id.temperatura_vrijednost) TextView mTemperatureLabel;
@@ -98,13 +89,6 @@ public class Home extends Fragment{
     @BindView(R.id.rv) RecyclerView recyclerView;
     @BindView(R.id.nema_predavanja) RelativeLayout np;
     @BindView(R.id.relative_parent_home) RelativeLayout parentRelative;
-    @BindView(R.id.banner_view_home) RelativeLayout bannerView;
-    @BindView(R.id.banner_title_home) TextView bannerTitle;
-    @BindView(R.id.banner_rating_home) TextView bannerRating;
-    @BindView(R.id.banner_install_home) TextView bannerInstall;
-    @BindView(R.id.banner_privacy_home) ImageView bannerPrivacy;
-    @BindView(R.id.banner_icon_home) ImageView bannerIcon;
-    @BindView(R.id.banner_click_home) View bannerClick;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -128,7 +112,9 @@ public class Home extends Fragment{
 
         setFancyFonts();
         loadNotes();
-        loadNativeAd();
+
+        homeAdView = view.findViewById(R.id.adViewHome);
+        loadAdsOnHome();
 
         return view;
     }
@@ -340,6 +326,17 @@ public class Home extends Fragment{
         });
     }
 
+    public void loadAdsOnHome(){
+
+        if(isNetworkAvailable()) {
+            homeAdView.setVisibility(View.VISIBLE);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            homeAdView.loadAd(adRequest);
+        } else {
+            homeAdView.setVisibility(View.GONE);
+        }
+    }
+
     public void showSnacOffline(){
         snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
@@ -354,56 +351,14 @@ public class Home extends Fragment{
         snack.show();
     }
 
-    public void loadNativeAd(){
-        // Make sure to use your own Placement ID as created in www.appnext.com
-        bannerAppnextAPI = new AppnextAPI(getActivity(), "344bf528-b041-44cc-aa7b-a58ec4157d73");
-        bannerAppnextAPI.setAdListener(new AppnextAPI.AppnextAdListener() {
-            @Override
-            public void onAdsLoaded(ArrayList<AppnextAd> arrayList) {
-                banner_ad = arrayList.get(0);
-
-                Glide.with(getActivity()).load(banner_ad.getImageURL()).transition(withCrossFade()).into(bannerIcon);
-                bannerTitle.setText(banner_ad.getAdTitle());
-                bannerRating.setText(banner_ad.getStoreRating());
-                bannerInstall.setText(banner_ad.getButtonText());
-                bannerView.setVisibility(View.VISIBLE);
-                bannerClick.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        bannerAppnextAPI.adClicked(banner_ad);
-                    }
-                });
-                bannerPrivacy.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        bannerAppnextAPI.privacyClicked(banner_ad);
-                    }
-                });
-
-                bannerAppnextAPI.adImpression(banner_ad);
-            }
-
-            @Override
-            public void onError(String s) {
-                bannerView.setVisibility(View.GONE);
-                Log.d("Ad loading error", s);
-            }
-        });
-        // In this example we're loading only one ad for the banner using the setCount(1) function in the ad request
-        // This is an optional usage. To load more ads either don't use the fucntion or call it with a different value: setCount(x)
-        bannerAppnextAPI.loadAds(new AppnextAdRequest());
-
-    }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
+
         if(mrealm!=null){
         mrealm.close();
         }
-
-        if(bannerAppnextAPI!=null)
-            bannerAppnextAPI.finish();
     }
 
 }
