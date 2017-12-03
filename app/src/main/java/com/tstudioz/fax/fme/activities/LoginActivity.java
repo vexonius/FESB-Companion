@@ -83,9 +83,14 @@ public class LoginActivity extends AppCompatActivity {
                        showErrorSnack("Niste unijeli korisničke podatke");
 
                     }else{
-                        bar.setVisibility(View.VISIBLE);
-                        but.setVisibility(View.INVISIBLE);
-                        validateUser(username, password, view);
+
+                        if(username.contains("@")){
+                            showErrorSnack("Potrebno je unijeti korisničko ime, ne email");
+                        } else {
+                            bar.setVisibility(View.VISIBLE);
+                            but.setVisibility(View.INVISIBLE);
+                            validateUser(username, password, view);
+                        }
                     }
                 }else {
                     showErrorSnack("Niste povezani");
