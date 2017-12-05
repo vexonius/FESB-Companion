@@ -12,6 +12,8 @@
     <color name="left_color">#006735</color>
     <color name="right_color">#263238</color>
     <color name="my_color">#1d1d1d</color>
+    <color name="dark_cyan">#0097a7</color>
+    <color name="darker_cyan">#00838f</color>
 
     //bottomNavigation
     <color name="inactive">#6e6e6e</color>

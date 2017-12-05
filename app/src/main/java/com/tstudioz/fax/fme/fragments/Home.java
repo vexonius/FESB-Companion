@@ -5,15 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
@@ -72,7 +76,6 @@ public class Home extends Fragment{
 
     private AdView homeAdView;
 
-
     @BindView(R.id.temperatura_vrijednost) TextView mTemperatureLabel;
     @BindView(R.id.vlaznost_vrijednost) TextView mHumidityValue;
     @BindView(R.id.opis) TextView mSummaryLabel;
@@ -99,6 +102,11 @@ public class Home extends Fragment{
         View view = inflater.inflate(R.layout.home_tab, container, false);
 
         setHasOptionsMenu(true);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#0097a7")));
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getContext(), R.color.darker_cyan));
+        }
+
         ButterKnife.bind(this, view);
 
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
@@ -351,6 +359,13 @@ public class Home extends Fragment{
         snack.show();
     }
 
+    @Override
+    public void onStop(){
+        super.onStop();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+        }
+    }
 
     @Override
     public void onDestroy(){

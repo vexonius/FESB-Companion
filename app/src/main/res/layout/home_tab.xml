@@ -11,9 +11,7 @@
     android:background="@color/colorPrimaryDark"
     android:layout_marginBottom="2dp">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
+<RelativeLayout
     android:id="@+id/relative_parent_home"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -23,11 +21,10 @@
 
   <FrameLayout
       android:id="@+id/frameLayout"
-      android:elevation="8dp"
-      android:background="@color/colorPrimary"
+      android:background="#0097a7"
       android:layout_width="match_parent"
       android:layout_height="180dp"
-      android:layout_margin="10dp">
+      android:padding="10dp">
 
       <ProgressBar
           android:id="@+id/progressCircle"
@@ -37,7 +34,7 @@
           android:interpolator="@android:interpolator/linear"
           android:progress="@android:integer/config_mediumAnimTime"
           android:indeterminate="true"
-          android:progressTint="@color/colorAccent"
+          android:progressTint="@color/white"
           android:visibility="visible" />
 
     <RelativeLayout
@@ -45,8 +42,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:attr/selectableItemBackground"
         android:visibility="invisible">
 
         <TextView
@@ -102,7 +97,7 @@
                     android:textStyle="bold"
                     android:text=""
                     android:paddingBottom="0dp"
-                    android:textColor="#FF00C4FF"
+                    android:textColor="@color/white"
                     android:gravity="center_horizontal"
                     android:textSize="65dp" />
 
@@ -216,10 +211,16 @@
 
     <RelativeLayout
         android:id="@+id/task"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
         android:layout_below="@+id/frameLayout"
+        android:background="@drawable/cyan_blue_gradient">
+
+    <RelativeLayout
         android:layout_height="100dp"
         android:layout_width="match_parent"
         android:background="#2ecc71"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         android:gravity="center"
@@ -242,6 +243,8 @@
                 android:maxLines = "100"
                 android:scrollbars = "vertical"
                 android:textColor="#ffffff"/>
+    </RelativeLayout>
+
     </RelativeLayout>
 
     <com.google.android.gms.ads.AdView
@@ -331,4 +334,4 @@
 
 </RelativeLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+</android.support.v4.widget.NestedScrollView>
