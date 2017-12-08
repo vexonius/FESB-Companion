@@ -30,7 +30,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.tstudioz.fax.fme.R;
@@ -172,7 +171,7 @@ public class Home extends Fragment{
 
         // make call to server
         // get your own API KEY from developer.forecast.io and fill it in.
-        final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude;
+        final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr";
 
         if(isNetworkAvailable()) {
             getForecast(forecastUrl);
