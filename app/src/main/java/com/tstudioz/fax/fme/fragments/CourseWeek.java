@@ -83,7 +83,6 @@ public class CourseWeek extends Fragment {
         setHasOptionsMenu(true);
         ButterKnife.bind(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
 
         fetchCourseContent(link);
 

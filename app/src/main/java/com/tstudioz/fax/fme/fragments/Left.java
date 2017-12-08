@@ -92,7 +92,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
+
         //set the layout you want to display in First Fragment
         View view = inflater.inflate(R.layout.left_tab,
                 container, false);
@@ -142,7 +142,9 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         dateDialogBuilder.setMaxDate(max)
                 .setMinDate(min)
                 .setFirstDayOfWeek(Calendar.MONDAY)
-                .setThemeDark(true);
+                .setThemeDark(true)
+                .setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark))
+                .setHeaderColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
 
      checkNetwork();
 

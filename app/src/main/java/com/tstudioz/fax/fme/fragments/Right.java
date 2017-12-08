@@ -45,7 +45,6 @@ public class Right extends Fragment {
         View view = inflater.inflate(R.layout.right_tab,
                 container, false);
         setHasOptionsMenu(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
 
         ButterKnife.bind(this, view);
 

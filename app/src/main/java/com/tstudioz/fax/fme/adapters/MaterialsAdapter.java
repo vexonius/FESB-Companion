@@ -266,8 +266,6 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                     intent.setAction(android.content.Intent.ACTION_VIEW);
                     intent.setDataAndType(Uri.fromFile(file), MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
                     view.getContext().startActivity(intent);
-
-                    // TODO: Activity not found surround with try catch
                 }
             });
             snackbar.show();

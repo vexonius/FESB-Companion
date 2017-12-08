@@ -90,8 +90,6 @@ public class Prisutnost extends Fragment {
 
         ButterKnife.bind(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
-
 
         mNested.setVisibility(View.INVISIBLE);
         mProgress.setVisibility(View.VISIBLE);

@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.addItem(item2);
 
         bottomNavigation.setBehaviorTranslationEnabled(false);
-        bottomNavigation.setDefaultBackgroundColor(Color.parseColor("#2f3031"));
+        bottomNavigation.setDefaultBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         bottomNavigation.setForceTint(true);
         bottomNavigation.setAccentColor(Color.parseColor("#FFFFFF"));
         bottomNavigation.setInactiveColor(Color.parseColor("#6e6e6e"));

@@ -102,11 +102,7 @@ public class Home extends Fragment{
         View view = inflater.inflate(R.layout.home_tab, container, false);
 
         setHasOptionsMenu(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#0097a7")));
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getContext(), R.color.darker_cyan));
-        }
-
+        setCyanStatusBarColor();
         ButterKnife.bind(this, view);
 
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
@@ -131,6 +127,7 @@ public class Home extends Fragment{
     public void onResume() {
         super.onResume();
 
+        setCyanStatusBarColor();
         showList();
     }
 
@@ -306,6 +303,13 @@ public class Home extends Fragment{
         mTemperatureLabel.setTypeface(typeBold);
     }
 
+    public void setCyanStatusBarColor(){
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.dark_cyan)));
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getContext(), R.color.darker_cyan));
+        }
+    }
+
     public void loadNotes(){
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String tekstic = sharedPref.getString("mojtext", "Trenutno nema bilješki");
@@ -362,6 +366,7 @@ public class Home extends Fragment{
     @Override
     public void onStop(){
         super.onStop();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.colorPrimary)));
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
         }
