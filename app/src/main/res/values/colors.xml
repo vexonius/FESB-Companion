@@ -8,6 +8,7 @@
     <color name="white">#ffffff</color>
     <color name="_20white">#70ffffff</color>
     <color name="_10white">#26FFFFFF</color>
+    <color name="_5white">#0affffff</color>
     <color name="_70white">#aeffffff</color>
     <color name="left_color">#006735</color>
     <color name="right_color">#263238</color>
@@ -16,7 +17,10 @@
     <color name="darker_cyan">#00838f</color>
 
     //bottomNavigation
-    <color name="inactive">#6e6e6e</color>
+    <color name="inactive">#658393</color>
+
+    //shades of grey
+    <color name="shady_blue">#658393</color>
     
     //Boje za svaku vrstu predavanja
     <color name="red_nice">#ff5252</color>
@@ -34,7 +38,7 @@
     <array name="rainbow">
         <item>@color/colorAccent</item>
         <item>@color/red_nice</item>
-        <item>@color/_10white</item>
+        <item>@color/_5white</item>
     </array>
 
     <!-- Screens background color-->

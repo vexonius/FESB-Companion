@@ -140,8 +140,8 @@ public class MainActivity extends AppCompatActivity {
 
         AHBottomNavigationItem item0 = new AHBottomNavigationItem(getString(R.string.homie), R.drawable.home, R.color.home_color);
         AHBottomNavigationItem item1 = new AHBottomNavigationItem(getString(R.string.left), R.drawable.schedule, R.color.left_color);
-        AHBottomNavigationItem item3 = new AHBottomNavigationItem("Prisutnost", R.drawable.plus_attend, R.color.left_color);
-        AHBottomNavigationItem item4 = new AHBottomNavigationItem("Kolegiji", R.drawable.courses, R.color.left_color);
+        AHBottomNavigationItem item3 = new AHBottomNavigationItem(getString(R.string.prisutnost), R.drawable.plus_attend, R.color.left_color);
+        AHBottomNavigationItem item4 = new AHBottomNavigationItem(getString(R.string.kolegiji), R.drawable.courses, R.color.left_color);
         AHBottomNavigationItem item2 = new AHBottomNavigationItem(getString(R.string.right), R.drawable.mail, R.color.right_color);
 
         bottomNavigation.addItem(item0);
@@ -153,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setBehaviorTranslationEnabled(false);
         bottomNavigation.setDefaultBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         bottomNavigation.setForceTint(true);
-        bottomNavigation.setAccentColor(Color.parseColor("#FFFFFF"));
-        bottomNavigation.setInactiveColor(Color.parseColor("#6e6e6e"));
+        bottomNavigation.setAccentColor(ContextCompat.getColor(this, R.color.white));
+        bottomNavigation.setInactiveColor(ContextCompat.getColor(this, R.color.inactive));
         bottomNavigation.setUseElevation(true);
         bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_HIDE);
         bottomNavigation.setCurrentItem(0);

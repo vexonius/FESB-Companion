@@ -5,7 +5,7 @@
     android:background="@color/colorPrimary">
 
     <EditText
-        android:textColorHint="#cacaca"
+        android:textColorHint="@color/shady_blue"
         android:gravity="start"
         android:id="@+id/textEditor"
         android:layout_width="match_parent"

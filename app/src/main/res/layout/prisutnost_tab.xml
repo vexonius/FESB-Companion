@@ -37,7 +37,7 @@
                 android:layout_marginBottom="5dp"
                 android:textSize="14dp"
                 android:text="ZIMSKI SEMESTAR"
-                android:textColor="@color/_20white"
+                android:textColor="@color/shady_blue"
                 android:textAllCaps="true"/>
 
             <android.support.v7.widget.RecyclerView
@@ -74,7 +74,7 @@
                 android:layout_marginBottom="5dp"
                 android:textSize="14dp"
                 android:text="LJETNI SEMESTAR"
-                android:textColor="@color/_20white"
+                android:textColor="@color/shady_blue"
                 android:textAllCaps="true"/>
 
             <android.support.v7.widget.RecyclerView
