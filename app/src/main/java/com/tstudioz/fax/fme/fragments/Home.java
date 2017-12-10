@@ -86,7 +86,7 @@ public class Home extends Fragment{
     @BindView(R.id.card_home) RelativeLayout mCardHome;
     @BindView(R.id.progressCircle) ProgressBar mProgressCircle;
     @BindView(R.id.task) RelativeLayout mtask;
-    @BindView(R.id.taskText) TextView mtasktext;
+    @BindView(R.id.recyclerTask) RecyclerView mRecyclerTask;
     @BindView(R.id.list_progressbar) ProgressBar pbar1;
     @BindView(R.id.rv) RecyclerView recyclerView;
     @BindView(R.id.nema_predavanja) RelativeLayout np;
@@ -294,7 +294,6 @@ public class Home extends Fragment{
         mPrecipValue.setTypeface(typeLight);
 
         Typeface typeRegular = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Regular.ttf");
-        mtasktext.setTypeface(typeRegular);
         danp.setTypeface(typeRegular);
         mSummaryLabel.setTypeface(typeRegular);
 
@@ -310,31 +309,7 @@ public class Home extends Fragment{
     }
 
     public void loadNotes(){
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String tekstic = sharedPref.getString("mojtext", "Trenutno nema bilješki");
 
-        if(!tekstic.isEmpty()){
-            mtasktext.setText(tekstic);
-        } else {
-            mtasktext.setText("Trenutno nema bilješki");
-        }
-
-        mtasktext.setMovementMethod(new ScrollingMovementMethod());
-        mtasktext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent newIntent = new Intent(getActivity(), NoteActivity.class);
-                startActivity(newIntent);
-            }
-        });
-
-        mtask.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent newIntent = new Intent(getActivity(), NoteActivity.class);
-                startActivity(newIntent);
-            }
-        });
     }
 
     public void loadAdsOnHome(){

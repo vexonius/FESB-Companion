@@ -214,38 +214,19 @@
     <RelativeLayout
         android:id="@+id/task"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/frameLayout"
         android:clickable="true"
         android:background="@drawable/cyan_blue_gradient">
 
-    <RelativeLayout
-        android:layout_height="100dp"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerTask"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:background="#2ecc71"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
-        android:gravity="center"
-        android:foreground="?android:attr/selectableItemBackground">
-
-            <TextView
-                android:id="@+id/taskText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="7dp"
-                android:text="@string/nema_biljeski"
-                android:textSize="16dp"
-                android:scrollbarStyle="outsideInset"
-                android:scrollbarThumbVertical="@color/_20white"
-                android:scrollbarSize="5dp"
-                android:textAlignment="center"
-                android:clickable="true"
-                android:textStyle="normal"
-                android:maxLines = "100"
-                android:scrollbars = "vertical"
-                android:textColor="#ffffff"/>
-    </RelativeLayout>
+        android:layout_marginLeft="10dp">
+    </android.support.v7.widget.RecyclerView>
 
     </RelativeLayout>
 
