@@ -13,7 +13,7 @@
         android:id="@+id/taskPoint"
         android:layout_width="22dp"
         android:layout_height="22dp"
-        android:src="@drawable/circle_white" />
+        android:src="@drawable/add_new" />
 
     <TextView
         android:id="@+id/taskPointText"
@@ -23,7 +23,7 @@
         android:layout_toRightOf="@+id/taskPoint"
         android:paddingLeft="15dp"
         android:text="Hello world"
-        android:textColor="@color/white"
+        android:textColor="@color/shady_blue"
         android:textSize="16dp" />
 
 </RelativeLayout>

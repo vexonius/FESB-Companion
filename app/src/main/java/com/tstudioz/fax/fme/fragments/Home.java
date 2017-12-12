@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
@@ -9,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -30,6 +32,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.activities.NoteActivity;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter;
 import com.tstudioz.fax.fme.adapters.LeanTaskAdapter;
 import com.tstudioz.fax.fme.database.LeanTask;
@@ -44,7 +47,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -86,10 +88,10 @@ public class Home extends Fragment{
     @BindView(R.id.progressCircle) ProgressBar mProgressCircle;
     @BindView(R.id.task) RelativeLayout mtask;
     @BindView(R.id.recyclerTask) RecyclerView mRecyclerTask;
-    @BindView(R.id.list_progressbar) ProgressBar pbar1;
     @BindView(R.id.rv) RecyclerView recyclerView;
     @BindView(R.id.nema_predavanja) RelativeLayout np;
     @BindView(R.id.relative_parent_home) RelativeLayout parentRelative;
+    @BindView(R.id.iksica_ad) ImageView iksicaPromoImage;
 
     public RealmConfiguration realmTaskConfiguration = new RealmConfiguration.Builder()
             .name("tasks.realm")
@@ -126,6 +128,7 @@ public class Home extends Fragment{
 
         homeAdView = view.findViewById(R.id.adViewHome);
         loadAdsOnHome();
+        loadIksicaAd();
 
         return view;
     }
@@ -275,7 +278,7 @@ public class Home extends Fragment{
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerView.setAdapter(adapter);
 
-            pbar1.setVisibility(View.INVISIBLE);
+            np.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
     }
@@ -305,44 +308,63 @@ public class Home extends Fragment{
     public void loadNotes(){
         RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
 
-        LeanTaskAdapter leanTaskAdapter = new LeanTaskAdapter(tasks);
-        mRecyclerTask.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerTask.setAdapter(leanTaskAdapter);
-    }
+        final LeanTask dodajNovi = new LeanTask();
+        dodajNovi.setId("ACTION_ADD");
+        dodajNovi.setTaskTekst("Dodaj novi podsjetnik");
 
-    public void loadTestNotes(){
-        final RealmResults<LeanTask> notes = taskRealm.where(LeanTask.class).findAll();
         taskRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                notes.deleteAllFromRealm();
-                for (int i = 0; i<2; i++) {
-                    LeanTask leanTask = taskRealm.createObject(LeanTask.class);
-                    leanTask.setTaskTekst("Podsjetnik broj");
-                }
+                taskRealm.insertOrUpdate(dodajNovi);
             }
         });
 
-        RealmResults<LeanTask> notez = taskRealm.where(LeanTask.class).findAll();
-        for (final LeanTask task : notez){
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.e("tag me", task.getTaskTekst());
-                }
-            });
-        }
+
+        LeanTaskAdapter leanTaskAdapter = new LeanTaskAdapter(tasks);
+        mRecyclerTask.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerTask.setAdapter(leanTaskAdapter);
+
+    }
+
+    public void loadTestNotes(){
+        final RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
+        taskRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+               // tasks.deleteAllFromRealm();
+
+              //  LeanTask newTask = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
+              //  newTask.setTaskTekst("Let me enlighten you");
+//
+              //  LeanTask newTask1 = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
+              //  newTask1.setTaskTekst("This is the way I pray");
+            }
+        });
     }
 
     public void loadAdsOnHome(){
 
-        if(isNetworkAvailable()) {
-            homeAdView.setVisibility(View.VISIBLE);
-            AdRequest adRequest = new AdRequest.Builder().build();
-            homeAdView.loadAd(adRequest);
-        } else {
+       // if(isNetworkAvailable()) {
+       //     homeAdView.setVisibility(View.VISIBLE);
+       //     AdRequest adRequest = new AdRequest.Builder().build();
+       //     homeAdView.loadAd(adRequest);
+       // } else {
             homeAdView.setVisibility(View.GONE);
-        }
+       // }
+    }
+
+    public void loadIksicaAd(){
+        iksicaPromoImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String appPackageName = "com.tstudioz.iksica";
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
+            }
+        });
     }
 
     public void showSnacOffline(){

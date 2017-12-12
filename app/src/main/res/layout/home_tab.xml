@@ -53,7 +53,7 @@
             android:text="Split"
             android:textColor="#ffffff"
             android:textSize="16dp"
-            android:paddingTop="6dp"
+            android:paddingTop="2dp"
             android:gravity="center_horizontal" />
 
         <LinearLayout
@@ -241,7 +241,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
-        android:paddingBottom="10dp">
+        android:layout_marginBottom="10dp">
     </android.support.v7.widget.RecyclerView>
 
     </RelativeLayout>
@@ -274,43 +274,32 @@
     <FrameLayout
         android:id="@+id/frame_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/pr">
 
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:smoothScrollbar="true"
             android:scrollbarStyle="outsideOverlay"
             android:scrollbarSize="5dp"
             android:scrollbarThumbVertical="@color/_20white"
-            android:layout_marginBottom="3dp"
+            android:paddingBottom="3dp"
             android:visibility="invisible" />
-
-            <ProgressBar
-                android:id="@+id/list_progressbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:interpolator="@android:interpolator/linear"
-                android:progress="@android:integer/config_mediumAnimTime"
-                android:indeterminate="true"
-                android:progressTint="@color/colorAccent"
-                android:visibility="visible"/>
 
         <RelativeLayout
             android:id="@+id/nema_predavanja"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            android:visibility="invisible">
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/smile"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="60dp"
                 android:src="@drawable/smiley"
                 android:scaleType="fitCenter"
                 android:paddingTop="20dp"/>
@@ -322,12 +311,25 @@
                 android:layout_marginTop="15dp"
                 android:textAlignment="center"
                 android:text="@string/odmori_se"
-                android:paddingBottom="20dp"
+                android:paddingBottom="10dp"
                 android:textColor="#cacaca"
                 android:textSize="14dp"/>
         </RelativeLayout>
 
     </FrameLayout>
+
+    <ImageView
+        android:id="@+id/iksica_ad"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:clickable="true"
+        android:scaleType="centerCrop"
+        android:layout_below="@id/frame_list"
+        android:src="@drawable/iksica_promo"/>
 
 </RelativeLayout>
 

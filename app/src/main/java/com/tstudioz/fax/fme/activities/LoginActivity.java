@@ -59,7 +59,6 @@ public class LoginActivity extends AppCompatActivity {
     final RealmConfiguration loginRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
             .schemaVersion(5)
-            .deleteRealmIfMigrationNeeded()
             .build();
 
     @Override

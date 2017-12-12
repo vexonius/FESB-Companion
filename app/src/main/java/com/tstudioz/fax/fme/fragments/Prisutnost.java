@@ -3,7 +3,6 @@ package com.tstudioz.fax.fme.fragments;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -66,7 +64,6 @@ public class Prisutnost extends Fragment {
     public RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
             .schemaVersion(5)
-            .deleteRealmIfMigrationNeeded()
             .build();
 
     @BindView(R.id.recyclerZimski) RecyclerView zRecyclerview;
@@ -465,7 +462,7 @@ public class Prisutnost extends Fragment {
 
         if(wRealm!=null)
             wRealm.close();
-            wRealm.close();
+
     }
 
 }

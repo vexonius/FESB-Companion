@@ -5,9 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -29,22 +26,20 @@ import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
-import com.tstudioz.fax.fme.fragments.Home;
-import com.tstudioz.fax.fme.fragments.Left;
 import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.fragments.Right;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
-import com.tstudioz.fax.fme.fragments.Prisutnost;
+import com.tstudioz.fax.fme.fragments.Home;
 import com.tstudioz.fax.fme.fragments.Kolegiji;
-
+import com.tstudioz.fax.fme.fragments.Left;
+import com.tstudioz.fax.fme.fragments.Prisutnost;
+import com.tstudioz.fax.fme.fragments.Right;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -93,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
     public final  RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
             .schemaVersion(5)
-            .deleteRealmIfMigrationNeeded()
             .build();
 
 
@@ -423,7 +417,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void showList() {
-        ProgressBar pbar1 = (ProgressBar) findViewById (R.id.list_progressbar);
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.rv);
         RelativeLayout np = (RelativeLayout) findViewById(R.id.nema_predavanja);
 
@@ -439,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setHasFixedSize(true);
             recyclerView.setAdapter(adapter);
 
-            pbar1.setVisibility(View.INVISIBLE);
+            np.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
 

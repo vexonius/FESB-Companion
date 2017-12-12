@@ -66,7 +66,6 @@ public class Kolegiji extends Fragment {
     public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
             .schemaVersion(5)
-            .deleteRealmIfMigrationNeeded()
             .build();
 
     @BindView(R.id.kolegiji_rv) RecyclerView recyclerView;
