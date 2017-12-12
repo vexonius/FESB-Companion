@@ -211,21 +211,37 @@
 
   </FrameLayout>
 
+    <TextView
+        android:id="@+id/taskHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/frameLayout"
+        android:text="PODSJETNICI:"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="3dp"
+        android:textColor="@color/shady_blue"
+        android:textSize="13dp"/>
+
     <RelativeLayout
         android:id="@+id/task"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/frameLayout"
-        android:clickable="true"
-        android:background="@drawable/cyan_blue_gradient">
+        android:layout_below="@+id/taskHeader"
+        android:background="@color/colorPrimary">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerTask"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:smoothScrollbar="true"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbarSize="5dp"
+        android:scrollbarThumbVertical="@color/_20white"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp">
+        android:layout_marginLeft="10dp"
+        android:paddingBottom="10dp">
     </android.support.v7.widget.RecyclerView>
 
     </RelativeLayout>
@@ -253,7 +269,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="3dp"
         android:layout_below="@+id/adViewHome"
-        android:textColor="#cacaca"/>
+        android:textColor="@color/shady_blue"/>
 
     <FrameLayout
         android:id="@+id/frame_list"
@@ -271,7 +287,6 @@
             android:scrollbarSize="5dp"
             android:scrollbarThumbVertical="@color/_20white"
             android:layout_marginBottom="3dp"
-            android:layout_marginTop="3dp"
             android:visibility="invisible" />
 
             <ProgressBar
@@ -290,7 +305,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            android:layout_marginTop="10dp"
             android:visibility="invisible">
 
             <ImageView

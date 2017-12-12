@@ -2,10 +2,8 @@ package com.tstudioz.fax.fme.fragments;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -20,7 +18,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,8 +30,9 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.activities.NoteActivity;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter;
+import com.tstudioz.fax.fme.adapters.LeanTaskAdapter;
+import com.tstudioz.fax.fme.database.LeanTask;
 import com.tstudioz.fax.fme.database.Predavanja;
 import com.tstudioz.fax.fme.weather.Current;
 import com.tstudioz.fax.fme.weather.Forecast;
@@ -46,17 +44,18 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
 
 import static android.content.ContentValues.TAG;
 
@@ -71,7 +70,7 @@ public class Home extends Fragment{
 
     private Forecast mForecast;
     Snackbar snack;
-    Realm mrealm;
+    Realm mrealm, taskRealm;
 
     private AdView homeAdView;
 
@@ -91,6 +90,12 @@ public class Home extends Fragment{
     @BindView(R.id.rv) RecyclerView recyclerView;
     @BindView(R.id.nema_predavanja) RelativeLayout np;
     @BindView(R.id.relative_parent_home) RelativeLayout parentRelative;
+
+    public RealmConfiguration realmTaskConfiguration = new RealmConfiguration.Builder()
+            .name("tasks.realm")
+            .deleteRealmIfMigrationNeeded()
+            .schemaVersion(1)
+            .build();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -114,6 +119,9 @@ public class Home extends Fragment{
         }
 
         setFancyFonts();
+
+        taskRealm = Realm.getInstance(realmTaskConfiguration);
+        loadTestNotes();
         loadNotes();
 
         homeAdView = view.findViewById(R.id.adViewHome);
@@ -254,20 +262,6 @@ public class Home extends Fragment{
         return isAvailable;
     }
 
-    public void updateWeatherWhenOffline(){
-        mProgressCircle.setVisibility(View.GONE);
-        mCardHome.setVisibility(View.VISIBLE);
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mTemperatureLabel.setText(sharedPref.getString("zadnja_temp", "-"));
-        mHumidityValue.setText(sharedPref.getString("zadnja_vlaznost", "-"));
-        mPrecipValue.setText(sharedPref.getString("zadnja_percip", "-"));
-        mWindLabel.setText(sharedPref.getString("zadnji_vjetar", "-"));
-        mSummaryLabel.setText(sharedPref.getString("zadnji_opis", "-"));
-        mIconImageView.setImageResource((sharedPref.getInt("imageId", R.drawable.clouds)));
-
-    }
-
     public void showList() {
         mrealm = Realm.getDefaultInstance();
         RealmResults<Predavanja> rezultati = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
@@ -309,7 +303,35 @@ public class Home extends Fragment{
     }
 
     public void loadNotes(){
+        RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
 
+        LeanTaskAdapter leanTaskAdapter = new LeanTaskAdapter(tasks);
+        mRecyclerTask.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerTask.setAdapter(leanTaskAdapter);
+    }
+
+    public void loadTestNotes(){
+        final RealmResults<LeanTask> notes = taskRealm.where(LeanTask.class).findAll();
+        taskRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                notes.deleteAllFromRealm();
+                for (int i = 0; i<2; i++) {
+                    LeanTask leanTask = taskRealm.createObject(LeanTask.class);
+                    leanTask.setTaskTekst("Podsjetnik broj");
+                }
+            }
+        });
+
+        RealmResults<LeanTask> notez = taskRealm.where(LeanTask.class).findAll();
+        for (final LeanTask task : notez){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.e("tag me", task.getTaskTekst());
+                }
+            });
+        }
     }
 
     public void loadAdsOnHome(){
@@ -352,6 +374,10 @@ public class Home extends Fragment{
 
         if(mrealm!=null){
         mrealm.close();
+        }
+
+        if (taskRealm!=null){
+            taskRealm.close();
         }
     }
 

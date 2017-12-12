@@ -4,12 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:paddingLeft="15dp">
+    android:paddingLeft="15dp"
+    android:paddingTop="7dp">
 
     <ImageView
         android:id="@+id/taskPoint"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:src="@drawable/circle_white"
         android:padding="2dp"/>
 

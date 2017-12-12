@@ -1,9 +1,5 @@
 package com.tstudioz.fax.fme.adapters;
 
-/**
- * Created by amarthus on 25-Mar-17.
- */
-
 
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
