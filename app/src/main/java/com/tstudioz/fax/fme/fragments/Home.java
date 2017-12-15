@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -276,6 +277,7 @@ public class Home extends Fragment{
 
             EmployeeRVAdapter adapter = new EmployeeRVAdapter(rezultati);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            ViewCompat.setNestedScrollingEnabled(recyclerView,false);
             recyclerView.setAdapter(adapter);
 
             np.setVisibility(View.GONE);
@@ -322,6 +324,7 @@ public class Home extends Fragment{
 
         LeanTaskAdapter leanTaskAdapter = new LeanTaskAdapter(tasks);
         mRecyclerTask.setLayoutManager(new LinearLayoutManager(getActivity()));
+        ViewCompat.setNestedScrollingEnabled(mRecyclerTask,false);
         mRecyclerTask.setAdapter(leanTaskAdapter);
 
     }
