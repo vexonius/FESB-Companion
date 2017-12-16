@@ -102,10 +102,10 @@ public class MainActivity extends AppCompatActivity {
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
 
-        checkUser();
         setUpBottomNav();
         setDefaultScreen();
         setFragmentTab();
+        checkUser();
 
     }
 
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setUpToolbar(){
         getSupportActionBar().setElevation(0.0f);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setTitle("FESB Companion");
     }
 

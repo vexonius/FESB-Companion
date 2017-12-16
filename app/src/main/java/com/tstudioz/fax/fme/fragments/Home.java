@@ -124,7 +124,7 @@ public class Home extends Fragment{
         setFancyFonts();
 
         taskRealm = Realm.getInstance(realmTaskConfiguration);
-        loadTestNotes();
+       // loadTestNotes();
         loadNotes();
 
         homeAdView = view.findViewById(R.id.adViewHome);
@@ -216,15 +216,15 @@ public class Home extends Fragment{
         Drawable drawable = getResources().getDrawable(current.getIconId());
         mIconImageView.setImageDrawable(drawable);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.Editor editor =  sharedPreferences.edit();
-        editor.putString("zadnja_temp", pTemperatura);
-        editor.putString("zadnja_vlaznost", pHumidity);
-        editor.putString("zadnja_percip", pPrecip);
-        editor.putString("zadnji_vjetar", pWind);
-        editor.putString("zadnji_opis", pSummary);
-        editor.putInt("imageId", current.getIconId());
-        editor.commit();
+     //   SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+     //   SharedPreferences.Editor editor =  sharedPreferences.edit();
+     //   editor.putString("zadnja_temp", pTemperatura);
+     //   editor.putString("zadnja_vlaznost", pHumidity);
+     //   editor.putString("zadnja_percip", pPrecip);
+     //   editor.putString("zadnji_vjetar", pWind);
+     //   editor.putString("zadnji_opis", pSummary);
+     //   editor.putInt("imageId", current.getIconId());
+     //   editor.commit();
     }
 
     private Forecast parseForecastDetails(String jsonData) throws JSONException {
@@ -236,7 +236,7 @@ public class Home extends Fragment{
 
     private Current getCurrentDetails(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
-        String timezone = forecast.getString("timezone");
+        // String timezone = forecast.getString("timezone");
 
         JSONObject currently = forecast.getJSONObject("currently");
 
@@ -249,6 +249,7 @@ public class Home extends Fragment{
         current.setWind(currently.getDouble("windSpeed"));
         current.setTemperature(currently.getDouble("temperature"));
         //current.setTimeZone(timezone);
+
 
         return current;
     }
@@ -330,19 +331,19 @@ public class Home extends Fragment{
     }
 
     public void loadTestNotes(){
-        final RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
-        taskRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-               // tasks.deleteAllFromRealm();
-
-              //  LeanTask newTask = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
-              //  newTask.setTaskTekst("Let me enlighten you");
+       // final RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
+       // taskRealm.executeTransaction(new Realm.Transaction() {
+       //     @Override
+       //     public void execute(Realm realm) {
+       //         tasks.deleteAllFromRealm();
 //
-              //  LeanTask newTask1 = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
-              //  newTask1.setTaskTekst("This is the way I pray");
-            }
-        });
+       //         LeanTask newTask = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
+       //         newTask.setTaskTekst("Let me enlighten you");
+//
+       //         LeanTask newTask1 = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
+       //         newTask1.setTaskTekst("This is the way I pray");
+       //     }
+       // });
     }
 
     public void loadAdsOnHome(){
@@ -391,19 +392,15 @@ public class Home extends Fragment{
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
         }
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
 
         if(mrealm!=null){
-        mrealm.close();
+            mrealm.close();
         }
 
         if (taskRealm!=null){
             taskRealm.close();
         }
+
     }
 
 }

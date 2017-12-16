@@ -51,29 +51,29 @@ public class CourseActivity extends AppCompatActivity {
         final CourseWeek cw = new CourseWeek();
         cw.setArguments(bundle);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.course_content, cw);
-                ft.addToBackStack(null);
-                ft.commit();
+        ft.replace(R.id.course_content, cw);
+        ft.addToBackStack(null);
+        ft.commit();
 
-    //     mInterstitialAd = new InterstitialAd(this);
-    //     mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
+       // mInterstitialAd = new InterstitialAd(this);
+       // mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
 //
-    //     mInterstitialAd.setAdListener(new AdListener() {
-    //    @Override
-    //    public void onAdClosed() {
-    //    requestNewInterstitial();
-    //    finish();
-    //    }
-    //    });
+       // mInterstitialAd.setAdListener(new AdListener() {
+       //     @Override
+       //     public void onAdClosed() {
+       //         requestNewInterstitial();
+       //         finish();
+       //     }
+       // });
 //
-    //     requestNewInterstitial();
+       // requestNewInterstitial();
 
 
     }
 
     @Override
-    public void onBackPressed(){
-       // mInterstitialAd.show();
+    public void onBackPressed() {
+        // mInterstitialAd.show();
     }
 
     @Override
@@ -102,9 +102,9 @@ public class CourseActivity extends AppCompatActivity {
         requestPermissions(permissions, requestCode);
     }
 
-    public void informUser(){
+    public void informUser() {
         int permissionCheck = ContextCompat.checkSelfPermission(CourseActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if(permissionCheck==-1){
+        if (permissionCheck == -1) {
             Snackbar snack = Snackbar.make(findViewById(R.id.relative_course_ac), "FESB Companion treba dopuštenje za preuzimanje dokumenata!", Snackbar.LENGTH_INDEFINITE);
             snack.setAction("DOPUSTI", new View.OnClickListener() {
                 @Override
@@ -113,7 +113,7 @@ public class CourseActivity extends AppCompatActivity {
                 }
             });
             snack.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.blue_nice));
-            snack.setActionTextColor(ContextCompat.getColor(this,R.color.white));
+            snack.setActionTextColor(ContextCompat.getColor(this, R.color.white));
             snack.show();
         }
     }
@@ -138,10 +138,10 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     private void requestNewInterstitial() {
-      //  AdRequest adRequest = new AdRequest.Builder()
-      //          .build();
+        //  AdRequest adRequest = new AdRequest.Builder()
+        //          .build();
 //
-      //   mInterstitialAd.loadAd(adRequest);
+        //   mInterstitialAd.loadAd(adRequest);
     }
 
 }
