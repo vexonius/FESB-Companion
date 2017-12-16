@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -75,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private Realm mainealm;
     private Realm realmLog;
     private Realm rlmLog;
+    private OkHttpClient client;
 
     private Snackbar snack;
 
@@ -94,17 +94,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setElevation(0.0f);
+        setUpToolbar();
         setContentView(R.layout.activity_main);
 
         Realm.setDefaultConfiguration(mainRealmConfig);
-        realmLog = Realm.getInstance(CredRealmCf);
 
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
-
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("FESB Companion");
 
         checkUser();
         setUpBottomNav();
@@ -114,8 +110,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkUser(){
+        realmLog = Realm.getInstance(CredRealmCf);
         if (realmLog!=null) {
-            new MojRaspored().execute();
+            getMojRaspored();
         } else {
             SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
             SharedPreferences.Editor editor =  sharedPref.edit();
@@ -124,9 +121,15 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show();
 
-            Intent nazad = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(nazad);
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+
         }
+    }
+
+    public void setUpToolbar(){
+        getSupportActionBar().setElevation(0.0f);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("FESB Companion");
     }
 
     public void setUpBottomNav(){
@@ -242,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.refresMe) {
             if (isNetworkAvailable()) {
-                new MojRaspored().execute();
+                getMojRaspored();
             } else {
                 showSnacOffline();
             }
@@ -279,11 +282,7 @@ public class MainActivity extends AppCompatActivity {
             exitApp();
         }
 
-
-    private class MojRaspored extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
+        public void getMojRaspored() {
 
             Realm rlm = Realm.getInstance(CredRealmCf);
             Korisnik kor = rlm.where(Korisnik.class).findFirst();
@@ -304,10 +303,7 @@ public class MainActivity extends AppCompatActivity {
             DateFormat smonth = new SimpleDateFormat("MM");
             DateFormat syear = new SimpleDateFormat("yyyy");
 
-            Log.d("pon", dfmonth.format(c.getTime()) + dfday.format(c.getTime()) + dfyear.format(c.getTime()));
-            Log.d("sub", smonth.format(s.getTime()) + sday.format(s.getTime()) + syear.format(s.getTime()));
-
-            OkHttpClient client = new OkHttpClient();
+            client = new OkHttpClient();
             final Request request = new Request.Builder()
                     .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" +  dfmonth.format(c.getTime())  + "%2F" +  dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" + smonth.format(s.getTime()) + "%2F" +  sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
                     .get()
@@ -323,98 +319,69 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
 
+                    Realm realm = Realm.getInstance(mainRealmConfig);
+
                     try {
                         if(response.code()==500){
-                            cancel(true);
-
-                            SharedPreferences mySPrefs1 = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-                            SharedPreferences.Editor editor1 = mySPrefs1.edit();
-                            editor1.putBoolean("loged_in", false);
-                            editor1.apply();
-
-                            final Realm rlmLog1 = Realm.getInstance(CredRealmCf);
-                            rlmLog1.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    rlmLog1.deleteAll();
-                                }
-                            });
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Pogrešno korisničko ime!", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            Intent noviIntent = new Intent(MainActivity.this, LoginActivity.class);
-                            startActivity(noviIntent);
+                            client.dispatcher().cancelAll();
+                            invalidCreds();
                         }
 
                         Document doc = Jsoup.parse(response.body().string());
-                        Realm realm = Realm.getInstance(mainRealmConfig);
-                        realm.beginTransaction();
-                        RealmResults<Predavanja> svaPredavanja = realm.where(Predavanja.class).findAll();
-                        svaPredavanja.deleteAllFromRealm();
-                        realm.commitTransaction();
+
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                RealmResults<Predavanja> svaPredavanja = realm.where(Predavanja.class).findAll();
+                                svaPredavanja.deleteAllFromRealm();
+                            }
+                        });
 
                         if (response.isSuccessful()) {
-                            Elements elements = doc.select("div.event");
+                            final Elements elements = doc.select("div.event");
 
                             try {
-                                realm.beginTransaction();
-                                for (final Element e : elements) {
-                                    Predavanja predavanja = realm.createObject(Predavanja.class, UUID.randomUUID().toString());
+                                realm.executeTransaction(new Realm.Transaction() {
+                                    @Override
+                                    public void execute(Realm realm) {
+                                        for (final Element e : elements) {
+                                            Predavanja predavanja = realm.createObject(Predavanja.class, UUID.randomUUID().toString());
 
-                                    if (e.hasAttr("data-id")) {
-                                        String attr = e.attr("data-id");
-                                        predavanja.setObjectId(Integer.parseInt(attr));
+                                            if (e.hasAttr("data-id")) {
+                                                String attr = e.attr("data-id");
+                                                predavanja.setObjectId(Integer.parseInt(attr));
+                                            }
+
+                                            predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
+                                            predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
+                                            predavanja.setRasponVremena(e.select("div.timespan").text());
+                                            predavanja.setGrupa(e.select("span.group.normal").text());
+                                            predavanja.setGrupaShort(e.select("span.group.short").text());
+                                            predavanja.setDvorana(e.select("span.resource").text());
+                                            predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
+                                            predavanja.setProfesor(e.select("div.detailItem.user").text());
+                                        }
                                     }
-
-                                    predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
-                                    predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
-                                    predavanja.setRasponVremena(e.select("div.timespan").text());
-                                    predavanja.setGrupa(e.select("span.group.normal").text());
-                                    predavanja.setGrupaShort(e.select("span.group.short").text());
-                                    predavanja.setDvorana(e.select("span.resource").text());
-                                    predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
-                                    predavanja.setProfesor(e.select("div.detailItem.user").text());
-                                }
-                                realm.commitTransaction();
+                                });
                             } finally {
                                 realm.close();
                             }
                         }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showList();
+                            }
+                        });
+
                     } catch (IOException e) {
                         Log.e(TAG, "Exception caught: ", e);
                     }
                 }
             });
 
-
-            return "gotovo";
         }
-
-        @Override
-        protected void onPostExecute(String result) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showList();
-                }
-            });
-
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-        }
-    }
-
 
     public void showList() {
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.rv);
@@ -451,6 +418,23 @@ public class MainActivity extends AppCompatActivity {
                 rlmLog.deleteAll();
             }
         });
+    }
+
+    public void invalidCreds(){
+        SharedPreferences mySPrefs1 = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+        SharedPreferences.Editor editor1 = mySPrefs1.edit();
+        editor1.putBoolean("loged_in", false);
+        editor1.apply();
+
+        final Realm rlmLog1 = Realm.getInstance(CredRealmCf);
+        rlmLog1.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                rlmLog1.deleteAll();
+            }
+        });
+
+        startActivity(new Intent(MainActivity.this, LoginActivity.class));
     }
 
     private boolean isNetworkAvailable() {
@@ -500,6 +484,14 @@ public class MainActivity extends AppCompatActivity {
         back_pressed= System.currentTimeMillis();
     }
 
+    @Override
+    public void onStop(){
+        super.onStop();
+
+        if(client!=null){
+            client.dispatcher().cancelAll();
+        }
+    }
 
     @Override
     public void onResume() {
