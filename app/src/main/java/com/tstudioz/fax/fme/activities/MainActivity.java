@@ -39,6 +39,7 @@ import com.tstudioz.fax.fme.fragments.Kolegiji;
 import com.tstudioz.fax.fme.fragments.Left;
 import com.tstudioz.fax.fme.fragments.Prisutnost;
 import com.tstudioz.fax.fme.fragments.Right;
+import com.tstudioz.fax.fme.migrations.CredMigration;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     public AlertDialog alertDialog;
     public long back_pressed;
 
-    private  AHBottomNavigation bottomNavigation;
+    private AHBottomNavigation bottomNavigation;
 
     private Realm mainealm;
     private Realm realmLog;
@@ -85,9 +86,10 @@ public class MainActivity extends AppCompatActivity {
             .build();
 
 
-    public final  RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
+    public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
-            .schemaVersion(5)
+            .schemaVersion(6)
+            .migration(new CredMigration())
             .build();
 
 
@@ -109,13 +111,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void checkUser(){
+    public void checkUser() {
         realmLog = Realm.getInstance(CredRealmCf);
-        if (realmLog!=null) {
+        if (realmLog != null) {
             getMojRaspored();
         } else {
             SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-            SharedPreferences.Editor editor =  sharedPref.edit();
+            SharedPreferences.Editor editor = sharedPref.edit();
             editor.putBoolean("loged_in", false);
             editor.commit();
 
@@ -126,13 +128,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setUpToolbar(){
+    public void setUpToolbar() {
         getSupportActionBar().setElevation(0.0f);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
-        getSupportActionBar().setTitle("FESB Companion");
     }
 
-    public void setUpBottomNav(){
+    public void setUpBottomNav() {
         bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
 
         AHBottomNavigationItem item0 = new AHBottomNavigationItem(getString(R.string.homie), R.drawable.home, R.color.home_color);
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setCurrentItem(0);
     }
 
-    public void setDefaultScreen(){
+    public void setDefaultScreen() {
         final Home hf = new Home();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -166,15 +167,13 @@ public class MainActivity extends AppCompatActivity {
         ft.commit();
     }
 
-    public void setFragmentTab(){
+    public void setFragmentTab() {
         bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 switch (position) {
-                    default:
-
                     case 0:
                         Home hf = new Home();
                         ft.replace(R.id.frame, hf);
@@ -216,6 +215,13 @@ public class MainActivity extends AppCompatActivity {
                         ft.addToBackStack(null);
                         ft.commit();
                         getSupportActionBar().setTitle("Mail");
+                        break;
+                    default:
+                        Home hf0 = new Home();
+                        ft.replace(R.id.frame, hf0);
+                        ft.addToBackStack(null);
+                        ft.commit();
+                        getSupportActionBar().setTitle("FESB Companion");
                         break;
                 }
                 return true;
@@ -262,14 +268,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void deleteWebViewCookies(){
+    public void deleteWebViewCookies() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             CookieManager.getInstance().removeAllCookies(null);
             CookieManager.getInstance().flush();
         } else {
             CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(getApplicationContext());
             cookieSyncMngr.startSync();
-            CookieManager cookieManager=CookieManager.getInstance();
+            CookieManager cookieManager = CookieManager.getInstance();
             cookieManager.removeAllCookie();
             cookieManager.removeSessionCookie();
             cookieSyncMngr.stopSync();
@@ -278,113 +284,113 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed(){
-            exitApp();
-        }
+    public void onBackPressed() {
+        exitApp();
+    }
 
-        public void getMojRaspored() {
+    public void getMojRaspored() {
 
-            Realm rlm = Realm.getInstance(CredRealmCf);
-            Korisnik kor = rlm.where(Korisnik.class).findFirst();
+        Realm rlm = Realm.getInstance(CredRealmCf);
+        Korisnik kor = rlm.where(Korisnik.class).findFirst();
 
-            // Get calendar set to current date and time
-            Calendar c = Calendar.getInstance();
-            Calendar s = Calendar.getInstance();
+        // Get calendar set to current date and time
+        Calendar c = Calendar.getInstance();
+        Calendar s = Calendar.getInstance();
 
-            // Set the calendar to monday of the current week
-            c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-            DateFormat dfday = new SimpleDateFormat("dd");
-            DateFormat dfmonth = new SimpleDateFormat("MM");
-            DateFormat dfyear = new SimpleDateFormat("yyyy");
+        // Set the calendar to monday of the current week
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        DateFormat dfday = new SimpleDateFormat("dd");
+        DateFormat dfmonth = new SimpleDateFormat("MM");
+        DateFormat dfyear = new SimpleDateFormat("yyyy");
 
-            // Set the calendar to Saturday of the current week
-            s.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-            DateFormat sday = new SimpleDateFormat("dd");
-            DateFormat smonth = new SimpleDateFormat("MM");
-            DateFormat syear = new SimpleDateFormat("yyyy");
+        // Set the calendar to Saturday of the current week
+        s.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        DateFormat sday = new SimpleDateFormat("dd");
+        DateFormat smonth = new SimpleDateFormat("MM");
+        DateFormat syear = new SimpleDateFormat("yyyy");
 
-            client = new OkHttpClient();
-            final Request request = new Request.Builder()
-                    .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" +  dfmonth.format(c.getTime())  + "%2F" +  dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" + smonth.format(s.getTime()) + "%2F" +  sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
-                    .get()
-                    .build();
+        client = new OkHttpClient();
+        final Request request = new Request.Builder()
+                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + dfmonth.format(c.getTime()) + "%2F" + dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" + smonth.format(s.getTime()) + "%2F" + sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
+                .get()
+                .build();
 
-            Call call = client.newCall(request);
-            call.enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.e(TAG, "Exception caught", e);
-                }
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "Exception caught", e);
+            }
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
 
-                    Realm realm = Realm.getInstance(mainRealmConfig);
+                Realm realm = Realm.getInstance(mainRealmConfig);
 
-                    try {
-                        if(response.code()==500){
-                            client.dispatcher().cancelAll();
-                            invalidCreds();
-                        }
-
-                        Document doc = Jsoup.parse(response.body().string());
-
-                        realm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                RealmResults<Predavanja> svaPredavanja = realm.where(Predavanja.class).findAll();
-                                svaPredavanja.deleteAllFromRealm();
-                            }
-                        });
-
-                        if (response.isSuccessful()) {
-                            final Elements elements = doc.select("div.event");
-
-                            try {
-                                realm.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        for (final Element e : elements) {
-                                            Predavanja predavanja = realm.createObject(Predavanja.class, UUID.randomUUID().toString());
-
-                                            if (e.hasAttr("data-id")) {
-                                                String attr = e.attr("data-id");
-                                                predavanja.setObjectId(Integer.parseInt(attr));
-                                            }
-
-                                            predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
-                                            predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
-                                            predavanja.setRasponVremena(e.select("div.timespan").text());
-                                            predavanja.setGrupa(e.select("span.group.normal").text());
-                                            predavanja.setGrupaShort(e.select("span.group.short").text());
-                                            predavanja.setDvorana(e.select("span.resource").text());
-                                            predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
-                                            predavanja.setProfesor(e.select("div.detailItem.user").text());
-                                        }
-                                    }
-                                });
-                            } finally {
-                                realm.close();
-                            }
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showList();
-                            }
-                        });
-
-                    } catch (IOException e) {
-                        Log.e(TAG, "Exception caught: ", e);
+                try {
+                    if (response.code() == 500) {
+                        client.dispatcher().cancelAll();
+                        invalidCreds();
                     }
-                }
-            });
 
-        }
+                    Document doc = Jsoup.parse(response.body().string());
+
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            RealmResults<Predavanja> svaPredavanja = realm.where(Predavanja.class).findAll();
+                            svaPredavanja.deleteAllFromRealm();
+                        }
+                    });
+
+                    if (response.isSuccessful()) {
+                        final Elements elements = doc.select("div.event");
+
+                        try {
+                            realm.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    for (final Element e : elements) {
+                                        Predavanja predavanja = realm.createObject(Predavanja.class, UUID.randomUUID().toString());
+
+                                        if (e.hasAttr("data-id")) {
+                                            String attr = e.attr("data-id");
+                                            predavanja.setObjectId(Integer.parseInt(attr));
+                                        }
+
+                                        predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
+                                        predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
+                                        predavanja.setRasponVremena(e.select("div.timespan").text());
+                                        predavanja.setGrupa(e.select("span.group.normal").text());
+                                        predavanja.setGrupaShort(e.select("span.group.short").text());
+                                        predavanja.setDvorana(e.select("span.resource").text());
+                                        predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
+                                        predavanja.setProfesor(e.select("div.detailItem.user").text());
+                                    }
+                                }
+                            });
+                        } finally {
+                            realm.close();
+                        }
+                    }
+
+                    //  runOnUiThread(new Runnable() {
+                    //      @Override
+                    //      public void run() {
+                    //          showList();
+                    //      }
+                    //  });
+
+                } catch (IOException e) {
+                    Log.e(TAG, "Exception caught: ", e);
+                }
+            }
+        });
+
+    }
 
     public void showList() {
-        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.rv);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv);
         RelativeLayout np = (RelativeLayout) findViewById(R.id.nema_predavanja);
 
         mainealm = Realm.getInstance(mainRealmConfig);
@@ -393,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
         if (rezultati.isEmpty()) {
             recyclerView.setVisibility(View.INVISIBLE);
             np.setVisibility(View.VISIBLE);
-        } else{
+        } else {
             EmployeeRVAdapter adapter = new EmployeeRVAdapter(rezultati);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setHasFixedSize(true);
@@ -405,7 +411,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void userLogOut(){
+    public void userLogOut() {
         SharedPreferences mySPrefs = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
         SharedPreferences.Editor editor = mySPrefs.edit();
         editor.putBoolean("loged_in", false);
@@ -420,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void invalidCreds(){
+    public void invalidCreds() {
         SharedPreferences mySPrefs1 = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
         SharedPreferences.Editor editor1 = mySPrefs1.edit();
         editor1.putBoolean("loged_in", false);
@@ -465,15 +471,15 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    public void showSnacOffline(){
+    public void showSnacOffline() {
         snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
         snack.show();
     }
 
-    public void exitApp(){
-        if (back_pressed + 2000 > System.currentTimeMillis()){
+    public void exitApp() {
+        if (back_pressed + 2000 > System.currentTimeMillis()) {
             finish();
         } else {
             snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Pritisnite nazad za izlazak iz aplikacije", Snackbar.LENGTH_SHORT);
@@ -481,14 +487,14 @@ public class MainActivity extends AppCompatActivity {
             viewto.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.grey_nice));
             snack.show();
         }
-        back_pressed= System.currentTimeMillis();
+        back_pressed = System.currentTimeMillis();
     }
 
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
 
-        if(client!=null){
+        if (client != null) {
             client.dispatcher().cancelAll();
         }
     }
@@ -502,13 +508,13 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        if(realmLog!=null)
+        if (realmLog != null)
             realmLog.close();
 
-        if(rlmLog!=null)
+        if (rlmLog != null)
             rlmLog.close();
 
-        if(mainealm!=null)
+        if (mainealm != null)
             mainealm.close();
     }
 

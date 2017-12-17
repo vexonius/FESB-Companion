@@ -28,6 +28,7 @@ import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.DolasciAdapter;
 import com.tstudioz.fax.fme.database.Dolazak;
 import com.tstudioz.fax.fme.database.Korisnik;
+import com.tstudioz.fax.fme.migrations.CredMigration;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -63,7 +64,8 @@ public class Prisutnost extends Fragment {
 
     public RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
-            .schemaVersion(5)
+            .schemaVersion(6)
+            .migration(new CredMigration())
             .build();
 
     @BindView(R.id.recyclerZimski) RecyclerView zRecyclerview;

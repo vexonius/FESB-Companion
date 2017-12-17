@@ -25,6 +25,7 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.migrations.CredMigration;
 import com.tstudioz.fax.fme.util.CircularAnim;
 import com.tstudioz.fax.fme.database.Korisnik;
 
@@ -58,7 +59,8 @@ public class LoginActivity extends AppCompatActivity {
 
     final RealmConfiguration loginRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
-            .schemaVersion(5)
+            .schemaVersion(6)
+            .migration(new CredMigration())
             .build();
 
     @Override

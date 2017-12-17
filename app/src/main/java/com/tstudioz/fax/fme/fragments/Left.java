@@ -29,6 +29,7 @@ import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapterTable;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
+import com.tstudioz.fax.fme.migrations.CredMigration;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -72,7 +73,8 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
      RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
-            .schemaVersion(5)
+            .schemaVersion(6)
+             .migration(new CredMigration())
             .build();
 
      RealmConfiguration tempRealm = new RealmConfiguration.Builder()

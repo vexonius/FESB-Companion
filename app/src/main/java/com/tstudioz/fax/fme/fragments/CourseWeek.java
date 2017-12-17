@@ -24,6 +24,7 @@ import com.tstudioz.fax.fme.adapters.CourseWeeksAdapter;
 import com.tstudioz.fax.fme.database.KolegijTjedan;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Materijal;
+import com.tstudioz.fax.fme.migrations.CredMigration;
 
 
 import org.jsoup.Jsoup;
@@ -58,7 +59,8 @@ public class CourseWeek extends Fragment {
 
     public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
-            .schemaVersion(5)
+            .schemaVersion(6)
+            .migration(new CredMigration())
             .build();
 
     private Realm tRealm;
