@@ -75,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
     private Realm mainealm;
     private Realm realmLog;
     private Realm rlmLog;
-    private OkHttpClient client;
 
+    private OkHttpClient client;
+    private Home hf;
     private Snackbar snack;
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
@@ -159,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setDefaultScreen() {
-        final Home hf = new Home();
+        hf = new Home();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame, hf);
@@ -374,12 +375,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                    //  runOnUiThread(new Runnable() {
-                    //      @Override
-                    //      public void run() {
-                    //          showList();
-                    //      }
-                    //  });
+                      runOnUiThread(new Runnable() {
+                          @Override
+                          public void run() {
+                             // showList();
+                              if (hf!=null){
+                                  hf.showList();
+                              }
+                          }
+                      });
 
                 } catch (IOException e) {
                     Log.e(TAG, "Exception caught: ", e);

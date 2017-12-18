@@ -276,14 +276,15 @@ public class Home extends Fragment{
             np.setVisibility(View.VISIBLE);
         } else {
 
+            np.setVisibility(View.INVISIBLE);
             EmployeeRVAdapter adapter = new EmployeeRVAdapter(rezultati);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             ViewCompat.setNestedScrollingEnabled(recyclerView,false);
             recyclerView.setAdapter(adapter);
 
-            np.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+
     }
 
     public void setFancyFonts(){
