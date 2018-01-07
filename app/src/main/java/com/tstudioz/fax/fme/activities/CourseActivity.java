@@ -74,6 +74,7 @@ public class CourseActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         // mInterstitialAd.show();
+        finish();
     }
 
     @Override

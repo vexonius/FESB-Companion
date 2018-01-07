@@ -15,6 +15,7 @@ import com.tstudioz.fax.fme.database.LeanTask;
 
 import java.util.UUID;
 
+import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -24,6 +25,7 @@ public class NoteActivity  extends AppCompatActivity {
     private InterstitialAd mInterstitialAd;
     private Realm tRealm;
     private String mTaskId;
+    private EditText et;
     private int mode;
 
     public RealmConfiguration realmTaskConfiguration = new RealmConfiguration.Builder()
@@ -37,10 +39,12 @@ public class NoteActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_layout);
 
+        ButterKnife.bind(this);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         tRealm=Realm.getInstance(realmTaskConfiguration);
-        EditText et = (EditText)findViewById(R.id.textEditor);
+        et = (EditText)findViewById(R.id.textEditor);
 
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
@@ -54,12 +58,6 @@ public class NoteActivity  extends AppCompatActivity {
             LeanTask leanTask = tRealm.where(LeanTask.class).equalTo("id", mTaskId).findFirst();
             et.setText(leanTask.getTaskTekst());
         }
-
-       // SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-       // String tekstic = sharedPref.getString("mojtext", "");
-       // et.setText(tekstic);
-//
-       // et.setSelection(et.getText().length());
 
      //   mInterstitialAd = new InterstitialAd(this);
      //   mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/2813576206");
@@ -79,8 +77,7 @@ public class NoteActivity  extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
 
-        EditText editText = (EditText)findViewById(R.id.textEditor);
-        final String stringBiljeska = editText.getText().toString();
+        final String stringBiljeska = et.getText().toString();
 
         if(mTaskId!=null && !stringBiljeska.trim().equals("")){
             tRealm.executeTransaction(new Realm.Transaction() {
@@ -109,14 +106,6 @@ public class NoteActivity  extends AppCompatActivity {
                 }
             });
         }
-
-//
-       // SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-       // SharedPreferences.Editor editor =  sharedPreferences.edit();
-       // editor.putString("mojtext", stringBiljeska);
-       // editor.commit();
-
-       // mInterstitialAd.show();
     }
 
     @Override
@@ -130,8 +119,8 @@ public class NoteActivity  extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.delete) {
-            EditText edtme = (EditText)findViewById(R.id.textEditor);
-            edtme.getText().clear();
+            et.setText("");
+            finish();
             return true;
         }
 

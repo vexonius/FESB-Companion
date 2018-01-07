@@ -25,5 +25,6 @@
     <string name="native_home">ca-app-pub-5944203368510130/8815874204</string>
     <string name="native_left">ca-app-pub-5944203368510130/6801293807</string>
     <string name="interstitial_note">ca-app-pub-5944203368510130/2813576206</string>
+    <string name="delete">Izbriši bilješku</string>
 
 </resources>

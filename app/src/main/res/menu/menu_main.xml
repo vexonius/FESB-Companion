@@ -11,12 +11,16 @@
         android:orderInCategory="1"
         android:title="Odjava"/>
 
-    <item android:id="@+id/about"
+    <item android:id="@+id/feedback"
         android:orderInCategory="2"
+        android:title="Pošalji feedback" />
+
+    <item android:id="@+id/about"
+        android:orderInCategory="3"
         android:title="O aplikaciji"/>
 
     <item android:id="@+id/legal"
-        android:orderInCategory="3"
+        android:orderInCategory="4"
         android:title="Licence"/>
 
 </menu>

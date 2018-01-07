@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -181,7 +182,6 @@ public class Home extends Fragment{
 
     private void start() throws IOException, JSONException {
 
-        // make call to server
         // get your own API KEY from developer.forecast.io and fill it in.
         final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr";
 
@@ -332,19 +332,19 @@ public class Home extends Fragment{
     }
 
     public void loadTestNotes(){
-       // final RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
-       // taskRealm.executeTransaction(new Realm.Transaction() {
-       //     @Override
-       //     public void execute(Realm realm) {
-       //         tasks.deleteAllFromRealm();
-//
-       //         LeanTask newTask = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
-       //         newTask.setTaskTekst("Let me enlighten you");
-//
-       //         LeanTask newTask1 = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
-       //         newTask1.setTaskTekst("This is the way I pray");
-       //     }
-       // });
+        final RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
+        taskRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                tasks.deleteAllFromRealm();
+
+                LeanTask newTask = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
+                newTask.setTaskTekst("Let me enlighten you");
+
+                LeanTask newTask1 = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
+                newTask1.setTaskTekst("This is the way I pray");
+            }
+        });
     }
 
     public void loadAdsOnHome(){

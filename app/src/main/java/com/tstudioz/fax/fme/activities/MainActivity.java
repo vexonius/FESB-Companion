@@ -5,12 +5,15 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -242,28 +245,49 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.logout) {
-            userLogOut();
-            deleteWebViewCookies();
+        switch (id) {
+            case R.id.logout:
+                userLogOut();
+                deleteWebViewCookies();
 
-            Intent nazadaNaLogin = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(nazadaNaLogin);
-        }
+                Intent nazadaNaLogin = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(nazadaNaLogin);
+                break;
 
-        if (id == R.id.refresMe) {
-            if (isNetworkAvailable()) {
-                getMojRaspored();
-            } else {
-                showSnacOffline();
-            }
-        }
 
-        if (id == R.id.legal) {
-            displayLicensesAlertDialog();
-        }
+            case R.id.refresMe:
+                if (isNetworkAvailable()) {
+                    getMojRaspored();
+                } else {
+                    showSnacOffline();
+                }
+                break;
 
-        if (id == R.id.about) {
-            appInfo();
+            case R.id.legal:
+                displayLicensesAlertDialog();
+                break;
+
+            case R.id.about:
+                appInfo();
+                break;
+
+            case R.id.feedback:
+                String version = "undefined";
+                try {
+                    PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+                    version = pInfo.versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                ShareCompat.IntentBuilder.from(this)
+                        .setType("message/rfc822")
+                        .addEmailTo("info@tstud.io")
+                        .setSubject("FESB Companion Feedback v"  + version)
+                        .setText("")
+                        .setChooserTitle("Otvori pomoću")
+                        .startChooser();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -375,15 +399,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                      runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                             // showList();
-                              if (hf!=null){
-                                  hf.showList();
-                              }
-                          }
-                      });
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // showList();
+                            if (hf != null) {
+                                hf.showList();
+                            }
+                        }
+                    });
 
                 } catch (IOException e) {
                     Log.e(TAG, "Exception caught: ", e);
