@@ -411,28 +411,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void showList() {
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv);
-        RelativeLayout np = (RelativeLayout) findViewById(R.id.nema_predavanja);
-
-        mainealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezultati = mainealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
-
-        if (rezultati.isEmpty()) {
-            recyclerView.setVisibility(View.INVISIBLE);
-            np.setVisibility(View.VISIBLE);
-        } else {
-            EmployeeRVAdapter adapter = new EmployeeRVAdapter(rezultati);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setAdapter(adapter);
-
-            np.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        }
-
-    }
-
     public void userLogOut() {
         SharedPreferences mySPrefs = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
         SharedPreferences.Editor editor = mySPrefs.edit();

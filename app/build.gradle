@@ -9,8 +9,8 @@ android {
         applicationId "com.tstudioz.fax.fme"
         minSdkVersion 18
         targetSdkVersion 26
-        versionCode 13
-        versionName "2.1.0 build #2106"
+        versionCode 14
+        versionName "2.1.0 build #2107"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

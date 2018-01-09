@@ -55,26 +55,25 @@ public class CourseActivity extends AppCompatActivity {
         ft.addToBackStack(null);
         ft.commit();
 
-       // mInterstitialAd = new InterstitialAd(this);
-       // mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
-//
-       // mInterstitialAd.setAdListener(new AdListener() {
-       //     @Override
-       //     public void onAdClosed() {
-       //         requestNewInterstitial();
-       //         finish();
-       //     }
-       // });
-//
-       // requestNewInterstitial();
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                finish();
+            }
+        });
+
+        requestNewInterstitial();
 
 
     }
 
     @Override
     public void onBackPressed() {
-        // mInterstitialAd.show();
-        finish();
+         mInterstitialAd.show();
     }
 
     @Override
@@ -139,10 +138,10 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     private void requestNewInterstitial() {
-        //  AdRequest adRequest = new AdRequest.Builder()
-        //          .build();
-//
-        //   mInterstitialAd.loadAd(adRequest);
+          AdRequest adRequest = new AdRequest.Builder()
+                  .build();
+
+           mInterstitialAd.loadAd(adRequest);
     }
 
 }
