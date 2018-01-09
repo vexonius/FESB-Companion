@@ -45,12 +45,17 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
 
         if(tjedan.getTjedan().isEmpty()) {
             holder.mWeek.setVisibility(View.GONE);
+            holder.mWeek.setTypeface(lighttf);
         }else{
             holder.mWeek.setText(tjedan.getTjedan());
         }
-        holder.mWeekDesc.setText(tjedan.getOpis());
-        holder.mWeek.setTypeface(lighttf);
-        holder.mWeekDesc.setTypeface(regulartf);
+
+        if(tjedan.getOpis().isEmpty()){
+            holder.mWeekDesc.setVisibility(View.GONE);
+        } else {
+            holder.mWeekDesc.setText(tjedan.getOpis());
+            holder.mWeekDesc.setTypeface(regulartf);
+        }
 
     }
 

@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:text="FESB Companion 2.0"/>
+        android:text="FESB Companion 2.1"/>
     <TextView
         android:id="@+id/copyright"
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
         android:textColor="#cacaca"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:text="tstudioz © 2017"/>
+        android:text="tstudioz © 2018"/>
 
     <TextView
         android:layout_width="match_parent"

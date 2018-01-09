@@ -281,6 +281,7 @@ public class Home extends Fragment{
             ViewCompat.setNestedScrollingEnabled(recyclerView,false);
             recyclerView.setAdapter(adapter);
 
+            np.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
 
@@ -349,9 +350,14 @@ public class Home extends Fragment{
             public void onClick(View view) {
                 final String appPackageName = "com.tstudioz.iksica";
                 try {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                    Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage(appPackageName);
+                    startActivity(intent);
                 } catch (android.content.ActivityNotFoundException anfe) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                    } catch (android.content.ActivityNotFoundException ex){
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                    }
                 }
             }
         });
@@ -383,10 +389,14 @@ public class Home extends Fragment{
             mrealm.close();
         }
 
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
         if (taskRealm!=null){
             taskRealm.close();
         }
-
     }
 
 }

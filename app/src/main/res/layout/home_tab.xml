@@ -275,6 +275,7 @@
         android:id="@+id/frame_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:layout_below="@+id/pr">
 
 
@@ -286,7 +287,6 @@
             android:scrollbarStyle="outsideOverlay"
             android:scrollbarSize="5dp"
             android:scrollbarThumbVertical="@color/_20white"
-            android:paddingBottom="3dp"
             android:visibility="invisible" />
 
         <RelativeLayout
@@ -322,7 +322,6 @@
         android:id="@+id/iksica_ad"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_marginTop="7dp"
         android:layout_marginBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"

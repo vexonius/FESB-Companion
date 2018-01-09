@@ -272,13 +272,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.feedback:
-                String version = "undefined";
-                try {
-                    PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
-                    version = pInfo.versionName;
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                }
+                String version = getBuildVersion();
 
                 ShareCompat.IntentBuilder.from(this)
                         .setType("message/rfc822")
@@ -516,6 +510,17 @@ public class MainActivity extends AppCompatActivity {
             snack.show();
         }
         back_pressed = System.currentTimeMillis();
+    }
+
+    public String getBuildVersion(){
+        String ver = "undefined";
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            ver = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return ver;
     }
 
     @Override
