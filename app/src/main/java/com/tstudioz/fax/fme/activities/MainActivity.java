@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
                         .addEmailTo("info@tstud.io")
                         .setSubject("FESB Companion Feedback v"  + version)
                         .setText("")
-                        .setChooserTitle("Otvori pomoću")
+                        .setChooserTitle("Pošalji email pomoću...")
                         .startChooser();
                 break;
         }

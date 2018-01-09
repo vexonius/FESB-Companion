@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.LeanTask;
@@ -26,7 +28,6 @@ public class NoteActivity  extends AppCompatActivity {
     private Realm tRealm;
     private String mTaskId;
     private EditText et;
-    private int mode;
 
     public RealmConfiguration realmTaskConfiguration = new RealmConfiguration.Builder()
             .name("tasks.realm")
@@ -59,18 +60,18 @@ public class NoteActivity  extends AppCompatActivity {
             et.setText(leanTask.getTaskTekst());
         }
 
-     //   mInterstitialAd = new InterstitialAd(this);
-     //   mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/2813576206");
-//
-     //   mInterstitialAd.setAdListener(new AdListener() {
-     //       @Override
-     //       public void onAdClosed() {
-     //           requestNewInterstitial();
-     //           finish();
-     //       }
-     //   });
-//
-     //   requestNewInterstitial();
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/2813576206");
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                finish();
+            }
+        });
+
+        requestNewInterstitial();
     }
 
     @Override
@@ -132,9 +133,9 @@ public class NoteActivity  extends AppCompatActivity {
     }
 
     private void requestNewInterstitial() {
-      //  AdRequest adRequest = new AdRequest.Builder()
-      //          .build();
-      //  mInterstitialAd.loadAd(adRequest);
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
+        mInterstitialAd.loadAd(adRequest);
     }
 }
 

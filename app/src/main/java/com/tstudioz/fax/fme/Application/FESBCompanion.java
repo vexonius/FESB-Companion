@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.Application;
 import android.app.Application;
 
 
+import com.google.android.gms.ads.MobileAds;
 import com.tstudioz.fax.fme.migrations.CredMigration;
 
 import io.realm.Realm;
@@ -17,5 +18,6 @@ public class FESBCompanion extends Application {
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
+        MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006");
     }
 }

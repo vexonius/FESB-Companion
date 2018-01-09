@@ -125,7 +125,6 @@ public class Home extends Fragment{
         setFancyFonts();
 
         taskRealm = Realm.getInstance(realmTaskConfiguration);
-       // loadTestNotes();
         loadNotes();
 
         homeAdView = view.findViewById(R.id.adViewHome);
@@ -312,6 +311,7 @@ public class Home extends Fragment{
     public void loadNotes(){
         RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
 
+
         final LeanTask dodajNovi = new LeanTask();
         dodajNovi.setId("ACTION_ADD");
         dodajNovi.setTaskTekst("Dodaj novi podsjetnik");
@@ -331,31 +331,16 @@ public class Home extends Fragment{
 
     }
 
-    public void loadTestNotes(){
-        final RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
-        taskRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                tasks.deleteAllFromRealm();
-
-                LeanTask newTask = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
-                newTask.setTaskTekst("Let me enlighten you");
-
-                LeanTask newTask1 = taskRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
-                newTask1.setTaskTekst("This is the way I pray");
-            }
-        });
-    }
 
     public void loadAdsOnHome(){
 
-       // if(isNetworkAvailable()) {
-       //     homeAdView.setVisibility(View.VISIBLE);
-       //     AdRequest adRequest = new AdRequest.Builder().build();
-       //     homeAdView.loadAd(adRequest);
-       // } else {
+        if(isNetworkAvailable()) {
+            homeAdView.setVisibility(View.VISIBLE);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            homeAdView.loadAd(adRequest);
+        } else {
             homeAdView.setVisibility(View.GONE);
-       // }
+        }
     }
 
     public void loadIksicaAd(){
