@@ -18,6 +18,6 @@ public class FESBCompanion extends Application {
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
-        MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006");
+       // MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006");
     }
 }

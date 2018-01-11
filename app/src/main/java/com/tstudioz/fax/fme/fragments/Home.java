@@ -51,6 +51,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.UUID;
 
+import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
@@ -90,6 +91,7 @@ public class Home extends Fragment{
     @BindView(R.id.card_home) RelativeLayout mCardHome;
     @BindView(R.id.progressCircle) ProgressBar mProgressCircle;
     @BindView(R.id.task) RelativeLayout mtask;
+    @BindView(R.id.taskHeader) TextView mtaskTekst;
     @BindView(R.id.recyclerTask) RecyclerView mRecyclerTask;
     @BindView(R.id.rv) RecyclerView recyclerView;
     @BindView(R.id.nema_predavanja) RelativeLayout np;
@@ -129,7 +131,7 @@ public class Home extends Fragment{
         loadNotes();
 
         homeAdView = view.findViewById(R.id.adViewHome);
-        loadAdsOnHome();
+        // loadAdsOnHome();
         loadIksicaAd();
 
         return view;
@@ -288,6 +290,7 @@ public class Home extends Fragment{
 
         Typeface typeRegular = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Regular.ttf");
         danp.setTypeface(typeRegular);
+        mtaskTekst.setTypeface(typeRegular);
         mSummaryLabel.setTypeface(typeRegular);
 
         Typeface typeBold = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Bold.ttf");

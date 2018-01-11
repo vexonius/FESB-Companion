@@ -115,20 +115,6 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
 
 
-        NativeExpressAdView adView = (NativeExpressAdView)view.findViewById(R.id.adViewleft);
-
-       // if(!isNetworkAvailable()){
-            adView.setVisibility(View.GONE);
-     /*   }else{
-
-            adView.setVisibility(View.VISIBLE);
-            AdRequest request = new AdRequest.Builder()
-                    .addTestDevice("0F0806B7833336104F00247BA81C120D")
-                    .build();
-            adView.loadAd(request);
-        }
-
-*/
         Calendar min = Calendar.getInstance();
         Calendar now = Calendar.getInstance();
         Calendar max = Calendar.getInstance();

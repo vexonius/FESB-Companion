@@ -55,14 +55,15 @@ public class CourseActivity extends AppCompatActivity {
         ft.addToBackStack(null);
         ft.commit();
 
-         loadAdsCourse();
+        // loadAdsCourse();
 
 
     }
 
     @Override
     public void onBackPressed() {
-          mInterstitialAd.show();
+         // mInterstitialAd.show();
+        finish();
     }
 
     @Override

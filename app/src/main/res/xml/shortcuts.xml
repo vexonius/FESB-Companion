@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:targetApi="25">
+    <shortcut
+        android:shortcutId="timetable"
+        android:enabled="true"
+        android:icon="@drawable/schedule_shortcut_icon"
+        android:shortcutShortLabel="@string/timetable_quick"
+        android:shortcutLongLabel="@string/check_timetable"
+        android:shortcutDisabledMessage="@string/unavailabe">
+        <intent
+            android:action="raspored"
+            android:targetPackage="com.tstudioz.fax.fme"
+            android:targetClass="com.tstudioz.fax.fme.activities.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="attendance"
+        android:enabled="true"
+        android:icon="@drawable/attend_shortcut_icon"
+        android:shortcutShortLabel="@string/attend_quick"
+        android:shortcutLongLabel="@string/check_attend"
+        android:shortcutDisabledMessage="@string/unavailabe">
+        <intent
+            android:action="prisutnost"
+            android:targetPackage="com.tstudioz.fax.fme"
+            android:targetClass="com.tstudioz.fax.fme.activities.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="reminder"
+        android:enabled="true"
+        android:icon="@drawable/reminder_shortcut_icon"
+        android:shortcutShortLabel="@string/add_reminder_short"
+        android:shortcutLongLabel="@string/add_reminder_long"
+        android:shortcutDisabledMessage="@string/unavailabe">
+        <intent
+            android:action="raspored"
+            android:targetPackage="com.tstudioz.fax.fme"
+            android:targetClass="com.tstudioz.fax.fme.activities.NoteActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <!-- Specify more shortcuts here. -->
+</shortcuts>

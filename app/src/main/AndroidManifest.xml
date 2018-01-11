@@ -13,6 +13,7 @@
         android:name=".Application.FESBCompanion"
         android:allowBackup="true"
         android:icon="@drawable/icon"
+        android:roundIcon="@drawable/icon"
         android:label="FESB Companion"
         tools:replace="label"
         android:screenOrientation="portrait"
@@ -28,6 +29,8 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
         <activity
             android:name=".activities.NoteActivity"

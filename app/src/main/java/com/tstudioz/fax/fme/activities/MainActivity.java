@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.activities;
 
 
 import android.app.Dialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -109,7 +110,13 @@ public class MainActivity extends AppCompatActivity {
         date = df.format(Calendar.getInstance().getTime());
 
         setUpBottomNav();
-        setDefaultScreen();
+
+        if (getIntent().getAction()!=null) {
+            showShortcutView();
+        } else {
+            setDefaultScreen();
+        }
+
         setFragmentTab();
         checkUser();
 
@@ -175,62 +182,66 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
-
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                switch (position) {
-                    case 0:
-                        Home hf = new Home();
-                        ft.replace(R.id.frame, hf);
-                        ft.addToBackStack(null);
-                        ft.commit();
-                        getSupportActionBar().setTitle("FESB Companion");
-                        break;
-
-                    case 1:
-                        Left lf = new Left();
-                        ft.replace(R.id.frame, lf);
-                        ft.addToBackStack(null);
-                        ft.commit();
-                        getSupportActionBar().setTitle("Raspored");
-                        break;
-
-
-                    case 2:
-                        Prisutnost ik = new Prisutnost();
-                        ft.replace(R.id.frame, ik);
-                        ft.addToBackStack(null);
-                        ft.commit();
-                        getSupportActionBar().setTitle("Prisutnost");
-                        break;
-
-                    case 3:
-
-                        Kolegiji kol = new Kolegiji();
-                        ft.replace(R.id.frame, kol);
-                        ft.addToBackStack(null);
-                        ft.commit();
-                        getSupportActionBar().setTitle("Kolegiji");
-                        break;
-
-                    case 4:
-
-                        Right rt = new Right();
-                        ft.replace(R.id.frame, rt);
-                        ft.addToBackStack(null);
-                        ft.commit();
-                        getSupportActionBar().setTitle("Mail");
-                        break;
-                    default:
-                        Home hf0 = new Home();
-                        ft.replace(R.id.frame, hf0);
-                        ft.addToBackStack(null);
-                        ft.commit();
-                        getSupportActionBar().setTitle("FESB Companion");
-                        break;
-                }
+                beginFragTransaction(position);
                 return true;
             }
         });
+    }
+
+    public void beginFragTransaction(int pos){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        switch (pos) {
+            case 0:
+                Home hf = new Home();
+                ft.replace(R.id.frame, hf);
+                ft.addToBackStack(null);
+                ft.commit();
+                getSupportActionBar().setTitle("FESB Companion");
+                break;
+
+            case 1:
+                Left lf = new Left();
+                ft.replace(R.id.frame, lf);
+                ft.addToBackStack(null);
+                ft.commit();
+                getSupportActionBar().setTitle("Raspored");
+                break;
+
+
+            case 2:
+                Prisutnost ik = new Prisutnost();
+                ft.replace(R.id.frame, ik);
+                ft.addToBackStack(null);
+                ft.commit();
+                getSupportActionBar().setTitle("Prisutnost");
+                break;
+
+            case 3:
+
+                Kolegiji kol = new Kolegiji();
+                ft.replace(R.id.frame, kol);
+                ft.addToBackStack(null);
+                ft.commit();
+                getSupportActionBar().setTitle("Kolegiji");
+                break;
+
+            case 4:
+
+                Right rt = new Right();
+                ft.replace(R.id.frame, rt);
+                ft.addToBackStack(null);
+                ft.commit();
+                getSupportActionBar().setTitle("Mail");
+                break;
+
+            default:
+                Home hf0 = new Home();
+                ft.replace(R.id.frame, hf0);
+                ft.addToBackStack(null);
+                ft.commit();
+                getSupportActionBar().setTitle("FESB Companion");
+                break;
+        }
     }
 
 
@@ -252,6 +263,9 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent nazadaNaLogin = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(nazadaNaLogin);
+                break;
+
+            case R.id.settings:
                 break;
 
 
@@ -396,7 +410,6 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            // showList();
                             if (hf != null) {
                                 hf.showList();
                             }
@@ -499,6 +512,22 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return ver;
+    }
+
+    public void showShortcutView(){
+        int shortPosition = 0;
+
+        switch (getIntent().getAction()) {
+            case "raspored":
+                shortPosition = 1;
+                break;
+            case "prisutnost":
+                shortPosition = 2;
+                break;
+        }
+
+        beginFragTransaction(shortPosition);
+
     }
 
     @Override

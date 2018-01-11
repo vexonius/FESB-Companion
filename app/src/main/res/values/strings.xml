@@ -21,6 +21,16 @@
     <string name="prisutnost">Prisutnost</string>
     <string name="kolegiji">Kolegiji</string>
 
+    /* Shortcuts */
+    <string name="unavailabe">Nedostupna radnja</string>
+    <string name="check_timetable">Provjeri svoj raspored</string>
+    <string name="timetable_quick">Raspored</string>
+    <string name="add_reminder_long">Dodaj novi podsjetnik</string>
+    <string name="add_reminder_short">Novi podsjetnik</string>
+    <string name="check_attend">Provjeri dolaske na predavanja</string>
+    <string name="attend_quick">Prisutnost</string>
+
+
     /*Kljucevi za admob*/
     <string name="native_home">ca-app-pub-5944203368510130/8815874204</string>
     <string name="native_left">ca-app-pub-5944203368510130/6801293807</string>
