@@ -60,18 +60,7 @@ public class NoteActivity  extends AppCompatActivity {
             et.setText(leanTask.getTaskTekst());
         }
 
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/2813576206");
-
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                requestNewInterstitial();
-                finish();
-            }
-        });
-
-        requestNewInterstitial();
+         loadAdsInTaskView();
     }
 
     @Override
@@ -129,13 +118,28 @@ public class NoteActivity  extends AppCompatActivity {
     }
 
     public void onBackPressed(){
-        super.onBackPressed();
+         mInterstitialAd.show();
     }
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
                 .build();
         mInterstitialAd.loadAd(adRequest);
+    }
+
+    public void loadAdsInTaskView(){
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/2813576206");
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                finish();
+            }
+        });
+
+        requestNewInterstitial();
     }
 }
 

@@ -55,25 +55,14 @@ public class CourseActivity extends AppCompatActivity {
         ft.addToBackStack(null);
         ft.commit();
 
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
-
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                requestNewInterstitial();
-                finish();
-            }
-        });
-
-        requestNewInterstitial();
+         loadAdsCourse();
 
 
     }
 
     @Override
     public void onBackPressed() {
-         mInterstitialAd.show();
+          mInterstitialAd.show();
     }
 
     @Override
@@ -142,6 +131,21 @@ public class CourseActivity extends AppCompatActivity {
                   .build();
 
            mInterstitialAd.loadAd(adRequest);
+    }
+
+    public void loadAdsCourse(){
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                finish();
+            }
+        });
+
+        requestNewInterstitial();
     }
 
 }

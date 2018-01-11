@@ -30,6 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.tstudioz.fax.fme.R;
@@ -215,15 +216,6 @@ public class Home extends Fragment{
         Drawable drawable = getResources().getDrawable(current.getIconId());
         mIconImageView.setImageDrawable(drawable);
 
-     //   SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-     //   SharedPreferences.Editor editor =  sharedPreferences.edit();
-     //   editor.putString("zadnja_temp", pTemperatura);
-     //   editor.putString("zadnja_vlaznost", pHumidity);
-     //   editor.putString("zadnja_percip", pPrecip);
-     //   editor.putString("zadnji_vjetar", pWind);
-     //   editor.putString("zadnji_opis", pSummary);
-     //   editor.putInt("imageId", current.getIconId());
-     //   editor.commit();
     }
 
     private Forecast parseForecastDetails(String jsonData) throws JSONException {
@@ -338,6 +330,12 @@ public class Home extends Fragment{
         if(isNetworkAvailable()) {
             homeAdView.setVisibility(View.VISIBLE);
             AdRequest adRequest = new AdRequest.Builder().build();
+            homeAdView.setAdListener(new AdListener(){
+                @Override
+                public void onAdFailedToLoad(int errorCode){
+                    homeAdView.setVisibility(View.GONE);
+                }
+            });
             homeAdView.loadAd(adRequest);
         } else {
             homeAdView.setVisibility(View.GONE);
@@ -352,7 +350,7 @@ public class Home extends Fragment{
                 try {
                     Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage(appPackageName);
                     startActivity(intent);
-                } catch (android.content.ActivityNotFoundException anfe) {
+                } catch (Exception anfe) {
                     try {
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
                     } catch (android.content.ActivityNotFoundException ex){
