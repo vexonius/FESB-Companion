@@ -43,6 +43,7 @@ import com.tstudioz.fax.fme.fragments.Kolegiji;
 import com.tstudioz.fax.fme.fragments.Left;
 import com.tstudioz.fax.fme.fragments.Prisutnost;
 import com.tstudioz.fax.fme.fragments.Right;
+import com.tstudioz.fax.fme.fragments.SettingsFragment;
 import com.tstudioz.fax.fme.migrations.CredMigration;
 
 import org.jsoup.Jsoup;
@@ -266,8 +267,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.settings:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
-
 
             case R.id.refresMe:
                 if (isNetworkAvailable()) {

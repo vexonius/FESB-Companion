@@ -54,6 +54,13 @@
             android:name=".activities.Welcome"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="Postavke"
+            android:screenOrientation="portrait"
+            android:theme="@style/SettingsTheme"
+            android:parentActivityName=".activities.MainActivity"/>
+
     </application>
 
 </manifest>
