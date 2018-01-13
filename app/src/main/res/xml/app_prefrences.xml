@@ -18,7 +18,8 @@
         <android.support.v7.preference.Preference
             android:key="theme"
             android:title="Tema"
-            android:summary="Tamna tema je primjenjena" />
+            android:summary="Tamna tema je primjenjena"
+            android:enabled="false" />
 
         <android.support.v7.preference.CheckBoxPreference
             android:key="units"
@@ -34,7 +35,7 @@
         <android.support.v7.preference.EditTextPreference
             android:key="broj_istovremenih_preuzimanja"
             android:title="Maksimalni broj istovremenih preuzimanja"
-            android:summary="Zadano 3" />
+            android:summary="Zadana vrijednost iznosi 3" />
 
     </android.support.v7.preference.PreferenceCategory>
 
@@ -45,12 +46,14 @@
             android:key="lockscreen"
             android:title="Zahtjevaj autentifikacija pri ulasku u aplikaciju"
             android:summary="Zaštitite svoje podatke"
-            android:defaultValue="true"/>
+            android:defaultValue="true"
+            android:enabled="false"/>
 
         <android.support.v7.preference.Preference
             android:key="fingerprint_auth"
             android:title="Biometrijska autentifikacija"
-            android:summary="Koristi otisak prsta kao mjeru zaštite" />
+            android:summary="Koristi otisak prsta kao mjeru zaštite"
+            android:enabled="false"/>
 
     </android.support.v7.preference.PreferenceCategory>
 
@@ -77,6 +80,11 @@
             android:key="betta_particp"
             android:title="Postani beta tester"
             android:summary="Uključi se razvoj i testiraj najnovije verzije prije ostalih" />
+
+        <android.support.v7.preference.Preference
+            android:key="mvp"
+            android:title="MVPs"
+            android:summary="Osobe bez kojih ova aplikacija ne bi bila ono što je danas" />
 
     </android.support.v7.preference.PreferenceCategory>
 

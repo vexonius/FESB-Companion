@@ -49,9 +49,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.UUID;
 
-import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
@@ -65,7 +63,7 @@ import okhttp3.Response;
 
 import static android.content.ContentValues.TAG;
 
-public class Home extends Fragment{
+public class Home extends Fragment {
 
     public String date = null;
 
@@ -119,11 +117,11 @@ public class Home extends Fragment{
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
 
-        try {
-            start();
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     start();
+        // } catch (IOException | JSONException e) {
+        //     e.printStackTrace();
+        // }
 
         setFancyFonts();
 
@@ -131,7 +129,7 @@ public class Home extends Fragment{
         loadNotes();
 
         homeAdView = view.findViewById(R.id.adViewHome);
-        // loadAdsOnHome();
+        loadAdsOnHome();
         loadIksicaAd();
 
         return view;
@@ -187,10 +185,10 @@ public class Home extends Fragment{
         // get your own API KEY from developer.forecast.io and fill it in.
         final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr";
 
-        if(isNetworkAvailable()) {
+        if (isNetworkAvailable()) {
             getForecast(forecastUrl);
         } else {
-           showSnacOffline();
+            showSnacOffline();
         }
 
     }
@@ -205,7 +203,7 @@ public class Home extends Fragment{
 
         String pTemperatura = (((current.getTemperature() - 32) * 5) / 9) + "°";
         String pHumidity = current.getHumidity() + "";
-        String pWind = (float) Math.round((current.getWind() * 1.609344)*10)/10 + " km/h";
+        String pWind = (float) Math.round((current.getWind() * 1.609344) * 10) / 10 + " km/h";
         String pPrecip = current.getPrecipChance() + "%";
         String pSummary = current.getSummary();
 
@@ -253,7 +251,7 @@ public class Home extends Fragment{
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         boolean isAvailable = false;
-        if(networkInfo != null && networkInfo.isConnected()) {
+        if (networkInfo != null && networkInfo.isConnected()) {
             isAvailable = true;
         }
 
@@ -272,7 +270,7 @@ public class Home extends Fragment{
             np.setVisibility(View.INVISIBLE);
             EmployeeRVAdapter adapter = new EmployeeRVAdapter(rezultati);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            ViewCompat.setNestedScrollingEnabled(recyclerView,false);
+            ViewCompat.setNestedScrollingEnabled(recyclerView, false);
             recyclerView.setAdapter(adapter);
 
             np.setVisibility(View.GONE);
@@ -281,30 +279,30 @@ public class Home extends Fragment{
 
     }
 
-    public void setFancyFonts(){
+    public void setFancyFonts() {
         Typeface typeLight = Typeface.createFromAsset(getActivity().getAssets(), "fonts/OpenSans-Light.ttf");
         lokacija.setTypeface(typeLight);
         mWindLabel.setTypeface(typeLight);
         mHumidityValue.setTypeface(typeLight);
         mPrecipValue.setTypeface(typeLight);
 
-        Typeface typeRegular = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Regular.ttf");
+        Typeface typeRegular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/OpenSans-Regular.ttf");
         danp.setTypeface(typeRegular);
         mtaskTekst.setTypeface(typeRegular);
         mSummaryLabel.setTypeface(typeRegular);
 
-        Typeface typeBold = Typeface.createFromAsset(getActivity().getAssets(),"fonts/OpenSans-Bold.ttf");
+        Typeface typeBold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/OpenSans-Bold.ttf");
         mTemperatureLabel.setTypeface(typeBold);
     }
 
-    public void setCyanStatusBarColor(){
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.dark_cyan)));
+    public void setCyanStatusBarColor() {
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.dark_cyan)));
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getContext(), R.color.darker_cyan));
         }
     }
 
-    public void loadNotes(){
+    public void loadNotes() {
         RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
 
 
@@ -322,30 +320,30 @@ public class Home extends Fragment{
 
         LeanTaskAdapter leanTaskAdapter = new LeanTaskAdapter(tasks);
         mRecyclerTask.setLayoutManager(new LinearLayoutManager(getActivity()));
-        ViewCompat.setNestedScrollingEnabled(mRecyclerTask,false);
+        ViewCompat.setNestedScrollingEnabled(mRecyclerTask, false);
         mRecyclerTask.setAdapter(leanTaskAdapter);
 
     }
 
 
-    public void loadAdsOnHome(){
+    public void loadAdsOnHome() {
 
-        if(isNetworkAvailable()) {
-            homeAdView.setVisibility(View.VISIBLE);
-            AdRequest adRequest = new AdRequest.Builder().build();
-            homeAdView.setAdListener(new AdListener(){
-                @Override
-                public void onAdFailedToLoad(int errorCode){
-                    homeAdView.setVisibility(View.GONE);
-                }
-            });
-            homeAdView.loadAd(adRequest);
-        } else {
-            homeAdView.setVisibility(View.GONE);
-        }
+        // if(isNetworkAvailable()) {
+        //     homeAdView.setVisibility(View.VISIBLE);
+        //     AdRequest adRequest = new AdRequest.Builder().build();
+        //     homeAdView.setAdListener(new AdListener(){
+        //         @Override
+        //         public void onAdFailedToLoad(int errorCode){
+        //             homeAdView.setVisibility(View.GONE);
+        //         }
+        //     });
+        //     homeAdView.loadAd(adRequest);
+        // } else {
+        homeAdView.setVisibility(View.GONE);
+        // }
     }
 
-    public void loadIksicaAd(){
+    public void loadIksicaAd() {
         iksicaPromoImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -356,7 +354,7 @@ public class Home extends Fragment{
                 } catch (Exception anfe) {
                     try {
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-                    } catch (android.content.ActivityNotFoundException ex){
+                    } catch (android.content.ActivityNotFoundException ex) {
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
                     }
                 }
@@ -364,14 +362,14 @@ public class Home extends Fragment{
         });
     }
 
-    public void showSnacOffline(){
+    public void showSnacOffline() {
         snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.show();
     }
 
-    public void alertUserAboutError(){
+    public void alertUserAboutError() {
         snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške pri dohvaćanju prognoze", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
@@ -379,23 +377,23 @@ public class Home extends Fragment{
     }
 
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.colorPrimary)));
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.colorPrimary)));
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
         }
 
-        if(mrealm!=null){
+        if (mrealm != null) {
             mrealm.close();
         }
 
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
-        if (taskRealm!=null){
+        if (taskRealm != null) {
             taskRealm.close();
         }
     }

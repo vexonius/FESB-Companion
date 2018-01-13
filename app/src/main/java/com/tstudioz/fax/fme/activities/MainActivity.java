@@ -1,41 +1,29 @@
 package com.tstudioz.fax.fme.activities;
 
 
-import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
 import com.tstudioz.fax.fme.fragments.Home;
@@ -43,7 +31,6 @@ import com.tstudioz.fax.fme.fragments.Kolegiji;
 import com.tstudioz.fax.fme.fragments.Left;
 import com.tstudioz.fax.fme.fragments.Prisutnost;
 import com.tstudioz.fax.fme.fragments.Right;
-import com.tstudioz.fax.fme.fragments.SettingsFragment;
 import com.tstudioz.fax.fme.migrations.CredMigration;
 
 import org.jsoup.Jsoup;
@@ -72,7 +59,6 @@ import static android.content.ContentValues.TAG;
 public class MainActivity extends AppCompatActivity {
 
     public String date = null;
-    public AlertDialog alertDialog;
     public long back_pressed;
 
     private AHBottomNavigation bottomNavigation;
@@ -84,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private OkHttpClient client;
     private Home hf;
     private Snackbar snack;
+    private BottomSheetDialog bottomSheet;
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
             .name("glavni.realm")
@@ -120,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         setFragmentTab();
         checkUser();
+        showChangelog();
 
     }
 
@@ -258,63 +246,20 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.logout:
-                userLogOut();
-                deleteWebViewCookies();
-
-                Intent nazadaNaLogin = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(nazadaNaLogin);
-                break;
-
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
 
             case R.id.refresMe:
-                if (isNetworkAvailable()) {
-                    getMojRaspored();
+                if (isNetworkAvailable()){
+                     getMojRaspored();
                 } else {
                     showSnacOffline();
                 }
                 break;
-
-            case R.id.legal:
-                displayLicensesAlertDialog();
-                break;
-
-            case R.id.about:
-                appInfo();
-                break;
-
-            case R.id.feedback:
-                String version = getBuildVersion();
-
-                ShareCompat.IntentBuilder.from(this)
-                        .setType("message/rfc822")
-                        .addEmailTo("info@tstud.io")
-                        .setSubject("FESB Companion Feedback v"  + version)
-                        .setText("")
-                        .setChooserTitle("Pošalji email pomoću...")
-                        .startChooser();
-                break;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void deleteWebViewCookies() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            CookieManager.getInstance().removeAllCookies(null);
-            CookieManager.getInstance().flush();
-        } else {
-            CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(getApplicationContext());
-            cookieSyncMngr.startSync();
-            CookieManager cookieManager = CookieManager.getInstance();
-            cookieManager.removeAllCookie();
-            cookieManager.removeSessionCookie();
-            cookieSyncMngr.stopSync();
-            cookieSyncMngr.sync();
-        }
     }
 
     @Override
@@ -425,20 +370,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void userLogOut() {
-        SharedPreferences mySPrefs = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-        SharedPreferences.Editor editor = mySPrefs.edit();
-        editor.putBoolean("loged_in", false);
-        editor.apply();
-
-        rlmLog = Realm.getInstance(CredRealmCf);
-        rlmLog.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                rlmLog.deleteAll();
-            }
-        });
-    }
 
     public void invalidCreds() {
         SharedPreferences mySPrefs1 = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
@@ -469,21 +400,6 @@ public class MainActivity extends AppCompatActivity {
         return isAvailable;
     }
 
-    private void displayLicensesAlertDialog() {
-        WebView view = (WebView) LayoutInflater.from(getApplicationContext()).inflate(R.layout.licence_view, null);
-        view.loadUrl("file:///android_asset/legal.html");
-        alertDialog = new AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert)
-                .setView(view)
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
-    }
-
-    private void appInfo() {
-        final Dialog dialog = new Dialog(this);
-        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.info_layout);
-        dialog.show();
-    }
 
     public void showSnacOffline() {
         snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
@@ -504,17 +420,6 @@ public class MainActivity extends AppCompatActivity {
         back_pressed = System.currentTimeMillis();
     }
 
-    public String getBuildVersion(){
-        String ver = "undefined";
-        try {
-            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
-            ver = pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        return ver;
-    }
-
     public void showShortcutView(){
         int shortPosition = 0;
 
@@ -528,6 +433,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         beginFragTransaction(shortPosition);
+
+    }
+
+    private void showChangelog() {
+        NestedScrollView view = (NestedScrollView) LayoutInflater.from(this).inflate(R.layout.licence_view, null);
+        WebView wv = (WebView) view.findViewById(R.id.webvju);
+        wv.loadUrl("file:///android_asset/changelog.html");
+        bottomSheet = new BottomSheetDialog(this);
+        bottomSheet.setCancelable(true);
+        bottomSheet.setContentView(view);
+        bottomSheet.setCanceledOnTouchOutside(true);
+        bottomSheet.show();
 
     }
 

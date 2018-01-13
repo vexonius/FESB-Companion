@@ -108,7 +108,6 @@ public class EmployeeRVAdapterTable extends RecyclerView.Adapter<EmployeeRVAdapt
     public void onShowBottomsheet(View view, int position){
         Context context = view.getContext();
 
-
         Predavanja predavanja = mEmployees.get(position);
 
         TextView infoKolegij, infoPredavanje,infoProf, infoVrijeme, infoGrupa, infoLokacija;
