@@ -117,11 +117,11 @@ public class Home extends Fragment {
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
 
-        // try {
-        //     start();
-        // } catch (IOException | JSONException e) {
-        //     e.printStackTrace();
-        // }
+         try {
+             start();
+         } catch (IOException | JSONException e) {
+             e.printStackTrace();
+         }
 
         setFancyFonts();
 

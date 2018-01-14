@@ -4,6 +4,8 @@ package com.tstudioz.fax.fme.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         setFragmentTab();
         checkUser();
-        showChangelog();
+        checkVersion();
 
     }
 
@@ -434,6 +436,33 @@ public class MainActivity extends AppCompatActivity {
 
         beginFragTransaction(shortPosition);
 
+    }
+
+    public void checkVersion(){
+        SharedPreferences shPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+        int staraVerzija = shPref.getInt("version_number", 14);
+        int trenutnaVerzija = getVersionCode();
+
+        if(staraVerzija < trenutnaVerzija){
+            showChangelog();
+
+            SharedPreferences.Editor editor = shPref.edit();
+            editor.putInt("version_number", trenutnaVerzija);
+            editor.commit();
+        } else {
+            return;
+        }
+    }
+
+    public int getVersionCode(){
+        int versionCode = 0;
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionCode = pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return versionCode;
     }
 
     private void showChangelog() {

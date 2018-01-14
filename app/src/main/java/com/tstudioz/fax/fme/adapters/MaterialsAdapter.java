@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -259,6 +260,8 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
         private void showDocSnack(View mView, String name, final String extension, final File file){
             Snackbar snackbar = Snackbar.make(mView, "Dokument " + name + "." + extension + " je preuzet.",Snackbar.LENGTH_LONG);
+            View snackView = snackbar.getView();
+            snackView.setBackgroundColor(ContextCompat.getColor(mView.getContext(), R.color.colorPrimaryDark));
             snackbar.setAction("OTVORI", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
