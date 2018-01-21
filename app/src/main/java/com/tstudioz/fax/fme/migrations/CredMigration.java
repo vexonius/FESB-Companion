@@ -28,6 +28,20 @@ public class CredMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if(oldVersion == 6){
+            shema.create("Meni")
+                    .addField("id", String.class)
+                    .addField("type", String.class)
+                    .addField("jelo1", String.class)
+                    .addField("jelo2", String.class)
+                    .addField("jelo3", String.class)
+                    .addField("jelo4", String.class)
+                    .addField("desert", String.class)
+                    .addField("cijena", String.class);
+
+            oldVersion++;
+        }
+
 
     }
 

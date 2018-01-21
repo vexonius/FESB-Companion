@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
-            .schemaVersion(6)
+            .schemaVersion(7)
             .migration(new CredMigration())
             .build();
 
@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
         setFragmentTab();
         checkUser();
         checkVersion();
-
     }
 
     public void checkUser() {
@@ -433,9 +432,7 @@ public class MainActivity extends AppCompatActivity {
                 shortPosition = 2;
                 break;
         }
-
         beginFragTransaction(shortPosition);
-
     }
 
     public void checkVersion(){
@@ -474,7 +471,6 @@ public class MainActivity extends AppCompatActivity {
         bottomSheet.setContentView(view);
         bottomSheet.setCanceledOnTouchOutside(true);
         bottomSheet.show();
-
     }
 
     @Override

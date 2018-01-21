@@ -329,6 +329,49 @@
         android:layout_below="@id/frame_list"
         android:src="@drawable/iksica_promo"/>
 
+    <RelativeLayout
+        android:id="@+id/menza_relative"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/welcome2"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/iksica_ad">
+
+        <TextView
+            android:id="@+id/menza_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Menza"
+            android:textSize="35dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/menza_text_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pregledaj dnevni jelovnik"
+            android:textSize="14dp"
+            android:layout_marginLeft="40dp"
+            android:layout_below="@+id/menza_text"
+            android:textColor="@color/white"/>
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/menza_drawings"
+            android:scaleType="centerInside"
+            android:layout_marginBottom="-40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+    
+
+
 </RelativeLayout>
 
 </android.support.v4.widget.NestedScrollView>

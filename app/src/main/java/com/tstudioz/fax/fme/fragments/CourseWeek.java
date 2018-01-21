@@ -59,7 +59,7 @@ public class CourseWeek extends Fragment {
 
     public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
-            .schemaVersion(6)
+            .schemaVersion(7)
             .migration(new CredMigration())
             .build();
 

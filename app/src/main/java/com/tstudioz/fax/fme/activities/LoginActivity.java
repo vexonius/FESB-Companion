@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
 
     final RealmConfiguration loginRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
-            .schemaVersion(6)
+            .schemaVersion(7)
             .migration(new CredMigration())
             .build();
 
@@ -68,7 +68,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         isUserLoggedIn();
-
 
         setContentView(R.layout.activity_login);
 

@@ -34,6 +34,7 @@
     <color name="silver">#7e7e7e</color>
 
     <color name="grey_new">#9a9a9a</color>
+    <color name="black">#000000</color>
 
     <array name="rainbow">
         <item>@color/colorAccent</item>

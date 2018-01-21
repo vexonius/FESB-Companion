@@ -63,14 +63,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         prefFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                String version = getBuildVersion();
-                ShareCompat.IntentBuilder.from(getActivity())
-                        .setType("message/rfc822")
-                        .addEmailTo("info@tstud.io")
-                        .setSubject("FESB Companion Feedback v" + version)
-                        .setText("")
-                        .setChooserTitle("Pošalji email pomoću...")
-                        .startChooser();
+               sendFeedMail("[FEEDBACK] FESB Companion");
+                return true;
+            }
+        });
+
+        Preference prefBugreport = (Preference) findPreference("bug_report");
+        prefBugreport.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                sendFeedMail("[BUG REPORT] FESB Companion");
                 return true;
             }
         });
@@ -183,5 +185,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         btmDialog.setCanceledOnTouchOutside(true);
         btmDialog.show();
 
+    }
+
+    public void sendFeedMail(String title){
+        String version = getBuildVersion();
+        ShareCompat.IntentBuilder.from(getActivity())
+                .setType("message/rfc822")
+                .addEmailTo("info@tstud.io")
+                .setSubject(title + " v" + version)
+                .setText("")
+                .setChooserTitle("Pošalji email pomoću...")
+                .startChooser();
     }
 }

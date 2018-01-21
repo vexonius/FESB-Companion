@@ -73,7 +73,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
      RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
-            .schemaVersion(6)
+            .schemaVersion(7)
              .migration(new CredMigration())
             .build();
 

@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -34,6 +35,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.activities.MenzaActivity;
 import com.tstudioz.fax.fme.activities.NoteActivity;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter;
 import com.tstudioz.fax.fme.adapters.LeanTaskAdapter;
@@ -95,6 +97,9 @@ public class Home extends Fragment {
     @BindView(R.id.nema_predavanja) RelativeLayout np;
     @BindView(R.id.relative_parent_home) RelativeLayout parentRelative;
     @BindView(R.id.iksica_ad) ImageView iksicaPromoImage;
+    @BindView(R.id.menza_text) TextView mMenzaText;
+    @BindView(R.id.menza_text_description) TextView mMenzaDescription;
+    @BindView(R.id.menza_relative) RelativeLayout mMenzaRelative;
 
     public RealmConfiguration realmTaskConfiguration = new RealmConfiguration.Builder()
             .name("tasks.realm")
@@ -131,6 +136,7 @@ public class Home extends Fragment {
         homeAdView = view.findViewById(R.id.adViewHome);
         loadAdsOnHome();
         loadIksicaAd();
+        loadMenzaView();
 
         return view;
     }
@@ -285,6 +291,8 @@ public class Home extends Fragment {
         mWindLabel.setTypeface(typeLight);
         mHumidityValue.setTypeface(typeLight);
         mPrecipValue.setTypeface(typeLight);
+        mMenzaText.setTypeface(typeLight);
+        mMenzaDescription.setTypeface(typeLight);
 
         Typeface typeRegular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/OpenSans-Regular.ttf");
         danp.setTypeface(typeRegular);
@@ -362,6 +370,29 @@ public class Home extends Fragment {
         });
     }
 
+    public void loadMenzaView(){
+      //  try {
+      //      mMenzaRelative.setOnClickListener(new View.OnClickListener() {
+      //          @Override
+      //          public void onClick(View v) {
+      //              CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+      //              CustomTabsIntent customTabsIntent = builder.setToolbarColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)).build();
+      //              customTabsIntent.launchUrl(getActivity(), Uri.parse("http://filestest.dbtouch.com/scst/menu/rucak/?fesb_vrh"));
+      //          }
+      //      });
+      //  }catch (Exception ex){
+      //      showSnackChromeError();
+      //  }
+
+        mMenzaRelative.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), MenzaActivity.class));
+            }
+        });
+
+    }
+
     public void showSnacOffline() {
         snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
@@ -371,6 +402,13 @@ public class Home extends Fragment {
 
     public void alertUserAboutError() {
         snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške pri dohvaćanju prognoze", Snackbar.LENGTH_LONG);
+        View vjuz = snack.getView();
+        vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
+        snack.show();
+    }
+
+    public void showSnackChromeError() {
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Ažurirajte Chrome preglednik za korištenje ove funkcije", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.show();

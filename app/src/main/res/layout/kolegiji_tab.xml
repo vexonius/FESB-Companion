@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:smoothScrollbar="true"
-        android:scrollbarStyle="outsideOverlay"
+        android:scrollbarStyle="insideOverlay"
         android:scrollbarSize="5dp"
         android:scrollbarThumbVertical="@color/_20white"
         android:layout_marginBottom="3dp"

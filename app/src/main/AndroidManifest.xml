@@ -5,62 +5,67 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.gms.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <application
         android:name=".Application.FESBCompanion"
         android:allowBackup="true"
         android:icon="@drawable/icon"
-        android:roundIcon="@drawable/icon"
         android:label="FESB Companion"
-        tools:replace="label"
+        android:roundIcon="@drawable/icon"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar">
-        <meta-data android:name="android.max_aspect" android:value="2.1" />
+        android:theme="@style/AppTheme.NoActionBar"
+        tools:replace="label">
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
+
         <activity
             android:name=".activities.LoginActivity"
-            android:theme="@style/AppTheme.Simple"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Simple">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data android:name="android.app.shortcuts"
+
+            <meta-data
+                android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
             android:name=".activities.NoteActivity"
             android:label=""
             android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.MainActivity"
             android:label="FESB Companion"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.CourseActivity"
-            android:parentActivityName=".activities.MainActivity"
             android:label=" "
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
+            android:parentActivityName=".activities.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.Welcome"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.SettingsActivity"
             android:label="Postavke"
+            android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/SettingsTheme"
-            android:parentActivityName=".activities.MainActivity"/>
-
+            android:theme="@style/SettingsTheme" />
+        <activity android:name=".activities.MenzaActivity"
+            android:theme="@style/AppTheme.Simple"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
