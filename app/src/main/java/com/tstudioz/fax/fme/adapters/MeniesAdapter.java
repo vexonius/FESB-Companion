@@ -10,8 +10,6 @@ import android.widget.TextView;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.Meni;
 
-import org.w3c.dom.Text;
-
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 

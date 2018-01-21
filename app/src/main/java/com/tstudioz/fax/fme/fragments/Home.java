@@ -96,7 +96,9 @@ public class Home extends Fragment {
     @BindView(R.id.rv) RecyclerView recyclerView;
     @BindView(R.id.nema_predavanja) RelativeLayout np;
     @BindView(R.id.relative_parent_home) RelativeLayout parentRelative;
-    @BindView(R.id.iksica_ad) ImageView iksicaPromoImage;
+    @BindView(R.id.iksica_ad) RelativeLayout iksicaPromoImage;
+    @BindView(R.id.iksicaText) TextView mIksicaText;
+    @BindView(R.id.iksica_text_description) TextView mIksicaDescription;
     @BindView(R.id.menza_text) TextView mMenzaText;
     @BindView(R.id.menza_text_description) TextView mMenzaDescription;
     @BindView(R.id.menza_relative) RelativeLayout mMenzaRelative;
@@ -293,6 +295,8 @@ public class Home extends Fragment {
         mPrecipValue.setTypeface(typeLight);
         mMenzaText.setTypeface(typeLight);
         mMenzaDescription.setTypeface(typeLight);
+        mIksicaText.setTypeface(typeLight);
+        mIksicaDescription.setTypeface(typeLight);
 
         Typeface typeRegular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/OpenSans-Regular.ttf");
         danp.setTypeface(typeRegular);
