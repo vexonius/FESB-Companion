@@ -5,7 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:elevation="4dp"
+    android:elevation="2dp"
+    android:stateListAnimator="@animator/lift_on_touch"
+    android:clickable="true"
+    android:focusable="true"
     android:layout_marginLeft="15dp"
     android:layout_marginRight="15dp"
     android:layout_marginBottom="10dp">

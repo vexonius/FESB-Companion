@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
@@ -119,9 +120,13 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
             if (materials.get(getAdapterPosition()).getDownloadable() == 0) {
 
-                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                CustomTabsIntent customTabsIntent = builder.setToolbarColor(context.getResources().getColor(R.color.colorPrimaryDark)).build();
-                customTabsIntent.launchUrl(view.getContext(), Uri.parse("https://korisnik.fesb.unist.hr/prijava?returnUrl=" + chromeurl));
+                try {
+                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                    CustomTabsIntent customTabsIntent = builder.setToolbarColor(context.getResources().getColor(R.color.colorPrimaryDark)).build();
+                    customTabsIntent.launchUrl(view.getContext(), Uri.parse("https://korisnik.fesb.unist.hr/prijava?returnUrl=" + chromeurl));
+                }catch (Exception ex){
+                    showErrorSnack(view, "Ažurirajte Chrome preglednik za korištenje ove funkcije");
+                }
 
             } else {
                 CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(view.getContext()));
@@ -183,9 +188,11 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
                     } catch (Exception exp){
                         Log.d("Download link exc", exp.toString());
-                        okHttpClient.dispatcher().cancelAll();
                         showErrorSnack(view, "Došlo je do problema pri preuzimanju datoteke");
+                        okHttpClient.dispatcher().cancelAll();
                     }
+
+                    if (url!=null) {
 
                         Request.Builder builder = new Request.Builder()
                                 .url(url)
@@ -238,13 +245,17 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                                     source.close();
 
                                     showDocSnack(view, doc_name, doc_ext, outFile);
-                                } catch (Exception exc){
+                                } catch (Exception exc) {
                                     Log.d("Download error", exc.toString());
                                     showErrorSnack(view, "Došlo je do pogreške pri preuzimanju");
                                 }
 
                             }
                         });
+
+                    } else {
+                        showErrorSnack(view ,"Došlo je do problema pri preuzimanju datoteke");
+                    }
 
                     }
                 });
@@ -258,17 +269,21 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
             notifyDataSetChanged();
         }
 
-        private void showDocSnack(View mView, String name, final String extension, final File file){
+        private void showDocSnack(final View mView, String name, final String extension, final File file){
             Snackbar snackbar = Snackbar.make(mView, "Dokument " + name + "." + extension + " je preuzet.",Snackbar.LENGTH_LONG);
             View snackView = snackbar.getView();
             snackView.setBackgroundColor(ContextCompat.getColor(mView.getContext(), R.color.colorPrimaryDark));
             snackbar.setAction("OTVORI", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent();
-                    intent.setAction(android.content.Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.fromFile(file), MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
-                    view.getContext().startActivity(intent);
+                    try {
+                        Intent intent = new Intent();
+                        intent.setAction(android.content.Intent.ACTION_VIEW);
+                        intent.setDataAndType(Uri.fromFile(file), MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
+                        view.getContext().startActivity(intent);
+                    } catch (Exception ex){
+                        showErrorSnack(mView, "Molimo instalirajte potrebnu aplikaciju za pregled ove datoteke");
+                    }
                 }
             });
             snackbar.show();
@@ -276,6 +291,8 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
         private void showErrorSnack(View mView, String errorMsg){
             Snackbar snackbar = Snackbar.make(mView, errorMsg, Snackbar.LENGTH_LONG);
+            View snackView = snackbar.getView();
+            snackView.setBackgroundColor(ContextCompat.getColor(mView.getContext(), R.color.red_nice));
             snackbar.show();
 
         }

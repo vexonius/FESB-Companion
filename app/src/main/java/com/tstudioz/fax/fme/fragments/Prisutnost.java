@@ -97,6 +97,7 @@ public class Prisutnost extends Fragment {
 
         startFetching();
         // loadAds();
+        mAdView.setVisibility(View.GONE);
 
         return view;
     }

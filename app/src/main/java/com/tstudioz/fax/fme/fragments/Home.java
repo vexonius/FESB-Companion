@@ -375,18 +375,7 @@ public class Home extends Fragment {
     }
 
     public void loadMenzaView(){
-      //  try {
-      //      mMenzaRelative.setOnClickListener(new View.OnClickListener() {
-      //          @Override
-      //          public void onClick(View v) {
-      //              CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-      //              CustomTabsIntent customTabsIntent = builder.setToolbarColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)).build();
-      //              customTabsIntent.launchUrl(getActivity(), Uri.parse("http://filestest.dbtouch.com/scst/menu/rucak/?fesb_vrh"));
-      //          }
-      //      });
-      //  }catch (Exception ex){
-      //      showSnackChromeError();
-      //  }
+
 
         mMenzaRelative.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -406,13 +395,6 @@ public class Home extends Fragment {
 
     public void alertUserAboutError() {
         snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške pri dohvaćanju prognoze", Snackbar.LENGTH_LONG);
-        View vjuz = snack.getView();
-        vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
-        snack.show();
-    }
-
-    public void showSnackChromeError() {
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Ažurirajte Chrome preglednik za korištenje ove funkcije", Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.show();

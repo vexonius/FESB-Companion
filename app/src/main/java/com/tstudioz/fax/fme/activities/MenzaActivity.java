@@ -118,7 +118,7 @@ public class MenzaActivity extends AppCompatActivity {
 
                     }
 
-                    for (int k=13; k<=15; k++) {
+                    for (int k=13; k<=14; k++) {
                         JSONArray itemsArray = array.getJSONArray(k);
 
                         final Meni izborniMeni = new Meni();
