@@ -8,7 +8,7 @@
         <android.support.v7.preference.Preference
             android:key="logout"
             android:title="Odjava"
-            android:summary="Prijavljani ste kao Tino Emer" />
+            android:summary="Prijavljeni korisnik" />
 
     </android.support.v7.preference.PreferenceCategory>
 

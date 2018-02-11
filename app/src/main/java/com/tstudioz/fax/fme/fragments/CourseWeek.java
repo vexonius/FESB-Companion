@@ -166,6 +166,11 @@ public class CourseWeek extends Fragment {
                                 Element content = doc.select("div.course-content").first();
                                 Elements selements = content.getElementsByClass("section main clearfix");
 
+                                Element currentElement = content.getElementsByClass("section main clearfix current").first();
+
+                                if(currentElement!=null)
+                                    selements.add(0, currentElement);
+
                             try {
                                 mRealm.beginTransaction();
 

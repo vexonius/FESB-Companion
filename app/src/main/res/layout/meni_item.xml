@@ -20,7 +20,6 @@
         android:textSize="25dp"
         android:layout_margin="20dp"
         android:textColor="@color/black"
-        android:text="MENI 1"
         />
 
     <TextView
@@ -30,8 +29,17 @@
         android:layout_marginLeft="20dp"
         android:textSize="16dp"
         android:textColor="@color/black"
-        android:text="MENI 1"
         android:layout_below="@+id/meni_title"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/almost_white"
+        android:layout_below="@+id/meni_jelo1"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="15dp"
         />
 
     <TextView
@@ -40,9 +48,19 @@
         android:layout_height="wrap_content"
         android:textSize="16dp"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
         android:textColor="@color/black"
-        android:text="MENI 1"
         android:layout_below="@+id/meni_jelo1"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/almost_white"
+        android:layout_below="@+id/meni_jelo2"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="15dp"
         />
 
     <TextView
@@ -51,9 +69,19 @@
         android:layout_height="wrap_content"
         android:textSize="16dp"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
         android:textColor="@color/black"
-        android:text="MENI 1"
         android:layout_below="@+id/meni_jelo2"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/almost_white"
+        android:layout_below="@+id/meni_jelo3"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="15dp"
         />
 
     <TextView
@@ -61,10 +89,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
         android:textSize="16dp"
         android:textColor="@color/black"
-        android:text="MENI 1"
         android:layout_below="@+id/meni_jelo3"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/almost_white"
+        android:layout_below="@+id/meni_jelo4"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="15dp"
         />
 
     <TextView
@@ -72,9 +111,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
         android:textSize="16dp"
         android:textColor="@color/black"
-        android:text="MENI 1"
         android:layout_below="@+id/meni_jelo4"
         />
 
@@ -86,7 +125,6 @@
         android:layout_margin="20dp"
         android:textColor="@color/welcome2"
         android:layout_alignParentRight="true"
-        android:text="4,99 kn"
         android:layout_below="@+id/meni_jelo5"
         />
 

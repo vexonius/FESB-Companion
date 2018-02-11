@@ -39,7 +39,7 @@ public class MeniesAdapter extends RecyclerView.Adapter<MeniesAdapter.MeniViewHo
         holder.jelo3.setTypeface(holder.lighttf);
         holder.jelo4.setTypeface(holder.lighttf);
         holder.jelo5.setTypeface(holder.lighttf);
-        holder.cijena.setTypeface(holder.boldtf);
+        holder.cijena.setTypeface(holder.regulartf);
 
         if(meni.getId().equals("R-MENI")){
             holder.title.setText(meni.getType());

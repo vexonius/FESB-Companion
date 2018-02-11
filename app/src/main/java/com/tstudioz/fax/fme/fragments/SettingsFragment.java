@@ -15,6 +15,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -22,6 +23,7 @@ import android.webkit.WebView;
 
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.LoginActivity;
+import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.migrations.CredMigration;
 
 import io.realm.Realm;
@@ -37,6 +39,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private Realm rlmLog;
     private AlertDialog alertDialog;
     private BottomSheetDialog btmDialog;
+    private String korisnik;
 
     public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
@@ -49,6 +52,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         addPreferencesFromResource(R.xml.app_prefrences);
 
         Preference prefLogOut = (Preference) findPreference("logout");
+        rlmLog = Realm.getInstance(CredRealmCf);
+        try {
+            korisnik = rlmLog.where(Korisnik.class).findFirst().getUsername();
+        } catch (Exception e){
+            Log.e("settings exp", e.getMessage());
+        }
+        finally {
+            rlmLog.close();
+        }
+        prefLogOut.setSummary("Prijavljeni ste kao " + korisnik);
         prefLogOut.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -124,12 +137,17 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         editor.apply();
 
         rlmLog = Realm.getInstance(CredRealmCf);
-        rlmLog.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                rlmLog.deleteAll();
-            }
-        });
+        try {
+            rlmLog.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    rlmLog.deleteAll();
+                }
+            });
+        } finally {
+            rlmLog.close();
+        }
+
     }
 
     public void deleteWebViewCookies() {
