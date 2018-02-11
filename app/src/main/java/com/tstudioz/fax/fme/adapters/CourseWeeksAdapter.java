@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +20,7 @@ import io.realm.RealmResults;
 public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.CoursesWeeksViewHolder> implements RealmChangeListener {
 
     private RealmResults<KolegijTjedan> tjedni;
-    Typeface regulartf, lighttf;
+    Typeface regulartf, lighttf, boldtf;
     private static RecyclerView materialRecycler;
 
     public CourseWeeksAdapter(RealmResults<KolegijTjedan> tjedan) {
@@ -43,14 +44,21 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
         holder.matAdapter = new MaterialsAdapter(tjedan.getMaterijali());
         materialRecycler.setAdapter(holder.matAdapter);
 
-        if(tjedan.getTjedan().isEmpty()) {
+        if (position == 0 && tjedan.getTjedan().contains("This week")) {
+            holder.mWeek.setText("Ovaj tjedan");
+            holder.mWeek.setPadding(25, 20, 25, 20);
+            holder.mWeek.setTypeface(boldtf);
+            holder.mWeek.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            holder.mWeek.setBackgroundColor(ContextCompat.getColor(holder.mWeek.getContext(), R.color.blue_nice));
+            holder.mWeek.setTextColor(ContextCompat.getColor(holder.mWeek.getContext(), R.color.white));
+        } else if (tjedan.getTjedan().isEmpty()) {
             holder.mWeek.setVisibility(View.GONE);
             holder.mWeek.setTypeface(lighttf);
-        }else{
+        } else {
             holder.mWeek.setText(tjedan.getTjedan());
         }
 
-        if(tjedan.getOpis().isEmpty()){
+        if (tjedan.getOpis().isEmpty()) {
             holder.mWeekDesc.setVisibility(View.GONE);
         } else {
             holder.mWeekDesc.setText(tjedan.getOpis());
@@ -74,14 +82,17 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
             super(itemView);
             mWeek = (TextView) itemView.findViewById(R.id.tjedanText);
             lighttf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Light.ttf");
-            mWeek.setTypeface(lighttf);
+            boldtf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Bold.ttf");
+            mWeek.setTypeface(boldtf);
 
             mWeekDesc = (TextView) itemView.findViewById(R.id.tjedanOpis);
             regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Regular.ttf");
             mWeekDesc.setTypeface(regulartf);
 
+
+
             Context context = itemView.getContext();
-            materialRecycler = (RecyclerView)itemView.findViewById(R.id.mat_recyc);
+            materialRecycler = (RecyclerView) itemView.findViewById(R.id.mat_recyc);
             materialRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
             materialRecycler.hasFixedSize();
 

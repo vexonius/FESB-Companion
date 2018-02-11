@@ -14,11 +14,13 @@
        android:id="@+id/tjedanText"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginLeft="25dp"
-       android:layout_marginTop="10dp"
-       android:layout_marginRight="20dp"
+       android:paddingLeft="25dp"
+       android:paddingTop="15dp"
+       android:paddingBottom="5dp"
+       android:paddingRight="25dp"
        android:textSize="14dp"
        android:text="Tjedan"
+       android:textAlignment="viewEnd"
        android:textColor="@color/blue_nice"/>
 
     <TextView
@@ -26,8 +28,8 @@
         android:layout_below="@+id/tjedanText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="15dp"
         android:layout_marginRight="10dp"
         android:textSize="14dp"
         android:text="Ovo je opis tjedne aktivnosti"

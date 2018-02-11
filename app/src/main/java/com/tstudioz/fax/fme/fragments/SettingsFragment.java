@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.LoginActivity;
@@ -40,6 +41,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private AlertDialog alertDialog;
     private BottomSheetDialog btmDialog;
     private String korisnik;
+    private static int i = 0;
 
     public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
             .name("encrypted.realm")
@@ -100,10 +102,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
 
         Preference prefInfo = (Preference) findPreference("version");
+        prefInfo.setSummary(getBuildVersion());
         prefInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                // TODO: smiley
+                i++;
+
+                if(i>6)
+                    Toast.makeText(getActivity(), ":)", Toast.LENGTH_SHORT).show();
+
                 return true;
             }
         });
@@ -166,8 +173,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     public void goToLoginSCreen() {
-        Intent nazadaNaLogin = new Intent(getActivity(), LoginActivity.class);
-        startActivity(nazadaNaLogin);
+        Intent nazadNaLogin = new Intent(getActivity(), LoginActivity.class);
+        startActivity(nazadNaLogin);
     }
 
     public String getBuildVersion() {
