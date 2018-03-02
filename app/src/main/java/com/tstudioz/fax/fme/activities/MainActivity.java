@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
         switch (pos) {
             case 0:
                 Home hf = new Home();
+                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, hf);
                 ft.addToBackStack(null);
                 ft.commit();
@@ -191,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
             case 1:
                 Left lf = new Left();
+                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, lf);
                 ft.addToBackStack(null);
                 ft.commit();
@@ -200,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
             case 2:
                 Prisutnost ik = new Prisutnost();
+                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, ik);
                 ft.addToBackStack(null);
                 ft.commit();
@@ -209,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
             case 3:
 
                 Kolegiji kol = new Kolegiji();
+                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, kol);
                 ft.addToBackStack(null);
                 ft.commit();
@@ -218,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
             case 4:
 
                 Right rt = new Right();
+                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, rt);
                 ft.addToBackStack(null);
                 ft.commit();
@@ -226,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
 
             default:
                 Home hf0 = new Home();
+                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, hf0);
                 ft.addToBackStack(null);
                 ft.commit();

@@ -311,11 +311,22 @@
 
         </FrameLayout>
 
+        <TextView
+            android:id="@+id/menzaHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/frame_list"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="20dp"
+            android:text="PREHRANA"
+            android:textColor="@color/shady_blue"
+            android:textSize="14dp" />
+
         <RelativeLayout
             android:id="@+id/menza_relative"
             android:layout_width="match_parent"
             android:layout_height="160dp"
-            android:layout_below="@+id/frame_list"
+            android:layout_below="@+id/menzaHeader"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"

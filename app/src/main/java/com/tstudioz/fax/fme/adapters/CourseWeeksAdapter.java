@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tstudioz.fax.fme.R;
@@ -65,6 +66,7 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
             holder.mWeekDesc.setTypeface(regulartf);
         }
 
+
     }
 
 
@@ -74,12 +76,14 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
     }
 
     public class CoursesWeeksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        RelativeLayout relativeLayout;
         TextView mWeek, mWeekDesc;
         private MaterialsAdapter matAdapter;
 
 
         public CoursesWeeksViewHolder(final View itemView) {
             super(itemView);
+
             mWeek = (TextView) itemView.findViewById(R.id.tjedanText);
             lighttf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Light.ttf");
             boldtf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Bold.ttf");
@@ -88,8 +92,6 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
             mWeekDesc = (TextView) itemView.findViewById(R.id.tjedanOpis);
             regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Regular.ttf");
             mWeekDesc.setTypeface(regulartf);
-
-
 
             Context context = itemView.getContext();
             materialRecycler = (RecyclerView) itemView.findViewById(R.id.mat_recyc);
