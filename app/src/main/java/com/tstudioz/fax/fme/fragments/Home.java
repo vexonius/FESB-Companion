@@ -110,6 +110,12 @@ public class Home extends Fragment {
             .schemaVersion(1)
             .build();
 
+    public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
+            .name("glavni.realm")
+            .schemaVersion(3)
+            .deleteRealmIfMigrationNeeded()
+            .build();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -268,7 +274,7 @@ public class Home extends Fragment {
     }
 
     public void showList() {
-        mrealm = Realm.getDefaultInstance();
+        mrealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezultati = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
 
         if (rezultati.isEmpty()) {
@@ -361,7 +367,7 @@ public class Home extends Fragment {
         iksicaPromoImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String appPackageName = "com.tstudioz.iksica";
+                final String appPackageName = "com.tstud.iksica";
                 try {
                     Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage(appPackageName);
                     startActivity(intent);

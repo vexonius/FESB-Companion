@@ -32,9 +32,6 @@ import io.realm.RealmConfiguration;
 
 import static android.content.Context.MODE_PRIVATE;
 
-/**
- * Created by etino7 on 12/01/2018.
- */
 
 public class SettingsFragment extends PreferenceFragmentCompat {
     private Realm rlmLog;
@@ -43,18 +40,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private String korisnik;
     private static int i = 0;
 
-    public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
-            .name("encrypted.realm")
-            .schemaVersion(7)
-            .migration(new CredMigration())
-            .build();
-
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.app_prefrences);
 
         Preference prefLogOut = (Preference) findPreference("logout");
-        rlmLog = Realm.getInstance(CredRealmCf);
+        rlmLog = Realm.getDefaultInstance();
         try {
             korisnik = rlmLog.where(Korisnik.class).findFirst().getUsername();
         } catch (Exception e){
@@ -143,7 +134,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         editor.putBoolean("loged_in", false);
         editor.apply();
 
-        rlmLog = Realm.getInstance(CredRealmCf);
+        rlmLog = Realm.getDefaultInstance();
         try {
             rlmLog.executeTransaction(new Realm.Transaction() {
                 @Override

@@ -70,16 +70,15 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     @BindView(R.id.odaberiDan) Button mOdaberiDan;
     @BindView(R.id.raspored_progress) ProgressBar mRasporedProgress;
 
-
-     RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
-            .name("encrypted.realm")
-            .schemaVersion(7)
-             .migration(new CredMigration())
-            .build();
-
      RealmConfiguration tempRealm = new RealmConfiguration.Builder()
             .name("temporary.realm")
             .schemaVersion(12)
+            .deleteRealmIfMigrationNeeded()
+            .build();
+
+    public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
+            .name("glavni.realm")
+            .schemaVersion(3)
             .deleteRealmIfMigrationNeeded()
             .build();
 
@@ -200,7 +199,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
                 }
             });
 
-            rlm = Realm.getInstance(CredRealmCf);
+            rlm = Realm.getDefaultInstance();
             Korisnik kor = rlm.where(Korisnik.class).findFirst();
 
             client = new OkHttpClient();
@@ -221,7 +220,6 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
                 public void onResponse(Call call, Response response) throws IOException {
 
                     try {
-                        String kod = String.valueOf(response.code());
 
                         if (response.code() == 500) {
                             getActivity().runOnUiThread(new Runnable() {
@@ -301,7 +299,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         }
 
     public void showPon(){
-        prealm = Realm.getDefaultInstance();
+        prealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiPon = prealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter = new EmployeeRVAdapterTable(rezulatiPon);
@@ -324,7 +322,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     }
 
     public void showUto(){
-        urealm = Realm.getDefaultInstance();
+        urealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiUto = urealm.where(Predavanja.class).contains("detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter2 = new EmployeeRVAdapterTable(rezulatiUto);
@@ -346,7 +344,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     }
 
     public void showSri(){
-        srealm = Realm.getDefaultInstance();
+        srealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiSri = srealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter3 = new EmployeeRVAdapterTable(rezulatiSri);
@@ -368,7 +366,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     }
 
     public void showCet(){
-        crealm = Realm.getDefaultInstance();
+        crealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiCet = crealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter4 = new EmployeeRVAdapterTable(rezulatiCet);
@@ -390,7 +388,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     }
 
     public void showPet(){
-        petrealm = Realm.getDefaultInstance();
+        petrealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiPet = petrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter5 = new EmployeeRVAdapterTable(rezulatiPet);
@@ -412,7 +410,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     }
 
     public void showSub() {
-        subrealm = Realm.getDefaultInstance();
+        subrealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiSub = subrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
 
         if (rezulatiSub.isEmpty()) {

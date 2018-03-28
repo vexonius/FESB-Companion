@@ -81,20 +81,11 @@ public class MainActivity extends AppCompatActivity {
             .build();
 
 
-    public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
-            .name("encrypted.realm")
-            .schemaVersion(7)
-            .migration(new CredMigration())
-            .build();
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setUpToolbar();
         setContentView(R.layout.activity_main);
-
-        Realm.setDefaultConfiguration(mainRealmConfig);
 
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
@@ -113,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkUser() {
-        realmLog = Realm.getInstance(CredRealmCf);
+        realmLog = Realm.getDefaultInstance();
         if (realmLog != null) {
             getMojRaspored();
         } else {
@@ -276,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getMojRaspored() {
 
-        Realm rlm = Realm.getInstance(CredRealmCf);
+        Realm rlm = Realm.getDefaultInstance();
         Korisnik kor = rlm.where(Korisnik.class).findFirst();
 
         // Get calendar set to current date and time
@@ -384,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
         editor1.putBoolean("loged_in", false);
         editor1.apply();
 
-        final Realm rlmLog1 = Realm.getInstance(CredRealmCf);
+        final Realm rlmLog1 = Realm.getDefaultInstance();
         rlmLog1.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

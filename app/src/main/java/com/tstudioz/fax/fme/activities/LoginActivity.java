@@ -57,11 +57,6 @@ public class LoginActivity extends AppCompatActivity {
     Snackbar snack;
     Realm mLogRealm;
 
-    final RealmConfiguration loginRealmCf = new RealmConfiguration.Builder()
-            .name("encrypted.realm")
-            .schemaVersion(7)
-            .migration(new CredMigration())
-            .build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,7 +218,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.putBoolean("loged_in", true);
         editor.commit();
 
-        mLogRealm = Realm.getInstance(loginRealmCf);
+        mLogRealm = Realm.getDefaultInstance();
         mLogRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

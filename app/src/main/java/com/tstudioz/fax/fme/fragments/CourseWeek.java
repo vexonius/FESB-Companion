@@ -57,12 +57,6 @@ public class CourseWeek extends Fragment {
             .schemaVersion(9)
             .build();
 
-    public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
-            .name("encrypted.realm")
-            .schemaVersion(7)
-            .migration(new CredMigration())
-            .build();
-
     private Realm tRealm;
     private Realm wRealm;
     private CourseWeeksAdapter adapter;
@@ -110,7 +104,7 @@ public class CourseWeek extends Fragment {
                 .cookieJar(cookieJar)
                 .build();
 
-        tRealm = Realm.getInstance(CredRealmCf);
+        tRealm = Realm.getDefaultInstance();
         Korisnik korisnik = tRealm.where(Korisnik.class).findFirst();
 
         try {

@@ -64,12 +64,6 @@ public class Kolegiji extends Fragment {
             .schemaVersion(9)
             .build();
 
-    public final RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
-            .name("encrypted.realm")
-            .schemaVersion(7)
-            .migration(new CredMigration())
-            .build();
-
     @BindView(R.id.kolegiji_rv) RecyclerView recyclerView;
     @BindView(R.id.kolegij_progress) ProgressBar progress;
 
@@ -119,7 +113,7 @@ public class Kolegiji extends Fragment {
                     .cookieJar(cookieJar)
                     .build();
 
-                    credRealm = Realm.getInstance(CredRealmCf);
+                    credRealm = Realm.getDefaultInstance();
                     Korisnik kor = credRealm.where(Korisnik.class).findFirst();
 
                     final RequestBody formData = new FormBody.Builder()

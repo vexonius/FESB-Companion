@@ -62,12 +62,6 @@ public class Prisutnost extends Fragment {
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    public RealmConfiguration CredRealmCf = new RealmConfiguration.Builder()
-            .name("encrypted.realm")
-            .schemaVersion(7)
-            .migration(new CredMigration())
-            .build();
-
     @BindView(R.id.recyclerZimski) RecyclerView zRecyclerview;
     @BindView(R.id.recyclerLItnji) RecyclerView lRecyclerview;
     @BindView(R.id.progress_attend) ProgressBar mProgress;
@@ -138,7 +132,7 @@ public class Prisutnost extends Fragment {
                         });
                     }
 
-                    cRealm = Realm.getInstance(CredRealmCf);
+                    cRealm = Realm.getDefaultInstance();
                     Korisnik korisnik = cRealm.where(Korisnik.class).findFirst();
 
                     final RequestBody formData = new FormBody.Builder()
