@@ -106,7 +106,19 @@ public class MainActivity extends AppCompatActivity {
     public void checkUser() {
         realmLog = Realm.getDefaultInstance();
         if (realmLog != null) {
-            getMojRaspored();
+            Korisnik korisnik = null;
+            try {
+                korisnik = realmLog.where(Korisnik.class).findFirst();
+            } catch (Exception ex) {
+
+            }
+
+            if (korisnik != null){
+                getMojRaspored();
+            } else {
+                invalidCreds();
+            }
+
         } else {
             SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();

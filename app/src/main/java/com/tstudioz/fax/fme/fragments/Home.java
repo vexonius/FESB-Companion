@@ -383,15 +383,12 @@ public class Home extends Fragment {
     }
 
     public void loadMenzaView(){
-
-
         mMenzaRelative.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), MenzaActivity.class));
             }
         });
-
     }
 
     public void showSnacOffline() {
