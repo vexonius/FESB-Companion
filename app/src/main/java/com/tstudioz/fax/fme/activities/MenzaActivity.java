@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.tstudioz.fax.fme.R;
@@ -148,7 +149,7 @@ public class MenzaActivity extends AppCompatActivity {
                     });
 
                 } catch (Exception ex){
-
+                    Log.d("MenzaActivity", "Doslo je do pogreske");
                 }
             }
         });

@@ -13,6 +13,7 @@ import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
@@ -39,19 +40,22 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private BottomSheetDialog btmDialog;
     private String korisnik;
     private static int i = 0;
+    private SharedPreferences mySPrefs;
+    private  SharedPreferences.Editor editor;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.app_prefrences);
 
+        mySPrefs = getActivity().getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+
         Preference prefLogOut = (Preference) findPreference("logout");
         rlmLog = Realm.getDefaultInstance();
         try {
             korisnik = rlmLog.where(Korisnik.class).findFirst().getUsername();
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e("settings exp", e.getMessage());
-        }
-        finally {
+        } finally {
             rlmLog.close();
         }
         prefLogOut.setSummary("Prijavljeni ste kao " + korisnik);
@@ -65,11 +69,29 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
+        final CheckBoxPreference weather_units = (CheckBoxPreference) findPreference("units");
+        weather_units.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                editor = mySPrefs.edit();
+                if (weather_units.isChecked()) {
+                    editor.putString("weather_units", "&units=ca");
+                    editor.apply();
+                } else {
+                    editor.putString("weather_units", "&units=us");
+                    editor.apply();
+                }
+                editor.commit();
+                return true;
+            }
+        });
+
+
         Preference prefFeedback = (Preference) findPreference("feedback");
         prefFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-               sendFeedMail("[FEEDBACK] FESB Companion");
+                sendFeedMail("[FEEDBACK] FESB Companion");
                 return true;
             }
         });
@@ -99,7 +121,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             public boolean onPreferenceClick(Preference preference) {
                 i++;
 
-                if(i>6)
+                if (i > 6)
                     Toast.makeText(getActivity(), ":)", Toast.LENGTH_SHORT).show();
 
                 return true;
@@ -129,8 +151,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     public void userLogOut() {
-        SharedPreferences mySPrefs = getActivity().getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-        SharedPreferences.Editor editor = mySPrefs.edit();
+        editor = mySPrefs.edit();
         editor.putBoolean("loged_in", false);
         editor.apply();
 
@@ -145,7 +166,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         } finally {
             rlmLog.close();
         }
-
     }
 
     public void deleteWebViewCookies() {
@@ -203,7 +223,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     }
 
-    public void sendFeedMail(String title){
+    public void sendFeedMail(String title) {
         String version = getBuildVersion();
         ShareCompat.IntentBuilder.from(getActivity())
                 .setType("message/rfc822")

@@ -19,6 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         tools:replace="label">
+
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />

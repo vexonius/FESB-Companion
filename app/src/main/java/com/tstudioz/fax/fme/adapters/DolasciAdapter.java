@@ -77,7 +77,7 @@ public class DolasciAdapter extends RecyclerView.Adapter<DolasciAdapter.DolazakV
         holder.chart.getDescription().setEnabled(false);
 
         PieDataSet set = new PieDataSet(entries, null);
-        set.setValueTextSize(12f);
+        set.setValueTextSize(14f);
         set.setValueTextColor(holder.colorWhite);
         set.setValueTypeface(regulartf);
         set.setColors(holder.colors);

@@ -70,6 +70,7 @@ public class Home extends Fragment {
     public String date = null;
 
     String myApiKey = "e39d50a0b9c65d5c7f2739eff093e6f5";
+    String units = "&units=ca";
 
     double mLatitude = 43.511287;
     double mLongitude = 16.469252;
@@ -197,8 +198,11 @@ public class Home extends Fragment {
 
     private void start() throws IOException, JSONException {
 
+        SharedPreferences shared = getActivity().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE);
+        units = shared.getString("weather_units", "&units=ca");
+
         // get your own API KEY from developer.forecast.io and fill it in.
-        final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr";
+        final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr" + units;
 
         if (isNetworkAvailable()) {
             getForecast(forecastUrl);
@@ -216,9 +220,9 @@ public class Home extends Fragment {
 
         Current current = mForecast.getCurrent();
 
-        String pTemperatura = (((current.getTemperature() - 32) * 5) / 9) + "°";
+        String pTemperatura = current.getTemperature() + "°";
         String pHumidity = current.getHumidity() + "";
-        String pWind = (float) Math.round((current.getWind() * 1.609344) * 10) / 10 + " km/h";
+        String pWind = current.getWind() + " km/h";
         String pPrecip = current.getPrecipChance() + "%";
         String pSummary = current.getSummary();
 

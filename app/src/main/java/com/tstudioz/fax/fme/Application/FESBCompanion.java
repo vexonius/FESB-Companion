@@ -27,8 +27,8 @@ public class FESBCompanion extends Application {
 
          CredRealmCf = new RealmConfiguration.Builder()
                 .name("encryptedv2.realm")
-                .schemaVersion(1)
-                .deleteRealmIfMigrationNeeded()
+                .schemaVersion(7)
+                .migration(new CredMigration())
                 .encryptionKey(getRealmKey())
                 .build();
         Realm.setDefaultConfiguration(CredRealmCf);
