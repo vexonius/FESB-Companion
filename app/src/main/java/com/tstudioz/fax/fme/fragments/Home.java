@@ -70,7 +70,7 @@ public class Home extends Fragment {
     public String date = null;
 
     String myApiKey = "e39d50a0b9c65d5c7f2739eff093e6f5";
-    String units = "&units=ca";
+    String units;
 
     double mLatitude = 43.511287;
     double mLongitude = 16.469252;
@@ -169,7 +169,6 @@ public class Home extends Fragment {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                alertUserAboutError();
                 Log.e(TAG, "Exception caught", e);
             }
 
@@ -214,7 +213,6 @@ public class Home extends Fragment {
 
 
     private void updateDisplay() {
-
         mProgressCircle.setVisibility(View.GONE);
         mCardHome.setVisibility(View.VISIBLE);
 

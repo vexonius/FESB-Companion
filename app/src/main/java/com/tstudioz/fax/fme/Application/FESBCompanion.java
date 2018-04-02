@@ -13,10 +13,6 @@ import java.security.SecureRandom;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-/**
- * Created by amarthus on 11-Sep-17.
- */
-
 public class FESBCompanion extends Application {
     RealmConfiguration CredRealmCf;
 
