@@ -195,6 +195,10 @@ public class CourseWeek extends Fragment {
                                                             case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fpdf&rev=305":
                                                                 materijal.setIcon(R.drawable.pdf);
                                                                 materijal.setVrsta("pdf");
+                                                                String imeMat = sekcija.select("span.instancename").text();
+                                                                if (imeMat.length()>5){
+                                                                    materijal.setImeMtarijala(sekcija.select("span.instancename").text().substring(0, sekcija.select("span.instancename").text().length()-5));
+                                                                }
                                                                 materijal.setDownloadable(1);
                                                                 break;
                                                             case "https://elearning.fesb.unist.hr/theme/image.php?theme=fesb_metro&image=f%2Fword&rev=305":
