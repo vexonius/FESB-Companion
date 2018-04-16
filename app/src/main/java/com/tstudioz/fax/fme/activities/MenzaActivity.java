@@ -1,11 +1,18 @@
 package com.tstudioz.fax.fme.activities;
 
+import android.content.Context;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tstudioz.fax.fme.R;
@@ -30,8 +37,14 @@ import okhttp3.Response;
 
 public class MenzaActivity extends AppCompatActivity {
 
-    @BindView(R.id.menza_title) TextView mMenzaTitle;
-    @BindView(R.id.menza_recyclerview) RecyclerView mRecyclerView;
+    @BindView(R.id.menza_title)
+    TextView mMenzaTitle;
+    @BindView(R.id.menza_recyclerview)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.cookie_header_text)
+    TextView cookieText;
+    @BindView(R.id.cookie_header_root)
+    RelativeLayout cookieRoot;
 
     RealmConfiguration menzaRealmConf = new RealmConfiguration.Builder()
             .name("menza.realm")
@@ -39,7 +52,8 @@ public class MenzaActivity extends AppCompatActivity {
             .deleteRealmIfMigrationNeeded()
             .build();
 
-     private Realm mRealm;
+    private Realm mRealm;
+    private Snackbar snack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,23 +62,30 @@ public class MenzaActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        Typeface typeBold = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Bold.ttf");
-        mMenzaTitle.setTypeface(typeBold);
+        setTextTypeface();
 
+        mRealm = Realm.getInstance(menzaRealmConf);
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                mRealm.deleteAll();
+            }
+        });
 
-         mRealm = Realm.getInstance(menzaRealmConf);
-         mRealm.executeTransaction(new Realm.Transaction() {
-             @Override
-             public void execute(Realm realm) {
-                 mRealm.deleteAll();
-             }
-         });
+       checkConditions();
 
-        startParsing();
+    }
+
+    public void checkConditions(){
+        if(isNetworkAvailable()){
+            startParsing();
+        } else {
+            showSnacOffline();
+        }
     }
 
 
-    public void startParsing(){
+    public void startParsing() {
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .followSslRedirects(true)
@@ -91,7 +112,7 @@ public class MenzaActivity extends AppCompatActivity {
 
                     JSONArray array = jsonResponse.getJSONArray("values");
 
-                    for (int j=7; j<=9; j++) {
+                    for (int j = 7; j <= 9; j++) {
                         JSONArray itemsArray = array.getJSONArray(j);
 
                         final Meni meni = new Meni();
@@ -119,13 +140,13 @@ public class MenzaActivity extends AppCompatActivity {
 
                     }
 
-                    for (int k=13; k<=14; k++) {
+                    for (int k = 13; k <= 14; k++) {
                         JSONArray itemsArray = array.getJSONArray(k);
 
                         final Meni izborniMeni = new Meni();
                         izborniMeni.setId(itemsArray.getString(0));
-                        izborniMeni.setJelo1(itemsArray.getString(1).substring(0, itemsArray.getString(1).length()-6));
-                        izborniMeni.setCijena(itemsArray.getString(1).substring(itemsArray.getString(1).length()-6, itemsArray.getString(1).length()));
+                        izborniMeni.setJelo1(itemsArray.getString(1).substring(0, itemsArray.getString(1).length() - 6));
+                        izborniMeni.setCijena(itemsArray.getString(1).substring(itemsArray.getString(1).length() - 6, itemsArray.getString(1).length()));
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -148,7 +169,7 @@ public class MenzaActivity extends AppCompatActivity {
                         }
                     });
 
-                } catch (Exception ex){
+                } catch (Exception ex) {
                     Log.d("MenzaActivity", "Doslo je do pogreske");
                 }
             }
@@ -156,21 +177,61 @@ public class MenzaActivity extends AppCompatActivity {
 
     }
 
-    public void showMenies(){
+    public void showMenies() {
 
         RealmResults<Meni> results = mRealm.where(Meni.class).findAll();
 
-        MeniesAdapter adapter = new MeniesAdapter(results);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setAdapter(adapter);
+        if(!results.isEmpty()) {
+            MeniesAdapter adapter = new MeniesAdapter(results);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            mRecyclerView.setHasFixedSize(true);
+            mRecyclerView.setAdapter(adapter);
+
+        }else {
+            mRecyclerView.setVisibility(View.INVISIBLE);
+            cookieRoot.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void setTextTypeface() {
+        Typeface typeBold = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Bold.ttf");
+        Typeface regular = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Regular.ttf");
+        mMenzaTitle.setTypeface(typeBold);
+        cookieText.setTypeface(regular);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
+        boolean isAvailable = false;
+        if(networkInfo != null && networkInfo.isConnected()) {
+            isAvailable = true;
+        }
+
+        return isAvailable;
+    }
+
+    public void showSnacOffline(){
+        snack = Snackbar.make(findViewById(R.id.menza_root), "Niste povezani", Snackbar.LENGTH_INDEFINITE);
+        View vjuz = snack.getView();
+        vjuz.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.red_nice));
+        snack.setAction("PONOVI", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snack.dismiss();
+                checkConditions();
+            }
+        });
+        snack.setActionTextColor(getResources().getColor(R.color.white));
+        snack.show();
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
 
-        if (mRealm!=null)
+        if (mRealm != null)
             mRealm.close();
     }
 }

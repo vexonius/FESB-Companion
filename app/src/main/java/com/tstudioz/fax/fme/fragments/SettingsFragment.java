@@ -91,7 +91,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         prefFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                sendFeedMail("[FEEDBACK] FESB Companion");
+                sendFeedMail("[FEEDBACK] FESB Companion", "");
                 return true;
             }
         });
@@ -100,7 +100,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         prefBugreport.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                sendFeedMail("[BUG REPORT] FESB Companion");
+                sendFeedMail("[BUG REPORT] FESB Companion", "");
+                return true;
+            }
+        });
+
+        Preference prefBeta = (Preference)findPreference("betta_particp");
+        prefBeta.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                sendFeedMail("[BETA] Prijava beta testera za FESB Companion", "Slanjem ovog maila prihvaćam sudjelovanje u internom beta testiranju s ovom email adresom. Upozorenje: beta verzije znaju biti nestabilne i nepouzdane.");
                 return true;
             }
         });
@@ -223,13 +232,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     }
 
-    public void sendFeedMail(String title) {
+    public void sendFeedMail(String title, String body) {
         String version = getBuildVersion();
         ShareCompat.IntentBuilder.from(getActivity())
                 .setType("message/rfc822")
                 .addEmailTo("info@tstud.io")
                 .setSubject(title + " v" + version)
-                .setText("")
+                .setText(body)
                 .setChooserTitle("Pošalji email pomoću...")
                 .startChooser();
     }
