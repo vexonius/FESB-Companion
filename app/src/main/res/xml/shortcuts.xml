@@ -36,9 +36,9 @@
         android:shortcutLongLabel="@string/add_reminder_long"
         android:shortcutDisabledMessage="@string/unavailabe">
         <intent
-            android:action="raspored"
+            android:action="podsjetnik"
             android:targetPackage="com.tstudioz.fax.fme"
-            android:targetClass="com.tstudioz.fax.fme.activities.NoteActivity" />
+            android:targetClass="com.tstudioz.fax.fme.activities.MainActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
     <!-- Specify more shortcuts here. -->

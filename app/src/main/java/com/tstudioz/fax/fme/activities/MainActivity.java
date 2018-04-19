@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
@@ -433,15 +434,23 @@ public class MainActivity extends AppCompatActivity {
     public void showShortcutView(){
         int shortPosition = 0;
 
-        switch (getIntent().getAction()) {
-            case "raspored":
-                shortPosition = 1;
-                break;
-            case "prisutnost":
-                shortPosition = 2;
-                break;
+        if(getIntent().getAction().equals("podsjetnik")){
+            Intent newIntent = new Intent(MainActivity.this, NoteActivity.class);
+            newIntent.putExtra("mode", 2);
+            newIntent.putExtra("task_key", "");
+            startActivity(newIntent);
+        } else {
+            switch (getIntent().getAction()) {
+                case "raspored":
+                    shortPosition = 1;
+                    break;
+                case "prisutnost":
+                    shortPosition = 2;
+                    break;
+            }
+            beginFragTransaction(shortPosition);
         }
-        beginFragTransaction(shortPosition);
+
     }
 
     public void checkVersion(){

@@ -83,8 +83,6 @@ public class Kolegiji extends Fragment {
         ButterKnife.bind(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        showList();
-
        startFetching();
         return  view;
     }
@@ -183,7 +181,7 @@ public class Kolegiji extends Fragment {
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            updateList();
+                                            showList();
                                             progress.setVisibility(View.INVISIBLE);
                                             recyclerView.setVisibility(View.VISIBLE);
                                         }
@@ -205,9 +203,6 @@ public class Kolegiji extends Fragment {
 
     }
 
-    public void updateList(){
-        kolegijiAdapter.notifyDataSetChanged();
-    }
 
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
