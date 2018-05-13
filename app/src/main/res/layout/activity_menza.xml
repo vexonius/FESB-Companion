@@ -64,8 +64,13 @@
         </RelativeLayout>
     </FrameLayout>
 
-
-
-
+    <ProgressBar
+        android:id="@+id/menza_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="visible"
+        android:indeterminateTint="@color/white"
+        android:indeterminateTintMode="src_in"/>
 
 </RelativeLayout>

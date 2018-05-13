@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -45,6 +46,8 @@ public class MenzaActivity extends AppCompatActivity {
     TextView cookieText;
     @BindView(R.id.cookie_header_root)
     RelativeLayout cookieRoot;
+    @BindView(R.id.menza_progress)
+    ProgressBar mProgress;
 
     RealmConfiguration menzaRealmConf = new RealmConfiguration.Builder()
             .name("menza.realm")
@@ -81,6 +84,7 @@ public class MenzaActivity extends AppCompatActivity {
             startParsing();
         } else {
             showSnacOffline();
+            mProgress.setVisibility(View.VISIBLE);
         }
     }
 
@@ -165,6 +169,7 @@ public class MenzaActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            mProgress.setVisibility(View.INVISIBLE);
                             showMenies();
                         }
                     });
