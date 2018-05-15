@@ -31,7 +31,7 @@ public class FESBCompanion extends Application {
 
         checkOldVersion();
 
-       // MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006");
+        MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006");
     }
 
     public void checkOldVersion(){
