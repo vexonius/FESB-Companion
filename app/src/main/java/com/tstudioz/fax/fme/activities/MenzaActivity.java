@@ -24,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,12 +76,12 @@ public class MenzaActivity extends AppCompatActivity {
             }
         });
 
-       checkConditions();
+        checkConditions();
 
     }
 
-    public void checkConditions(){
-        if(isNetworkAvailable()){
+    public void checkConditions() {
+        if (isNetworkAvailable()) {
             startParsing();
         } else {
             showSnacOffline();
@@ -117,53 +118,65 @@ public class MenzaActivity extends AppCompatActivity {
                     JSONArray array = jsonResponse.getJSONArray("values");
 
                     for (int j = 7; j <= 9; j++) {
-                        JSONArray itemsArray = array.getJSONArray(j);
 
-                        final Meni meni = new Meni();
-                        meni.setId(itemsArray.getString(0));
-                        meni.setType(itemsArray.getString(1));
-                        meni.setJelo1(itemsArray.getString(2));
-                        meni.setJelo2(itemsArray.getString(3));
-                        meni.setJelo3(itemsArray.getString(4));
-                        meni.setJelo4(itemsArray.getString(5));
-                        meni.setDesert(itemsArray.getString(6));
-                        meni.setCijena(itemsArray.getString(7));
+                        try {
+                            JSONArray itemsArray = array.getJSONArray(j);
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mRealm.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        mRealm.copyToRealm(meni);
-                                    }
-                                });
+                            final Meni meni = new Meni();
+                            meni.setId(itemsArray.getString(0));
+                            meni.setType(itemsArray.getString(1));
+                            meni.setJelo1(itemsArray.getString(2));
+                            meni.setJelo2(itemsArray.getString(3));
+                            meni.setJelo3(itemsArray.getString(4));
+                            meni.setJelo4(itemsArray.getString(5));
+                            meni.setDesert(itemsArray.getString(6));
+                            meni.setCijena(itemsArray.getString(7));
 
-                            }
-                        });
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mRealm.executeTransaction(new Realm.Transaction() {
+                                        @Override
+                                        public void execute(Realm realm) {
+                                            mRealm.copyToRealm(meni);
+                                        }
+                                    });
+
+                                }
+                            });
+
+                        } catch (Exception ex) {
+                            Log.d("Menza activity", ex.toString());
+                        }
 
                     }
 
-                    for (int k = 13; k <= 14; k++) {
-                        JSONArray itemsArray = array.getJSONArray(k);
+                    for (int k = 13; k <= 15; k++) {
 
-                        final Meni izborniMeni = new Meni();
-                        izborniMeni.setId(itemsArray.getString(0));
-                        izborniMeni.setJelo1(itemsArray.getString(1).substring(0, itemsArray.getString(1).length() - 6));
-                        izborniMeni.setCijena(itemsArray.getString(1).substring(itemsArray.getString(1).length() - 6, itemsArray.getString(1).length()));
+                        try {
+                            JSONArray itemsArray = array.getJSONArray(k);
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mRealm.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        mRealm.copyToRealm(izborniMeni);
-                                    }
-                                });
+                            final Meni izborniMeni = new Meni();
+                            izborniMeni.setId(itemsArray.getString(0));
+                            izborniMeni.setJelo1(itemsArray.getString(1).substring(0, itemsArray.getString(1).length() - 6));
+                            izborniMeni.setCijena(itemsArray.getString(1).substring(itemsArray.getString(1).length() - 6, itemsArray.getString(1).length()));
 
-                            }
-                        });
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mRealm.executeTransaction(new Realm.Transaction() {
+                                        @Override
+                                        public void execute(Realm realm) {
+                                            mRealm.copyToRealm(izborniMeni);
+                                        }
+                                    });
+
+                                }
+                            });
+
+                        } catch (Exception exc) {
+                            Log.d("Menza activity", exc.toString());
+                        }
                     }
 
                     runOnUiThread(new Runnable() {
@@ -186,13 +199,13 @@ public class MenzaActivity extends AppCompatActivity {
 
         RealmResults<Meni> results = mRealm.where(Meni.class).findAll();
 
-        if(!results.isEmpty()) {
+        if (!results.isEmpty()) {
             MeniesAdapter adapter = new MeniesAdapter(results);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setAdapter(adapter);
 
-        }else {
+        } else {
             mRecyclerView.setVisibility(View.INVISIBLE);
             cookieRoot.setVisibility(View.VISIBLE);
         }
@@ -210,14 +223,14 @@ public class MenzaActivity extends AppCompatActivity {
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         boolean isAvailable = false;
-        if(networkInfo != null && networkInfo.isConnected()) {
+        if (networkInfo != null && networkInfo.isConnected()) {
             isAvailable = true;
         }
 
         return isAvailable;
     }
 
-    public void showSnacOffline(){
+    public void showSnacOffline() {
         snack = Snackbar.make(findViewById(R.id.menza_root), "Niste povezani", Snackbar.LENGTH_INDEFINITE);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.red_nice));
