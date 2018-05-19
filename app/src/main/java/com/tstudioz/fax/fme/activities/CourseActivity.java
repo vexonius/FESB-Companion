@@ -37,9 +37,7 @@ public class CourseActivity extends AppCompatActivity {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
-        }
+       styledNavigation();
 
         if (shouldAskPermissions()) {
             askPermissions();
@@ -55,15 +53,15 @@ public class CourseActivity extends AppCompatActivity {
         ft.addToBackStack(null);
         ft.commit();
 
-        // loadAdsCourse();
+         loadAdsCourse();
 
 
     }
 
-    @Override
-    public void onBackPressed() {
-         // mInterstitialAd.show();
-        finish();
+    public void styledNavigation(){
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        }
     }
 
     @Override
@@ -127,14 +125,21 @@ public class CourseActivity extends AppCompatActivity {
         }
     }
 
-    private void requestNewInterstitial() {
-          AdRequest adRequest = new AdRequest.Builder()
-                  .build();
-
-           mInterstitialAd.loadAd(adRequest);
+    public void onBackPressed() {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            finish();
+        }
     }
 
-    public void loadAdsCourse(){
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
+        mInterstitialAd.loadAd(adRequest);
+    }
+
+    public void loadAdsCourse() {
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/8958513574");
 

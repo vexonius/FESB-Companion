@@ -16,6 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.MeniesAdapter;
 import com.tstudioz.fax.fme.database.Meni;
@@ -58,6 +61,8 @@ public class MenzaActivity extends AppCompatActivity {
 
     private Realm mRealm;
     private Snackbar snack;
+    private OkHttpClient okHttpClient;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +82,7 @@ public class MenzaActivity extends AppCompatActivity {
         });
 
         checkConditions();
+        loadAds();
 
     }
 
@@ -92,7 +98,7 @@ public class MenzaActivity extends AppCompatActivity {
 
     public void startParsing() {
 
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+        okHttpClient = new OkHttpClient.Builder()
                 .followSslRedirects(true)
                 .build();
 
@@ -218,6 +224,35 @@ public class MenzaActivity extends AppCompatActivity {
         cookieText.setTypeface(regular);
     }
 
+    public void onBackPressed() {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            finish();
+        }
+    }
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
+        mInterstitialAd.loadAd(adRequest);
+    }
+
+    public void loadAds() {
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/4938248175");
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                finish();
+            }
+        });
+
+        requestNewInterstitial();
+    }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
@@ -243,6 +278,15 @@ public class MenzaActivity extends AppCompatActivity {
         });
         snack.setActionTextColor(getResources().getColor(R.color.white));
         snack.show();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+
+        if(okHttpClient!=null)
+            okHttpClient.dispatcher().cancelAll();
+
     }
 
     @Override

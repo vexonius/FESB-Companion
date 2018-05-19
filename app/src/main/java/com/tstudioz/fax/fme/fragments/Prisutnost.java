@@ -90,8 +90,7 @@ public class Prisutnost extends Fragment {
         mAdView = view.findViewById(R.id.adView);
 
         startFetching();
-        // loadAds();
-        mAdView.setVisibility(View.GONE);
+        loadAds();
 
         return view;
     }

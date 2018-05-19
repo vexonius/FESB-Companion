@@ -61,7 +61,7 @@ public class NoteActivity extends AppCompatActivity {
             et.setText(leanTask.getTaskTekst());
         }
 
-        // loadAdsInTaskView();
+         loadAdsInTaskView();
     }
 
     @Override
@@ -119,8 +119,11 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        // mInterstitialAd.show();
-        finish();
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            finish();
+        }
     }
 
     private void requestNewInterstitial() {

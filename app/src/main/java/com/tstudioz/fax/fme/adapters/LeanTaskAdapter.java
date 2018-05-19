@@ -156,10 +156,6 @@ public class LeanTaskAdapter extends RecyclerView.Adapter<LeanTaskAdapter.LeanTa
                     break;
                 case NOTE:
                     taskText.setMaxLines(12);
-                    // taskText.setPaintFlags(taskText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-
-                    // TODO: add delete button
-                    // TODO: optimizirat recyclerview
 
                     break;
             }

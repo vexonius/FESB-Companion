@@ -350,19 +350,19 @@ public class Home extends Fragment {
 
     public void loadAdsOnHome() {
 
-        // if(isNetworkAvailable()) {
-        //     homeAdView.setVisibility(View.VISIBLE);
-        //     AdRequest adRequest = new AdRequest.Builder().build();
-        //     homeAdView.setAdListener(new AdListener(){
-        //         @Override
-        //         public void onAdFailedToLoad(int errorCode){
-        //             homeAdView.setVisibility(View.GONE);
-        //         }
-        //     });
-        //     homeAdView.loadAd(adRequest);
-        // } else {
+         if(isNetworkAvailable()) {
+             homeAdView.setVisibility(View.VISIBLE);
+             AdRequest adRequest = new AdRequest.Builder().build();
+             homeAdView.setAdListener(new AdListener(){
+                 @Override
+                 public void onAdFailedToLoad(int errorCode){
+                     homeAdView.setVisibility(View.GONE);
+                 }
+             });
+             homeAdView.loadAd(adRequest);
+         } else {
         homeAdView.setVisibility(View.GONE);
-        // }
+         }
     }
 
     public void loadIksicaAd() {
