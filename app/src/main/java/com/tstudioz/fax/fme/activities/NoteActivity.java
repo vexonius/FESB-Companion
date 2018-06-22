@@ -44,7 +44,6 @@ public class NoteActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        tRealm = Realm.getInstance(realmTaskConfiguration);
         et = (EditText) findViewById(R.id.textEditor);
 
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -56,46 +55,57 @@ public class NoteActivity extends AppCompatActivity {
         }
 
 
-        if (mTaskId != null) {
-            LeanTask leanTask = tRealm.where(LeanTask.class).equalTo("id", mTaskId).findFirst();
-            et.setText(leanTask.getTaskTekst());
+        tRealm = Realm.getInstance(realmTaskConfiguration);
+
+        try {
+            if (mTaskId != null) {
+                LeanTask leanTask = tRealm.where(LeanTask.class).equalTo("id", mTaskId).findFirst();
+                et.setText(leanTask.getTaskTekst());
+            }
+        }finally {
+            tRealm.close();
         }
 
-         loadAdsInTaskView();
+       //  loadAdsInTaskView();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
+        Realm sRealm = Realm.getInstance(realmTaskConfiguration);
         final String stringBiljeska = et.getText().toString();
 
-        if (mTaskId != null && !stringBiljeska.trim().equals("")) {
-            tRealm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    LeanTask leanTask = tRealm.where(LeanTask.class).equalTo("id", mTaskId).findFirst();
-                    leanTask.setTaskTekst(stringBiljeska);
-                    leanTask.setChecked(false);
-                }
-            });
-        } else if (mTaskId != null && stringBiljeska.trim().equals("")) {
-            tRealm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    LeanTask leanTask = tRealm.where(LeanTask.class).equalTo("id", mTaskId).findFirst();
-                    leanTask.deleteFromRealm();
-                }
-            });
-        } else if (!stringBiljeska.trim().equals("")) {
-            tRealm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    LeanTask leanTask = tRealm.createObject(LeanTask.class, UUID.randomUUID().toString());
-                    leanTask.setTaskTekst(stringBiljeska);
-                    leanTask.setChecked(false);
-                }
-            });
+        try {
+            if (mTaskId != null && !stringBiljeska.trim().equals("")) {
+                sRealm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        LeanTask leanTask = realm.where(LeanTask.class).equalTo("id", mTaskId).findFirst();
+                        leanTask.setTaskTekst(stringBiljeska);
+                        leanTask.setChecked(false);
+                    }
+                });
+            } else if (mTaskId != null && stringBiljeska.trim().equals("")) {
+                sRealm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        LeanTask leanTask = realm.where(LeanTask.class).equalTo("id", mTaskId).findFirst();
+                        leanTask.deleteFromRealm();
+                    }
+                });
+            } else if (!stringBiljeska.trim().equals("")) {
+                sRealm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        LeanTask leanTask = realm.createObject(LeanTask.class, UUID.randomUUID().toString());
+                        leanTask.setTaskTekst(stringBiljeska);
+                        leanTask.setChecked(false);
+                    }
+                });
+            }
+        }finally {
+            sRealm.close();
         }
     }
 
@@ -119,11 +129,11 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        } else {
+      //  if (mInterstitialAd.isLoaded()) {
+      //      mInterstitialAd.show();
+      //  } else {
             finish();
-        }
+      //  }
     }
 
     private void requestNewInterstitial() {

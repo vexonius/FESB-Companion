@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/relative_home_row_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -18,95 +19,103 @@
     <RelativeLayout
         android:id="@+id/textBox"
         android:layout_width="20dp"
-        android:layout_height="64dp"
-        android:elevation="10dp"
-        android:orientation="vertical"
+        android:layout_height="0dp"
         android:background="#00c4ff"
-        android:gravity="center">
-        </RelativeLayout>
+        android:elevation="10dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </RelativeLayout>
 
     <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/textBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:focusable="true"
         android:orientation="vertical"
-        android:focusable="true">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textBox"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ELEKTRONIKA"
-        android:paddingTop="8dp"
-        android:paddingLeft="14dp"
-        android:paddingRight="10dp"
-        android:textAllCaps="true"
-        android:paddingBottom="2dp"
-        android:textStyle="bold"
-        android:textColor="@color/white"
-        android:textSize="21dp"/>
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:paddingLeft="14dp"
+            android:paddingRight="10dp"
+            android:paddingTop="8dp"
+            android:text="ELEKTRONIKA"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="21dp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/name"
-        android:text="8.15 - 11.00"
-        android:paddingBottom="10dp"
-        android:paddingLeft="14dp"
-        android:textStyle="normal"
-        android:textColor="@color/_70white"
-        android:textSize="12dp"/>
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/name"
+            android:paddingBottom="10dp"
+            android:paddingLeft="14dp"
+            android:text="8.15 - 11.00"
+            android:textColor="@color/_70white"
+            android:textSize="12dp"
+            android:textStyle="normal" />
 
         <TextView
             android:id="@+id/seperator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/type"
             android:layout_below="@+id/name"
-            android:text="·"
+            android:layout_toRightOf="@+id/type"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
-            android:textStyle="normal"
+            android:text="·"
             android:textColor="@color/_70white"
-            android:textSize="12dp"/>
+            android:textSize="12dp"
+            android:textStyle="normal" />
 
         <TextView
             android:id="@+id/vrstaPredavanja"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/seperator"
             android:layout_below="@+id/name"
-            android:text="Predavanje"
+            android:layout_toRightOf="@+id/seperator"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
-            android:textStyle="normal"
+            android:text="Predavanje"
             android:textColor="@color/_70white"
-            android:textSize="12dp"/>
+            android:textSize="12dp"
+            android:textStyle="normal" />
+
         <TextView
             android:id="@+id/seperator1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/vrstaPredavanja"
             android:layout_below="@+id/name"
-            android:text="·"
+            android:layout_toRightOf="@+id/vrstaPredavanja"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
-            android:textStyle="normal"
+            android:text="·"
             android:textColor="@color/_70white"
-            android:textSize="12dp"/>
+            android:textSize="12dp"
+            android:textStyle="normal" />
+
         <TextView
             android:id="@+id/mjesto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/seperator1"
             android:layout_below="@+id/name"
-            android:text="A100"
+            android:layout_toRightOf="@+id/seperator1"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
-            android:textStyle="normal"
+            android:text="A100"
             android:textColor="@color/_70white"
-            android:textSize="12dp"/>
+            android:textSize="12dp"
+            android:textStyle="normal" />
     </RelativeLayout>
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

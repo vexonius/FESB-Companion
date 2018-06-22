@@ -54,8 +54,7 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.login_pomoc) TextView loginHelp;
     @BindView(R.id.progress_login) ProgressBar bar;
 
-    Snackbar snack;
-    Realm mLogRealm;
+    private Snackbar snack;
 
 
     @Override
@@ -68,20 +67,42 @@ public class LoginActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        loadBlueButton();
+        helpListener();
+    }
+
+    public void isUserLoggedIn() {
+        SharedPreferences sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+        Boolean prvi_put = sharedPreferences.getBoolean("first_open", true);
+
+        if (prvi_put) {
+            startActivity(new Intent(LoginActivity.this, Welcome.class));
+        }
+
+        Boolean prijavljen = sharedPreferences.getBoolean("loged_in", false);
+
+        if (prijavljen) {
+            Intent nwIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(nwIntent);
+            finish();
+        }
+    }
+
+    private void loadBlueButton() {
         but.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(isNetworkAvailable()==true) {
+                if (isNetworkAvailable() == true) {
                     final String username = editText.getText().toString();
                     final String password = pass.getText().toString();
 
-                    if(username.isEmpty() || password.isEmpty()){
-                       showErrorSnack("Niste unijeli korisničke podatke");
+                    if (username.isEmpty() || password.isEmpty()) {
+                        showErrorSnack("Niste unijeli korisničke podatke");
 
-                    }else{
+                    } else {
 
-                        if(username.contains("@")){
+                        if (username.contains("@")) {
                             showErrorSnack("Potrebno je unijeti korisničko ime, ne email");
                         } else {
                             bar.setVisibility(View.VISIBLE);
@@ -89,35 +110,11 @@ public class LoginActivity extends AppCompatActivity {
                             validateUser(username, password, view);
                         }
                     }
-                }else {
+                } else {
                     showErrorSnack("Niste povezani");
                 }
             }
         });
-
-        loginHelp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                helpMe();
-            }
-        });
-    }
-
-    public void isUserLoggedIn(){
-        SharedPreferences sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-        Boolean prvi_put = sharedPreferences.getBoolean("first_open", true);
-
-        if(prvi_put) {
-            startActivity(new Intent(LoginActivity.this, Welcome.class));
-        }
-
-        Boolean prijavljen = sharedPreferences.getBoolean("loged_in", false);
-
-        if(prijavljen){
-            Intent nwIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(nwIntent);
-            finish();
-        }
     }
 
 
@@ -126,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         boolean isAvailable = false;
-        if(networkInfo != null && networkInfo.isConnected()) {
+        if (networkInfo != null && networkInfo.isConnected()) {
             isAvailable = true;
         }
 
@@ -142,23 +139,23 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         Intent a = new Intent(Intent.ACTION_MAIN);
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
     }
 
-    public void showErrorSnack(String message){
+    public void showErrorSnack(String message) {
         snack = Snackbar.make(relativeLayout, message, Snackbar.LENGTH_SHORT);
         View snackBarView2 = snack.getView();
         snackBarView2.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
         snack.show();
     }
 
-     public void validateUser(final String user, final String pass, final View mView){
+    public void validateUser(final String user, final String pass, final View mView) {
 
-         final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(this));
+        final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(this));
 
         final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
                 .followRedirects(true)
@@ -166,44 +163,43 @@ public class LoginActivity extends AppCompatActivity {
                 .cookieJar(cookieJar)
                 .build();
 
-         final RequestBody formData = new FormBody.Builder()
-                 .add("Username", user)
-                 .add("Password", pass)
-                 .add("IsRememberMeChecked", "true")
-                 .build();
+        final RequestBody formData = new FormBody.Builder()
+                .add("Username", user)
+                .add("Password", pass)
+                .add("IsRememberMeChecked", "true")
+                .build();
 
-         final Request rq = new Request.Builder()
-                 .url("https://korisnik.fesb.unist.hr/prijava")
-                 .post(formData)
-                 .build();
+        final Request rq = new Request.Builder()
+                .url("https://korisnik.fesb.unist.hr/prijava")
+                .post(formData)
+                .build();
 
-         Call call0 = okHttpClient.newCall(rq);
-         call0.enqueue(new Callback() {
-             @Override
-             public void onFailure(Call call, IOException e) {
-                 Log.d("pogreska", "failure");
-             }
+        Call call0 = okHttpClient.newCall(rq);
+        call0.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("pogreska", "failure");
+            }
 
-             @Override
-             public void onResponse(Call call, Response response) throws IOException {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
 
-                if(response.request().url().toString().equals("https://korisnik.fesb.unist.hr/")){
+                if (response.request().url().toString().equals("https://korisnik.fesb.unist.hr/")) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             register(user, pass, mView);
                         }
                     });
-                }
-                else {
-                 runOnUiThread(new Runnable() {
-                     @Override
-                     public void run() {
-                         showErrorSnack("Uneseni podatci su pogrešni!");
-                         bar.setVisibility(View.INVISIBLE);
-                         but.setVisibility(View.VISIBLE);
-                     }
-                 });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showErrorSnack("Uneseni podatci su pogrešni!");
+                            bar.setVisibility(View.INVISIBLE);
+                            but.setVisibility(View.VISIBLE);
+                        }
+                    });
                 }
 
             }
@@ -211,25 +207,30 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    public void register(final String username, final String password, View nView){
+    public void register(final String username, final String password, View nView) {
+        Realm mLogRealm;
 
         SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-        SharedPreferences.Editor editor =  sharedPref.edit();
+        SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean("loged_in", true);
         editor.commit();
 
         mLogRealm = Realm.getDefaultInstance();
-        mLogRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Korisnik user = mLogRealm.createObject(Korisnik.class);
-                user.setUsername(username);
-                user.setLozinka(password);
-            }
-        });
+        try {
+            mLogRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Korisnik user = realm.createObject(Korisnik.class);
+                    user.setUsername(username);
+                    user.setLozinka(password);
+                }
+            });
+        } finally {
+            mLogRealm.close();
+        }
 
         if (nView != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(nView.getWindowToken(), 0);
         }
 
@@ -244,13 +245,13 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        if(mLogRealm!=null) {
-            mLogRealm.close();
-        }
+    private void helpListener() {
+        loginHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                helpMe();
+            }
+        });
     }
-
 
 }

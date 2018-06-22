@@ -35,8 +35,8 @@
                 android:layout_gravity="center"
                 android:indeterminate="true"
                 android:interpolator="@android:interpolator/linear"
-                android:progress="@android:integer/config_mediumAnimTime"
-                android:progressTint="@color/white"
+                android:indeterminateTint="@color/white"
+                android:indeterminateTintMode="src_in"
                 android:visibility="visible" />
 
             <RelativeLayout
@@ -217,7 +217,7 @@
             android:layout_marginBottom="3dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
-            android:text="PODSJETNICI:"
+            android:text="PODSJETNICI"
             android:textColor="@color/shady_blue"
             android:textSize="13dp" />
 
@@ -325,7 +325,7 @@
         <RelativeLayout
             android:id="@+id/menza_relative"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="140dp"
             android:layout_below="@+id/menzaHeader"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
@@ -352,21 +352,14 @@
                 android:textColor="@color/white"
                 android:textSize="14dp" />
 
-            <ImageView
-                android:layout_width="160dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="-40dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/menza_drawings" />
+
 
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/iksica_ad"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="140dp"
             android:layout_below="@+id/menza_relative"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
@@ -394,15 +387,51 @@
                 android:textColor="@color/white"
                 android:textSize="14dp" />
 
-            <ImageView
-                android:layout_width="85dp"
-                android:layout_height="85dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="10dp"
-                android:layout_marginRight="40dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/iksica_promo_icon" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/indeksHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iksica_ad"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="20dp"
+            android:text="OCJENE"
+            android:textColor="@color/shady_blue"
+            android:textSize="14dp" />
+
+        <RelativeLayout
+            android:id="@+id/eindex_Relative"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layout_below="@+id/indeksHeader"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/purple_nice"
+            android:clickable="true">
+
+            <TextView
+                android:id="@+id/eindexText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="20dp"
+                android:text="eIndeks"
+                android:textColor="@color/white"
+                android:textSize="35dp" />
+
+            <TextView
+                android:id="@+id/eindex_text_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/eindexText"
+                android:layout_marginLeft="30dp"
+                android:text="Pregled ocjena"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+
         </RelativeLayout>
 
     </RelativeLayout>

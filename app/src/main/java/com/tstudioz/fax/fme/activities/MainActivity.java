@@ -50,6 +50,7 @@ import java.util.UUID;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
+import io.realm.exceptions.RealmException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -66,9 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AHBottomNavigation bottomNavigation;
 
-    private Realm mainealm;
     private Realm realmLog;
-    private Realm rlmLog;
 
     private OkHttpClient client;
     private Home hf;
@@ -93,15 +92,19 @@ public class MainActivity extends AppCompatActivity {
 
         setUpBottomNav();
 
+        isThereAction();
+
+        setFragmentTab();
+        checkUser();
+        checkVersion();
+    }
+
+    public void isThereAction(){
         if (getIntent().getAction()!=null) {
             showShortcutView();
         } else {
             setDefaultScreen();
         }
-
-        setFragmentTab();
-        checkUser();
-        checkVersion();
     }
 
     public void checkUser() {
@@ -111,7 +114,9 @@ public class MainActivity extends AppCompatActivity {
             try {
                 korisnik = realmLog.where(Korisnik.class).findFirst();
             } catch (Exception ex) {
-
+                ex.printStackTrace();
+            } finally {
+                realmLog.close();
             }
 
             if (korisnik != null){
@@ -119,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 invalidCreds();
             }
+
 
         } else {
             SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
@@ -283,6 +289,7 @@ public class MainActivity extends AppCompatActivity {
         Realm rlm = Realm.getDefaultInstance();
         Korisnik kor = rlm.where(Korisnik.class).findFirst();
 
+
         // Get calendar set to current date and time
         Calendar c = Calendar.getInstance();
         Calendar s = Calendar.getInstance();
@@ -379,6 +386,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        rlm.close();
     }
 
 
@@ -389,12 +397,18 @@ public class MainActivity extends AppCompatActivity {
         editor1.apply();
 
         final Realm rlmLog1 = Realm.getDefaultInstance();
-        rlmLog1.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                rlmLog1.deleteAll();
-            }
-        });
+        try {
+            rlmLog1.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    rlmLog1.deleteAll();
+                }
+            });
+        } catch (RealmException ex){
+            Log.e("MainActivity", ex.toString());
+        } finally {
+            rlmLog1.close();
+        }
 
         startActivity(new Intent(MainActivity.this, LoginActivity.class));
     }
@@ -509,14 +523,6 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        if (realmLog != null)
-            realmLog.close();
-
-        if (rlmLog != null)
-            rlmLog.close();
-
-        if (mainealm != null)
-            mainealm.close();
     }
 
 }

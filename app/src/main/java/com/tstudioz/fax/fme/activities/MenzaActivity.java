@@ -59,7 +59,7 @@ public class MenzaActivity extends AppCompatActivity {
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    private Realm mRealm;
+    private Realm mRealm, nRealm;
     private Snackbar snack;
     private OkHttpClient okHttpClient;
     private InterstitialAd mInterstitialAd;
@@ -73,16 +73,8 @@ public class MenzaActivity extends AppCompatActivity {
 
         setTextTypeface();
 
-        mRealm = Realm.getInstance(menzaRealmConf);
-        mRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                mRealm.deleteAll();
-            }
-        });
-
         checkConditions();
-        loadAds();
+        //  loadAds();
 
     }
 
@@ -117,6 +109,14 @@ public class MenzaActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
 
+                mRealm = Realm.getInstance(menzaRealmConf);
+                mRealm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        mRealm.deleteAll();
+                    }
+                });
+
                 String json = response.body().string();
                 try {
                     JSONObject jsonResponse = new JSONObject(json);
@@ -138,18 +138,14 @@ public class MenzaActivity extends AppCompatActivity {
                             meni.setDesert(itemsArray.getString(6));
                             meni.setCijena(itemsArray.getString(7));
 
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mRealm.executeTransaction(new Realm.Transaction() {
-                                        @Override
-                                        public void execute(Realm realm) {
-                                            mRealm.copyToRealm(meni);
-                                        }
-                                    });
 
+                            mRealm.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    mRealm.copyToRealm(meni);
                                 }
                             });
+
 
                         } catch (Exception ex) {
                             Log.d("Menza activity", ex.toString());
@@ -167,18 +163,14 @@ public class MenzaActivity extends AppCompatActivity {
                             izborniMeni.setJelo1(itemsArray.getString(1).substring(0, itemsArray.getString(1).length() - 6));
                             izborniMeni.setCijena(itemsArray.getString(1).substring(itemsArray.getString(1).length() - 6, itemsArray.getString(1).length()));
 
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mRealm.executeTransaction(new Realm.Transaction() {
-                                        @Override
-                                        public void execute(Realm realm) {
-                                            mRealm.copyToRealm(izborniMeni);
-                                        }
-                                    });
 
+                            mRealm.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    mRealm.copyToRealm(izborniMeni);
                                 }
                             });
+
 
                         } catch (Exception exc) {
                             Log.d("Menza activity", exc.toString());
@@ -194,7 +186,9 @@ public class MenzaActivity extends AppCompatActivity {
                     });
 
                 } catch (Exception ex) {
-                    Log.d("MenzaActivity", "Doslo je do pogreske");
+                    Log.d("MenzaActivity", ex.getMessage());
+                } finally {
+                    mRealm.close();
                 }
             }
         });
@@ -203,9 +197,12 @@ public class MenzaActivity extends AppCompatActivity {
 
     public void showMenies() {
 
-        RealmResults<Meni> results = mRealm.where(Meni.class).findAll();
+        nRealm = Realm.getInstance(menzaRealmConf);
+
+        RealmResults<Meni> results = nRealm.where(Meni.class).findAll();
 
         if (!results.isEmpty()) {
+
             MeniesAdapter adapter = new MeniesAdapter(results);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             mRecyclerView.setHasFixedSize(true);
@@ -215,6 +212,7 @@ public class MenzaActivity extends AppCompatActivity {
             mRecyclerView.setVisibility(View.INVISIBLE);
             cookieRoot.setVisibility(View.VISIBLE);
         }
+
     }
 
     public void setTextTypeface() {
@@ -225,11 +223,11 @@ public class MenzaActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        } else {
-            finish();
-        }
+        //  if (mInterstitialAd.isLoaded()) {
+        //      mInterstitialAd.show();
+        //  } else {
+        finish();
+        //  }
     }
 
     private void requestNewInterstitial() {
@@ -281,10 +279,10 @@ public class MenzaActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
 
-        if(okHttpClient!=null)
+        if (okHttpClient != null)
             okHttpClient.dispatcher().cancelAll();
 
     }
@@ -293,7 +291,8 @@ public class MenzaActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        if (mRealm != null)
-            mRealm.close();
+        if (nRealm != null)
+            nRealm.close();
+
     }
 }

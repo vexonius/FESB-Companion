@@ -34,6 +34,7 @@ public class CourseActivity extends AppCompatActivity {
         String imeKolegija = intent.getStringExtra("kolegij");
         getSupportActionBar().setTitle(imeKolegija);
 
+
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
@@ -53,7 +54,7 @@ public class CourseActivity extends AppCompatActivity {
         ft.addToBackStack(null);
         ft.commit();
 
-         loadAdsCourse();
+      //   loadAdsCourse();
 
 
     }
@@ -126,11 +127,11 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        } else {
+     //   if (mInterstitialAd.isLoaded()) {
+     //       mInterstitialAd.show();
+     //   } else {
             finish();
-        }
+     //   }
     }
 
     private void requestNewInterstitial() {

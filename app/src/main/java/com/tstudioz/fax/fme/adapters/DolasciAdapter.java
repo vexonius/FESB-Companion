@@ -85,8 +85,9 @@ public class DolasciAdapter extends RecyclerView.Adapter<DolasciAdapter.DolazakV
         PieData data = new PieData(set);
         holder.chart.setData(data);
 
-        holder.chart.invalidate(); // refresh
+        // holder.chart.invalidate(); // refresh
         holder.chart.animateY(600);
+
     }
 
     @Override
@@ -96,7 +97,7 @@ public class DolasciAdapter extends RecyclerView.Adapter<DolasciAdapter.DolazakV
 
     public class DolazakViewHolder extends RecyclerView.ViewHolder {
         TextView name, type, dolazakNum;
-        RelativeLayout boja;
+        RelativeLayout root;
         PieChart chart;
         int colors[];
         int colorWhite;
@@ -104,6 +105,8 @@ public class DolasciAdapter extends RecyclerView.Adapter<DolasciAdapter.DolazakV
 
         public DolazakViewHolder(View itemView) {
             super(itemView);
+            root = (RelativeLayout) itemView.findViewById(R.id.attend_row_root);
+
             name = (TextView) itemView.findViewById(R.id.predmetName);
             regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Regular.ttf");
             name.setTypeface(regulartf);

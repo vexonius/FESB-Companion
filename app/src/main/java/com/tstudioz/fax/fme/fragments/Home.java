@@ -35,6 +35,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.tstudioz.fax.fme.R;
+import com.tstudioz.fax.fme.activities.IndexActivity;
 import com.tstudioz.fax.fme.activities.MenzaActivity;
 import com.tstudioz.fax.fme.activities.NoteActivity;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter;
@@ -104,6 +105,9 @@ public class Home extends Fragment {
     @BindView(R.id.menza_text) TextView mMenzaText;
     @BindView(R.id.menza_text_description) TextView mMenzaDescription;
     @BindView(R.id.menza_relative) RelativeLayout mMenzaRelative;
+    @BindView(R.id.eindexText) TextView eIndeksText;
+    @BindView(R.id.eindex_text_description) TextView eIndeksDescription;
+    @BindView(R.id.eindex_Relative) RelativeLayout eIndeksRelative;
 
     public RealmConfiguration realmTaskConfiguration = new RealmConfiguration.Builder()
             .name("tasks.realm")
@@ -283,7 +287,6 @@ public class Home extends Fragment {
             recyclerView.setVisibility(View.INVISIBLE);
             np.setVisibility(View.VISIBLE);
         } else {
-
             np.setVisibility(View.INVISIBLE);
             EmployeeRVAdapter adapter = new EmployeeRVAdapter(rezultati);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -306,6 +309,8 @@ public class Home extends Fragment {
         mMenzaDescription.setTypeface(typeLight);
         mIksicaText.setTypeface(typeLight);
         mIksicaDescription.setTypeface(typeLight);
+        eIndeksText.setTypeface(typeLight);
+        eIndeksDescription.setTypeface(typeLight);
 
         Typeface typeRegular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/OpenSans-Regular.ttf");
         danp.setTypeface(typeRegular);
@@ -327,7 +332,6 @@ public class Home extends Fragment {
     public void loadNotes() {
         RealmResults<LeanTask> tasks = taskRealm.where(LeanTask.class).findAll();
 
-
         final LeanTask dodajNovi = new LeanTask();
         dodajNovi.setId("ACTION_ADD");
         dodajNovi.setTaskTekst("Dodaj novi podsjetnik");
@@ -335,10 +339,9 @@ public class Home extends Fragment {
         taskRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskRealm.insertOrUpdate(dodajNovi);
+                realm.insertOrUpdate(dodajNovi);
             }
         });
-
 
         LeanTaskAdapter leanTaskAdapter = new LeanTaskAdapter(tasks);
         mRecyclerTask.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -350,19 +353,19 @@ public class Home extends Fragment {
 
     public void loadAdsOnHome() {
 
-         if(isNetworkAvailable()) {
-             homeAdView.setVisibility(View.VISIBLE);
-             AdRequest adRequest = new AdRequest.Builder().build();
-             homeAdView.setAdListener(new AdListener(){
-                 @Override
-                 public void onAdFailedToLoad(int errorCode){
-                     homeAdView.setVisibility(View.GONE);
-                 }
-             });
-             homeAdView.loadAd(adRequest);
-         } else {
+      //   if(isNetworkAvailable()) {
+      //       homeAdView.setVisibility(View.VISIBLE);
+      //       AdRequest adRequest = new AdRequest.Builder().build();
+      //       homeAdView.setAdListener(new AdListener(){
+      //           @Override
+      //           public void onAdFailedToLoad(int errorCode){
+      //               homeAdView.setVisibility(View.GONE);
+      //           }
+      //       });
+      //       homeAdView.loadAd(adRequest);
+      //   } else {
         homeAdView.setVisibility(View.GONE);
-         }
+      //   }
     }
 
     public void loadIksicaAd() {
@@ -389,6 +392,13 @@ public class Home extends Fragment {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), MenzaActivity.class));
+            }
+        });
+
+        eIndeksRelative.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), IndexActivity.class));
             }
         });
     }

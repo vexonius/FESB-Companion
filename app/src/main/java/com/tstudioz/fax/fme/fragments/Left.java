@@ -1,16 +1,14 @@
 package com.tstudioz.fax.fme.fragments;
 
 
-
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,15 +19,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.google.android.gms.ads.NativeExpressAdView;
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog;
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapterTable;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
-import com.tstudioz.fax.fme.migrations.CredMigration;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -57,7 +54,7 @@ import okhttp3.Response;
 import static android.content.ContentValues.TAG;
 
 
-public class Left extends Fragment implements DatePickerDialog.OnDateSetListener{
+public class Left extends Fragment implements DatePickerDialog.OnDateSetListener {
 
     @BindView(R.id.recyclerPon) RecyclerView mRecyclerPon;
     @BindView(R.id.recyclerUto) RecyclerView recyclerUto;
@@ -69,8 +66,20 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     @BindView(R.id.linearSub) LinearLayout mLinearSub;
     @BindView(R.id.odaberiDan) Button mOdaberiDan;
     @BindView(R.id.raspored_progress) ProgressBar mRasporedProgress;
+    @BindView(R.id.pon_date) TextView ponDate;
+    @BindView(R.id.uto_date) TextView utoDate;
+    @BindView(R.id.sri_date) TextView sriDate;
+    @BindView(R.id.cet_date) TextView cetDate;
+    @BindView(R.id.pet_date) TextView petDate;
+    @BindView(R.id.sub_date) TextView subDate;
+    @BindView(R.id.mPon) TextView mPon;
+    @BindView(R.id.mUto) TextView mUto;
+    @BindView(R.id.mSri) TextView mSri;
+    @BindView(R.id.mCet) TextView mCet;
+    @BindView(R.id.mPet) TextView mPet;
+    @BindView(R.id.mSub) TextView mSub;
 
-     RealmConfiguration tempRealm = new RealmConfiguration.Builder()
+    RealmConfiguration tempRealm = new RealmConfiguration.Builder()
             .name("temporary.realm")
             .schemaVersion(12)
             .deleteRealmIfMigrationNeeded()
@@ -82,11 +91,12 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    Realm rlm, prealm, ptrealm, urealm, utrealm, srealm, strealm, crealm, ctrealm, petrealm, pettrealm, subrealm,subtrealm;
+    Realm rlm, prealm, ptrealm, urealm, utrealm, srealm, strealm, crealm, ctrealm, petrealm, pettrealm, subrealm, subtrealm;
 
-    Snackbar snack;
-    EmployeeRVAdapterTable adapterPonTemp, adapterUtoTemp, adapterSriTemp, adapterCetTemp, adapterPetTemp, adapterSubTemp;
-    OkHttpClient client;
+    private Snackbar snack;
+    private EmployeeRVAdapterTable adapterPonTemp, adapterUtoTemp, adapterSriTemp, adapterCetTemp, adapterPetTemp, adapterSubTemp;
+    private OkHttpClient client;
+    private Typeface bold;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -113,7 +123,6 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         });
 
 
-
         Calendar min = Calendar.getInstance();
         Calendar now = Calendar.getInstance();
         Calendar max = Calendar.getInstance();
@@ -132,20 +141,23 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
                 .setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark))
                 .setHeaderColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
 
-     checkNetwork();
+        checkNetwork();
 
-     mOdaberiDan.setOnClickListener(new View.OnClickListener() {
-         @Override
-         public void onClick(View view) {
+        mOdaberiDan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-             builder.build().show(getFragmentManager(), TAG);
-         }
-     });
+                builder.build().show(getFragmentManager(), TAG);
+            }
+        });
 
 
+        setSetDates(now);
+        boldOut();
         return view;
 
     }
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.refresMe).setVisible(false);
@@ -177,128 +189,177 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         String sDay = sday.format(kal.getTime());
         String sYear = syear.format(kal.getTime());
 
-        mojRaspored(mMonth, mDay, mYear, sMonth, sDay, sYear);
+        mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear);
         mOdaberiDan.setText("Raspored za " + mDay + "." + mMonth + " - " + sDay + "." + sMonth);
 
     }
 
-    public void mojRaspored(String mMonth, String mDay, String mYear, String sMonth, String sDay, String sYear) {
+    public void mojRaspored(final Calendar cal, String mMonth, String mDay, String mYear, String sMonth, String sDay, String sYear) {
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mLinearParent.setVisibility(View.INVISIBLE);
-                    mRasporedProgress.setVisibility(View.VISIBLE);
-                    showPonTemp();
-                    showUtoTemp();
-                    showSriTemp();
-                    showCetTemp();
-                    showPetTemp();
-                    showSubTemp();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mLinearParent.setVisibility(View.INVISIBLE);
+                mRasporedProgress.setVisibility(View.VISIBLE);
+                showPonTemp();
+                showUtoTemp();
+                showSriTemp();
+                showCetTemp();
+                showPetTemp();
+                showSubTemp();
 
-                }
-            });
+            }
+        });
 
-            rlm = Realm.getDefaultInstance();
-            Korisnik kor = rlm.where(Korisnik.class).findFirst();
+        rlm = Realm.getDefaultInstance();
+        Korisnik kor = rlm.where(Korisnik.class).findFirst();
 
-            client = new OkHttpClient();
+        client = new OkHttpClient();
 
-            final Request request = new Request.Builder()
-                    .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + mMonth + "%2F" +  mDay + "%2F" + mYear + "%2022%3A44%3A48&MaxDate=" + sMonth + "%2F" + sDay + "%2F" + sYear + "%2022%3A44%3A48")
-                    .get()
-                    .build();
+        final Request request = new Request.Builder()
+                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + mMonth + "%2F" + mDay + "%2F" + mYear + "%2022%3A44%3A48&MaxDate=" + sMonth + "%2F" + sDay + "%2F" + sYear + "%2022%3A44%3A48")
+                .get()
+                .build();
 
-            Call call = client.newCall(request);
-            call.enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.e(TAG, "Exception caught", e);
-                }
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "Exception caught", e);
+            }
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
 
-                    try {
+                try {
 
-                        if (response.code() == 500) {
+                    if (response.code() == 500) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showSnackError();
+                            }
+                        });
+
+                    } else {
+                        Document doc = Jsoup.parse(response.body().string());
+
+                        Realm trealm = Realm.getInstance(tempRealm);
+                        trealm.beginTransaction();
+                        RealmResults<Predavanja> svaPredavanja = trealm.where(Predavanja.class).findAll();
+                        svaPredavanja.deleteAllFromRealm();
+                        trealm.commitTransaction();
+
+                        if (response.isSuccessful()) {
+                            Elements elements = doc.select("div.event");
+                            try {
+
+                                trealm.beginTransaction();
+
+                                for (final Element e : elements) {
+
+                                    Predavanja predavanja = trealm.createObject(Predavanja.class, UUID.randomUUID().toString());
+
+                                    if (e.hasAttr("data-id")) {
+                                        String attr = e.attr("data-id");
+                                        predavanja.setObjectId(Integer.parseInt(attr));
+                                    }
+
+                                    predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
+                                    predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
+                                    predavanja.setRasponVremena(e.select("div.timespan").text());
+                                    predavanja.setGrupa(e.select("span.group.normal").text());
+                                    predavanja.setGrupaShort(e.select("span.group.short").text());
+                                    predavanja.setDvorana(e.select("span.resource").text());
+                                    predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
+                                    predavanja.setProfesor(e.select("div.detailItem.user").text());
+
+                                }
+                                trealm.commitTransaction();
+
+                            } finally {
+                                trealm.close();
+                            }
+
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    showSnackError();
+                                    updateTemporaryWeek();
+                                    setSetDates(cal);
+
+                                    if (adapterSubTemp.getItemCount() > 0) {
+                                        mLinearParent.setWeightSum(6);
+                                        mLinearSub.setVisibility(View.VISIBLE);
+                                        mLinearParent.invalidate();
+                                    } else {
+                                        mLinearSub.setVisibility(View.INVISIBLE);
+                                        mLinearParent.setWeightSum(5);
+                                        mLinearParent.invalidate();
+                                    }
+
+                                    mRasporedProgress.setVisibility(View.INVISIBLE);
+                                    mLinearParent.setVisibility(View.VISIBLE);
                                 }
                             });
-
-                        } else {
-                            Document doc = Jsoup.parse(response.body().string());
-
-                            Realm trealm = Realm.getInstance(tempRealm);
-                            trealm.beginTransaction();
-                            RealmResults<Predavanja> svaPredavanja = trealm.where(Predavanja.class).findAll();
-                            svaPredavanja.deleteAllFromRealm();
-                            trealm.commitTransaction();
-
-                            if (response.isSuccessful()) {
-                                Elements elements = doc.select("div.event");
-                                try {
-
-                                    trealm.beginTransaction();
-
-                                    for (final Element e : elements) {
-
-                                        Predavanja predavanja = trealm.createObject(Predavanja.class, UUID.randomUUID().toString());
-
-                                        if (e.hasAttr("data-id")) {
-                                            String attr = e.attr("data-id");
-                                            predavanja.setObjectId(Integer.parseInt(attr));
-                                        }
-
-                                        predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
-                                        predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
-                                        predavanja.setRasponVremena(e.select("div.timespan").text());
-                                        predavanja.setGrupa(e.select("span.group.normal").text());
-                                        predavanja.setGrupaShort(e.select("span.group.short").text());
-                                        predavanja.setDvorana(e.select("span.resource").text());
-                                        predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
-                                        predavanja.setProfesor(e.select("div.detailItem.user").text());
-
-                                    }
-                                    trealm.commitTransaction();
-
-                                } finally {
-                                    trealm.close();
-                                }
-
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        updateTemporaryWeek();
-
-                                        if(adapterSubTemp.getItemCount() > 0) {
-                                            mLinearParent.setWeightSum(6);
-                                            mLinearSub.setVisibility(View.VISIBLE);
-                                            mLinearParent.invalidate();
-                                        } else {
-                                            mLinearSub.setVisibility(View.INVISIBLE);
-                                            mLinearParent.setWeightSum(5);
-                                            mLinearParent.invalidate();
-                                        }
-
-                                        mRasporedProgress.setVisibility(View.INVISIBLE);
-                                        mLinearParent.setVisibility(View.VISIBLE);
-                                    }
-                                });
-                            }
-                        }
-                        } catch(IOException e){
-                            Log.e(TAG, "Exception caught: ", e);
                         }
                     }
+                } catch (IOException e) {
+                    Log.e(TAG, "Exception caught: ", e);
+                }
+            }
 
-            });
-        }
+        });
+    }
 
-    public void showPon(){
+    public void setSetDates(Calendar calendar){
+
+        calendar.get(Calendar.DAY_OF_WEEK);
+        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY));
+
+        DateFormat format = new SimpleDateFormat("d");
+        String pon = format.format(calendar.getTime());
+        ponDate.setText(pon);
+
+        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.TUESDAY));
+        String uto = format.format(calendar.getTime());
+
+        utoDate.setText(uto);
+
+        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.WEDNESDAY));
+        String sri = format.format(calendar.getTime());
+
+        sriDate.setText(sri);
+
+        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.THURSDAY));
+        String cet = format.format(calendar.getTime());
+
+        cetDate.setText(cet);
+
+        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.FRIDAY));
+        String pet = format.format(calendar.getTime());
+
+        petDate.setText(pet);
+
+        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.SATURDAY));
+        String sub = format.format(calendar.getTime());
+
+        subDate.setText(sub);
+
+    }
+
+    public void boldOut(){
+        bold = Typeface.createFromAsset(getContext().getAssets(), "fonts/OpenSans-Bold.ttf");
+
+        mPon.setTypeface(bold);
+        mUto.setTypeface(bold);
+        mSri.setTypeface(bold);
+        mCet.setTypeface(bold);
+        mPet.setTypeface(bold);
+        mSub.setTypeface(bold);
+
+    }
+
+    public void showPon() {
         prealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiPon = prealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
 
@@ -309,7 +370,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     }
 
-    public void showPonTemp(){
+    public void showPonTemp() {
         ptrealm = Realm.getInstance(tempRealm);
         RealmResults<Predavanja> rezulatiPon1 = ptrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
 
@@ -321,7 +382,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     }
 
-    public void showUto(){
+    public void showUto() {
         urealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiUto = urealm.where(Predavanja.class).contains("detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
 
@@ -343,7 +404,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     }
 
-    public void showSri(){
+    public void showSri() {
         srealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiSri = srealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
 
@@ -354,7 +415,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     }
 
-    public void showSriTemp(){
+    public void showSriTemp() {
         strealm = Realm.getInstance(tempRealm);
         RealmResults<Predavanja> rezulatiSri1 = strealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
 
@@ -365,7 +426,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     }
 
-    public void showCet(){
+    public void showCet() {
         crealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiCet = crealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
 
@@ -376,7 +437,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     }
 
-    public void showCetTemp( ){
+    public void showCetTemp() {
         ctrealm = Realm.getInstance(tempRealm);
         RealmResults<Predavanja> rezulatiCet1 = ctrealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
 
@@ -387,7 +448,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     }
 
-    public void showPet(){
+    public void showPet() {
         petrealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezulatiPet = petrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
 
@@ -398,7 +459,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     }
 
-    public void showPetTemp(){
+    public void showPetTemp() {
         pettrealm = Realm.getInstance(tempRealm);
         RealmResults<Predavanja> rezulatiPet1 = pettrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
 
@@ -427,19 +488,19 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         }
     }
 
-    public void showSubTemp(){
+    public void showSubTemp() {
 
         subtrealm = Realm.getInstance(tempRealm);
 
         RealmResults<Predavanja> rezulatiSub1 = subtrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
 
-         adapterSubTemp = new EmployeeRVAdapterTable(rezulatiSub1);
-         mRecyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
-         mRecyclerSub.setAdapter(adapterSubTemp);
+        adapterSubTemp = new EmployeeRVAdapterTable(rezulatiSub1);
+        mRecyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerSub.setAdapter(adapterSubTemp);
 
     }
 
-    public void updateTemporaryWeek(){
+    public void updateTemporaryWeek() {
         adapterPonTemp.notifyDataSetChanged();
         adapterUtoTemp.notifyDataSetChanged();
         adapterSriTemp.notifyDataSetChanged();
@@ -454,23 +515,23 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         boolean isAvailable = false;
-        if(networkInfo != null && networkInfo.isConnected()) {
+        if (networkInfo != null && networkInfo.isConnected()) {
             isAvailable = true;
         }
 
         return isAvailable;
     }
 
-    public void checkNetwork(){
-        if(isNetworkAvailable()){
+    public void checkNetwork() {
+        if (isNetworkAvailable()) {
             mOdaberiDan.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             mOdaberiDan.setVisibility(View.INVISIBLE);
             showSnacOffline();
         }
     }
 
-    public void showSnacOffline(){
+    public void showSnacOffline() {
         snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani.\nPrikazuje se raspored ovog tjedna.", Snackbar.LENGTH_INDEFINITE);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
@@ -485,65 +546,65 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         snack.show();
     }
 
-    public void showSnackError(){
+    public void showSnackError() {
         snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške pri dohvaćanju rasporeda", Snackbar.LENGTH_SHORT);
         View vjuzs = snack.getView();
         vjuzs.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.show();
     }
 
-    public void onStop(){
+    public void onStop() {
         super.onStop();
-        if(snack!=null){
+        if (snack != null) {
             snack.dismiss();
         }
 
-        if (client!=null){
+        if (client != null) {
             client.dispatcher().cancelAll();
         }
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
-        if(rlm!=null) {
+        if (rlm != null) {
             rlm.close();
         }
-        if(prealm!=null) {
+        if (prealm != null) {
             prealm.close();
         }
-        if (ptrealm!=null) {
+        if (ptrealm != null) {
             ptrealm.close();
         }
-        if(urealm!=null) {
+        if (urealm != null) {
             urealm.close();
         }
-        if(utrealm!=null) {
+        if (utrealm != null) {
             utrealm.close();
         }
-        if (srealm!=null){
+        if (srealm != null) {
             srealm.close();
         }
-        if (strealm!=null){
+        if (strealm != null) {
             strealm.close();
         }
-        if(crealm!=null) {
+        if (crealm != null) {
             crealm.close();
         }
-        if(ctrealm!=null){
+        if (ctrealm != null) {
             ctrealm.close();
         }
-        if(petrealm!=null){
+        if (petrealm != null) {
             petrealm.close();
         }
-        if(pettrealm!=null){
+        if (pettrealm != null) {
             pettrealm.close();
         }
-        if(subrealm!=null) {
+        if (subrealm != null) {
             subrealm.close();
         }
-        if(subtrealm!=null){
-        subtrealm.close();
+        if (subtrealm != null) {
+            subtrealm.close();
         }
     }
 }
