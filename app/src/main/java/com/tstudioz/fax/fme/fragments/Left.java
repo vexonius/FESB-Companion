@@ -313,10 +313,11 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void setSetDates(Calendar calendar){
 
+        DateFormat format = new SimpleDateFormat("d");
+
         calendar.get(Calendar.DAY_OF_WEEK);
         calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY));
 
-        DateFormat format = new SimpleDateFormat("d");
         String pon = format.format(calendar.getTime());
         ponDate.setText(pon);
 

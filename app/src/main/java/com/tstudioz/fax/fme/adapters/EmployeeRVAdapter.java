@@ -44,8 +44,10 @@ public class EmployeeRVAdapter extends RecyclerView.Adapter<EmployeeRVAdapter.Em
         holder.type.setText(predavanja.getRasponVremena());
 
         String imePredavanja = predavanja.getPredavanjeIme();
-        if(imePredavanja.length()>0){
-        imePredavanja = imePredavanja.substring(0, imePredavanja.length()-1);  }
+
+        if(imePredavanja.length()>0)
+            imePredavanja = imePredavanja.substring(0, imePredavanja.length()-1);
+
         holder.vrstaPredavanja.setText(imePredavanja);
 
         holder.mjesto.setText(predavanja.getDvorana());
