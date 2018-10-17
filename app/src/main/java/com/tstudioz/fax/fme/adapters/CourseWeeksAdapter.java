@@ -87,11 +87,12 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
             mWeek = (TextView) itemView.findViewById(R.id.tjedanText);
             lighttf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Light.ttf");
             boldtf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Bold.ttf");
-            mWeek.setTypeface(boldtf);
+
 
             mWeekDesc = (TextView) itemView.findViewById(R.id.tjedanOpis);
             regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Regular.ttf");
             mWeekDesc.setTypeface(regulartf);
+            mWeek.setTypeface(regulartf);
 
             Context context = itemView.getContext();
             materialRecycler = (RecyclerView) itemView.findViewById(R.id.mat_recyc);

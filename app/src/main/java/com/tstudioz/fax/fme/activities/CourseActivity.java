@@ -32,13 +32,13 @@ public class CourseActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         String imeKolegija = intent.getStringExtra("kolegij");
-        getSupportActionBar().setTitle(imeKolegija);
+   //     getSupportActionBar().setTitle(imeKolegija);
 
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-       styledNavigation();
+   //    styledNavigation();
 
         if (shouldAskPermissions()) {
             askPermissions();
@@ -46,6 +46,7 @@ public class CourseActivity extends AppCompatActivity {
 
         Bundle bundle = new Bundle();
         bundle.putString("link_kolegija", intent.getStringExtra("link_na_kolegij"));
+        bundle.putString("kolegij", intent.getStringExtra("kolegij"));
 
         final CourseWeek cw = new CourseWeek();
         cw.setArguments(bundle);

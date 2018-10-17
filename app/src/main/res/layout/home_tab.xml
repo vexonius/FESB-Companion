@@ -332,6 +332,20 @@
             android:layout_marginRight="10dp"
             android:background="@color/welcome2">
 
+            <com.doctoror.particlesdrawable.ParticlesView
+                android:id="@+id/particles_menza"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:minDotRadius="1dp"
+                app:maxDotRadius="3dp"
+                app:lineThickness="1dp"
+                app:lineDistance="110dp"
+                app:numDots="12"
+                app:dotColor="@color/white"
+                app:lineColor="@color/white"
+                app:frameDelayMillis="10"
+                app:stepMultiplier="1" />
+
             <TextView
                 android:id="@+id/menza_text"
                 android:layout_width="wrap_content"
@@ -366,6 +380,20 @@
             android:layout_marginRight="10dp"
             android:background="@color/red_nice"
             android:clickable="true">
+
+            <com.doctoror.particlesdrawable.ParticlesView
+                android:id="@+id/particles_iksica"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:minDotRadius="1dp"
+                app:maxDotRadius="3dp"
+                app:lineThickness="1dp"
+                app:lineDistance="110dp"
+                app:numDots="12"
+                app:dotColor="@color/white"
+                app:lineColor="@color/white"
+                app:frameDelayMillis="10"
+                app:stepMultiplier="1" />
 
             <TextView
                 android:id="@+id/iksicaText"
@@ -411,6 +439,20 @@
             android:layout_marginRight="10dp"
             android:background="@color/purple_nice"
             android:clickable="true">
+
+            <com.doctoror.particlesdrawable.ParticlesView
+                android:id="@+id/particles_indeks"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:minDotRadius="1dp"
+                app:maxDotRadius="3dp"
+                app:lineThickness="1dp"
+                app:lineDistance="110dp"
+                app:numDots="12"
+                app:dotColor="@color/white"
+                app:lineColor="@color/white"
+                app:frameDelayMillis="10"
+                app:stepMultiplier="1" />
 
             <TextView
                 android:id="@+id/eindexText"

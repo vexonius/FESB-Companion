@@ -23,6 +23,7 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
+import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.Materijal;
 
@@ -129,16 +130,11 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                 }
 
             } else {
-                CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(view.getContext()));
 
                 download.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
 
-                final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
-                        .followRedirects(true)
-                        .followSslRedirects(true)
-                        .cookieJar(cookieJar)
-                        .build();
+                final OkHttpClient okHttpClient = FESBCompanion.getInstance().getOkHttpInstance();
 
                 final Request rq = new Request.Builder()
                         .url(materials.get(getAdapterPosition()).getUrl())
@@ -227,7 +223,7 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
                                         super.onUIProgressFinish();
                                         progressBar.setVisibility(View.INVISIBLE);
                                         download.setVisibility(View.VISIBLE);
-                                        download.setImageResource(R.drawable.checked);
+                                        download.setImageResource(R.drawable.circle_checked);
                                     }
 
                                 });

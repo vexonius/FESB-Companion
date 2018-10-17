@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.IndexActivity;
 import com.tstudioz.fax.fme.activities.MenzaActivity;
@@ -131,8 +132,7 @@ public class Home extends Fragment {
         setCyanStatusBarColor();
         ButterKnife.bind(this, view);
 
-        DateFormat df = new SimpleDateFormat("d.M.yyyy.");
-        date = df.format(Calendar.getInstance().getTime());
+        getDate();
 
          try {
              start();
@@ -161,9 +161,14 @@ public class Home extends Fragment {
         showList();
     }
 
+    private void getDate(){
+        DateFormat df = new SimpleDateFormat("d.M.yyyy.");
+        date = df.format(Calendar.getInstance().getTime());
+    }
+
     private void getForecast(String url) {
         // OkHttp stuff
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = FESBCompanion.getInstance().getOkHttpInstance();
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -280,6 +285,7 @@ public class Home extends Fragment {
     public void showList() {
         mrealm = Realm.getInstance(mainRealmConfig);
         RealmResults<Predavanja> rezultati = mrealm.where(Predavanja.class).contains("detaljnoVrijeme", date).findAll();
+
 
         if (rezultati.isEmpty()) {
             recyclerView.setVisibility(View.INVISIBLE);

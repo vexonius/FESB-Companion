@@ -1,8 +1,12 @@
 package com.tstudioz.fax.fme.Application;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 
 
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.google.android.gms.ads.MobileAds;
 import com.orhanobut.hawk.Hawk;
 import com.tstudioz.fax.fme.migrations.CredMigration;
@@ -12,13 +16,25 @@ import java.security.SecureRandom;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import okhttp3.CookieJar;
+import okhttp3.OkHttpClient;
 
 public class FESBCompanion extends Application {
     RealmConfiguration CredRealmCf;
 
+    private  static OkHttpClient okHttpClient;
+    private static FESBCompanion instance;
+    private static SharedPreferences shPref;
+
+    public static FESBCompanion getInstance(){
+        return instance;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
+
         Realm.init(this);
 
          CredRealmCf = new RealmConfiguration.Builder()
@@ -54,7 +70,7 @@ public class FESBCompanion extends Application {
 
     private byte[] getRealmKey(){
 
-        Hawk.init(getApplicationContext()).build();
+        Hawk.init(this).build();
 
         if(Hawk.contains("masterKey")){
             byte[] array = Hawk.get("masterKey");
@@ -67,5 +83,28 @@ public class FESBCompanion extends Application {
         Hawk.put("masterKey", bytes);
 
         return bytes;
+    }
+
+    public SharedPreferences getSP(){
+        if(shPref==null)
+            shPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+
+        return shPref;
+    }
+
+    public OkHttpClient getOkHttpInstance(){
+
+        if (okHttpClient== null) {
+
+            CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getApplicationContext()));
+
+            okHttpClient = new OkHttpClient().newBuilder()
+                    .followRedirects(true)
+                    .followSslRedirects(true)
+                    .cookieJar(cookieJar)
+                    .build();
+        }
+
+        return okHttpClient;
     }
 }

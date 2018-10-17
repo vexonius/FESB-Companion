@@ -76,7 +76,6 @@ public class EmployeeRVAdapter extends RecyclerView.Adapter<EmployeeRVAdapter.Em
                     break;
         }
 
-
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.fragments;
 
 
-
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -64,8 +63,12 @@ public class CourseWeek extends Fragment {
 
     private OkHttpClient okHttpClient;
 
-    @BindView(R.id.course_week_rv) RecyclerView mRecyclerView;
-    @BindView(R.id.course_week_progress) ProgressBar mProgress;
+    @BindView(R.id.course_week_rv)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.course_week_progress)
+    ProgressBar mProgress;
+    @BindView(R.id.bigName)
+    TextView header;
 
 
     @Override
@@ -73,6 +76,8 @@ public class CourseWeek extends Fragment {
                              Bundle savedInstanceState) {
 
         String link = getArguments().getString("link_kolegija");
+        String ime = getArguments().getString("kolegij");
+
         View view = inflater.inflate(R.layout.course_weeks_tab,
                 container, false);
 
@@ -80,12 +85,14 @@ public class CourseWeek extends Fragment {
         ButterKnife.bind(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        header.setText(ime);
+
         fetchCourseContent(link);
 
-        return  view;
+        return view;
     }
 
-    public void fetchCourseContent(final String url){
+    public void fetchCourseContent(final String url) {
 
         CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
 
@@ -158,13 +165,13 @@ public class CourseWeek extends Fragment {
                                 }
                             });
 
-                                Element content = doc.select("div.course-content").first();
-                                Elements selements = content.getElementsByClass("section main clearfix");
+                            Element content = doc.select("div.course-content").first();
+                            Elements selements = content.getElementsByClass("section main clearfix");
 
-                                Element currentElement = content.getElementsByClass("section main clearfix current").first();
+                            Element currentElement = content.getElementsByClass("section main clearfix current").first();
 
-                                if(currentElement!=null)
-                                    selements.add(0, currentElement);
+                            if (currentElement != null)
+                                selements.add(0, currentElement);
 
                             try {
                                 mRealm.beginTransaction();
@@ -197,8 +204,8 @@ public class CourseWeek extends Fragment {
                                                                 materijal.setIcon(R.drawable.pdf);
                                                                 materijal.setVrsta("pdf");
                                                                 String imeMat = sekcija.select("span.instancename").text();
-                                                                if (imeMat.length()>5){
-                                                                    materijal.setImeMtarijala(sekcija.select("span.instancename").text().substring(0, sekcija.select("span.instancename").text().length()-5));
+                                                                if (imeMat.length() > 5) {
+                                                                    materijal.setImeMtarijala(sekcija.select("span.instancename").text().substring(0, sekcija.select("span.instancename").text().length() - 5));
                                                                 }
                                                                 materijal.setDownloadable(1);
                                                                 break;
@@ -279,7 +286,7 @@ public class CourseWeek extends Fragment {
 
                                 mRealm.commitTransaction();
 
-                            } catch (Exception ex){
+                            } catch (Exception ex) {
                                 Log.e("Exception found", ex.toString());
 
                             } finally {
@@ -310,7 +317,7 @@ public class CourseWeek extends Fragment {
 
     }
 
-    public void showWeeks(){
+    public void showWeeks() {
         wRealm = Realm.getInstance(realmConfig);
         final RealmResults<KolegijTjedan> tjedni = wRealm.where(KolegijTjedan.class).findAll();
 
@@ -325,14 +332,14 @@ public class CourseWeek extends Fragment {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
 
     }
 
-    public void onStop(){
+    public void onStop() {
         super.onStop();
-        if(okHttpClient!=null){
+        if (okHttpClient != null) {
             okHttpClient.dispatcher().cancelAll();
         }
     }

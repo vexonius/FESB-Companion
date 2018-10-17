@@ -29,93 +29,98 @@
         app:layout_constraintTop_toTopOf="parent">
     </RelativeLayout>
 
-    <RelativeLayout
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:paddingLeft="14dp"
+        android:paddingTop="8dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="2dp"
+        android:text="ELEKTRONIKA"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="21dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textBox"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/textBox"
-        android:focusable="true"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_below="@+id/name"
+        android:paddingLeft="14dp"
+        android:paddingBottom="10dp"
+        android:text="8.15 - 11.00"
+        android:textColor="@color/_70white"
+        android:textSize="13dp"
+        android:textStyle="normal"
         app:layout_constraintStart_toEndOf="@+id/textBox"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/name" />
 
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingLeft="14dp"
-            android:paddingRight="10dp"
-            android:paddingTop="8dp"
-            android:text="ELEKTRONIKA"
-            android:textAllCaps="true"
-            android:textColor="@color/white"
-            android:textSize="21dp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/seperator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/name"
+        android:layout_toRightOf="@+id/type"
+        android:paddingLeft="8dp"
+        android:paddingBottom="10dp"
+        android:text="·"
+        android:textColor="@color/_70white"
+        android:textSize="13dp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toEndOf="@+id/type"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
 
-        <TextView
-            android:id="@+id/type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/name"
-            android:paddingBottom="10dp"
-            android:paddingLeft="14dp"
-            android:text="8.15 - 11.00"
-            android:textColor="@color/_70white"
-            android:textSize="12dp"
-            android:textStyle="normal" />
+    <TextView
+        android:id="@+id/vrstaPredavanja"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/name"
+        android:layout_toRightOf="@+id/seperator"
+        android:paddingLeft="8dp"
+        android:paddingBottom="10dp"
+        android:text="Predavanje"
+        android:textColor="@color/_70white"
+        android:textSize="13dp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toEndOf="@+id/seperator"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
 
-        <TextView
-            android:id="@+id/seperator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/name"
-            android:layout_toRightOf="@+id/type"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:text="·"
-            android:textColor="@color/_70white"
-            android:textSize="12dp"
-            android:textStyle="normal" />
+    <TextView
+        android:id="@+id/seperator1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/name"
+        android:layout_toRightOf="@+id/vrstaPredavanja"
+        android:paddingLeft="8dp"
+        android:paddingBottom="10dp"
+        android:text="·"
+        android:textColor="@color/_70white"
+        android:textSize="13dp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toEndOf="@+id/vrstaPredavanja"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
 
-        <TextView
-            android:id="@+id/vrstaPredavanja"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/name"
-            android:layout_toRightOf="@+id/seperator"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:text="Predavanje"
-            android:textColor="@color/_70white"
-            android:textSize="12dp"
-            android:textStyle="normal" />
-
-        <TextView
-            android:id="@+id/seperator1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/name"
-            android:layout_toRightOf="@+id/vrstaPredavanja"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:text="·"
-            android:textColor="@color/_70white"
-            android:textSize="12dp"
-            android:textStyle="normal" />
-
-        <TextView
-            android:id="@+id/mjesto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/name"
-            android:layout_toRightOf="@+id/seperator1"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:text="A100"
-            android:textColor="@color/_70white"
-            android:textSize="12dp"
-            android:textStyle="normal" />
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/mjesto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/name"
+        android:layout_toRightOf="@+id/seperator1"
+        android:paddingLeft="8dp"
+        android:paddingBottom="10dp"
+        android:text="A100"
+        android:textColor="@color/_70white"
+        android:textSize="13dp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toEndOf="@+id/seperator1"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
 
 </android.support.constraint.ConstraintLayout>

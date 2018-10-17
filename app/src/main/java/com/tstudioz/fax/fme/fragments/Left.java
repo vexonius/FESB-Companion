@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog;
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog;
+import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapterTable;
 import com.tstudioz.fax.fme.database.Korisnik;
@@ -214,7 +215,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         rlm = Realm.getDefaultInstance();
         Korisnik kor = rlm.where(Korisnik.class).findFirst();
 
-        client = new OkHttpClient();
+        client = FESBCompanion.getInstance().getOkHttpInstance();
 
         final Request request = new Request.Builder()
                 .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + mMonth + "%2F" + mDay + "%2F" + mYear + "%2022%3A44%3A48&MaxDate=" + sMonth + "%2F" + sDay + "%2F" + sYear + "%2022%3A44%3A48")

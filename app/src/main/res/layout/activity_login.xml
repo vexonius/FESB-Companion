@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/relative_login"
+    android:id="@+id/login_constraint_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.doctoror.particlesdrawable.ParticlesView
-            android:id="@+id/particles"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            app:minDotRadius="1dp"
-            app:maxDotRadius="3dp"
-            app:lineThickness="1dp"
-            app:lineDistance="110dp"
-            app:numDots="85"
-            app:dotColor="@color/blue_nice"
-            app:lineColor="@android:color/white"
-            app:frameDelayMillis="10"
-            app:stepMultiplier="1"/>
+    <com.doctoror.particlesdrawable.ParticlesView
+        android:id="@+id/particles"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:dotColor="@color/blue_nice"
+        app:frameDelayMillis="10"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lineColor="@android:color/white"
+        app:lineDistance="180dp"
+        app:lineThickness="1dp"
+        app:maxDotRadius="3dp"
+        app:minDotRadius="1dp"
+        app:numDots="37"
+        app:stepMultiplier="1" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -32,62 +32,61 @@
                 android:id="@+id/myIcon"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:src="@drawable/fmebig"
-                android:scaleType="centerInside"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="50dp"
-                android:layout_marginTop="100dp"/>
+                android:layout_marginTop="100dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/fmebig" />
 
             <EditText
                 android:id="@+id/login_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
                 android:layout_below="@+id/myIcon"
+                android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
                 android:background="@color/colorPrimary"
-                android:textColorHint="@color/_20white"
+                android:hint="FESB korisničko ime"
+                android:padding="10dp"
                 android:singleLine="true"
                 android:textColor="@color/white"
-                android:padding="10dp"
-                android:hint="FESB korisničko ime"/>
+                android:textColorHint="@color/_20white" />
 
             <EditText
                 android:id="@+id/login_pass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginTop="1dp"
                 android:layout_below="@+id/login_text"
+                android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
+                android:layout_marginTop="1dp"
                 android:background="@color/colorPrimary"
-                android:textColorHint="@color/_20white"
+                android:hint="Lozinka"
                 android:inputType="textPassword"
+                android:padding="10dp"
                 android:singleLine="true"
                 android:textColor="@color/white"
-                android:padding="10dp"
-                android:hint="Lozinka"/>
+                android:textColorHint="@color/_20white" />
 
             <FrameLayout
                 android:id="@+id/framebutton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="80dp"
                 android:layout_below="@+id/login_pass"
-                android:layout_marginRight="80dp">
+                android:layout_marginLeft="80dp"
+                android:layout_marginRight="80dp"
+                android:layout_marginTop="10dp">
 
                 <ProgressBar
                     android:id="@+id/progress_login"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
                     android:background="@drawable/button_blue"
                     android:indeterminate="true"
-                    android:layout_gravity="center_horizontal|center_vertical"
-                    android:visibility="invisible"
                     android:indeterminateTint="@color/white"
                     android:indeterminateTintMode="src_in"
-                    />
+                    android:visibility="invisible" />
 
                 <Button
                     android:id="@+id/login_button"
@@ -95,9 +94,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/button_blue"
-                    android:textColor="@color/white"
                     android:padding="15dp"
-                    android:text="Prijava" />
+                    android:text="Prijava"
+                    android:textColor="@color/white" />
 
 
             </FrameLayout>
@@ -106,17 +105,14 @@
                 android:id="@+id/login_pomoc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
                 android:layout_below="@+id/framebutton"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:clickable="true"
+                android:text="Pomoć"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:clickable="true"
-                android:textSize="11dp"
-                android:text="Pomoć"/>
+                android:textSize="11dp" />
         </RelativeLayout>
-    </FrameLayout>
 
-
-
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

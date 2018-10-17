@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.MeniesAdapter;
 import com.tstudioz.fax.fme.database.Meni;
@@ -90,9 +91,7 @@ public class MenzaActivity extends AppCompatActivity {
 
     public void startParsing() {
 
-        okHttpClient = new OkHttpClient.Builder()
-                .followSslRedirects(true)
-                .build();
+        okHttpClient = FESBCompanion.getInstance().getOkHttpInstance();
 
         Request request = new Request.Builder()
                 .url("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")

@@ -22,6 +22,9 @@
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5944203368510130~8955475006"/>
 
         <activity
             android:name=".activities.LoginActivity"
@@ -47,13 +50,14 @@
             android:name=".activities.MainActivity"
             android:label="FESB Companion"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            />
         <activity
             android:name=".activities.CourseActivity"
             android:label=" "
             android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.Simple" />
         <activity
             android:name=".activities.Welcome"
             android:screenOrientation="portrait" />

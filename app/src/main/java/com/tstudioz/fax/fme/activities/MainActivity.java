@@ -1,15 +1,20 @@
 package com.tstudioz.fax.fme.activities;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.constraint.ConstraintLayout;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
@@ -22,10 +27,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
+import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
@@ -73,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
     private Home hf;
     private Snackbar snack;
     private BottomSheetDialog bottomSheet;
+    private SharedPreferences shPref;
+    private SharedPreferences.Editor editor;
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
             .name("glavni.realm")
@@ -87,8 +97,7 @@ public class MainActivity extends AppCompatActivity {
         setUpToolbar();
         setContentView(R.layout.activity_main);
 
-        DateFormat df = new SimpleDateFormat("d.M.yyyy.");
-        date = df.format(Calendar.getInstance().getTime());
+        getDate();
 
         setUpBottomNav();
 
@@ -97,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         setFragmentTab();
         checkUser();
         checkVersion();
+        shouldShowGDPRDialog();
     }
 
     public void isThereAction(){
@@ -127,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         } else {
-            SharedPreferences sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
+            shPref = FESBCompanion.getInstance().getSP();
+            editor = shPref.edit();
             editor.putBoolean("loged_in", false);
             editor.commit();
 
@@ -286,8 +296,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void getMojRaspored() {
 
-        Realm rlm = Realm.getDefaultInstance();
-        Korisnik kor = rlm.where(Korisnik.class).findFirst();
+        realmLog = Realm.getDefaultInstance();
+        Korisnik kor = realmLog.where(Korisnik.class).findFirst();
 
 
         // Get calendar set to current date and time
@@ -306,7 +316,8 @@ public class MainActivity extends AppCompatActivity {
         DateFormat smonth = new SimpleDateFormat("MM");
         DateFormat syear = new SimpleDateFormat("yyyy");
 
-        client = new OkHttpClient();
+        client = FESBCompanion.getInstance().getOkHttpInstance();
+
         final Request request = new Request.Builder()
                 .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + dfmonth.format(c.getTime()) + "%2F" + dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" + smonth.format(s.getTime()) + "%2F" + sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
                 .get()
@@ -386,31 +397,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        rlm.close();
+        realmLog.close();
     }
 
 
     public void invalidCreds() {
-        SharedPreferences mySPrefs1 = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
-        SharedPreferences.Editor editor1 = mySPrefs1.edit();
-        editor1.putBoolean("loged_in", false);
-        editor1.apply();
+        shPref = FESBCompanion.getInstance().getSP();
+        editor = shPref.edit();
+        editor.putBoolean("loged_in", false);
+        editor.apply();
 
-        final Realm rlmLog1 = Realm.getDefaultInstance();
+        realmLog = Realm.getDefaultInstance();
         try {
-            rlmLog1.executeTransaction(new Realm.Transaction() {
+            realmLog.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    rlmLog1.deleteAll();
+                    realmLog.deleteAll();
                 }
             });
         } catch (RealmException ex){
             Log.e("MainActivity", ex.toString());
         } finally {
-            rlmLog1.close();
+            realmLog.close();
         }
 
         startActivity(new Intent(MainActivity.this, LoginActivity.class));
+    }
+
+    private void getDate(){
+        DateFormat df = new SimpleDateFormat("d.M.yyyy.");
+        date = df.format(Calendar.getInstance().getTime());
     }
 
     private boolean isNetworkAvailable() {
@@ -468,14 +484,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkVersion(){
-        SharedPreferences shPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+        shPref = FESBCompanion.getInstance().getSP();
         int staraVerzija = shPref.getInt("version_number", 14);
         int trenutnaVerzija = getVersionCode();
 
         if(staraVerzija < trenutnaVerzija){
             showChangelog();
 
-            SharedPreferences.Editor editor = shPref.edit();
+            editor = shPref.edit();
             editor.putInt("version_number", trenutnaVerzija);
             editor.commit();
         } else {
@@ -505,6 +521,62 @@ public class MainActivity extends AppCompatActivity {
         bottomSheet.show();
     }
 
+    private void shouldShowGDPRDialog(){
+        shPref = FESBCompanion.getInstance().getSP();
+        Boolean bool = shPref.getBoolean("GDPR_agreed", false);
+        if (!bool) {
+            showGDPRCompliance();
+
+            editor = shPref.edit();
+            editor.putBoolean("GDPR_agreed", true);
+            editor.commit();
+        }
+
+    }
+
+    private void showGDPRCompliance() {
+        ConstraintLayout view = (ConstraintLayout) LayoutInflater.from(this).inflate(R.layout.gdpr_layout, null);
+
+        TextView heading = (TextView) view.findViewById(R.id.terms_heading);
+        TextView desc = (TextView) view.findViewById(R.id.terms_text);
+
+        Typeface typeBold = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Bold.ttf");
+        heading.setTypeface(typeBold);
+
+        Typeface typeRegular = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Regular.ttf");
+        desc.setTypeface(typeRegular);
+
+        TextView more = (TextView) view.findViewById(R.id.button_more);
+        more.setTypeface(typeBold);
+        more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                    CustomTabsIntent customTabsIntent = builder.setToolbarColor(getResources().getColor(R.color.colorPrimaryDark)).build();
+                    customTabsIntent.launchUrl(view.getContext(), Uri.parse("http://tstud.io/privacy"));
+                }catch (Exception ex){
+                    Toast.makeText(view.getContext(), "Ažurirajte Chrome preglednik za pregled web stranice", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        TextView ok = (TextView) view.findViewById(R.id.button_ok);
+        ok.setTypeface(typeBold);
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bottomSheet.dismiss();
+            }
+        });
+
+        bottomSheet = new BottomSheetDialog(this);
+        bottomSheet.setCancelable(false);
+        bottomSheet.setContentView(view);
+        bottomSheet.setCanceledOnTouchOutside(false);
+        bottomSheet.show();
+    }
+
     @Override
     public void onStop() {
         super.onStop();
@@ -519,10 +591,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
 
-    }
 
 }

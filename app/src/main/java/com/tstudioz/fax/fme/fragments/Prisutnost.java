@@ -25,6 +25,7 @@ import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersisto
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.DolasciAdapter;
 import com.tstudioz.fax.fme.database.Dolazak;
@@ -106,11 +107,7 @@ public class Prisutnost extends Fragment {
 
         final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
 
-        okHttpClient = new OkHttpClient().newBuilder()
-                .followRedirects(true)
-                .followSslRedirects(true)
-                .cookieJar(cookieJar)
-                .build();
+        okHttpClient = FESBCompanion.getInstance().getOkHttpInstance();
 
         deletePreviousResults();
 

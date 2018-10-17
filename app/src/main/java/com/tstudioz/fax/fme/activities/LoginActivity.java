@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.migrations.CredMigration;
 import com.tstudioz.fax.fme.util.CircularAnim;
@@ -48,7 +50,8 @@ import okhttp3.Response;
 public class LoginActivity extends AppCompatActivity {
 
     @BindView(R.id.login_button) Button but;
-    @BindView(R.id.relative_login) RelativeLayout relativeLayout;
+    @BindView(R.id.login_constraint_root)
+    ConstraintLayout relativeLayout;
     @BindView(R.id.login_text) EditText editText;
     @BindView(R.id.login_pass) EditText pass;
     @BindView(R.id.login_pomoc) TextView loginHelp;
@@ -155,13 +158,8 @@ public class LoginActivity extends AppCompatActivity {
 
     public void validateUser(final String user, final String pass, final View mView) {
 
-        final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(this));
 
-        final OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
-                .followRedirects(true)
-                .followSslRedirects(true)
-                .cookieJar(cookieJar)
-                .build();
+        final OkHttpClient okHttpClient = FESBCompanion.getInstance().getOkHttpInstance();
 
         final RequestBody formData = new FormBody.Builder()
                 .add("Username", user)

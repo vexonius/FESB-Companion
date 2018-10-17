@@ -157,6 +157,21 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
+        Preference prefPriv = (Preference) findPreference("privacy");
+        prefPriv.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                try {
+                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                    CustomTabsIntent customTabsIntent = builder.setToolbarColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)).build();
+                    customTabsIntent.launchUrl(getActivity(), Uri.parse("http://tstud.io/privacy"));
+                } catch (Exception e){
+                    Toast.makeText(getContext(), "Ažurirajte Chrome preglednik", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+        });
+
     }
 
     public void userLogOut() {

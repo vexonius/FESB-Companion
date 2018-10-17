@@ -26,6 +26,7 @@ import android.widget.ProgressBar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.CoursesAdapter;
 import com.tstudioz.fax.fme.database.Kolegij;
@@ -103,13 +104,7 @@ public class Kolegiji extends Fragment {
 
     public void fetchCourses(){
 
-             CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
-
-             okHttpClient = new OkHttpClient().newBuilder()
-                    .followRedirects(true)
-                    .followSslRedirects(true)
-                    .cookieJar(cookieJar)
-                    .build();
+             okHttpClient = FESBCompanion.getInstance().getOkHttpInstance();
 
                     credRealm = Realm.getDefaultInstance();
                     Korisnik kor = credRealm.where(Korisnik.class).findFirst();

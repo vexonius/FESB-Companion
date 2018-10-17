@@ -7,7 +7,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
-    android:descendantFocusability="blocksDescendants">
+    android:paddingBottom="@dimen/bsp_month_navigation_bar_height">
+
+    <TextView
+        android:id="@+id/bigName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginEnd="16dp"
+        android:text="Primjenjena matematika"
+        android:textAlignment="viewStart"
+        android:textColor="@color/white"
+        android:textSize="26dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.doctoror.particlesdrawable.ParticlesView
+        android:id="@+id/particles"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:dotColor="@color/white"
+        app:frameDelayMillis="10"
+        app:layout_constraintBottom_toTopOf="@+id/course_week_rv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lineColor="@color/white"
+        app:lineDistance="110dp"
+        app:lineThickness="1dp"
+        app:maxDotRadius="3dp"
+        app:minDotRadius="1dp"
+        app:numDots="12"
+        app:stepMultiplier="1" />
 
 
     <ProgressBar
@@ -33,6 +67,7 @@
         android:id="@+id/course_week_rv"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         android:fadeScrollbars="false"
         android:scrollbarSize="7dp"
         android:scrollbarThumbVertical="@color/_20white"
@@ -41,6 +76,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/bigName" />
 
 </android.support.constraint.ConstraintLayout>

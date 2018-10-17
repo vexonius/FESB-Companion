@@ -78,6 +78,10 @@
             android:summary="Tino Emer @ tstud.io" />
 
         <android.support.v7.preference.Preference
+            android:key="privacy"
+            android:title="Privatnost podataka" />
+
+        <android.support.v7.preference.Preference
             android:key="legal"
             android:title="Licence korištenih biblioteka" />
 
