@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/login_constraint_root"
     android:layout_width="match_parent"
@@ -39,7 +39,7 @@
                 android:src="@drawable/fmebig" />
 
             <EditText
-                android:id="@+id/login_text"
+                android:id="@+id/login_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/myIcon"
@@ -56,7 +56,7 @@
                 android:id="@+id/login_pass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/login_text"
+                android:layout_below="@+id/login_input"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
                 android:layout_marginTop="1dp"
@@ -115,4 +115,4 @@
                 android:textSize="11dp" />
         </RelativeLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

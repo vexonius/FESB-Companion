@@ -1,8 +1,11 @@
 package com.tstudioz.fax.fme.Application;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.StrictMode;
 
+import androidx.multidex.MultiDex;
 
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
@@ -22,22 +25,36 @@ import okhttp3.OkHttpClient;
 public class FESBCompanion extends Application {
     RealmConfiguration CredRealmCf;
 
-    private  static OkHttpClient okHttpClient;
+    private static OkHttpClient okHttpClient;
     private static FESBCompanion instance;
     private static SharedPreferences shPref;
 
-    public static FESBCompanion getInstance(){
+    public static FESBCompanion getInstance() {
         return instance;
     }
 
     @Override
     public void onCreate() {
+
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads()
+                .detectDiskWrites()
+                .detectNetwork()   // or .detectAll() for all detectable problems
+                .penaltyLog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects()
+                .penaltyLog()
+                .penaltyDeath()
+                .build());
+
         super.onCreate();
         instance = this;
 
         Realm.init(this);
 
-         CredRealmCf = new RealmConfiguration.Builder()
+        CredRealmCf = new RealmConfiguration.Builder()
                 .name("encryptedv2.realm")
                 .schemaVersion(7)
                 .migration(new CredMigration())
@@ -50,7 +67,13 @@ public class FESBCompanion extends Application {
         MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006");
     }
 
-    public void checkOldVersion(){
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
+
+    public void checkOldVersion() {
 
         File newRealmFile = new File(CredRealmCf.getPath());
         if (!newRealmFile.exists()) {
@@ -68,11 +91,11 @@ public class FESBCompanion extends Application {
         }
     }
 
-    private byte[] getRealmKey(){
+    private byte[] getRealmKey() {
 
         Hawk.init(this).build();
 
-        if(Hawk.contains("masterKey")){
+        if (Hawk.contains("masterKey")) {
             byte[] array = Hawk.get("masterKey");
             return array;
         }
@@ -85,18 +108,19 @@ public class FESBCompanion extends Application {
         return bytes;
     }
 
-    public SharedPreferences getSP(){
-        if(shPref==null)
+    public SharedPreferences getSP() {
+        if (shPref == null)
             shPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
 
         return shPref;
     }
 
-    public OkHttpClient getOkHttpInstance(){
+    public OkHttpClient getOkHttpInstance() {
 
-        if (okHttpClient== null) {
+        if (okHttpClient == null) {
 
-            CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getApplicationContext()));
+            CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(),
+                    new SharedPrefsCookiePersistor(getApplicationContext()));
 
             okHttpClient = new OkHttpClient().newBuilder()
                     .followRedirects(true)

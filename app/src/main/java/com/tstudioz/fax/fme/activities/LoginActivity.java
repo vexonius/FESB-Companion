@@ -7,40 +7,26 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.franmontiel.persistentcookiejar.PersistentCookieJar;
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.migrations.CredMigration;
-import com.tstudioz.fax.fme.util.CircularAnim;
 import com.tstudioz.fax.fme.database.Korisnik;
-
+import com.tstudioz.fax.fme.databinding.ActivityLoginBinding;
+import com.tstudioz.fax.fme.util.CircularAnim;
 
 import java.io.IOException;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.CookieJar;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -49,26 +35,18 @@ import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    @BindView(R.id.login_button) Button but;
-    @BindView(R.id.login_constraint_root)
-    ConstraintLayout relativeLayout;
-    @BindView(R.id.login_text) EditText editText;
-    @BindView(R.id.login_pass) EditText pass;
-    @BindView(R.id.login_pomoc) TextView loginHelp;
-    @BindView(R.id.progress_login) ProgressBar bar;
-
     private Snackbar snack;
+    private ActivityLoginBinding binding;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
 
         isUserLoggedIn();
-
-        setContentView(R.layout.activity_login);
-
-        ButterKnife.bind(this);
 
         loadBlueButton();
         helpListener();
@@ -92,13 +70,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loadBlueButton() {
-        but.setOnClickListener(new View.OnClickListener() {
+        binding.loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (isNetworkAvailable() == true) {
-                    final String username = editText.getText().toString();
-                    final String password = pass.getText().toString();
+                    final String username = binding.loginInput.getText().toString();
+                    final String password = binding.loginPass.getText().toString();
 
                     if (username.isEmpty() || password.isEmpty()) {
                         showErrorSnack("Niste unijeli korisničke podatke");
@@ -108,8 +86,8 @@ public class LoginActivity extends AppCompatActivity {
                         if (username.contains("@")) {
                             showErrorSnack("Potrebno je unijeti korisničko ime, ne email");
                         } else {
-                            bar.setVisibility(View.VISIBLE);
-                            but.setVisibility(View.INVISIBLE);
+                            binding.progressLogin.setVisibility(View.VISIBLE);
+                            binding.loginButton.setVisibility(View.INVISIBLE);
                             validateUser(username, password, view);
                         }
                     }
@@ -122,7 +100,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager manager =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         boolean isAvailable = false;
@@ -150,9 +129,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void showErrorSnack(String message) {
-        snack = Snackbar.make(relativeLayout, message, Snackbar.LENGTH_SHORT);
+        snack = Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT);
         View snackBarView2 = snack.getView();
-        snackBarView2.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
+        snackBarView2.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),
+                R.color.red_nice));
         snack.show();
     }
 
@@ -194,8 +174,8 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             showErrorSnack("Uneseni podatci su pogrešni!");
-                            bar.setVisibility(View.INVISIBLE);
-                            but.setVisibility(View.VISIBLE);
+                            binding.progressLogin.setVisibility(View.INVISIBLE);
+                            binding.loginButton.setVisibility(View.VISIBLE);
                         }
                     });
                 }
@@ -228,7 +208,8 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (nView != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(nView.getWindowToken(), 0);
         }
 
@@ -244,7 +225,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void helpListener() {
-        loginHelp.setOnClickListener(new View.OnClickListener() {
+        binding.loginPomoc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 helpMe();

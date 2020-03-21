@@ -6,21 +6,17 @@ import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog;
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
@@ -28,6 +24,7 @@ import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapterTable;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
+import com.tstudioz.fax.fme.databinding.TimetableTabBinding;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -40,8 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.UUID;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -55,30 +50,7 @@ import okhttp3.Response;
 import static android.content.ContentValues.TAG;
 
 
-public class Left extends Fragment implements DatePickerDialog.OnDateSetListener {
-
-    @BindView(R.id.recyclerPon) RecyclerView mRecyclerPon;
-    @BindView(R.id.recyclerUto) RecyclerView recyclerUto;
-    @BindView(R.id.recyclerSri) RecyclerView recyclerSri;
-    @BindView(R.id.recyclerCet) RecyclerView recyclerCet;
-    @BindView(R.id.recyclerPet) RecyclerView mRecyclerPet;
-    @BindView(R.id.recyclerSub) RecyclerView mRecyclerSub;
-    @BindView(R.id.linear_parent) LinearLayout mLinearParent;
-    @BindView(R.id.linearSub) LinearLayout mLinearSub;
-    @BindView(R.id.odaberiDan) Button mOdaberiDan;
-    @BindView(R.id.raspored_progress) ProgressBar mRasporedProgress;
-    @BindView(R.id.pon_date) TextView ponDate;
-    @BindView(R.id.uto_date) TextView utoDate;
-    @BindView(R.id.sri_date) TextView sriDate;
-    @BindView(R.id.cet_date) TextView cetDate;
-    @BindView(R.id.pet_date) TextView petDate;
-    @BindView(R.id.sub_date) TextView subDate;
-    @BindView(R.id.mPon) TextView mPon;
-    @BindView(R.id.mUto) TextView mUto;
-    @BindView(R.id.mSri) TextView mSri;
-    @BindView(R.id.mCet) TextView mCet;
-    @BindView(R.id.mPet) TextView mPet;
-    @BindView(R.id.mSub) TextView mSub;
+public class TimeTable extends Fragment implements DatePickerDialog.OnDateSetListener {
 
     RealmConfiguration tempRealm = new RealmConfiguration.Builder()
             .name("temporary.realm")
@@ -92,12 +64,16 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    Realm rlm, prealm, ptrealm, urealm, utrealm, srealm, strealm, crealm, ctrealm, petrealm, pettrealm, subrealm, subtrealm;
+    Realm rlm, prealm, ptrealm, urealm, utrealm, srealm, strealm, crealm, ctrealm, petrealm,
+            pettrealm, subrealm, subtrealm;
 
     private Snackbar snack;
-    private EmployeeRVAdapterTable adapterPonTemp, adapterUtoTemp, adapterSriTemp, adapterCetTemp, adapterPetTemp, adapterSubTemp;
+    private EmployeeRVAdapterTable adapterPonTemp, adapterUtoTemp, adapterSriTemp, adapterCetTemp
+            , adapterPetTemp, adapterSubTemp;
     private OkHttpClient client;
     private Typeface bold;
+
+    private TimetableTabBinding binding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -105,11 +81,9 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         setHasOptionsMenu(true);
 
         //set the layout you want to display in First Fragment
-        View view = inflater.inflate(R.layout.left_tab,
+        binding = TimetableTabBinding.inflate(inflater,
                 container, false);
 
-
-        ButterKnife.bind(this, view);
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -130,7 +104,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         max.add(Calendar.YEAR, 10);
         min.add(Calendar.YEAR, -1);
         final BottomSheetPickerDialog.Builder builder = new DatePickerDialog.Builder(
-                Left.this,
+                TimeTable.this,
                 now.get(Calendar.YEAR),
                 now.get(Calendar.MONTH),
                 now.get(Calendar.DAY_OF_MONTH));
@@ -144,7 +118,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
         checkNetwork();
 
-        mOdaberiDan.setOnClickListener(new View.OnClickListener() {
+        binding.odaberiDan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -155,7 +129,7 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
         setSetDates(now);
         boldOut();
-        return view;
+        return binding.getRoot();
 
     }
 
@@ -191,17 +165,18 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         String sYear = syear.format(kal.getTime());
 
         mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear);
-        mOdaberiDan.setText("Raspored za " + mDay + "." + mMonth + " - " + sDay + "." + sMonth);
+        binding.odaberiDan.setText("Raspored za " + mDay + "." + mMonth + " - " + sDay + "." + sMonth);
 
     }
 
-    public void mojRaspored(final Calendar cal, String mMonth, String mDay, String mYear, String sMonth, String sDay, String sYear) {
+    public void mojRaspored(final Calendar cal, String mMonth, String mDay, String mYear,
+                            String sMonth, String sDay, String sYear) {
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mLinearParent.setVisibility(View.INVISIBLE);
-                mRasporedProgress.setVisibility(View.VISIBLE);
+                binding.linearParent.setVisibility(View.INVISIBLE);
+                binding.rasporedProgress.setVisibility(View.VISIBLE);
                 showPonTemp();
                 showUtoTemp();
                 showSriTemp();
@@ -218,7 +193,8 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         client = FESBCompanion.getInstance().getOkHttpInstance();
 
         final Request request = new Request.Builder()
-                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + mMonth + "%2F" + mDay + "%2F" + mYear + "%2022%3A44%3A48&MaxDate=" + sMonth + "%2F" + sDay + "%2F" + sYear + "%2022%3A44%3A48")
+                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" +
+                        "=" + kor.getUsername().toString() + "&MinDate=" + mMonth + "%2F" + mDay + "%2F" + mYear + "%2022%3A44%3A48&MaxDate=" + sMonth + "%2F" + sDay + "%2F" + sYear + "%2022%3A44%3A48")
                 .get()
                 .build();
 
@@ -247,7 +223,8 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
                         Realm trealm = Realm.getInstance(tempRealm);
                         trealm.beginTransaction();
-                        RealmResults<Predavanja> svaPredavanja = trealm.where(Predavanja.class).findAll();
+                        RealmResults<Predavanja> svaPredavanja =
+                                trealm.where(Predavanja.class).findAll();
                         svaPredavanja.deleteAllFromRealm();
                         trealm.commitTransaction();
 
@@ -259,7 +236,8 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
                                 for (final Element e : elements) {
 
-                                    Predavanja predavanja = trealm.createObject(Predavanja.class, UUID.randomUUID().toString());
+                                    Predavanja predavanja = trealm.createObject(Predavanja.class,
+                                            UUID.randomUUID().toString());
 
                                     if (e.hasAttr("data-id")) {
                                         String attr = e.attr("data-id");
@@ -272,7 +250,8 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
                                     predavanja.setGrupa(e.select("span.group.normal").text());
                                     predavanja.setGrupaShort(e.select("span.group.short").text());
                                     predavanja.setDvorana(e.select("span.resource").text());
-                                    predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
+                                    predavanja.setDetaljnoVrijeme(e.select("div.detailItem" +
+                                            ".datetime").text());
                                     predavanja.setProfesor(e.select("div.detailItem.user").text());
 
                                 }
@@ -289,17 +268,17 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
                                     setSetDates(cal);
 
                                     if (adapterSubTemp.getItemCount() > 0) {
-                                        mLinearParent.setWeightSum(6);
-                                        mLinearSub.setVisibility(View.VISIBLE);
-                                        mLinearParent.invalidate();
+                                        binding.linearParent.setWeightSum(6);
+                                        binding.linearSub.setVisibility(View.VISIBLE);
+                                        binding.linearParent.invalidate();
                                     } else {
-                                        mLinearSub.setVisibility(View.INVISIBLE);
-                                        mLinearParent.setWeightSum(5);
-                                        mLinearParent.invalidate();
+                                        binding.linearSub.setVisibility(View.INVISIBLE);
+                                        binding.linearParent.setWeightSum(5);
+                                        binding.linearParent.invalidate();
                                     }
 
-                                    mRasporedProgress.setVisibility(View.INVISIBLE);
-                                    mLinearParent.setVisibility(View.VISIBLE);
+                                    binding.rasporedProgress.setVisibility(View.INVISIBLE);
+                                    binding.linearParent.setVisibility(View.VISIBLE);
                                 }
                             });
                         }
@@ -312,181 +291,198 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
         });
     }
 
-    public void setSetDates(Calendar calendar){
+    public void setSetDates(Calendar calendar) {
 
         DateFormat format = new SimpleDateFormat("d");
 
         calendar.get(Calendar.DAY_OF_WEEK);
-        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY));
+        calendar.add(Calendar.DAY_OF_MONTH,
+                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY));
 
         String pon = format.format(calendar.getTime());
-        ponDate.setText(pon);
+        binding.ponDate.setText(pon);
 
-        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.TUESDAY));
+        calendar.add(Calendar.DAY_OF_MONTH,
+                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.TUESDAY));
         String uto = format.format(calendar.getTime());
 
-        utoDate.setText(uto);
+        binding.utoDate.setText(uto);
 
-        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.WEDNESDAY));
+        calendar.add(Calendar.DAY_OF_MONTH,
+                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.WEDNESDAY));
         String sri = format.format(calendar.getTime());
 
-        sriDate.setText(sri);
+        binding.sriDate.setText(sri);
 
-        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.THURSDAY));
+        calendar.add(Calendar.DAY_OF_MONTH,
+                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.THURSDAY));
         String cet = format.format(calendar.getTime());
 
-        cetDate.setText(cet);
+        binding.cetDate.setText(cet);
 
-        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.FRIDAY));
+        calendar.add(Calendar.DAY_OF_MONTH,
+                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.FRIDAY));
         String pet = format.format(calendar.getTime());
 
-        petDate.setText(pet);
+        binding.petDate.setText(pet);
 
-        calendar.add(Calendar.DAY_OF_MONTH, -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.SATURDAY));
+        calendar.add(Calendar.DAY_OF_MONTH,
+                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.SATURDAY));
         String sub = format.format(calendar.getTime());
 
-        subDate.setText(sub);
+        binding.subDate.setText(sub);
 
     }
 
-    public void boldOut(){
+    public void boldOut() {
         bold = Typeface.createFromAsset(getContext().getAssets(), "fonts/OpenSans-Bold.ttf");
 
-        mPon.setTypeface(bold);
-        mUto.setTypeface(bold);
-        mSri.setTypeface(bold);
-        mCet.setTypeface(bold);
-        mPet.setTypeface(bold);
-        mSub.setTypeface(bold);
+        binding.mPon.setTypeface(bold);
+        binding.mUto.setTypeface(bold);
+        binding.mSri.setTypeface(bold);
+        binding.mCet.setTypeface(bold);
+        binding.mPet.setTypeface(bold);
+        binding.mSub.setTypeface(bold);
 
     }
 
     public void showPon() {
         prealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiPon = prealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiPon = prealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter = new EmployeeRVAdapterTable(rezulatiPon);
-        mRecyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerPon.setHasFixedSize(true);
-        mRecyclerPon.setAdapter(adapter);
+        binding.recyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerPon.setHasFixedSize(true);
+        binding.recyclerPon.setAdapter(adapter);
 
     }
 
     public void showPonTemp() {
         ptrealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiPon1 = ptrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiPon1 = ptrealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
 
 
         adapterPonTemp = new EmployeeRVAdapterTable(rezulatiPon1);
-        mRecyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerPon.setHasFixedSize(true);
-        mRecyclerPon.setAdapter(adapterPonTemp);
+        binding.recyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerPon.setHasFixedSize(true);
+        binding.recyclerPon.setAdapter(adapterPonTemp);
 
     }
 
     public void showUto() {
         urealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiUto = urealm.where(Predavanja.class).contains("detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiUto = urealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter2 = new EmployeeRVAdapterTable(rezulatiUto);
-        recyclerUto.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerUto.setHasFixedSize(true);
-        recyclerUto.setAdapter(adapter2);
+        binding.recyclerUto.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerUto.setHasFixedSize(true);
+        binding.recyclerUto.setAdapter(adapter2);
 
     }
 
     public void showUtoTemp() {
         utrealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiUto1 = utrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiUto1 = utrealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
 
         adapterUtoTemp = new EmployeeRVAdapterTable(rezulatiUto1);
-        recyclerUto.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerUto.setHasFixedSize(true);
-        recyclerUto.setAdapter(adapterUtoTemp);
+        binding.recyclerUto.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerUto.setHasFixedSize(true);
+        binding.recyclerUto.setAdapter(adapterUtoTemp);
 
     }
 
     public void showSri() {
         srealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiSri = srealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiSri = srealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter3 = new EmployeeRVAdapterTable(rezulatiSri);
-        recyclerSri.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerSri.setHasFixedSize(true);
-        recyclerSri.setAdapter(adapter3);
+        binding.recyclerSri.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerSri.setHasFixedSize(true);
+        binding.recyclerSri.setAdapter(adapter3);
 
     }
 
     public void showSriTemp() {
         strealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiSri1 = strealm.where(Predavanja.class).contains("detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiSri1 = strealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
 
         adapterSriTemp = new EmployeeRVAdapterTable(rezulatiSri1);
-        recyclerSri.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerSri.setHasFixedSize(true);
-        recyclerSri.setAdapter(adapterSriTemp);
+        binding.recyclerSri.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerSri.setHasFixedSize(true);
+        binding.recyclerSri.setAdapter(adapterSriTemp);
 
     }
 
     public void showCet() {
         crealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiCet = crealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiCet = crealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter4 = new EmployeeRVAdapterTable(rezulatiCet);
-        recyclerCet.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerCet.setHasFixedSize(true);
-        recyclerCet.setAdapter(adapter4);
+        binding.recyclerCet.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerCet.setHasFixedSize(true);
+        binding.recyclerCet.setAdapter(adapter4);
 
     }
 
     public void showCetTemp() {
         ctrealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiCet1 = ctrealm.where(Predavanja.class).contains("detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiCet1 = ctrealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
 
         adapterCetTemp = new EmployeeRVAdapterTable(rezulatiCet1);
-        recyclerCet.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerCet.setHasFixedSize(true);
-        recyclerCet.setAdapter(adapterCetTemp);
+        binding.recyclerCet.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerCet.setHasFixedSize(true);
+        binding.recyclerCet.setAdapter(adapterCetTemp);
 
     }
 
     public void showPet() {
         petrealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiPet = petrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiPet = petrealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
 
         EmployeeRVAdapterTable adapter5 = new EmployeeRVAdapterTable(rezulatiPet);
-        mRecyclerPet.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerPet.setHasFixedSize(true);
-        mRecyclerPet.setAdapter(adapter5);
+        binding.recyclerPet.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerPet.setHasFixedSize(true);
+        binding.recyclerPet.setAdapter(adapter5);
 
     }
 
     public void showPetTemp() {
         pettrealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiPet1 = pettrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiPet1 = pettrealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
 
         adapterPetTemp = new EmployeeRVAdapterTable(rezulatiPet1);
-        mRecyclerPet.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerPet.setHasFixedSize(true);
-        mRecyclerPet.setAdapter(adapterPetTemp);
+        binding.recyclerPet.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerPet.setHasFixedSize(true);
+        binding.recyclerPet.setAdapter(adapterPetTemp);
 
     }
 
     public void showSub() {
         subrealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiSub = subrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiSub = subrealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
 
         if (rezulatiSub.isEmpty()) {
-            mLinearSub.setVisibility(View.GONE);
-            mLinearParent.setWeightSum(5);
+            binding.linearSub.setVisibility(View.GONE);
+            binding.linearParent.setWeightSum(5);
 
         } else {
-            mLinearSub.setVisibility(View.VISIBLE);
-            mLinearParent.setWeightSum(6);
+            binding.linearSub.setVisibility(View.VISIBLE);
+            binding.linearParent.setWeightSum(6);
             EmployeeRVAdapterTable adapter6 = new EmployeeRVAdapterTable(rezulatiSub);
-            mRecyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
-            mRecyclerSub.setHasFixedSize(true);
-            mRecyclerSub.setAdapter(adapter6);
+            binding.recyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
+            binding.recyclerSub.setHasFixedSize(true);
+            binding.recyclerSub.setAdapter(adapter6);
         }
     }
 
@@ -494,11 +490,12 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
         subtrealm = Realm.getInstance(tempRealm);
 
-        RealmResults<Predavanja> rezulatiSub1 = subtrealm.where(Predavanja.class).contains("detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
+        RealmResults<Predavanja> rezulatiSub1 = subtrealm.where(Predavanja.class).contains(
+                "detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
 
         adapterSubTemp = new EmployeeRVAdapterTable(rezulatiSub1);
-        mRecyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerSub.setAdapter(adapterSubTemp);
+        binding.recyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.recyclerSub.setAdapter(adapterSubTemp);
 
     }
 
@@ -513,7 +510,8 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager manager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         boolean isAvailable = false;
@@ -526,15 +524,16 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
 
     public void checkNetwork() {
         if (isNetworkAvailable()) {
-            mOdaberiDan.setVisibility(View.VISIBLE);
+            binding.odaberiDan.setVisibility(View.VISIBLE);
         } else {
-            mOdaberiDan.setVisibility(View.INVISIBLE);
+            binding.odaberiDan.setVisibility(View.INVISIBLE);
             showSnacOffline();
         }
     }
 
     public void showSnacOffline() {
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani.\nPrikazuje se raspored ovog tjedna.", Snackbar.LENGTH_INDEFINITE);
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani" +
+                ".\nPrikazuje se raspored ovog tjedna.", Snackbar.LENGTH_INDEFINITE);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.setAction("OSVJEŽI", new View.OnClickListener() {
@@ -549,7 +548,8 @@ public class Left extends Fragment implements DatePickerDialog.OnDateSetListener
     }
 
     public void showSnackError() {
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške pri dohvaćanju rasporeda", Snackbar.LENGTH_SHORT);
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
+                "pogreške pri dohvaćanju rasporeda", Snackbar.LENGTH_SHORT);
         View vjuzs = snack.getView();
         vjuzs.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.show();

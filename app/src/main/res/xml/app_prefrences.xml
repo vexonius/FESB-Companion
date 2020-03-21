@@ -1,90 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.preference.PreferenceScreen
+<androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.v7.preference.PreferenceCategory
+    <androidx.preference.PreferenceCategory
         android:title="KORISNIK">
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="logout"
             android:title="Odjava"
             android:summary="Prijavljeni korisnik" />
 
-    </android.support.v7.preference.PreferenceCategory>
+    </androidx.preference.PreferenceCategory>
 
-    <android.support.v7.preference.PreferenceCategory
+    <androidx.preference.PreferenceCategory
         android:title="GENERALNO">
 
-        <android.support.v7.preference.CheckBoxPreference
+        <androidx.preference.CheckBoxPreference
             android:key="units"
             android:title="Koristi celzijuse pri prikazu temperature"
             android:summary="Vrijednost temperature će biti prkazana u celzijusima"
             android:defaultValue="true"/>
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="cache"
             android:title="Očisti predmemoriju"
             android:summary="Izbriši nepotrebne predmemorirane podatke" />
 
-        <android.support.v7.preference.EditTextPreference
+        <androidx.preference.EditTextPreference
             android:key="broj_istovremenih_preuzimanja"
             android:title="Maksimalni broj istovremenih preuzimanja"
             android:summary="Zadana vrijednost iznosi 3" />
 
-    </android.support.v7.preference.PreferenceCategory>
+    </androidx.preference.PreferenceCategory>
 
-    <android.support.v7.preference.PreferenceCategory
+    <androidx.preference.PreferenceCategory
         android:title="SUDJELUJ U RAZVOJU APLIKACIJE">
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="feedback"
             android:title="Pošalji povratne informacije"
             android:summary="Pomogni učiniti ovu aplikaciju još boljom" />
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="bug_report"
             android:title="Prijavi bug"
             android:summary="Pomozi učiniti aplikaciju stabilnijom slanjem bug reporta" />
 
-        <android.support.v7.preference.CheckBoxPreference
+        <androidx.preference.CheckBoxPreference
             android:key="experiment"
             android:title="Eksperimentalne značajke"
             android:summary="Isprobaj značajke koje su još u razvoju"
             android:defaultValue="true"/>
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="betta_particp"
             android:title="Postani beta tester"
             android:summary="Uključi se razvoj i testiraj najnovije verzije prije ostalih" />
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="mvp"
             android:title="MVPs"
             android:summary="Osobe bez kojih ova aplikacija ne bi bila ono što je danas" />
 
-    </android.support.v7.preference.PreferenceCategory>
+    </androidx.preference.PreferenceCategory>
 
-    <android.support.v7.preference.PreferenceCategory
+    <androidx.preference.PreferenceCategory
         android:title="O APLIKACIJI">
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="version"
             android:title="Verzija"
             android:summary="FC v2.2.0 build #2200" />
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="developer"
             android:title="Developer"
             android:summary="Tino Emer @ tstud.io" />
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="privacy"
             android:title="Privatnost podataka" />
 
-        <android.support.v7.preference.Preference
+        <androidx.preference.Preference
             android:key="legal"
             android:title="Licence korištenih biblioteka" />
 
-    </android.support.v7.preference.PreferenceCategory>
+    </androidx.preference.PreferenceCategory>
 
-</android.support.v7.preference.PreferenceScreen>
+</androidx.preference.PreferenceScreen>

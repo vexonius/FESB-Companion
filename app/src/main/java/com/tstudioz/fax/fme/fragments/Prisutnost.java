@@ -6,31 +6,26 @@ import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+import com.google.android.material.snackbar.Snackbar;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.DolasciAdapter;
 import com.tstudioz.fax.fme.database.Dolazak;
 import com.tstudioz.fax.fme.database.Korisnik;
-import com.tstudioz.fax.fme.migrations.CredMigration;
+import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -41,8 +36,6 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -64,37 +57,29 @@ public class Prisutnost extends Fragment {
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    @BindView(R.id.recyclerZimski)
-    RecyclerView zRecyclerview;
-    @BindView(R.id.recyclerLItnji)
-    RecyclerView lRecyclerview;
-    @BindView(R.id.progress_attend)
-    ProgressBar mProgress;
-    @BindView(R.id.nested_attend)
-    NestedScrollView mNested;
-    @BindView(R.id.adView)
-    AdView mAdView;
 
     private Snackbar snack;
     private DolasciAdapter winterAdapter, summerAdapter;
     private Realm nRealm, cRealm, sRealm, wRealm;
     private OkHttpClient okHttpClient;
 
+    private PrisutnostTabBinding binding;
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
         setHasOptionsMenu(true);
-        View view = inflater.inflate(R.layout.prisutnost_tab, container, false);
+        binding = PrisutnostTabBinding.inflate(inflater, container, false);
 
-        ButterKnife.bind(this, view);
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         hideRecyc();
 
         startFetching();
         loadAds();
 
-        return view;
+        return binding.getRoot();
     }
 
     @Override
@@ -105,7 +90,8 @@ public class Prisutnost extends Fragment {
 
     public void fetchPrisutnost() {
 
-        final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(getActivity()));
+        final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(),
+                new SharedPrefsCookiePersistor(getActivity()));
 
         okHttpClient = FESBCompanion.getInstance().getOkHttpInstance();
 
@@ -121,7 +107,8 @@ public class Prisutnost extends Fragment {
                 .build();
 
         final Request rq = new Request.Builder()
-                .url("https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb.unist.hr")
+                .url("https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb" +
+                        ".unist.hr")
                 .post(formData)
                 .build();
 
@@ -157,8 +144,10 @@ public class Prisutnost extends Fragment {
                             try {
                                 Element zimski = doc.select("div.semster.winter").first();
                                 Element litnji = doc.select("div.semster.summer").first();
-                                Element zimskaPredavanja = zimski.select("div.body.clearfix").first();
-                                Element litnjaPredavanja = litnji.select("div.body.clearfix").first();
+                                Element zimskaPredavanja =
+                                        zimski.select("div.body.clearfix").first();
+                                Element litnjaPredavanja =
+                                        litnji.select("div.body.clearfix").first();
 
 
                                 if (zimski.getElementsByClass("emptyList").first() == null) {
@@ -181,29 +170,39 @@ public class Prisutnost extends Fragment {
 
                                             @Override
                                             public void onResponse(Call call, Response response) throws IOException {
-                                                Document document = Jsoup.parse(response.body().string());
+                                                Document document =
+                                                        Jsoup.parse(response.body().string());
                                                 Realm mRealm1 = Realm.getInstance(realmConfig);
 
                                                 try {
 
-                                                    Element content = document.getElementsByClass("courseCategories").first();
-                                                    final Elements kategorije = content.select("div.courseCategory");
+                                                    Element content =
+                                                            document.getElementsByClass(
+                                                                    "courseCategories").first();
+                                                    final Elements kategorije = content.select(
+                                                            "div.courseCategory");
 
                                                     mRealm1.executeTransaction(new Realm.Transaction() {
                                                         @Override
                                                         public void execute(Realm realm) {
                                                             for (Element kat : kategorije) {
-                                                                final Dolazak mDolazak = realm.createObject(Dolazak.class, UUID.randomUUID().toString());
+                                                                final Dolazak mDolazak =
+                                                                        realm.createObject(Dolazak.class, UUID.randomUUID().toString());
 
                                                                 mDolazak.setSemestar(1);
                                                                 mDolazak.setPredmet(element.select("div.cellContent").first().text());
                                                                 mDolazak.setVrsta(kat.getElementsByClass("name").first().text());
                                                                 mDolazak.setAttended(Integer.parseInt(kat.select("div.attended > span.num").first().text()));
                                                                 mDolazak.setAbsent(Integer.parseInt(kat.select("div.absent > span.num").first().text()));
-                                                                mDolazak.setRequired(kat.select("div.required-attendance > span").first().text());
+                                                                mDolazak.setRequired(kat.select(
+                                                                        "div.required-attendance " +
+                                                                                "> span").first().text());
 
-                                                                String string = kat.select("div.required-attendance > span").first().text();
-                                                                StringTokenizer st = new StringTokenizer(string, " ");
+                                                                String string = kat.select("div" +
+                                                                        ".required-attendance > " +
+                                                                        "span").first().text();
+                                                                StringTokenizer st =
+                                                                        new StringTokenizer(string, " ");
                                                                 String ric1 = st.nextToken();
                                                                 String ric2 = st.nextToken();
                                                                 String max = st.nextToken();
@@ -215,7 +214,8 @@ public class Prisutnost extends Fragment {
                                                     });
 
                                                 } catch (Exception exception) {
-                                                    Log.d("Exception prisutnost", exception.getMessage());
+                                                    Log.d("Exception prisutnost",
+                                                            exception.getMessage());
                                                     exception.printStackTrace();
                                                 } finally {
                                                     mRealm1.close();
@@ -250,29 +250,39 @@ public class Prisutnost extends Fragment {
 
                                             @Override
                                             public void onResponse(Call call, Response response) throws IOException {
-                                                Document document = Jsoup.parse(response.body().string());
+                                                Document document =
+                                                        Jsoup.parse(response.body().string());
 
                                                 Realm mRealm2 = Realm.getInstance(realmConfig);
 
                                                 try {
-                                                    Element content = document.getElementsByClass("courseCategories").first();
-                                                    final Elements kategorije = content.select("div.courseCategory");
+                                                    Element content =
+                                                            document.getElementsByClass(
+                                                                    "courseCategories").first();
+                                                    final Elements kategorije = content.select(
+                                                            "div.courseCategory");
 
                                                     mRealm2.executeTransaction(new Realm.Transaction() {
                                                         @Override
                                                         public void execute(Realm realm) {
                                                             for (Element kat : kategorije) {
-                                                                final Dolazak mDolazak = realm.createObject(Dolazak.class, UUID.randomUUID().toString());
+                                                                final Dolazak mDolazak =
+                                                                        realm.createObject(Dolazak.class, UUID.randomUUID().toString());
 
                                                                 mDolazak.setSemestar(2);
                                                                 mDolazak.setPredmet(element.select("div.cellContent").first().text());
                                                                 mDolazak.setVrsta(kat.getElementsByClass("name").first().text());
                                                                 mDolazak.setAttended(Integer.parseInt(kat.select("div.attended > span.num").first().text()));
                                                                 mDolazak.setAbsent(Integer.parseInt(kat.select("div.absent > span.num").first().text()));
-                                                                mDolazak.setRequired(kat.select("div.required-attendance > span").first().text());
+                                                                mDolazak.setRequired(kat.select(
+                                                                        "div.required-attendance " +
+                                                                                "> span").first().text());
 
-                                                                String string = kat.select("div.required-attendance > span").first().text();
-                                                                StringTokenizer st = new StringTokenizer(string, " ");
+                                                                String string = kat.select("div" +
+                                                                        ".required-attendance > " +
+                                                                        "span").first().text();
+                                                                StringTokenizer st =
+                                                                        new StringTokenizer(string, " ");
                                                                 String ric1 = st.nextToken();
                                                                 String ric2 = st.nextToken();
                                                                 String max = st.nextToken();
@@ -306,8 +316,8 @@ public class Prisutnost extends Fragment {
                                     public void run() {
                                         showRecyclerviewWinterSem();
                                         showRecyclerviewSummerSem();
-                                        mProgress.setVisibility(View.INVISIBLE);
-                                        mNested.setVisibility(View.VISIBLE);
+                                        binding.progressAttend.setVisibility(View.INVISIBLE);
+                                        binding.nestedAttend.setVisibility(View.VISIBLE);
                                     }
                                 });
                             }
@@ -326,12 +336,14 @@ public class Prisutnost extends Fragment {
     public void showRecyclerviewWinterSem() {
 
         wRealm = Realm.getInstance(realmConfig);
-        RealmResults<Dolazak> dolasciWinter = wRealm.where(Dolazak.class).equalTo("semestar", 1).findAll();
+        RealmResults<Dolazak> dolasciWinter =
+                wRealm.where(Dolazak.class).equalTo("semestar", 1).findAll();
 
         try {
-            zRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+            binding.recyclerZimski.setLayoutManager(new LinearLayoutManager(getActivity(),
+                    LinearLayoutManager.HORIZONTAL, false));
             winterAdapter = new DolasciAdapter(dolasciWinter);
-            zRecyclerview.setAdapter(winterAdapter);
+            binding.recyclerZimski.setAdapter(winterAdapter);
         } finally {
             wRealm.close();
         }
@@ -340,12 +352,14 @@ public class Prisutnost extends Fragment {
     public void showRecyclerviewSummerSem() {
 
         sRealm = Realm.getInstance(realmConfig);
-        RealmResults<Dolazak> dolasciSummer = sRealm.where(Dolazak.class).equalTo("semestar", 2).findAll();
+        RealmResults<Dolazak> dolasciSummer =
+                sRealm.where(Dolazak.class).equalTo("semestar", 2).findAll();
 
         try {
-            lRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+            binding.recyclerLItnji.setLayoutManager(new LinearLayoutManager(getActivity(),
+                    LinearLayoutManager.HORIZONTAL, false));
             summerAdapter = new DolasciAdapter(dolasciSummer);
-            lRecyclerview.setAdapter(summerAdapter);
+            binding.recyclerLItnji.setAdapter(summerAdapter);
         } finally {
             sRealm.close();
         }
@@ -377,7 +391,7 @@ public class Prisutnost extends Fragment {
         //      });
         //      mAdView.loadAd(adRequest);
         //  } else {
-        mAdView.setVisibility(View.GONE);
+        binding.adView.setVisibility(View.GONE);
         //  }
     }
 
@@ -397,7 +411,8 @@ public class Prisutnost extends Fragment {
     }
 
     public void showSnacOffline() {
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_INDEFINITE);
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste " +
+                "povezani", Snackbar.LENGTH_INDEFINITE);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.setAction("PONOVI", new View.OnClickListener() {
@@ -412,7 +427,8 @@ public class Prisutnost extends Fragment {
     }
 
     public void showSnackError() {
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do pogreške", Snackbar.LENGTH_LONG);
+        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
+                "pogreške", Snackbar.LENGTH_LONG);
         View okvir = snack.getView();
         okvir.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
         snack.setAction(("PONOVI"), new View.OnClickListener() {
@@ -428,7 +444,8 @@ public class Prisutnost extends Fragment {
 
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager manager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         boolean isAvailable = false;
@@ -439,8 +456,8 @@ public class Prisutnost extends Fragment {
     }
 
     private void hideRecyc() {
-        mNested.setVisibility(View.INVISIBLE);
-        mProgress.setVisibility(View.VISIBLE);
+        binding.nestedAttend.setVisibility(View.INVISIBLE);
+        binding.progressAttend.setVisibility(View.VISIBLE);
     }
 
     public void onStop() {

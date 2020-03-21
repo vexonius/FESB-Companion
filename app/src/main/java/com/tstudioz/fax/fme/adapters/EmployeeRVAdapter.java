@@ -2,12 +2,13 @@ package com.tstudioz.fax.fme.adapters;
 
 
 import android.graphics.Typeface;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.Predavanja;
@@ -30,7 +31,8 @@ public class EmployeeRVAdapter extends RecyclerView.Adapter<EmployeeRVAdapter.Em
 
     @Override
     public EmployeeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item, parent,
+                false);
         return new EmployeeViewHolder(view);
     }
 
@@ -45,35 +47,35 @@ public class EmployeeRVAdapter extends RecyclerView.Adapter<EmployeeRVAdapter.Em
 
         String imePredavanja = predavanja.getPredavanjeIme();
 
-        if(imePredavanja.length()>0)
-            imePredavanja = imePredavanja.substring(0, imePredavanja.length()-1);
+        if (imePredavanja.length() > 0)
+            imePredavanja = imePredavanja.substring(0, imePredavanja.length() - 1);
 
         holder.vrstaPredavanja.setText(imePredavanja);
 
         holder.mjesto.setText(predavanja.getDvorana());
 
-        switch (predavanja.getPredavanjeIme()){
-                case("Predavanja,"):
-                    holder.boja.setBackgroundResource(R.color.blue_nice);
-                    break;
-                case("Auditorne vježbe,"):
-                    holder.boja.setBackgroundResource(R.color.green_nice);
-                    break;
-                case("Kolokviji,"):
-                    holder.boja.setBackgroundResource(R.color.purple_nice);
-                    break;
-                case("Laboratorijske vježbe,"):
-                    holder.boja.setBackgroundResource(R.color.red_nice);
-                    break;
-                case("Konstrukcijske vježbe,"):
-                    holder.boja.setBackgroundResource(R.color.grey_nice);
-                    break;
-            case("Seminar,"):
-                    holder.boja.setBackgroundResource(R.color.blue_nice);
-                    break;
-                case("Ispiti,"):
-                    holder.boja.setBackgroundResource(R.color.purple_dark);
-                    break;
+        switch (predavanja.getPredavanjeIme()) {
+            case ("Predavanja,"):
+                holder.boja.setBackgroundResource(R.color.blue_nice);
+                break;
+            case ("Auditorne vježbe,"):
+                holder.boja.setBackgroundResource(R.color.green_nice);
+                break;
+            case ("Kolokviji,"):
+                holder.boja.setBackgroundResource(R.color.purple_nice);
+                break;
+            case ("Laboratorijske vježbe,"):
+                holder.boja.setBackgroundResource(R.color.red_nice);
+                break;
+            case ("Konstrukcijske vježbe,"):
+                holder.boja.setBackgroundResource(R.color.grey_nice);
+                break;
+            case ("Seminar,"):
+                holder.boja.setBackgroundResource(R.color.blue_nice);
+                break;
+            case ("Ispiti,"):
+                holder.boja.setBackgroundResource(R.color.purple_dark);
+                break;
         }
 
     }
@@ -91,21 +93,24 @@ public class EmployeeRVAdapter extends RecyclerView.Adapter<EmployeeRVAdapter.Em
         public EmployeeViewHolder(View itemView) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.name);
-            lighttf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Light.ttf");
-            boldtf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Bold.ttf");
+            lighttf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans" +
+                    "-Light.ttf");
+            boldtf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans" +
+                    "-Bold.ttf");
             name.setTypeface(regulartf);
 
             type = (TextView) itemView.findViewById(R.id.type);
-            regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Regular.ttf");
+            regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts" +
+                    "/OpenSans-Regular.ttf");
             type.setTypeface(regulartf);
 
             vrstaPredavanja = (TextView) itemView.findViewById(R.id.vrstaPredavanja);
             vrstaPredavanja.setTypeface(regulartf);
 
-            mjesto = (TextView)itemView.findViewById(R.id.mjesto);
+            mjesto = (TextView) itemView.findViewById(R.id.mjesto);
             mjesto.setTypeface(regulartf);
 
-            boja = (RelativeLayout)itemView.findViewById(R.id.textBox);
+            boja = (RelativeLayout) itemView.findViewById(R.id.textBox);
         }
     }
 

@@ -5,33 +5,28 @@ import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.material.snackbar.Snackbar;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.adapters.MeniesAdapter;
 import com.tstudioz.fax.fme.database.Meni;
+import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.time.LocalDate;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -43,16 +38,6 @@ import okhttp3.Response;
 
 public class MenzaActivity extends AppCompatActivity {
 
-    @BindView(R.id.menza_title)
-    TextView mMenzaTitle;
-    @BindView(R.id.menza_recyclerview)
-    RecyclerView mRecyclerView;
-    @BindView(R.id.cookie_header_text)
-    TextView cookieText;
-    @BindView(R.id.cookie_header_root)
-    RelativeLayout cookieRoot;
-    @BindView(R.id.menza_progress)
-    ProgressBar mProgress;
 
     RealmConfiguration menzaRealmConf = new RealmConfiguration.Builder()
             .name("menza.realm")
@@ -65,12 +50,13 @@ public class MenzaActivity extends AppCompatActivity {
     private OkHttpClient okHttpClient;
     private InterstitialAd mInterstitialAd;
 
+    private ActivityMenzaBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_menza);
-
-        ButterKnife.bind(this);
+        binding = ActivityMenzaBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         setTextTypeface();
 
@@ -84,7 +70,7 @@ public class MenzaActivity extends AppCompatActivity {
             startParsing();
         } else {
             showSnacOffline();
-            mProgress.setVisibility(View.VISIBLE);
+            binding.menzaProgress.setVisibility(View.VISIBLE);
         }
     }
 
@@ -159,7 +145,8 @@ public class MenzaActivity extends AppCompatActivity {
 
                             final Meni izborniMeni = new Meni();
                             izborniMeni.setId(itemsArray.getString(0));
-                            izborniMeni.setJelo1(itemsArray.getString(1).substring(0, itemsArray.getString(1).length() - 6));
+                            izborniMeni.setJelo1(itemsArray.getString(1).substring(0,
+                                    itemsArray.getString(1).length() - 6));
                             izborniMeni.setCijena(itemsArray.getString(1).substring(itemsArray.getString(1).length() - 6, itemsArray.getString(1).length()));
 
 
@@ -179,7 +166,7 @@ public class MenzaActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mProgress.setVisibility(View.INVISIBLE);
+                            binding.menzaProgress.setVisibility(View.INVISIBLE);
                             showMenies();
                         }
                     });
@@ -203,13 +190,13 @@ public class MenzaActivity extends AppCompatActivity {
         if (!results.isEmpty()) {
 
             MeniesAdapter adapter = new MeniesAdapter(results);
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setAdapter(adapter);
+            binding.menzaRecyclerview.setLayoutManager(new LinearLayoutManager(this));
+            binding.menzaRecyclerview.setHasFixedSize(true);
+            binding.menzaRecyclerview.setAdapter(adapter);
 
         } else {
-            mRecyclerView.setVisibility(View.INVISIBLE);
-            cookieRoot.setVisibility(View.VISIBLE);
+            binding.menzaRecyclerview.setVisibility(View.INVISIBLE);
+            binding.cookieHeaderRoot.setVisibility(View.VISIBLE);
         }
 
     }
@@ -217,8 +204,8 @@ public class MenzaActivity extends AppCompatActivity {
     public void setTextTypeface() {
         Typeface typeBold = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Bold.ttf");
         Typeface regular = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Regular.ttf");
-        mMenzaTitle.setTypeface(typeBold);
-        cookieText.setTypeface(regular);
+        binding.menzaTitle.setTypeface(typeBold);
+        binding.cookieHeaderText.setTypeface(regular);
     }
 
     public void onBackPressed() {
@@ -251,7 +238,8 @@ public class MenzaActivity extends AppCompatActivity {
     }
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager manager =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         boolean isAvailable = false;
@@ -263,7 +251,8 @@ public class MenzaActivity extends AppCompatActivity {
     }
 
     public void showSnacOffline() {
-        snack = Snackbar.make(findViewById(R.id.menza_root), "Niste povezani", Snackbar.LENGTH_INDEFINITE);
+        snack = Snackbar.make(findViewById(R.id.menza_root), "Niste povezani",
+                Snackbar.LENGTH_INDEFINITE);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.red_nice));
         snack.setAction("PONOVI", new View.OnClickListener() {

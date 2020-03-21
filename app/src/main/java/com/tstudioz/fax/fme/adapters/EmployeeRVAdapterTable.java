@@ -5,16 +5,16 @@ package com.tstudioz.fax.fme.adapters;
  */
 
 
-
 import android.content.Context;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.Predavanja;
 
@@ -34,7 +34,8 @@ public class EmployeeRVAdapterTable extends RecyclerView.Adapter<EmployeeRVAdapt
 
     @Override
     public EmployeeViewHolderTable onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.table_row_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.table_row_item,
+                parent, false);
         return new EmployeeViewHolderTable(view);
     }
 
@@ -47,28 +48,28 @@ public class EmployeeRVAdapterTable extends RecyclerView.Adapter<EmployeeRVAdapt
         holder.tablemjesto.setText(predavanja.getDvorana());
 
 
-        switch (predavanja.getPredavanjeIme()){
-                case("Predavanja,"):
-                    holder.tableboja.setBackgroundResource(R.color.blue_nice);
-                    break;
-                case("Auditorne vježbe,"):
-                    holder.tableboja.setBackgroundResource(R.color.green_nice);
-                    break;
-                case("Kolokviji,"):
-                    holder.tableboja.setBackgroundResource(R.color.purple_nice);
-                    break;
-                case("Laboratorijske vježbe,"):
-                    holder.tableboja.setBackgroundResource(R.color.red_nice);
-                    break;
-                case("Konstrukcijske vježbe,"):
-                    holder.tableboja.setBackgroundResource(R.color.grey_nice);
-                    break;
-            case("Seminar,"):
-                    holder.tableboja.setBackgroundResource(R.color.blue_nice);
-                    break;
-                case("Ispiti,"):
-                    holder.tableboja.setBackgroundResource(R.color.purple_dark);
-                    break;
+        switch (predavanja.getPredavanjeIme()) {
+            case ("Predavanja,"):
+                holder.tableboja.setBackgroundResource(R.color.blue_nice);
+                break;
+            case ("Auditorne vježbe,"):
+                holder.tableboja.setBackgroundResource(R.color.green_nice);
+                break;
+            case ("Kolokviji,"):
+                holder.tableboja.setBackgroundResource(R.color.purple_nice);
+                break;
+            case ("Laboratorijske vježbe,"):
+                holder.tableboja.setBackgroundResource(R.color.red_nice);
+                break;
+            case ("Konstrukcijske vježbe,"):
+                holder.tableboja.setBackgroundResource(R.color.grey_nice);
+                break;
+            case ("Seminar,"):
+                holder.tableboja.setBackgroundResource(R.color.blue_nice);
+                break;
+            case ("Ispiti,"):
+                holder.tableboja.setBackgroundResource(R.color.purple_dark);
+                break;
         }
 
 
@@ -79,7 +80,7 @@ public class EmployeeRVAdapterTable extends RecyclerView.Adapter<EmployeeRVAdapt
         return mEmployees.size();
     }
 
-    public class EmployeeViewHolderTable extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class EmployeeViewHolderTable extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tablename, tabletype, tablemjesto;
         RelativeLayout tableboja;
 
@@ -88,8 +89,8 @@ public class EmployeeRVAdapterTable extends RecyclerView.Adapter<EmployeeRVAdapt
             super(itemView);
             tablename = (TextView) itemView.findViewById(R.id.table_name);
             tabletype = (TextView) itemView.findViewById(R.id.table_type);
-            tableboja = (RelativeLayout)itemView.findViewById(R.id.colorMe);
-            tablemjesto = (TextView)itemView.findViewById(R.id.table_mjesto);
+            tableboja = (RelativeLayout) itemView.findViewById(R.id.colorMe);
+            tablemjesto = (TextView) itemView.findViewById(R.id.table_mjesto);
             itemView.setOnClickListener(this);
         }
 
@@ -105,12 +106,12 @@ public class EmployeeRVAdapterTable extends RecyclerView.Adapter<EmployeeRVAdapt
         notifyDataSetChanged();
     }
 
-    public void onShowBottomsheet(View view, int position){
+    public void onShowBottomsheet(View view, int position) {
         Context context = view.getContext();
 
         Predavanja predavanja = mEmployees.get(position);
 
-        TextView infoKolegij, infoPredavanje,infoProf, infoVrijeme, infoGrupa, infoLokacija;
+        TextView infoKolegij, infoPredavanje, infoProf, infoVrijeme, infoGrupa, infoLokacija;
         View views = LayoutInflater.from(context).inflate(R.layout.bottom_sheep, null);
         infoKolegij = (TextView) views.findViewById(R.id.predavanjeImeDialog);
         infoPredavanje = (TextView) views.findViewById(R.id.opisPredavanja);
@@ -121,13 +122,13 @@ public class EmployeeRVAdapterTable extends RecyclerView.Adapter<EmployeeRVAdapt
 
 
         String imePredavanja = predavanja.getPredavanjeIme();
-        if(imePredavanja.length()>0){
-            imePredavanja = imePredavanja.substring(0, imePredavanja.length()-1);
+        if (imePredavanja.length() > 0) {
+            imePredavanja = imePredavanja.substring(0, imePredavanja.length() - 1);
         }
 
         String imeGrupe = predavanja.getGrupa();
 
-        if(imeGrupe.length()>0) {
+        if (imeGrupe.length() > 0) {
             imeGrupe = imeGrupe.substring(0, imeGrupe.length() - 1);
         }
 
@@ -139,26 +140,26 @@ public class EmployeeRVAdapterTable extends RecyclerView.Adapter<EmployeeRVAdapt
         infoLokacija.setText(predavanja.getDvorana());
 
 
-        switch (predavanja.getPredavanjeIme()){
-            case("Predavanja,"):
+        switch (predavanja.getPredavanjeIme()) {
+            case ("Predavanja,"):
                 infoKolegij.setBackgroundResource(R.color.blue_nice);
                 break;
-            case("Auditorne vježbe,"):
+            case ("Auditorne vježbe,"):
                 infoKolegij.setBackgroundResource(R.color.green_nice);
                 break;
-            case("Kolokviji,"):
+            case ("Kolokviji,"):
                 infoKolegij.setBackgroundResource(R.color.purple_nice);
                 break;
-            case("Laboratorijske vježbe,"):
+            case ("Laboratorijske vježbe,"):
                 infoKolegij.setBackgroundResource(R.color.red_nice);
                 break;
-            case("Konstrukcijske vježbe,"):
+            case ("Konstrukcijske vježbe,"):
                 infoKolegij.setBackgroundResource(R.color.grey_nice);
                 break;
-            case("Seminar,"):
+            case ("Seminar,"):
                 infoKolegij.setBackgroundResource(R.color.blue_nice);
                 break;
-            case("Ispiti,"):
+            case ("Ispiti,"):
                 infoKolegij.setBackgroundResource(R.color.purple_dark);
                 break;
         }

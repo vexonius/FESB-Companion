@@ -1,9 +1,9 @@
 package com.tstudioz.fax.fme.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.Preference;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.tstudioz.fax.fme.fragments.SettingsFragment;
 

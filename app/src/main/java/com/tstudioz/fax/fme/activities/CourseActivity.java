@@ -6,17 +6,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.material.snackbar.Snackbar;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.fragments.CourseWeek;
 
@@ -32,13 +32,8 @@ public class CourseActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         String imeKolegija = intent.getStringExtra("kolegij");
-   //     getSupportActionBar().setTitle(imeKolegija);
-
-
-        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());
-
-   //    styledNavigation();
+        //     getSupportActionBar().setTitle(imeKolegija);
+        //    styledNavigation();
 
         if (shouldAskPermissions()) {
             askPermissions();
@@ -55,14 +50,15 @@ public class CourseActivity extends AppCompatActivity {
         ft.addToBackStack(null);
         ft.commit();
 
-      //   loadAdsCourse();
+        //   loadAdsCourse();
 
 
     }
 
-    public void styledNavigation(){
+    public void styledNavigation() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+            getWindow().setNavigationBarColor(ContextCompat.getColor(this,
+                    R.color.colorPrimaryDark));
         }
     }
 
@@ -93,9 +89,11 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     public void informUser() {
-        int permissionCheck = ContextCompat.checkSelfPermission(CourseActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionCheck = ContextCompat.checkSelfPermission(CourseActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permissionCheck == -1) {
-            Snackbar snack = Snackbar.make(findViewById(R.id.relative_course_ac), "FESB Companion treba dopuštenje za preuzimanje dokumenata!", Snackbar.LENGTH_INDEFINITE);
+            Snackbar snack = Snackbar.make(findViewById(R.id.relative_course_ac), "FESB Companion" +
+                    " treba dopuštenje za preuzimanje dokumenata!", Snackbar.LENGTH_INDEFINITE);
             snack.setAction("DOPUSTI", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -128,11 +126,11 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-     //   if (mInterstitialAd.isLoaded()) {
-     //       mInterstitialAd.show();
-     //   } else {
-            finish();
-     //   }
+        //   if (mInterstitialAd.isLoaded()) {
+        //       mInterstitialAd.show();
+        //   } else {
+        finish();
+        //   }
     }
 
     private void requestNewInterstitial() {

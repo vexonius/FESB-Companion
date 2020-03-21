@@ -7,15 +7,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.app.ShareCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.preference.CheckBoxPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.webkit.CookieManager;
@@ -23,13 +14,21 @@ import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.app.ShareCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.LoginActivity;
 import com.tstudioz.fax.fme.database.Korisnik;
-import com.tstudioz.fax.fme.migrations.CredMigration;
 
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 
 import static android.content.Context.MODE_PRIVATE;
 

@@ -2,8 +2,9 @@ package com.tstudioz.fax.fme.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.github.paolorotolo.appintro.AppIntro2;
 import com.tstudioz.fax.fme.R;
@@ -20,7 +21,6 @@ public class Welcome extends AppIntro2 {
         addSlide(SampleSlide.newInstance(R.layout.welcome_timetable));
         addSlide(SampleSlide.newInstance(R.layout.welcome_files));
         addSlide(SampleSlide.newInstance(R.layout.welcome_attendance));
-
     }
 
     @Override

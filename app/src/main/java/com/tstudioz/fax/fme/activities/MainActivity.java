@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.activities;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,37 +11,35 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.support.constraint.ConstraintLayout;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
 import com.tstudioz.fax.fme.fragments.Home;
 import com.tstudioz.fax.fme.fragments.Kolegiji;
-import com.tstudioz.fax.fme.fragments.Left;
+import com.tstudioz.fax.fme.fragments.Mail;
 import com.tstudioz.fax.fme.fragments.Prisutnost;
-import com.tstudioz.fax.fme.fragments.Right;
-import com.tstudioz.fax.fme.migrations.CredMigration;
+import com.tstudioz.fax.fme.fragments.TimeTable;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -109,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
         shouldShowGDPRDialog();
     }
 
-    public void isThereAction(){
-        if (getIntent().getAction()!=null) {
+    public void isThereAction() {
+        if (getIntent().getAction() != null) {
             showShortcutView();
         } else {
             setDefaultScreen();
@@ -129,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 realmLog.close();
             }
 
-            if (korisnik != null){
+            if (korisnik != null) {
                 getMojRaspored();
             } else {
                 invalidCreds();
@@ -157,11 +154,16 @@ public class MainActivity extends AppCompatActivity {
     public void setUpBottomNav() {
         bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
 
-        AHBottomNavigationItem item0 = new AHBottomNavigationItem(getString(R.string.homie), R.drawable.home, R.color.home_color);
-        AHBottomNavigationItem item1 = new AHBottomNavigationItem(getString(R.string.left), R.drawable.schedule, R.color.left_color);
-        AHBottomNavigationItem item3 = new AHBottomNavigationItem(getString(R.string.prisutnost), R.drawable.plus_attend, R.color.left_color);
-        AHBottomNavigationItem item4 = new AHBottomNavigationItem(getString(R.string.kolegiji), R.drawable.courses, R.color.left_color);
-        AHBottomNavigationItem item2 = new AHBottomNavigationItem(getString(R.string.right), R.drawable.mail, R.color.right_color);
+        AHBottomNavigationItem item0 = new AHBottomNavigationItem(getString(R.string.homie),
+                R.drawable.home, R.color.home_color);
+        AHBottomNavigationItem item1 = new AHBottomNavigationItem(getString(R.string.left),
+                R.drawable.schedule, R.color.left_color);
+        AHBottomNavigationItem item3 = new AHBottomNavigationItem(getString(R.string.prisutnost),
+                R.drawable.plus_attend, R.color.left_color);
+        AHBottomNavigationItem item4 = new AHBottomNavigationItem(getString(R.string.kolegiji),
+                R.drawable.courses, R.color.left_color);
+        AHBottomNavigationItem item2 = new AHBottomNavigationItem(getString(R.string.right),
+                R.drawable.mail, R.color.right_color);
 
         bottomNavigation.addItem(item0);
         bottomNavigation.addItem(item1);
@@ -170,7 +172,8 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.addItem(item2);
 
         bottomNavigation.setBehaviorTranslationEnabled(false);
-        bottomNavigation.setDefaultBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        bottomNavigation.setDefaultBackgroundColor(ContextCompat.getColor(this,
+                R.color.colorPrimary));
         bottomNavigation.setForceTint(true);
         bottomNavigation.setAccentColor(ContextCompat.getColor(this, R.color.white));
         bottomNavigation.setInactiveColor(ContextCompat.getColor(this, R.color.inactive));
@@ -198,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void beginFragTransaction(int pos){
+    public void beginFragTransaction(int pos) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         switch (pos) {
             case 0:
@@ -211,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case 1:
-                Left lf = new Left();
+                TimeTable lf = new TimeTable();
                 ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, lf);
                 ft.addToBackStack(null);
@@ -241,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
 
             case 4:
 
-                Right rt = new Right();
+                Mail rt = new Mail();
                 ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, rt);
                 ft.addToBackStack(null);
@@ -278,8 +281,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.refresMe:
-                if (isNetworkAvailable()){
-                     getMojRaspored();
+                if (isNetworkAvailable()) {
+                    getMojRaspored();
                 } else {
                     showSnacOffline();
                 }
@@ -319,7 +322,8 @@ public class MainActivity extends AppCompatActivity {
         client = FESBCompanion.getInstance().getOkHttpInstance();
 
         final Request request = new Request.Builder()
-                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + kor.getUsername().toString() + "&MinDate=" + dfmonth.format(c.getTime()) + "%2F" + dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" + smonth.format(s.getTime()) + "%2F" + sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
+                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" +
+                        "=" + kor.getUsername().toString() + "&MinDate=" + dfmonth.format(c.getTime()) + "%2F" + dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" + smonth.format(s.getTime()) + "%2F" + sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
                 .get()
                 .build();
 
@@ -346,7 +350,8 @@ public class MainActivity extends AppCompatActivity {
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
-                            RealmResults<Predavanja> svaPredavanja = realm.where(Predavanja.class).findAll();
+                            RealmResults<Predavanja> svaPredavanja =
+                                    realm.where(Predavanja.class).findAll();
                             svaPredavanja.deleteAllFromRealm();
                         }
                     });
@@ -359,7 +364,9 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void execute(Realm realm) {
                                     for (final Element e : elements) {
-                                        Predavanja predavanja = realm.createObject(Predavanja.class, UUID.randomUUID().toString());
+                                        Predavanja predavanja =
+                                                realm.createObject(Predavanja.class,
+                                                        UUID.randomUUID().toString());
 
                                         if (e.hasAttr("data-id")) {
                                             String attr = e.attr("data-id");
@@ -367,12 +374,14 @@ public class MainActivity extends AppCompatActivity {
                                         }
 
                                         predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
-                                        predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
+                                        predavanja.setPredmetPredavanja((e.select("span.name" +
+                                                ".normal").text()));
                                         predavanja.setRasponVremena(e.select("div.timespan").text());
                                         predavanja.setGrupa(e.select("span.group.normal").text());
                                         predavanja.setGrupaShort(e.select("span.group.short").text());
                                         predavanja.setDvorana(e.select("span.resource").text());
-                                        predavanja.setDetaljnoVrijeme(e.select("div.detailItem.datetime").text());
+                                        predavanja.setDetaljnoVrijeme(e.select("div.detailItem" +
+                                                ".datetime").text());
                                         predavanja.setProfesor(e.select("div.detailItem.user").text());
                                     }
                                 }
@@ -415,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
                     realmLog.deleteAll();
                 }
             });
-        } catch (RealmException ex){
+        } catch (RealmException ex) {
             Log.e("MainActivity", ex.toString());
         } finally {
             realmLog.close();
@@ -424,13 +433,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this, LoginActivity.class));
     }
 
-    private void getDate(){
+    private void getDate() {
         DateFormat df = new SimpleDateFormat("d.M.yyyy.");
         date = df.format(Calendar.getInstance().getTime());
     }
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager manager =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         boolean isAvailable = false;
@@ -443,7 +453,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void showSnacOffline() {
-        snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG);
+        snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Niste povezani",
+                Snackbar.LENGTH_LONG);
         View vjuz = snack.getView();
         vjuz.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.red_nice));
         snack.show();
@@ -453,7 +464,8 @@ public class MainActivity extends AppCompatActivity {
         if (back_pressed + 2000 > System.currentTimeMillis()) {
             finish();
         } else {
-            snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Pritisnite nazad za izlazak iz aplikacije", Snackbar.LENGTH_SHORT);
+            snack = Snackbar.make(findViewById(R.id.coordinatorLayout), "Pritisnite nazad za " +
+                    "izlazak iz aplikacije", Snackbar.LENGTH_SHORT);
             View viewto = snack.getView();
             viewto.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.grey_nice));
             snack.show();
@@ -461,10 +473,10 @@ public class MainActivity extends AppCompatActivity {
         back_pressed = System.currentTimeMillis();
     }
 
-    public void showShortcutView(){
+    public void showShortcutView() {
         int shortPosition = 0;
 
-        if(getIntent().getAction().equals("podsjetnik")){
+        if (getIntent().getAction().equals("podsjetnik")) {
             Intent newIntent = new Intent(MainActivity.this, NoteActivity.class);
             newIntent.putExtra("mode", 2);
             newIntent.putExtra("task_key", "");
@@ -483,12 +495,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void checkVersion(){
+    public void checkVersion() {
         shPref = FESBCompanion.getInstance().getSP();
         int staraVerzija = shPref.getInt("version_number", 14);
         int trenutnaVerzija = getVersionCode();
 
-        if(staraVerzija < trenutnaVerzija){
+        if (staraVerzija < trenutnaVerzija) {
             showChangelog();
 
             editor = shPref.edit();
@@ -499,7 +511,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public int getVersionCode(){
+    public int getVersionCode() {
         int versionCode = 0;
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -511,7 +523,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showChangelog() {
-        NestedScrollView view = (NestedScrollView) LayoutInflater.from(this).inflate(R.layout.licence_view, null);
+        NestedScrollView view =
+                (NestedScrollView) LayoutInflater.from(this).inflate(R.layout.licence_view, null);
         WebView wv = (WebView) view.findViewById(R.id.webvju);
         wv.loadUrl("file:///android_asset/changelog.html");
         bottomSheet = new BottomSheetDialog(this);
@@ -521,7 +534,7 @@ public class MainActivity extends AppCompatActivity {
         bottomSheet.show();
     }
 
-    private void shouldShowGDPRDialog(){
+    private void shouldShowGDPRDialog() {
         shPref = FESBCompanion.getInstance().getSP();
         Boolean bool = shPref.getBoolean("GDPR_agreed", false);
         if (!bool) {
@@ -535,7 +548,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showGDPRCompliance() {
-        ConstraintLayout view = (ConstraintLayout) LayoutInflater.from(this).inflate(R.layout.gdpr_layout, null);
+        ConstraintLayout view =
+                (ConstraintLayout) LayoutInflater.from(this).inflate(R.layout.gdpr_layout, null);
 
         TextView heading = (TextView) view.findViewById(R.id.terms_heading);
         TextView desc = (TextView) view.findViewById(R.id.terms_text);
@@ -553,10 +567,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                    CustomTabsIntent customTabsIntent = builder.setToolbarColor(getResources().getColor(R.color.colorPrimaryDark)).build();
-                    customTabsIntent.launchUrl(view.getContext(), Uri.parse("http://tstud.io/privacy"));
-                }catch (Exception ex){
-                    Toast.makeText(view.getContext(), "Ažurirajte Chrome preglednik za pregled web stranice", Toast.LENGTH_SHORT).show();
+                    CustomTabsIntent customTabsIntent =
+                            builder.setToolbarColor(getResources().getColor(R.color.colorPrimaryDark)).build();
+                    customTabsIntent.launchUrl(view.getContext(), Uri.parse("http://tstud" +
+                            ".io/privacy"));
+                } catch (Exception ex) {
+                    Toast.makeText(view.getContext(), "Ažurirajte Chrome preglednik za pregled " +
+                            "web stranice", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -590,7 +607,6 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
     }
-
 
 
 }

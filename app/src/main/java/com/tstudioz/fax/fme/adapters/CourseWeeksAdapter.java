@@ -2,14 +2,15 @@ package com.tstudioz.fax.fme.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.KolegijTjedan;
@@ -31,7 +32,9 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
 
     @Override
     public CoursesWeeksViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item_course_week, parent, false);
+        View view =
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item_course_week,
+                        parent, false);
         return new CoursesWeeksViewHolder(view);
     }
 
@@ -50,8 +53,10 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
             holder.mWeek.setPadding(25, 20, 25, 20);
             holder.mWeek.setTypeface(boldtf);
             holder.mWeek.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            holder.mWeek.setBackgroundColor(ContextCompat.getColor(holder.mWeek.getContext(), R.color.blue_nice));
-            holder.mWeek.setTextColor(ContextCompat.getColor(holder.mWeek.getContext(), R.color.white));
+            holder.mWeek.setBackgroundColor(ContextCompat.getColor(holder.mWeek.getContext(),
+                    R.color.blue_nice));
+            holder.mWeek.setTextColor(ContextCompat.getColor(holder.mWeek.getContext(),
+                    R.color.white));
         } else if (tjedan.getTjedan().isEmpty()) {
             holder.mWeek.setVisibility(View.GONE);
             holder.mWeek.setTypeface(lighttf);
@@ -85,18 +90,22 @@ public class CourseWeeksAdapter extends RecyclerView.Adapter<CourseWeeksAdapter.
             super(itemView);
 
             mWeek = (TextView) itemView.findViewById(R.id.tjedanText);
-            lighttf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Light.ttf");
-            boldtf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Bold.ttf");
+            lighttf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans" +
+                    "-Light.ttf");
+            boldtf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans" +
+                    "-Bold.ttf");
 
 
             mWeekDesc = (TextView) itemView.findViewById(R.id.tjedanOpis);
-            regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Regular.ttf");
+            regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts" +
+                    "/OpenSans-Regular.ttf");
             mWeekDesc.setTypeface(regulartf);
             mWeek.setTypeface(regulartf);
 
             Context context = itemView.getContext();
             materialRecycler = (RecyclerView) itemView.findViewById(R.id.mat_recyc);
-            materialRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+            materialRecycler.setLayoutManager(new LinearLayoutManager(context,
+                    LinearLayoutManager.VERTICAL, false));
             materialRecycler.hasFixedSize();
 
             itemView.setOnClickListener(this);

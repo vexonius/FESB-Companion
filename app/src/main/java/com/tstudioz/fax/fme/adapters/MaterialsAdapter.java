@@ -6,10 +6,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +13,12 @@ import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.franmontiel.persistentcookiejar.PersistentCookieJar;
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
@@ -40,7 +37,6 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -64,7 +60,8 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
     @Override
     public MaterialViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.materijal_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.materijal_item,
+                parent, false);
         return new MaterialViewHolder(view);
     }
 
@@ -77,9 +74,9 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
         holder.icon.setImageResource(materijal.getIcon());
 
-        if(materijal.getDownloadable()==1){
+        if (materijal.getDownloadable() == 1) {
             holder.download.setImageResource(R.drawable.download);
-        }else{
+        } else {
             holder.download.setImageResource(R.drawable.open_in_browser);
         }
 
@@ -100,12 +97,13 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
         public MaterialViewHolder(final View itemView) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.mat_text);
-            regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Light.ttf");
+            regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts" +
+                    "/OpenSans-Light.ttf");
             name.setTypeface(regulartf);
 
-            icon = (ImageView)itemView.findViewById(R.id.mat_src);
-            download = (ImageView)itemView.findViewById(R.id.mat_dl);
-            progressBar = (CircularProgressBar )itemView.findViewById(R.id.mat_progress);
+            icon = (ImageView) itemView.findViewById(R.id.mat_src);
+            download = (ImageView) itemView.findViewById(R.id.mat_dl);
+            progressBar = (CircularProgressBar) itemView.findViewById(R.id.mat_progress);
 
             itemView.setOnClickListener(this);
         }
@@ -123,9 +121,11 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
                 try {
                     CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                    CustomTabsIntent customTabsIntent = builder.setToolbarColor(context.getResources().getColor(R.color.colorPrimaryDark)).build();
-                    customTabsIntent.launchUrl(view.getContext(), Uri.parse("https://korisnik.fesb.unist.hr/prijava?returnUrl=" + chromeurl));
-                }catch (Exception ex){
+                    CustomTabsIntent customTabsIntent =
+                            builder.setToolbarColor(context.getResources().getColor(R.color.colorPrimaryDark)).build();
+                    customTabsIntent.launchUrl(view.getContext(), Uri.parse("https://korisnik" +
+                            ".fesb.unist.hr/prijava?returnUrl=" + chromeurl));
+                } catch (Exception ex) {
                     showErrorSnack(view, "Ažurirajte Chrome preglednik za korištenje ove funkcije");
                 }
 
@@ -153,105 +153,113 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
 
                         Document doc = Jsoup.parse(response.body().string());
 
-                    try {
-                        switch (doc_ext) {
-                            case "pdf":
+                        try {
+                            switch (doc_ext) {
+                                case "pdf":
 
-                                Element element = doc.select("div.region-content").first();
-                                final Element links = element.select("a[href]").first();
-                                if (links != null) {
-                                    url = links.attr("href");
-                                } else {
+                                    Element element = doc.select("div.region-content").first();
+                                    final Element links = element.select("a[href]").first();
+                                    if (links != null) {
+                                        url = links.attr("href");
+                                    } else {
+                                        url = rq.url().toString();
+                                    }
+                                    break;
+
+                                case "docx":
+                                case "txt":
+                                case "pptx":
+                                case "xlsx":
+                                case "zip":
                                     url = rq.url().toString();
-                                }
-                                break;
+                                    break;
 
-                            case "docx":
-                            case "txt":
-                            case "pptx":
-                            case "xlsx":
-                            case "zip":
-                                url = rq.url().toString();
-                                break;
+                                case "jpg":
+                                    Element elementx = doc.select("div.region-content").first();
 
-                            case "jpg":
-                                Element elementx = doc.select("div.region-content").first();
+                                    final Element src = elementx.select("img[src]").first();
+                                    url = src.attr("src");
+                                    break;
+                            }
 
-                                final Element src = elementx.select("img[src]").first();
-                                url = src.attr("src");
-                                break;
+                        } catch (Exception exp) {
+                            Log.d("Download link exc", exp.toString());
+                            showErrorSnack(view, "Došlo je do problema pri preuzimanju datoteke");
+                            okHttpClient.dispatcher().cancelAll();
                         }
 
-                    } catch (Exception exp){
-                        Log.d("Download link exc", exp.toString());
-                        showErrorSnack(view, "Došlo je do problema pri preuzimanju datoteke");
-                        okHttpClient.dispatcher().cancelAll();
-                    }
+                        if (url != null) {
 
-                    if (url!=null) {
+                            Request.Builder builder = new Request.Builder()
+                                    .url(url)
+                                    .get();
 
-                        Request.Builder builder = new Request.Builder()
-                                .url(url)
-                                .get();
-
-                        Call callDown = okHttpClient.newCall(builder.build());
-                        callDown.enqueue(new Callback() {
-                            @Override
-                            public void onFailure(Call call, IOException e) {
-                                e.printStackTrace();
-                            }
-
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-                                ResponseBody body = response.body();
-                                //wrap the original response body with progress
-                                ResponseBody responseBody = ProgressHelper.withProgress(body, new ProgressUIListener() {
-                                    //if you don't need this method, don't override this methd. It isn't an abstract method, just an empty method.
-                                    @Override
-                                    public void onUIProgressStart(long totalBytes) {
-                                        super.onUIProgressStart(totalBytes);
-                                    }
-
-                                    @Override
-                                    public void onUIProgressChanged(long numBytes, long totalBytes, float percent, float speed) {
-                                        progressBar.setProgressWithAnimation((int) (100 * percent), 200);
-                                    }
-
-                                    //if you don't need this method, don't override this methd. It isn't an abstract method, just an empty method.
-                                    @Override
-                                    public void onUIProgressFinish() {
-                                        super.onUIProgressFinish();
-                                        progressBar.setVisibility(View.INVISIBLE);
-                                        download.setVisibility(View.VISIBLE);
-                                        download.setImageResource(R.drawable.circle_checked);
-                                    }
-
-                                });
-
-                                //read the body to file
-                                try {
-                                    BufferedSource source = responseBody.source();
-                                    File outFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + doc_name + "." + doc_ext);
-                                    outFile.delete();
-                                    outFile.getParentFile().mkdirs();
-                                    outFile.createNewFile();
-                                    BufferedSink sink = Okio.buffer(Okio.sink(outFile));
-                                    source.readAll(sink);
-                                    sink.flush();
-                                    source.close();
-
-                                    showDocSnack(view, doc_name, doc_ext, outFile);
-                                } catch (Exception exc) {
-                                    Log.d("Download error", exc.toString());
-                                    showErrorSnack(view, "Došlo je do pogreške pri preuzimanju");
+                            Call callDown = okHttpClient.newCall(builder.build());
+                            callDown.enqueue(new Callback() {
+                                @Override
+                                public void onFailure(Call call, IOException e) {
+                                    e.printStackTrace();
                                 }
 
-                            }
-                        });
+                                @Override
+                                public void onResponse(Call call, Response response) throws IOException {
+                                    ResponseBody body = response.body();
+                                    //wrap the original response body with progress
+                                    ResponseBody responseBody = ProgressHelper.withProgress(body,
+                                            new ProgressUIListener() {
+                                        //if you don't need this method, don't override this
+                                        // methd. It isn't an abstract method, just an empty method.
+                                        @Override
+                                        public void onUIProgressStart(long totalBytes) {
+                                            super.onUIProgressStart(totalBytes);
+                                        }
 
-                    } else {
-                        showErrorSnack(view ,"Došlo je do problema pri preuzimanju datoteke");
-                    }
+                                        @Override
+                                        public void onUIProgressChanged(long numBytes,
+                                                                        long totalBytes,
+                                                                        float percent,
+                                                                        float speed) {
+                                            progressBar.setProgressWithAnimation((int) (100 * percent), 200L);
+                                        }
+
+                                        //if you don't need this method, don't override this
+                                        // methd. It isn't an abstract method, just an empty method.
+                                        @Override
+                                        public void onUIProgressFinish() {
+                                            super.onUIProgressFinish();
+                                            progressBar.setVisibility(View.INVISIBLE);
+                                            download.setVisibility(View.VISIBLE);
+                                            download.setImageResource(R.drawable.circle_checked);
+                                        }
+
+                                    });
+
+                                    //read the body to file
+                                    try {
+                                        BufferedSource source = responseBody.source();
+                                        File outFile =
+                                                new File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + doc_name + "." + doc_ext);
+                                        outFile.delete();
+                                        outFile.getParentFile().mkdirs();
+                                        outFile.createNewFile();
+                                        BufferedSink sink = Okio.buffer(Okio.sink(outFile));
+                                        source.readAll(sink);
+                                        sink.flush();
+                                        source.close();
+
+                                        showDocSnack(view, doc_name, doc_ext, outFile);
+                                    } catch (Exception exc) {
+                                        Log.d("Download error", exc.toString());
+                                        showErrorSnack(view, "Došlo je do pogreške pri " +
+                                                "preuzimanju");
+                                    }
+
+                                }
+                            });
+
+                        } else {
+                            showErrorSnack(view, "Došlo je do problema pri preuzimanju datoteke");
+                        }
 
                     }
                 });
@@ -260,38 +268,43 @@ public class MaterialsAdapter extends RecyclerView.Adapter<MaterialsAdapter.Mate
         }
     }
 
-        @Override
-        public void onChange(Object element) {
-            notifyDataSetChanged();
-        }
+    @Override
+    public void onChange(Object element) {
+        notifyDataSetChanged();
+    }
 
-        private void showDocSnack(final View mView, String name, final String extension, final File file){
-            Snackbar snackbar = Snackbar.make(mView, "Dokument " + name + "." + extension + " je preuzet.",Snackbar.LENGTH_LONG);
-            View snackView = snackbar.getView();
-            snackView.setBackgroundColor(ContextCompat.getColor(mView.getContext(), R.color.colorPrimaryDark));
-            snackbar.setAction("OTVORI", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        Intent intent = new Intent();
-                        intent.setAction(android.content.Intent.ACTION_VIEW);
-                        intent.setDataAndType(Uri.fromFile(file), MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
-                        view.getContext().startActivity(intent);
-                    } catch (Exception ex){
-                        showErrorSnack(mView, "Molimo instalirajte potrebnu aplikaciju za pregled ove datoteke");
-                    }
+    private void showDocSnack(final View mView, String name, final String extension,
+                              final File file) {
+        Snackbar snackbar = Snackbar.make(mView, "Dokument " + name + "." + extension + " je " +
+                "preuzet.", Snackbar.LENGTH_LONG);
+        View snackView = snackbar.getView();
+        snackView.setBackgroundColor(ContextCompat.getColor(mView.getContext(),
+                R.color.colorPrimaryDark));
+        snackbar.setAction("OTVORI", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    Intent intent = new Intent();
+                    intent.setAction(android.content.Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.fromFile(file),
+                            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
+                    view.getContext().startActivity(intent);
+                } catch (Exception ex) {
+                    showErrorSnack(mView, "Molimo instalirajte potrebnu aplikaciju za pregled ove" +
+                            " datoteke");
                 }
-            });
-            snackbar.show();
-        }
+            }
+        });
+        snackbar.show();
+    }
 
-        private void showErrorSnack(View mView, String errorMsg){
-            Snackbar snackbar = Snackbar.make(mView, errorMsg, Snackbar.LENGTH_LONG);
-            View snackView = snackbar.getView();
-            snackView.setBackgroundColor(ContextCompat.getColor(mView.getContext(), R.color.red_nice));
-            snackbar.show();
+    private void showErrorSnack(View mView, String errorMsg) {
+        Snackbar snackbar = Snackbar.make(mView, errorMsg, Snackbar.LENGTH_LONG);
+        View snackView = snackbar.getView();
+        snackView.setBackgroundColor(ContextCompat.getColor(mView.getContext(), R.color.red_nice));
+        snackbar.show();
 
-        }
+    }
 
 }
 

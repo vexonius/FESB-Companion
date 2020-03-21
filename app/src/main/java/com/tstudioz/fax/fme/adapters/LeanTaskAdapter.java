@@ -4,12 +4,13 @@ package com.tstudioz.fax.fme.adapters;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.NoteActivity;
@@ -34,28 +35,29 @@ public class LeanTaskAdapter extends RecyclerView.Adapter<LeanTaskAdapter.LeanTa
             .build();
 
 
-
-    public LeanTaskAdapter(RealmResults<LeanTask> task){
+    public LeanTaskAdapter(RealmResults<LeanTask> task) {
         this.mTasks = task;
         mTasks.addChangeListener(this);
     }
 
     @Override
-    public LeanTaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+    public LeanTaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
 
         if (viewType == ADD_NEW) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.add_lean_task_item, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.add_lean_task_item,
+                    parent, false);
             return new LeanTaskViewHolder(view);
         } else {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.lean_task_item, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.lean_task_item,
+                    parent, false);
             return new LeanTaskViewHolder(view);
         }
 
     }
 
     @Override
-    public void onBindViewHolder(LeanTaskViewHolder holder, int position){
+    public void onBindViewHolder(LeanTaskViewHolder holder, int position) {
         LeanTask leanTask = mTasks.get(position);
         holder.taskText.setText(leanTask.getTaskTekst());
 
@@ -75,21 +77,21 @@ public class LeanTaskAdapter extends RecyclerView.Adapter<LeanTaskAdapter.LeanTa
     }
 
     @Override
-    public int getItemCount(){
+    public int getItemCount() {
         return mTasks.size();
     }
 
     @Override
-    public int getItemViewType(int position){
+    public int getItemViewType(int position) {
         LeanTask taskType = mTasks.get(position);
-        if(taskType.getId().equals("ACTION_ADD")){
+        if (taskType.getId().equals("ACTION_ADD")) {
             return 2;
         } else {
             return 1;
         }
     }
 
-    public class LeanTaskViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
+    public class LeanTaskViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         TextView taskText;
         ImageView point;
@@ -101,7 +103,8 @@ public class LeanTaskAdapter extends RecyclerView.Adapter<LeanTaskAdapter.LeanTa
             taskText = (TextView) itemView.findViewById(R.id.taskPointText);
             point = (ImageView) itemView.findViewById(R.id.taskPoint);
 
-            light = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans-Light.ttf");
+            light = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans" +
+                    "-Light.ttf");
             taskText.setTypeface(light);
 
             itemView.setOnClickListener(this);
@@ -112,15 +115,16 @@ public class LeanTaskAdapter extends RecyclerView.Adapter<LeanTaskAdapter.LeanTa
             point.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    switch (getItemViewType()){
-                        case ADD_NEW :
+                    switch (getItemViewType()) {
+                        case ADD_NEW:
                             Intent newIntent = new Intent(view.getContext(), NoteActivity.class);
                             newIntent.putExtra("mode", 2);
-                            newIntent.putExtra("task_key", mTasks.get(getAdapterPosition()).getId());
+                            newIntent.putExtra("task_key",
+                                    mTasks.get(getAdapterPosition()).getId());
                             view.getContext().startActivity(newIntent);
                             break;
                         case NOTE:
-                            if(mTasks.get(getAdapterPosition()).getChecked()) {
+                            if (mTasks.get(getAdapterPosition()).getChecked()) {
                                 taskText.setPaintFlags(0);
                                 point.setImageResource(R.drawable.circle_white);
                                 mRealm.executeTransaction(new Realm.Transaction() {
@@ -139,16 +143,16 @@ public class LeanTaskAdapter extends RecyclerView.Adapter<LeanTaskAdapter.LeanTa
                                     }
                                 });
                             }
-                        break;
+                            break;
                     }
-              }
+                }
             });
         }
 
         @Override
-        public  void onClick(View view){
-            switch (getItemViewType()){
-                case ADD_NEW :
+        public void onClick(View view) {
+            switch (getItemViewType()) {
+                case ADD_NEW:
                     Intent newIntent = new Intent(view.getContext(), NoteActivity.class);
                     newIntent.putExtra("mode", 2);
                     newIntent.putExtra("task_key", mTasks.get(getAdapterPosition()).getId());
@@ -164,8 +168,8 @@ public class LeanTaskAdapter extends RecyclerView.Adapter<LeanTaskAdapter.LeanTa
         @Override
         public boolean onLongClick(View view) {
 
-            switch (getItemViewType()){
-                case ADD_NEW :
+            switch (getItemViewType()) {
+                case ADD_NEW:
                     Intent newIntent = new Intent(view.getContext(), NoteActivity.class);
                     newIntent.putExtra("mode", 2);
                     newIntent.putExtra("task_key", mTasks.get(getAdapterPosition()).getId());
