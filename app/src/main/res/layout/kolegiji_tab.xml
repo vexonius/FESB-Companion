@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
-    android:paddingBottom="@dimen/bottom_navigation_height">
+    android:background="@color/colorPrimaryDark">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedCourse"

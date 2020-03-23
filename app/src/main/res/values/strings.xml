@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">FESB Companion</string>
     <string name="homie">Home</string>
-    <string name="left">Raspored</string>
-    <string name="right">Mail</string>
+    <string name="timetable">Raspored</string>
+    <string name="mail">Mail</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="error_title">Oops! Sorry!</string>
     <string name="error_message">There was an error. Please try again.</string>

@@ -35,6 +35,7 @@ import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.database.Predavanja;
+import com.tstudioz.fax.fme.databinding.ActivityMainBinding;
 import com.tstudioz.fax.fme.fragments.Home;
 import com.tstudioz.fax.fme.fragments.Kolegiji;
 import com.tstudioz.fax.fme.fragments.Mail;
@@ -70,8 +71,6 @@ public class MainActivity extends AppCompatActivity {
     public String date = null;
     public long back_pressed;
 
-    private AHBottomNavigation bottomNavigation;
-
     private Realm realmLog;
 
     private OkHttpClient client;
@@ -80,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
     private BottomSheetDialog bottomSheet;
     private SharedPreferences shPref;
     private SharedPreferences.Editor editor;
+
+    private ActivityMainBinding binding;
+    private AHBottomNavigation bottomNavigation;
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
             .name("glavni.realm")
@@ -91,9 +93,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpToolbar();
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
+        setUpToolbar();
         getDate();
 
         setUpBottomNav();
@@ -147,23 +150,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setUpToolbar() {
-        getSupportActionBar().setElevation(0.0f);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().hide();
+       // getSupportActionBar().setElevation(0.0f);
+       // getSupportActionBar().setDisplayShowHomeEnabled(false);
+
     }
 
     public void setUpBottomNav() {
-        bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
+        bottomNavigation = binding.bottomNavigation;
 
-        AHBottomNavigationItem item0 = new AHBottomNavigationItem(getString(R.string.homie),
-                R.drawable.home, R.color.home_color);
-        AHBottomNavigationItem item1 = new AHBottomNavigationItem(getString(R.string.left),
-                R.drawable.schedule, R.color.left_color);
-        AHBottomNavigationItem item3 = new AHBottomNavigationItem(getString(R.string.prisutnost),
-                R.drawable.plus_attend, R.color.left_color);
-        AHBottomNavigationItem item4 = new AHBottomNavigationItem(getString(R.string.kolegiji),
-                R.drawable.courses, R.color.left_color);
-        AHBottomNavigationItem item2 = new AHBottomNavigationItem(getString(R.string.right),
-                R.drawable.mail, R.color.right_color);
+        AHBottomNavigationItem item0 = new AHBottomNavigationItem(getString(R.string.homie), R.drawable.home, R.color.home_color);
+        AHBottomNavigationItem item1 = new AHBottomNavigationItem(getString(R.string.timetable), R.drawable.schedule, R.color.left_color);
+        AHBottomNavigationItem item3 = new AHBottomNavigationItem(getString(R.string.prisutnost), R.drawable.plus_attend, R.color.left_color);
+        AHBottomNavigationItem item4 = new AHBottomNavigationItem(getString(R.string.kolegiji), R.drawable.courses, R.color.left_color);
+        AHBottomNavigationItem item2 = new AHBottomNavigationItem(getString(R.string.mail), R.drawable.mail, R.color.right_color);
 
         bottomNavigation.addItem(item0);
         bottomNavigation.addItem(item1);
@@ -172,14 +172,14 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.addItem(item2);
 
         bottomNavigation.setBehaviorTranslationEnabled(false);
-        bottomNavigation.setDefaultBackgroundColor(ContextCompat.getColor(this,
-                R.color.colorPrimary));
+        bottomNavigation.setDefaultBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         bottomNavigation.setForceTint(true);
         bottomNavigation.setAccentColor(ContextCompat.getColor(this, R.color.white));
         bottomNavigation.setInactiveColor(ContextCompat.getColor(this, R.color.inactive));
         bottomNavigation.setUseElevation(true);
         bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_HIDE);
         bottomNavigation.setCurrentItem(0);
+
     }
 
     public void setDefaultScreen() {
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setFragmentTab() {
-        bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
+        binding.bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
                 beginFragTransaction(position);
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                 ft.replace(R.id.frame, hf);
                 ft.addToBackStack(null);
                 ft.commit();
-                getSupportActionBar().setTitle("FESB Companion");
+
                 break;
 
             case 1:
@@ -258,7 +258,6 @@ public class MainActivity extends AppCompatActivity {
                 ft.replace(R.id.frame, hf0);
                 ft.addToBackStack(null);
                 ft.commit();
-                getSupportActionBar().setTitle("FESB Companion");
                 break;
         }
     }

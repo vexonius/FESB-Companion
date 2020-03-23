@@ -1,481 +1,507 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginBottom="2dp"
-    android:background="@color/colorPrimaryDark"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/bottom_navigation_height"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:id="@+id/relative_parent_home"
+    <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="2dp"
         android:background="@color/colorPrimaryDark"
-        android:descendantFocusability="blocksDescendants"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
-            android:id="@+id/frameLayout"
+        <RelativeLayout
+            android:id="@+id/relative_parent_home"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:background="@color/dark_cyan"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimaryDark"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical">
 
-            <ProgressBar
-                android:id="@+id/progressCircle"
+            <TextView
+                android:id="@+id/taskHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:indeterminate="true"
-                android:interpolator="@android:interpolator/linear"
-                android:indeterminateTint="@color/white"
-                android:indeterminateTintMode="src_in"
-                android:visibility="visible" />
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="3dp"
+                android:text="PODSJETNICI"
+                android:textColor="@color/shady_blue"
+                android:textSize="13dp" />
 
             <RelativeLayout
-                android:id="@+id/card_home"
+                android:id="@+id/task"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clickable="true"
-                android:visibility="invisible">
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/taskHeader"
+                android:background="@color/colorPrimary">
 
-                <TextView
-                    android:id="@+id/txtloc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:paddingTop="2dp"
-                    android:text="Split"
-                    android:textColor="#ffffff"
-                    android:textSize="16dp" />
-
-                <LinearLayout
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerTask"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:weightSum="1">
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:scrollbarSize="5dp"
+                    android:scrollbarStyle="outsideOverlay"
+                    android:scrollbarThumbVertical="@color/_20white"
+                    android:smoothScrollbar="true" />
+
+            </RelativeLayout>
+
+            <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/adViewHome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/task"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                ads:adSize="BANNER"
+                ads:adUnitId="ca-app-pub-5944203368510130/3254221091" />
+
+            <TextView
+                android:id="@+id/pr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/adViewHome"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="3dp"
+                android:text="@string/danasnja_predavanja"
+                android:textColor="@color/shady_blue"
+                android:textSize="13dp" />
+
+            <FrameLayout
+                android:id="@+id/frame_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/pr"
+                android:layout_marginBottom="10dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbarSize="5dp"
+                    android:scrollbarStyle="outsideOverlay"
+                    android:scrollbarThumbVertical="@color/_20white"
+                    android:smoothScrollbar="true"
+                    android:visibility="invisible" />
+
+                <RelativeLayout
+                    android:id="@+id/nema_predavanja"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimary"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/smile"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:paddingTop="20dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/smiley" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/smile"
+                        android:layout_marginTop="15dp"
+                        android:paddingBottom="10dp"
+                        android:text="@string/odmori_se"
+                        android:textAlignment="center"
+                        android:textColor="#cacaca"
+                        android:textSize="14dp" />
+                </RelativeLayout>
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/menzaHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/frame_list"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="3dp"
+                android:text="PREHRANA"
+                android:textColor="@color/shady_blue"
+                android:textSize="14dp" />
+
+            <RelativeLayout
+                android:id="@+id/menza_relative"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:layout_below="@+id/menzaHeader"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/welcome2">
+
+                <com.doctoror.particlesdrawable.ParticlesView
+                    android:id="@+id/particles_menza"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:dotColor="@color/white"
+                    app:frameDelayMillis="10"
+                    app:lineColor="@color/white"
+                    app:lineDistance="110dp"
+                    app:lineThickness="1dp"
+                    app:maxDotRadius="3dp"
+                    app:minDotRadius="1dp"
+                    app:numDots="12"
+                    app:stepMultiplier="1" />
+
+                <TextView
+                    android:id="@+id/menza_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Menza"
+                    android:textColor="@color/white"
+                    android:textSize="35dp" />
+
+                <TextView
+                    android:id="@+id/menza_text_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/menza_text"
+                    android:layout_marginLeft="30dp"
+                    android:text="Pregledaj dnevni jelovnik"
+                    android:textColor="@color/white"
+                    android:textSize="14dp" />
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/iksica_ad"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:layout_below="@+id/menza_relative"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/red_nice"
+                android:clickable="true">
+
+                <com.doctoror.particlesdrawable.ParticlesView
+                    android:id="@+id/particles_iksica"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:dotColor="@color/white"
+                    app:frameDelayMillis="10"
+                    app:lineColor="@color/white"
+                    app:lineDistance="110dp"
+                    app:lineThickness="1dp"
+                    app:maxDotRadius="3dp"
+                    app:minDotRadius="1dp"
+                    app:numDots="12"
+                    app:stepMultiplier="1" />
+
+                <TextView
+                    android:id="@+id/iksicaText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Iksica"
+                    android:textColor="@color/white"
+                    android:textSize="35dp" />
+
+                <TextView
+                    android:id="@+id/iksica_text_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/iksicaText"
+                    android:layout_marginLeft="30dp"
+                    android:text="Provjeri stanje svoje x-ice"
+                    android:textColor="@color/white"
+                    android:textSize="14dp" />
+
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/indeksHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iksica_ad"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="3dp"
+                android:text="OCJENE"
+                android:textColor="@color/shady_blue"
+                android:textSize="14dp" />
+
+            <RelativeLayout
+                android:id="@+id/eindex_Relative"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:layout_below="@+id/indeksHeader"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/purple_nice"
+                android:clickable="true">
+
+                <com.doctoror.particlesdrawable.ParticlesView
+                    android:id="@+id/particles_indeks"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:dotColor="@color/white"
+                    app:frameDelayMillis="10"
+                    app:lineColor="@color/white"
+                    app:lineDistance="110dp"
+                    app:lineThickness="1dp"
+                    app:maxDotRadius="3dp"
+                    app:minDotRadius="1dp"
+                    app:numDots="12"
+                    app:stepMultiplier="1" />
+
+                <TextView
+                    android:id="@+id/eindexText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="20dp"
+                    android:text="eIndeks"
+                    android:textColor="@color/white"
+                    android:textSize="35dp" />
+
+                <TextView
+                    android:id="@+id/eindex_text_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/eindexText"
+                    android:layout_marginLeft="30dp"
+                    android:text="Pregled ocjena"
+                    android:textColor="@color/white"
+                    android:textSize="14dp" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dark_cyan"
+        >
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            app:contentScrim="@color/colorPrimary"
+            app:expandedTitleGravity="bottom"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+
+            <FrameLayout
+                android:id="@+id/frameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dp">
+
+                <ProgressBar
+                    android:id="@+id/progressCircle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/white"
+                    android:indeterminateTintMode="src_in"
+                    android:interpolator="@android:interpolator/linear"
+                    android:visibility="visible" />
+
+                <RelativeLayout
+                    android:id="@+id/card_home"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:visibility="invisible">
+
+                    <TextView
+                        android:id="@+id/txtloc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:paddingTop="2dp"
+                        android:text="Split"
+                        android:textColor="#ffffff"
+                        android:textSize="16dp" />
 
                     <LinearLayout
-                        android:id="@+id/prije"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="0.55"
-                        android:orientation="horizontal">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:id="@+id/vrijeme_image"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_margin="10dp"
-                                android:scaleType="centerInside" />
-
-                        </RelativeLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="0.45"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/temperatura_vrijednost"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_horizontal"
-                            android:paddingBottom="0dp"
-                            android:text=""
-                            android:textColor="@color/white"
-                            android:textSize="65dp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/opis"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_horizontal"
-                            android:paddingBottom="10dp"
-                            android:text=""
-                            android:textColor="#ffffff"
-                            android:textSize="13dp" />
+                        android:orientation="horizontal"
+                        android:weightSum="1">
 
                         <LinearLayout
+                            android:id="@+id/prije"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:weightSum="3">
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.55"
+                            android:orientation="horizontal">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="1">
-
-                                <TextView
-                                    android:id="@+id/trenutni_vjetar"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text=""
-                                    android:textAlignment="center"
-                                    android:textColor="#ffffff"
-                                    android:textSize="12dp" />
-
-                                <ImageView
-                                    android:id="@+id/vjetrovito"
-                                    android:layout_width="25dp"
-                                    android:layout_height="25dp"
-                                    android:layout_below="@+id/trenutni_vjetar"
-                                    android:layout_centerHorizontal="true"
-                                    android:scaleType="centerInside"
-                                    android:src="@drawable/wind" />
-
-                            </RelativeLayout>
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="1"
                                 android:gravity="center">
 
-
-                                <TextView
-                                    android:id="@+id/vlaznost_vrijednost"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text=""
-                                    android:textAlignment="center"
-                                    android:textColor="#ffffff"
-                                    android:textSize="12dp" />
-
                                 <ImageView
-                                    android:id="@+id/vlaznost"
-                                    android:layout_width="22dp"
-                                    android:layout_height="22dp"
-                                    android:layout_below="@+id/vlaznost_vrijednost"
-                                    android:layout_centerHorizontal="true"
-                                    android:paddingTop="3dp"
-                                    android:scaleType="centerInside"
-                                    android:src="@drawable/vlaga" />
-
-                            </RelativeLayout>
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="1"
-                                android:gravity="center">
-
-                                <TextView
-                                    android:id="@+id/oborine_vrijednost"
+                                    android:id="@+id/vrijeme_image"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text=""
-                                    android:textAlignment="center"
-                                    android:textColor="#ffffff"
-                                    android:textSize="12dp" />
-
-                                <ImageView
-                                    android:id="@+id/oborine"
-                                    android:layout_width="25dp"
-                                    android:layout_height="25dp"
-                                    android:layout_below="@+id/oborine_vrijednost"
-                                    android:layout_centerHorizontal="true"
-                                    android:scaleType="centerInside"
-                                    android:src="@drawable/oborine" />
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="10dp"
+                                    android:scaleType="centerInside" />
 
                             </RelativeLayout>
 
                         </LinearLayout>
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.45"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/temperatura_vrijednost"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal"
+                                android:paddingBottom="0dp"
+                                android:text=""
+                                android:textColor="@color/white"
+                                android:textSize="65dp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/opis"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal"
+                                android:paddingBottom="10dp"
+                                android:text=""
+                                android:textColor="#ffffff"
+                                android:textSize="13dp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:weightSum="3">
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center"
+                                    android:layout_weight="1">
+
+                                    <TextView
+                                        android:id="@+id/trenutni_vjetar"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text=""
+                                        android:textAlignment="center"
+                                        android:textColor="#ffffff"
+                                        android:textSize="12dp" />
+
+                                    <ImageView
+                                        android:id="@+id/vjetrovito"
+                                        android:layout_width="25dp"
+                                        android:layout_height="25dp"
+                                        android:layout_below="@+id/trenutni_vjetar"
+                                        android:layout_centerHorizontal="true"
+                                        android:scaleType="centerInside"
+                                        android:src="@drawable/wind" />
+
+                                </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+
+
+                                    <TextView
+                                        android:id="@+id/vlaznost_vrijednost"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text=""
+                                        android:textAlignment="center"
+                                        android:textColor="#ffffff"
+                                        android:textSize="12dp" />
+
+                                    <ImageView
+                                        android:id="@+id/vlaznost"
+                                        android:layout_width="22dp"
+                                        android:layout_height="22dp"
+                                        android:layout_below="@+id/vlaznost_vrijednost"
+                                        android:layout_centerHorizontal="true"
+                                        android:paddingTop="3dp"
+                                        android:scaleType="centerInside"
+                                        android:src="@drawable/vlaga" />
+
+                                </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/oborine_vrijednost"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text=""
+                                        android:textAlignment="center"
+                                        android:textColor="#ffffff"
+                                        android:textSize="12dp" />
+
+                                    <ImageView
+                                        android:id="@+id/oborine"
+                                        android:layout_width="25dp"
+                                        android:layout_height="25dp"
+                                        android:layout_below="@+id/oborine_vrijednost"
+                                        android:layout_centerHorizontal="true"
+                                        android:scaleType="centerInside"
+                                        android:src="@drawable/oborine" />
+
+                                </RelativeLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
                     </LinearLayout>
 
-                </LinearLayout>
+                </RelativeLayout>
 
-            </RelativeLayout>
+            </FrameLayout>
 
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/taskHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/frameLayout"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:text="PODSJETNICI"
-            android:textColor="@color/shady_blue"
-            android:textSize="13dp" />
-
-        <RelativeLayout
-            android:id="@+id/task"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/taskHeader"
-            android:background="@color/colorPrimary">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerTask"
+            <Toolbar
+                android:id="@+id/custom_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
-                android:scrollbarSize="5dp"
-                android:scrollbarStyle="outsideOverlay"
-                android:scrollbarThumbVertical="@color/_20white"
-                android:smoothScrollbar="true"/>
-
-        </RelativeLayout>
-
-        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/adViewHome"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/task"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            ads:adSize="BANNER"
-            ads:adUnitId="ca-app-pub-5944203368510130/3254221091"/>
-
-        <TextView
-            android:id="@+id/pr"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/adViewHome"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/danasnja_predavanja"
-            android:textColor="@color/shady_blue"
-            android:textSize="13dp" />
-
-        <FrameLayout
-            android:id="@+id/frame_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/pr"
-            android:layout_marginBottom="10dp">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbarSize="5dp"
-                android:scrollbarStyle="outsideOverlay"
-                android:scrollbarThumbVertical="@color/_20white"
-                android:smoothScrollbar="true"
-                android:visibility="invisible" />
-
-            <RelativeLayout
-                android:id="@+id/nema_predavanja"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/smile"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:paddingTop="20dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/smiley" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/smile"
-                    android:layout_marginTop="15dp"
-                    android:paddingBottom="10dp"
-                    android:text="@string/odmori_se"
-                    android:textAlignment="center"
-                    android:textColor="#cacaca"
-                    android:textSize="14dp" />
-            </RelativeLayout>
-
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/menzaHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/frame_list"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="20dp"
-            android:text="PREHRANA"
-            android:textColor="@color/shady_blue"
-            android:textSize="14dp" />
-
-        <RelativeLayout
-            android:id="@+id/menza_relative"
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layout_below="@+id/menzaHeader"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/welcome2">
-
-            <com.doctoror.particlesdrawable.ParticlesView
-                android:id="@+id/particles_menza"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:minDotRadius="1dp"
-                app:maxDotRadius="3dp"
-                app:lineThickness="1dp"
-                app:lineDistance="110dp"
-                app:numDots="12"
-                app:dotColor="@color/white"
-                app:lineColor="@color/white"
-                app:frameDelayMillis="10"
-                app:stepMultiplier="1" />
-
-            <TextView
-                android:id="@+id/menza_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="20dp"
-                android:text="Menza"
-                android:textColor="@color/white"
-                android:textSize="35dp" />
-
-            <TextView
-                android:id="@+id/menza_text_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/menza_text"
-                android:layout_marginLeft="30dp"
-                android:text="Pregledaj dnevni jelovnik"
-                android:textColor="@color/white"
-                android:textSize="14dp" />
-
-
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/iksica_ad"
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layout_below="@+id/menza_relative"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/red_nice"
-            android:clickable="true">
-
-            <com.doctoror.particlesdrawable.ParticlesView
-                android:id="@+id/particles_iksica"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:minDotRadius="1dp"
-                app:maxDotRadius="3dp"
-                app:lineThickness="1dp"
-                app:lineDistance="110dp"
-                app:numDots="12"
-                app:dotColor="@color/white"
-                app:lineColor="@color/white"
-                app:frameDelayMillis="10"
-                app:stepMultiplier="1" />
-
-            <TextView
-                android:id="@+id/iksicaText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="20dp"
-                android:text="Iksica"
-                android:textColor="@color/white"
-                android:textSize="35dp" />
-
-            <TextView
-                android:id="@+id/iksica_text_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/iksicaText"
-                android:layout_marginLeft="30dp"
-                android:text="Provjeri stanje svoje x-ice"
-                android:textColor="@color/white"
-                android:textSize="14dp" />
-
-
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/indeksHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/iksica_ad"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="20dp"
-            android:text="OCJENE"
-            android:textColor="@color/shady_blue"
-            android:textSize="14dp" />
-
-        <RelativeLayout
-            android:id="@+id/eindex_Relative"
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layout_below="@+id/indeksHeader"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/purple_nice"
-            android:clickable="true">
-
-            <com.doctoror.particlesdrawable.ParticlesView
-                android:id="@+id/particles_indeks"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:minDotRadius="1dp"
-                app:maxDotRadius="3dp"
-                app:lineThickness="1dp"
-                app:lineDistance="110dp"
-                app:numDots="12"
-                app:dotColor="@color/white"
-                app:lineColor="@color/white"
-                app:frameDelayMillis="10"
-                app:stepMultiplier="1" />
-
-            <TextView
-                android:id="@+id/eindexText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="20dp"
-                android:text="eIndeks"
-                android:textColor="@color/white"
-                android:textSize="35dp" />
-
-            <TextView
-                android:id="@+id/eindex_text_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/eindexText"
-                android:layout_marginLeft="30dp"
-                android:text="Pregled ocjena"
-                android:textColor="@color/white"
-                android:textSize="14dp" />
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-
-</androidx.core.widget.NestedScrollView>
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="parallax" />
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

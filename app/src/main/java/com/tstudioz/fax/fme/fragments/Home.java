@@ -91,6 +91,8 @@ public class Home extends Fragment {
 
         binding = HomeTabBinding.inflate(inflater, container, false);
 
+        getActivity().setActionBar(binding.customToolbar);
+
         setHasOptionsMenu(true);
         setCyanStatusBarColor();
         getDate();
