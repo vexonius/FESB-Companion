@@ -295,18 +295,18 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/dark_cyan"
-        >
+        android:background="@color/dark_cyan">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarLayout"
             android:layout_width="match_parent"
             android:layout_height="220dp"
             app:contentScrim="@color/colorPrimary"
-            app:expandedTitleGravity="bottom"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+            app:expandedTitleGravity="top"
+            app:layout_scrollFlags="scroll|snap"
+            app:titleEnabled="false">
 
-            <FrameLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/frameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
@@ -316,16 +316,18 @@
                 android:paddingRight="10dp"
                 android:paddingBottom="10dp">
 
-                <ProgressBar
-                    android:id="@+id/progressCircle"
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmer_weather"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:indeterminate="true"
-                    android:indeterminateTint="@color/white"
-                    android:indeterminateTintMode="src_in"
-                    android:interpolator="@android:interpolator/linear"
-                    android:visibility="visible" />
+                    android:layout_height="match_parent"
+                    app:shimmer_clip_to_children="true"
+                    app:shimmer_highlight_color="@color/_70white"
+                    app:shimmer_colored="true"
+                    app:shimmer_duration="1800">
+
+                    <include layout="@layout/weather_layout_placeholder" />
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
 
                 <RelativeLayout
                     android:id="@+id/card_home"
@@ -367,6 +369,8 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:layout_margin="10dp"
+                                    android:minWidth="80dp"
+                                    android:minHeight="80dp"
                                     android:scaleType="centerInside" />
 
                             </RelativeLayout>
@@ -378,6 +382,7 @@
                             android:layout_height="match_parent"
                             android:layout_weight="0.45"
                             android:gravity="center_vertical"
+                            android:visibility="visible"
                             android:orientation="vertical">
 
                             <TextView
@@ -388,7 +393,7 @@
                                 android:paddingBottom="0dp"
                                 android:text=""
                                 android:textColor="@color/white"
-                                android:textSize="65dp"
+                                android:textSize="42dp"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -495,13 +500,13 @@
 
                 </RelativeLayout>
 
-            </FrameLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <Toolbar
                 android:id="@+id/custom_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="parallax" />
+                app:layout_collapseMode="pin" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

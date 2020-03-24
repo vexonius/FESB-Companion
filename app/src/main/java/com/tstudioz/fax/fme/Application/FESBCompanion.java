@@ -3,7 +3,6 @@ package com.tstudioz.fax.fme.Application;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.StrictMode;
 
 import androidx.multidex.MultiDex;
 
@@ -35,19 +34,6 @@ public class FESBCompanion extends Application {
 
     @Override
     public void onCreate() {
-
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
-                .detectDiskWrites()
-                .detectNetwork()   // or .detectAll() for all detectable problems
-                .penaltyLog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
-                .detectLeakedClosableObjects()
-                .penaltyLog()
-                .penaltyDeath()
-                .build());
 
         super.onCreate();
         instance = this;

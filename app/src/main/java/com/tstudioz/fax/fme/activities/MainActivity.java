@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.activities;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,8 +28,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
@@ -42,6 +41,8 @@ import com.tstudioz.fax.fme.fragments.Mail;
 import com.tstudioz.fax.fme.fragments.Prisutnost;
 import com.tstudioz.fax.fme.fragments.TimeTable;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -57,6 +58,7 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
+import nl.joery.animatedbottombar.AnimatedBottomBar;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -81,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
 
     private ActivityMainBinding binding;
-    private AHBottomNavigation bottomNavigation;
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
             .name("glavni.realm")
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         setUpToolbar();
         getDate();
 
-        setUpBottomNav();
+        testBottomBar();
 
         isThereAction();
 
@@ -115,6 +116,16 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setDefaultScreen();
         }
+    }
+
+    private void setDefaultScreen() {
+        getSupportActionBar().hide();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        hf = new Home();
+        ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
+        ft.replace(R.id.frame, hf);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     public void checkUser() {
@@ -149,54 +160,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     public void setUpToolbar() {
+        getSupportActionBar().setShowHideAnimationEnabled(false);
         getSupportActionBar().hide();
-       // getSupportActionBar().setElevation(0.0f);
-       // getSupportActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().setElevation(0.0f);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
+    }
+
+    public void testBottomBar() {
+        AnimatedBottomBar bar = binding.bottomBar;
+
+        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.attend), "Prisutnost", 1));
+        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.cal), "Raspored", 2));
+        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.command_line), "Home", 3));
+        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.courses), "Kolegiji", 4));
+        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.mail), "Outlook", 5));
+
+        bar.selectTabById(3, false);
 
     }
 
-    public void setUpBottomNav() {
-        bottomNavigation = binding.bottomNavigation;
-
-        AHBottomNavigationItem item0 = new AHBottomNavigationItem(getString(R.string.homie), R.drawable.home, R.color.home_color);
-        AHBottomNavigationItem item1 = new AHBottomNavigationItem(getString(R.string.timetable), R.drawable.schedule, R.color.left_color);
-        AHBottomNavigationItem item3 = new AHBottomNavigationItem(getString(R.string.prisutnost), R.drawable.plus_attend, R.color.left_color);
-        AHBottomNavigationItem item4 = new AHBottomNavigationItem(getString(R.string.kolegiji), R.drawable.courses, R.color.left_color);
-        AHBottomNavigationItem item2 = new AHBottomNavigationItem(getString(R.string.mail), R.drawable.mail, R.color.right_color);
-
-        bottomNavigation.addItem(item0);
-        bottomNavigation.addItem(item1);
-        bottomNavigation.addItem(item3);
-        bottomNavigation.addItem(item4);
-        bottomNavigation.addItem(item2);
-
-        bottomNavigation.setBehaviorTranslationEnabled(false);
-        bottomNavigation.setDefaultBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        bottomNavigation.setForceTint(true);
-        bottomNavigation.setAccentColor(ContextCompat.getColor(this, R.color.white));
-        bottomNavigation.setInactiveColor(ContextCompat.getColor(this, R.color.inactive));
-        bottomNavigation.setUseElevation(true);
-        bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_HIDE);
-        bottomNavigation.setCurrentItem(0);
-
-    }
-
-    public void setDefaultScreen() {
-        hf = new Home();
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.frame, hf);
-        ft.addToBackStack(null);
-        ft.commit();
-    }
 
     public void setFragmentTab() {
-        binding.bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
+        binding.bottomBar.setOnTabSelectListener(new AnimatedBottomBar.OnTabSelectListener() {
             @Override
-            public boolean onTabSelected(int position, boolean wasSelected) {
-                beginFragTransaction(position);
-                return true;
+            public void onTabSelected(int i, @Nullable AnimatedBottomBar.Tab tab, int i1,
+                                      @NotNull AnimatedBottomBar.Tab tab1) {
+                beginFragTransaction(tab1.getId());
+            }
+
+            @Override
+            public void onTabReselected(int i, @NotNull AnimatedBottomBar.Tab tab) {
+
             }
         });
     }
@@ -204,35 +200,29 @@ public class MainActivity extends AppCompatActivity {
     public void beginFragTransaction(int pos) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         switch (pos) {
-            case 0:
-                Home hf = new Home();
-                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
-                ft.replace(R.id.frame, hf);
-                ft.addToBackStack(null);
-                ft.commit();
-
-                break;
 
             case 1:
-                TimeTable lf = new TimeTable();
-                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
-                ft.replace(R.id.frame, lf);
-                ft.addToBackStack(null);
-                ft.commit();
-                getSupportActionBar().setTitle("Raspored");
-                break;
-
-
-            case 2:
                 Prisutnost ik = new Prisutnost();
                 ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, ik);
                 ft.addToBackStack(null);
                 ft.commit();
                 getSupportActionBar().setTitle("Prisutnost");
+                getSupportActionBar().show();
                 break;
 
-            case 3:
+
+            case 2:
+                TimeTable lf = new TimeTable();
+                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
+                ft.replace(R.id.frame, lf);
+                ft.addToBackStack(null);
+                ft.commit();
+                getSupportActionBar().setTitle("Raspored");
+                getSupportActionBar().show();
+                break;
+
+            case 4:
 
                 Kolegiji kol = new Kolegiji();
                 ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
@@ -240,9 +230,10 @@ public class MainActivity extends AppCompatActivity {
                 ft.addToBackStack(null);
                 ft.commit();
                 getSupportActionBar().setTitle("Kolegiji");
+                getSupportActionBar().show();
                 break;
 
-            case 4:
+            case 5:
 
                 Mail rt = new Mail();
                 ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
@@ -250,9 +241,11 @@ public class MainActivity extends AppCompatActivity {
                 ft.addToBackStack(null);
                 ft.commit();
                 getSupportActionBar().setTitle("Mail");
+                getSupportActionBar().show();
                 break;
 
-            default:
+            case 3:
+                getSupportActionBar().hide();
                 Home hf0 = new Home();
                 ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, hf0);

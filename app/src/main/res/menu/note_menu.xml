@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/delete"
-        android:icon="@drawable/trashcan"
+        android:icon="@drawable/deletedelete"
         android:visible="true"
         android:title="@string/delete"
         app:showAsAction="always"

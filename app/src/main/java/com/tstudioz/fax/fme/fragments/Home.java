@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
+import com.tstudioz.fax.fme.BuildConfig;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.activities.IndexActivity;
 import com.tstudioz.fax.fme.activities.MenzaActivity;
@@ -57,17 +58,18 @@ import static android.content.ContentValues.TAG;
 
 public class Home extends Fragment {
 
-    public String date = null;
 
-    String myApiKey = "e39d50a0b9c65d5c7f2739eff093e6f5";
-    String units;
+    private static final String myApiKey = BuildConfig.DARKSKY_API_KEY;
+    private static final double mLatitude = 43.511287;
+    private static final double mLongitude = 16.469252;
 
-    double mLatitude = 43.511287;
-    double mLongitude = 16.469252;
+    private String date = null;
+    private String units;
 
     private Forecast mForecast;
-    Snackbar snack;
-    Realm mrealm, taskRealm;
+    private Snackbar snack;
+    private Realm mrealm, taskRealm;
+    private HomeTabBinding binding;
 
     public RealmConfiguration realmTaskConfiguration = new RealmConfiguration.Builder()
             .name("tasks.realm")
@@ -81,7 +83,6 @@ public class Home extends Fragment {
             .deleteRealmIfMigrationNeeded()
             .build();
 
-    private HomeTabBinding binding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -169,9 +170,11 @@ public class Home extends Fragment {
 
         // get your own API KEY from developer.forecast.io and fill it in.
         final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr" + units;
+        Log.d("Dark", forecastUrl);
+        final String testUrl = "http://34.65.18.132/forecast";
 
         if (isNetworkAvailable()) {
-            getForecast(forecastUrl);
+            getForecast(testUrl);
         } else {
             showSnacOffline();
         }
@@ -180,9 +183,6 @@ public class Home extends Fragment {
 
 
     private void updateDisplay() {
-        binding.progressCircle.setVisibility(View.GONE);
-        binding.cardHome.setVisibility(View.VISIBLE);
-
         Current current = mForecast.getCurrent();
 
         String pTemperatura = current.getTemperature() + "°";
@@ -197,12 +197,18 @@ public class Home extends Fragment {
         binding.trenutniVjetar.setText(pWind);
         binding.opis.setText(pSummary);
 
+        binding.shimmerWeather.setVisibility(View.GONE);
+        binding.cardHome.setVisibility(View.VISIBLE);
+
         Drawable drawable = getResources().getDrawable(current.getIconId());
         binding.vrijemeImage.setImageDrawable(drawable);
 
     }
 
     private Forecast parseForecastDetails(String jsonData) throws JSONException {
+        jsonData = jsonData.replaceAll("\\\\\"", "\"");
+        jsonData = jsonData.substring(1, jsonData.length()-1);
+        Log.d("REGEX OUTPUT", jsonData);
         Forecast forecast = new Forecast();
         forecast.setCurrent(getCurrentDetails(jsonData));
 
