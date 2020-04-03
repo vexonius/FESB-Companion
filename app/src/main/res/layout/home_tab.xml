@@ -393,7 +393,7 @@
                                 android:paddingBottom="0dp"
                                 android:text=""
                                 android:textColor="@color/white"
-                                android:textSize="42dp"
+                                android:textSize="64dp"
                                 android:textStyle="bold" />
 
                             <TextView

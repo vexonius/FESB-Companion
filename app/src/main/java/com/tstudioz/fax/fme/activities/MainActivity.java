@@ -40,6 +40,7 @@ import com.tstudioz.fax.fme.fragments.Kolegiji;
 import com.tstudioz.fax.fme.fragments.Mail;
 import com.tstudioz.fax.fme.fragments.Prisutnost;
 import com.tstudioz.fax.fme.fragments.TimeTable;
+import com.tstudioz.fax.fme.ui.mainscreen.MainViewModel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,6 +67,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static android.content.ContentValues.TAG;
+import static org.koin.java.KoinJavaComponent.get;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -81,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomSheetDialog bottomSheet;
     private SharedPreferences shPref;
     private SharedPreferences.Editor editor;
+
+    private MainViewModel viewModel = get(MainViewModel.class);
 
     private ActivityMainBinding binding;
 
@@ -108,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         checkUser();
         checkVersion();
         shouldShowGDPRDialog();
+
     }
 
     public void isThereAction() {

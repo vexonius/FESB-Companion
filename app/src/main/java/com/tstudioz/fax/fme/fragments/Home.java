@@ -217,20 +217,16 @@ public class Home extends Fragment {
 
     private Current getCurrentDetails(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
-        // String timezone = forecast.getString("timezone");
 
         JSONObject currently = forecast.getJSONObject("currently");
 
         Current current = new Current();
         current.setHumidity(currently.getDouble("humidity"));
-        //current.setTime(currently.getLong("time"));
         current.setIcon(currently.getString("icon"));
         current.setPrecipChance(currently.getDouble("precipProbability"));
         current.setSummary(currently.getString("summary"));
         current.setWind(currently.getDouble("windSpeed"));
         current.setTemperature(currently.getDouble("temperature"));
-        //current.setTimeZone(timezone);
-
 
         return current;
     }

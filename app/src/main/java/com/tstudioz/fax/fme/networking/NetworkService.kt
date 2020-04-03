@@ -3,7 +3,7 @@ package com.tstudioz.fax.fme.networking
 import retrofit2.Retrofit
 
 
-class Service {
+class NetworkService {
 
     companion object {
         private const val BASE_URL: String = "https://fesb.hr"

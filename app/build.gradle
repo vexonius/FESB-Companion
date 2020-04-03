@@ -41,9 +41,10 @@ dependencies {
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-android-scope:$koin_version"
     implementation "org.koin:koin-android-viewmodel:$koin_version"
-    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
     implementation "com.squareup.moshi:moshi-kotlin:1.9.2"
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    implementation "io.coil-kt:coil:0.9.5"
 
     implementation 'nl.joery.animatedbottombar:library:1.0.7'
 
@@ -51,16 +52,15 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    implementation('com.philliphsu:bottomsheetpickers:2.4.1')
+    implementation 'com.philliphsu:bottomsheetpickers:2.4.1'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
-    implementation 'androidx.gridlayout:gridlayout:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.preference:preference:1.1.0'
     implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
     implementation 'androidx.browser:browser:1.2.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.14.4'
-    implementation 'org.jsoup:jsoup:1.11.2'
+    implementation 'com.squareup.okhttp3:okhttp:4.4.1'
+    implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.google.android.gms:play-services-ads:19.0.1'
     implementation 'io.realm:android-adapters:2.1.1'
     implementation "com.github.doctoror.particlesdrawable:library:1.0.9"
@@ -75,6 +75,11 @@ dependencies {
 
     def multidex_version = "2.0.1"
     implementation "androidx.multidex:multidex:$multidex_version"
+
+    def lifecycle_version = "2.2.0"
+
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
 }
 
 
