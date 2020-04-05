@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.networking
 
-import com.tstudioz.fax.fme.models.PortalResult
+import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +16,7 @@ class PortalService : FService {
 
     private val client: OkHttpClient by inject(OkHttpClient::class.java)
 
-    override suspend fun loginUser(): Flow<PortalResult.LoginResult> = flow {
+    override suspend fun loginUser(): Flow<Result.LoginResult> = flow {
         val requestBody = FormBody.Builder()
                 .add("Username", "temer00")
                 .add("Password", "Jc72028N")
@@ -31,12 +31,12 @@ class PortalService : FService {
 
         val response = client.newCall(request).execute()
 
-        if (response.isSuccessful)  emit(PortalResult.LoginResult.Success(User("temi", "Tino", "temi@fesb.hr")))
-        else emit(PortalResult.LoginResult.Failure(Throwable("Doslo je do pogreske prilikom prijave")))
+        if (response.isSuccessful) emit(Result.LoginResult.Success(User("temi", "Tino", "temi@fesb.hr")))
+        else emit(Result.LoginResult.Failure(Throwable("Doslo je do pogreske prilikom prijave")))
 
     }.flowOn(context = Dispatchers.IO)
 
-    override fun logoutUser(): Flow<PortalResult.LogoutResult> {
+    override fun logoutUser(): Flow<Result.LogoutResult> {
         TODO("Not yet implemented")
     }
 

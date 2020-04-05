@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.data.Repository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.catch
@@ -21,6 +22,7 @@ class MainViewModel : ViewModel() {
 
     init {
         loginUser()
+        fetchUserTimetable()
     }
 
     private fun loginUser() {
@@ -29,6 +31,15 @@ class MainViewModel : ViewModel() {
                     .onStart { println("Started") }
                     .catch { println("Doslo je do pogreske") }
                     .collect { result -> Log.d("hello", result.fullname) }
+        }
+    }
+
+    private fun fetchUserTimetable(){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.fetchTimetable("spomenka", "2020-04-06", "2020-04-12")
+                    .onStart { println("started Fetching Timetable for user") }
+                    .catch { e -> Log.e("Error timetable", e.toString()) }
+                    .collect { list -> list.forEach { println(it.name)} }
         }
     }
 

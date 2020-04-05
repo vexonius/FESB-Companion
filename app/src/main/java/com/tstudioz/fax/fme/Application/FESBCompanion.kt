@@ -1,14 +1,19 @@
 package com.tstudioz.fax.fme.Application
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.multidex.MultiDex
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.google.android.gms.ads.MobileAds
 import com.orhanobut.hawk.Hawk
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.di.module
 import com.tstudioz.fax.fme.migrations.CredMigration
 import io.realm.Realm
@@ -22,6 +27,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import java.io.File
 import java.security.SecureRandom
+
 
 @InternalCoroutinesApi
 class FESBCompanion : Application() {
@@ -52,6 +58,8 @@ class FESBCompanion : Application() {
         }
 
         MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006")
+
+        sendNotification()
     }
 
     override fun attachBaseContext(base: Context) {
@@ -113,5 +121,23 @@ class FESBCompanion : Application() {
         var instance: FESBCompanion? = null
             private set
         private var shPref: SharedPreferences? = null
+    }
+
+    private fun sendNotification(){
+        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel("default", "Default", NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(applicationContext, "default")
+                .setContentTitle("Promjena u rasporedu")
+                .setContentText("Dodano novo predavanje u Utorak")
+                .setPriority(2)
+                .setStyle(NotificationCompat.BigTextStyle())
+                .setSmallIcon(R.drawable.fmebig)
+
+        notificationManager.notify(1, notification.build())
     }
 }
