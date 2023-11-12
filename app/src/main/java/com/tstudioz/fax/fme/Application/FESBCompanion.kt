@@ -1,21 +1,18 @@
 package com.tstudioz.fax.fme.Application
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
-import androidx.core.app.NotificationCompat
 import androidx.multidex.MultiDex
+import androidx.work.*
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.google.android.gms.ads.MobileAds
 import com.orhanobut.hawk.Hawk
-import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.di.module
 import com.tstudioz.fax.fme.migrations.CredMigration
+import com.tstudioz.fax.fme.workers.ScheduledWorker
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -27,15 +24,21 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import java.io.File
 import java.security.SecureRandom
+import java.util.concurrent.TimeUnit
 
 
 @InternalCoroutinesApi
 class FESBCompanion : Application() {
 
     var CredRealmCf: RealmConfiguration? = null
+    var sP: SharedPreferences? = null
+
 
     override fun onCreate() {
         super.onCreate()
+
+        sP = this.getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
+        Hawk.init(this).build()
 
         instance = this
 
@@ -59,7 +62,27 @@ class FESBCompanion : Application() {
 
         MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006")
 
-        sendNotification()
+        setupTimetableSyncWorker()
+    }
+
+    private fun setupTimetableSyncWorker() {
+        val worker = WorkManager.getInstance(this)
+
+        if (sP!!.getBoolean("timetable_sync_enabled", true)) {
+            val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiresBatteryNotLow(true)
+                    .build()
+
+            val request = PeriodicWorkRequest
+                    .Builder(ScheduledWorker::class.java, 25, TimeUnit.MINUTES)
+                    .setConstraints(constraints)
+                    .build()
+
+            worker.enqueueUniquePeriodicWork("fc_timetable_sync", ExistingPeriodicWorkPolicy.KEEP, request)
+        } else {
+            worker.cancelUniqueWork("fc_timetable_sync")
+        }
     }
 
     override fun attachBaseContext(base: Context) {
@@ -85,7 +108,6 @@ class FESBCompanion : Application() {
 
     private val realmKey: ByteArray
         private get() {
-            Hawk.init(this).build()
             if (Hawk.contains("masterKey")) {
                 return Hawk.get("masterKey")
             }
@@ -95,11 +117,6 @@ class FESBCompanion : Application() {
             return bytes
         }
 
-    val sP: SharedPreferences?
-        get() {
-            if (shPref == null) shPref = getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
-            return shPref
-        }
 
     val okHttpInstance: OkHttpClient?
         get() {
@@ -117,27 +134,11 @@ class FESBCompanion : Application() {
 
     companion object {
         private var okHttpClient: OkHttpClient? = null
+
         @JvmStatic
         var instance: FESBCompanion? = null
             private set
-        private var shPref: SharedPreferences? = null
     }
 
-    private fun sendNotification(){
-        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel("default", "Default", NotificationManager.IMPORTANCE_HIGH)
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val notification = NotificationCompat.Builder(applicationContext, "default")
-                .setContentTitle("Promjena u rasporedu")
-                .setContentText("Dodano novo predavanje u Utorak")
-                .setPriority(2)
-                .setStyle(NotificationCompat.BigTextStyle())
-                .setSmallIcon(R.drawable.fmebig)
-
-        notificationManager.notify(1, notification.build())
-    }
 }

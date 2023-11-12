@@ -12,17 +12,21 @@ import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
+import com.tstudioz.fax.fme.BuildConfig;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.Korisnik;
 import com.tstudioz.fax.fme.databinding.ActivityLoginBinding;
 import com.tstudioz.fax.fme.util.CircularAnim;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 import io.realm.Realm;
 import okhttp3.Call;
@@ -32,11 +36,16 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import timber.log.Timber;
 
 public class LoginActivity extends AppCompatActivity {
 
     private Snackbar snack;
     private ActivityLoginBinding binding;
+    private SharedPreferences sharedPreferences;
+    private Executor executor;
+    private BiometricPrompt biometricPrompt;
+    private BiometricPrompt.PromptInfo promptInfo;
 
 
     @Override
@@ -46,14 +55,59 @@ public class LoginActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-        isUserLoggedIn();
+        executor = ContextCompat.getMainExecutor(this);
+        biometricPrompt = new BiometricPrompt(this,
+                executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode,
+                                              @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                Timber.e("AUTHENTICATION ERROR");
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(
+                    @NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                isUserLoggedIn();
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+                Timber.e("AUTHENTICATION FAILED");
+            }
+        });
+
+        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Potvrdite svoj identitet")
+                .setSubtitle("Prijavite se preko biometrijskog otiska")
+                .setDeviceCredentialAllowed(true)
+                .setConfirmationRequired(true)
+                .build();
+
+        sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+
+        if (authenticated())
+            showBiometric();
+        else
+            isUserLoggedIn();
+
 
         loadBlueButton();
         helpListener();
     }
 
+    private void showBiometric() {
+        biometricPrompt.authenticate(promptInfo);
+    }
+
+    private boolean authenticated() {
+        return sharedPreferences.getBoolean("ask_authentication", true);
+    }
+
     public void isUserLoggedIn() {
-        SharedPreferences sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE);
+
         Boolean prvi_put = sharedPreferences.getBoolean("first_open", true);
 
         if (prvi_put) {
@@ -225,12 +279,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void helpListener() {
-        binding.loginPomoc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                helpMe();
-            }
-        });
+        binding.loginPomoc.setText(BuildConfig.VERSION_NAME);
     }
 
 }

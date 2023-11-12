@@ -19,7 +19,32 @@ data class TimetableItem(val id: Int,
                          val professor: String = "",
                          val classDuration: Int = 0,
                          val recurringUntil: String = ""
-                         ) {
+) {
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is TimetableItem) throw IllegalArgumentException("You can only compare same class instances")
+
+        return other.id == this.id &&
+                other.name == this.name &&
+                other.group == this.group &&
+                other.professor == this.professor &&
+                other.startDate == this.startDate &&
+                other.endDate == this.endDate &&
+                other.startHour == this.startHour &&
+                other.startMin == this.startMin &&
+                other.endHour == this.endHour &&
+                other.endMin == this.endMin &&
+                other.eventType == this.eventType &&
+                other.room == this.room &&
+                other.timeSpan == this.timeSpan &&
+                other.studyCode == this.studyCode &&
+                other.recurring == this.recurring &&
+                other.recurringType == this.recurringType &&
+                other.detailDateWithDayName == this.detailDateWithDayName &&
+                other.classDuration == this.classDuration &&
+                other.recurringUntil == this.recurringUntil
+
+    }
 
 }
 
