@@ -167,8 +167,6 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("RestrictedApi")
     public void setUpToolbar() {
-        getSupportActionBar().setShowHideAnimationEnabled(false);
-        getSupportActionBar().hide();
         getSupportActionBar().setElevation(0.0f);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
     }
@@ -481,10 +479,12 @@ public class MainActivity extends AppCompatActivity {
         } else {
             switch (getIntent().getAction()) {
                 case "raspored":
-                    shortPosition = 1;
+                    shortPosition = 2;
+                    binding.bottomBar.selectTabAt(2, true);
                     break;
                 case "prisutnost":
-                    shortPosition = 2;
+                    shortPosition = 1;
+                    binding.bottomBar.selectTabAt(1, true);
                     break;
             }
             beginFragTransaction(shortPosition);
