@@ -179,13 +179,17 @@ public class MainActivity extends AppCompatActivity {
     public void testBottomBar() {
         AnimatedBottomBar bar = binding.bottomBar;
 
-        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.attend), "Prisutnost", 1));
+        /*bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.attend), "Prisutnost", 1));
         bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.cal), "Raspored", 2));
         bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.command_line), "Home", 3));
         bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.courses), "Kolegiji", 4));
-        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.mail), "Outlook", 5));
+        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.mail), "Outlook", 5));*/
 
-        bar.selectTabById(3, false);
+        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.attend), "Prisutnost", 1));
+        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.command_line), "Home", 2));
+        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.cal), "Raspored", 3));
+
+        bar.selectTabById(2, false);
 
     }
 
@@ -217,8 +221,16 @@ public class MainActivity extends AppCompatActivity {
                 getSupportActionBar().show();
                 break;
 
-
             case 2:
+                getSupportActionBar().setTitle("FESB Companion");
+                Home hf0 = new Home();
+                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
+                ft.replace(R.id.frame, hf0);
+                ft.addToBackStack(null);
+                ft.commit();
+                break;
+
+            case 3:
                 TimeTable lf = new TimeTable();
                 ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, lf);
@@ -228,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 getSupportActionBar().show();
                 break;
 
-            case 4:
+            /*case 4:
 
                 Kolegiji kol = new Kolegiji();
                 ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
@@ -249,15 +261,7 @@ public class MainActivity extends AppCompatActivity {
                 getSupportActionBar().setTitle("Mail");
                 getSupportActionBar().show();
                 break;
-
-            case 3:
-                getSupportActionBar().setTitle("FESB Companion");
-                Home hf0 = new Home();
-                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
-                ft.replace(R.id.frame, hf0);
-                ft.addToBackStack(null);
-                ft.commit();
-                break;
+*/
         }
     }
 
@@ -323,7 +327,9 @@ public class MainActivity extends AppCompatActivity {
 
         final Request request = new Request.Builder()
                 .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" +
-                        "=" + kor.getUsername().toString() + "&MinDate=" + dfmonth.format(c.getTime()) + "%2F" + dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" + smonth.format(s.getTime()) + "%2F" + sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
+                        "=" + kor.getUsername().toString() + "&MinDate=" + dfmonth.format(c.getTime()) +
+                        "%2F" + dfday.format(c.getTime()) + "%2F" + dfyear.format(c.getTime()) + "%2022%3A44%3A48&MaxDate=" +
+                        smonth.format(s.getTime()) + "%2F" + sday.format(s.getTime()) + "%2F" + syear.format(s.getTime()) + "%2022%3A44%3A48")
                 .get()
                 .build();
 

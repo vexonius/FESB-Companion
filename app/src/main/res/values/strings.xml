@@ -40,5 +40,7 @@
     <string name="terms_desc">Sukladno s GDPR zakonom ovim pristankom prihvaćate uvjete korištenja ove aplikacije.</string>
     <string name="postavke">Postavke</string>
     <string name="osvje_i">Osvježi</string>
+    <string name="ljetni_semestar">LJETNI SEMESTAR</string>
+    <string name="zimski_semestar">ZIMSKI SEMESTAR</string>
 
 </resources>

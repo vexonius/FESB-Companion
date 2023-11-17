@@ -57,16 +57,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         } finally {
             rlmLog.close();
         }
-        prefLogOut.setSummary("Prijavljeni ste kao " + korisnik);
-        prefLogOut.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                userLogOut();
-                deleteWebViewCookies();
-                goToLoginSCreen();
-                return true;
-            }
-        });
+
 
         final CheckBoxPreference weather_units = (CheckBoxPreference) findPreference("units");
         weather_units.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -84,7 +75,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return true;
             }
         });
-
+        prefLogOut.setSummary("Prijavljeni ste kao " + korisnik);
+        prefLogOut.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                userLogOut();
+                deleteWebViewCookies();
+                goToLoginScreen();
+                return true;
+            }
+        });
 
         Preference prefFeedback = (Preference) findPreference("feedback");
         prefFeedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -206,7 +206,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    public void goToLoginSCreen() {
+    public void goToLoginScreen() {
         Intent nazadNaLogin = new Intent(getActivity(), LoginActivity.class);
         startActivity(nazadNaLogin);
     }

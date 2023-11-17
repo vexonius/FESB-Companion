@@ -147,7 +147,7 @@ public class TimeTable extends Fragment implements DatePickerDialog.OnDateSetLis
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.refresMe).setVisible(false);
+        menu.findItem(R.id.refresMe).setVisible(true);
         super.onPrepareOptionsMenu(menu);
     }
 
