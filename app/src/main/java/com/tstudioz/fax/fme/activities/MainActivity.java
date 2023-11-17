@@ -19,19 +19,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.PreferenceFragmentCompat;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
 import com.tstudioz.fax.fme.database.Korisnik;
@@ -55,6 +60,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.UUID;
 
 import io.realm.Realm;
@@ -101,6 +107,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+       /* CheckBoxPreference amoledPreference = findPreference("amoled_theme");
+
+        amoledPreference.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged (CompoundButton buttonView, boolean isChecked){
+                if (isChecked) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                }
+                else {
+                    AppCompatDelegate.setDefaultNightMode (AppCompatDelegate.MODE_NIGHT_NO);
+                }
+            }
+        });*/
 
         setUpToolbar();
         getDate();

@@ -70,6 +70,7 @@ public class Home extends Fragment {
     private Realm mrealm, taskRealm;
     private HomeTabBinding binding;
 
+
     public RealmConfiguration realmTaskConfiguration = new RealmConfiguration.Builder()
             .allowWritesOnUiThread(true)
             .name("tasks.realm")
