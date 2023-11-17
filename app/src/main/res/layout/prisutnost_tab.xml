@@ -54,20 +54,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textZimskiSem"></androidx.recyclerview.widget.RecyclerView>
 
-            <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/adView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/recyclerZimski"
-                android:layout_centerHorizontal="true"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                ads:adSize="BANNER"
-                ads:adUnitId="ca-app-pub-5944203368510130/1801414912"
-                ads:layout_constraintEnd_toEndOf="parent"
-                ads:layout_constraintStart_toStartOf="parent"
-                ads:layout_constraintTop_toBottomOf="@+id/recyclerZimski"></com.google.android.gms.ads.AdView>
 
             <TextView
                 android:id="@+id/textLitnjiSem"

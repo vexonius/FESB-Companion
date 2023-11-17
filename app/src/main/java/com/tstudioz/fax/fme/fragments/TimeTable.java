@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,12 +54,14 @@ import static android.content.ContentValues.TAG;
 public class TimeTable extends Fragment implements DatePickerDialog.OnDateSetListener {
 
     RealmConfiguration tempRealm = new RealmConfiguration.Builder()
+            .allowWritesOnUiThread(true)
             .name("temporary.realm")
             .schemaVersion(12)
             .deleteRealmIfMigrationNeeded()
             .build();
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
+            .allowWritesOnUiThread(true)
             .name("glavni.realm")
             .schemaVersion(3)
             .deleteRealmIfMigrationNeeded()
@@ -76,13 +79,12 @@ public class TimeTable extends Fragment implements DatePickerDialog.OnDateSetLis
     private TimetableTabBinding binding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView( LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
 
         //set the layout you want to display in First Fragment
-        binding = TimetableTabBinding.inflate(inflater,
-                container, false);
+        binding = TimetableTabBinding.inflate(inflater, container, false);
 
 
         getActivity().runOnUiThread(new Runnable() {
@@ -125,7 +127,17 @@ public class TimeTable extends Fragment implements DatePickerDialog.OnDateSetLis
                 builder.build().show(getFragmentManager(), TAG);
             }
         });
+        // Get the root frame layout
+       /* View rootFrameLayout = binding.getRoot();
 
+        // Get the layout parameters of the root frame layout
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) rootFrameLayout.getLayoutParams();
+
+        // Set bottom margin to 64 pixels
+        params.bottomMargin = 64;
+
+        // Apply the modified layout parameters
+        rootFrameLayout.setLayoutParams(params);*/
 
         setSetDates(now);
         boldOut();

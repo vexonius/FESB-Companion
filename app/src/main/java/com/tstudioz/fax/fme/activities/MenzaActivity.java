@@ -12,9 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.material.snackbar.Snackbar;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.R;
@@ -40,6 +37,7 @@ public class MenzaActivity extends AppCompatActivity {
 
 
     RealmConfiguration menzaRealmConf = new RealmConfiguration.Builder()
+            .allowWritesOnUiThread(true)
             .name("menza.realm")
             .schemaVersion(1)
             .deleteRealmIfMigrationNeeded()
@@ -48,7 +46,6 @@ public class MenzaActivity extends AppCompatActivity {
     private Realm mRealm, nRealm;
     private Snackbar snack;
     private OkHttpClient okHttpClient;
-    private InterstitialAd mInterstitialAd;
 
     private ActivityMenzaBinding binding;
 
@@ -216,26 +213,6 @@ public class MenzaActivity extends AppCompatActivity {
         //  }
     }
 
-    private void requestNewInterstitial() {
-        AdRequest adRequest = new AdRequest.Builder()
-                .build();
-        mInterstitialAd.loadAd(adRequest);
-    }
-
-    public void loadAds() {
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-5944203368510130/4938248175");
-
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                requestNewInterstitial();
-                finish();
-            }
-        });
-
-        requestNewInterstitial();
-    }
 
     private boolean isNetworkAvailable() {
         ConnectivityManager manager =

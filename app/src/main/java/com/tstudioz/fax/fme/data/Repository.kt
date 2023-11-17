@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.data
 
-import com.orhanobut.hawk.Hawk
+import android.util.Log
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.TimetableItem
 import com.tstudioz.fax.fme.models.User
@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import org.koin.java.KoinJavaComponent.inject
-import timber.log.Timber
 
 
 @InternalCoroutinesApi
@@ -25,7 +24,7 @@ class Repository {
         service.loginUser().collect { result ->
             when (result) {
                 is Result.LoginResult.Success -> emit(result.data)
-                is Result.LoginResult.Failure -> Timber.e(result.throwable, "Doslo je do pogreske")
+                is Result.LoginResult.Failure -> Log.d(TAG, "Doslo je do pogreske")
             }
         }
 
@@ -33,26 +32,10 @@ class Repository {
 
     suspend fun fetchTimetable(user: String, startDate: String, endDate: String): Flow<List<TimetableItem>> = flow {
         networkService.fetchTimeTable(user, startDate, endDate).collect { result ->
-            when (result) {
+            when(result){
                 is Result.TimeTableResult.Success -> emit(parseTimetable(result.data))
-                is Result.TimeTableResult.Failure -> Timber.e(result.throwable, "Timetable fetching error")
+                is Result.TimeTableResult.Failure -> Log.e(TAG, "Timetable fetching error")
             }
-        }
-    }
-
-    suspend fun compareTimetables(list: List<TimetableItem>): Flow<List<TimetableItem>> = flow {
-        var oldList: List<TimetableItem>? = null
-        oldList = Hawk.get<List<TimetableItem>>("raspored_cache")
-        Timber.d("old list size ${oldList?.size}")
-
-        if (oldList == null || oldList.isEmpty()) {
-            emit(list)
-        } else {
-            val oldListIDs = oldList.map { it.id }
-            val difference: List<TimetableItem> = list.filter { it.id !in oldListIDs }
-            Hawk.put("raspored_cache", list)
-
-            emit(difference)
         }
     }
 

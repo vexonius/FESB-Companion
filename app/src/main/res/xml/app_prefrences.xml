@@ -3,17 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.preference.PreferenceCategory
-        android:title="EKSPERIMENTALNO">
-
-        <androidx.preference.SwitchPreference
-            android:key="scheduled_workmanager_enabled"
-            android:title="Sinkronizacija rasporeda"
-            android:summaryOff="Raspored se neće sinkronizirati u pozadini i nećete biti obaviješteni o promjenama "
-            android:summaryOn="Raspored je sinkroniziran i obavijesti o promjenama su uključene"/>
-
-    </androidx.preference.PreferenceCategory>
-
-    <androidx.preference.PreferenceCategory
         android:title="KORISNIK">
 
         <androidx.preference.Preference

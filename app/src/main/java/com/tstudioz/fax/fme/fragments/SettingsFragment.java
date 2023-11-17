@@ -22,7 +22,6 @@ import androidx.core.widget.NestedScrollView;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.SwitchPreference;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tstudioz.fax.fme.R;
@@ -41,7 +40,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private String korisnik;
     private static int i = 0;
     private SharedPreferences mySPrefs;
-    private SharedPreferences.Editor editor;
+    private  SharedPreferences.Editor editor;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -67,21 +66,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 goToLoginSCreen();
                 return true;
             }
-        });
-
-        SwitchPreference worker_sync_timetable = (SwitchPreference) findPreference(
-                "scheduled_workmanager_enabled");
-        worker_sync_timetable.setChecked(mySPrefs.getBoolean("timetable_sync_enabled", true));
-        worker_sync_timetable.setOnPreferenceChangeListener((preference, newValue) -> {
-            editor = mySPrefs.edit();
-            if (((boolean) newValue)) {
-                editor.putBoolean("timetable_sync_enabled", true);
-            } else {
-                editor.putBoolean("timetable_sync_enabled", false);
-            }
-
-            editor.commit();
-            return true;
         });
 
         final CheckBoxPreference weather_units = (CheckBoxPreference) findPreference("units");
@@ -120,13 +104,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        Preference prefBeta = (Preference) findPreference("betta_particp");
+        Preference prefBeta = (Preference)findPreference("betta_particp");
         prefBeta.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                sendFeedMail("[BETA] Prijava beta testera za FESB Companion", "Slanjem ovog maila" +
-                        " prihvaćam sudjelovanje u internom beta testiranju s ovom email adresom." +
-                        " Upozorenje: beta verzije znaju biti nestabilne i nepouzdane.");
+                sendFeedMail("[BETA] Prijava beta testera za FESB Companion", "Slanjem ovog maila prihvaćam sudjelovanje u internom beta testiranju s ovom email adresom. Upozorenje: beta verzije znaju biti nestabilne i nepouzdane.");
                 return true;
             }
         });
@@ -168,9 +150,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                CustomTabsIntent customTabsIntent =
-                        builder.setToolbarColor(ContextCompat.getColor(getActivity(),
-                                R.color.colorPrimaryDark)).build();
+                CustomTabsIntent customTabsIntent = builder.setToolbarColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)).build();
                 customTabsIntent.launchUrl(getActivity(), Uri.parse("http://tstud.io/"));
                 return true;
             }
@@ -182,13 +162,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             public boolean onPreferenceClick(Preference preference) {
                 try {
                     CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                    CustomTabsIntent customTabsIntent =
-                            builder.setToolbarColor(ContextCompat.getColor(getActivity(),
-                                    R.color.colorPrimaryDark)).build();
+                    CustomTabsIntent customTabsIntent = builder.setToolbarColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)).build();
                     customTabsIntent.launchUrl(getActivity(), Uri.parse("http://tstud.io/privacy"));
-                } catch (Exception e) {
-                    Toast.makeText(getContext(), "Ažurirajte Chrome preglednik",
-                            Toast.LENGTH_SHORT).show();
+                } catch (Exception e){
+                    Toast.makeText(getContext(), "Ažurirajte Chrome preglednik", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
@@ -237,8 +214,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public String getBuildVersion() {
         String ver = "undefined";
         try {
-            PackageInfo pInfo =
-                    getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+            PackageInfo pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
             ver = pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -248,8 +224,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
 
     private void displayLicensesAlertDialog() {
-        NestedScrollView view =
-                (NestedScrollView) LayoutInflater.from(getActivity()).inflate(R.layout.licence_view, null);
+        NestedScrollView view = (NestedScrollView) LayoutInflater.from(getActivity()).inflate(R.layout.licence_view, null);
         WebView wv = (WebView) view.findViewById(R.id.webvju);
         wv.loadUrl("file:///android_asset/legal.html");
         btmDialog = new BottomSheetDialog(getActivity());
@@ -260,8 +235,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     private void mvpDialog() {
-        NestedScrollView view =
-                (NestedScrollView) LayoutInflater.from(getActivity()).inflate(R.layout.licence_view, null);
+        NestedScrollView view = (NestedScrollView) LayoutInflater.from(getActivity()).inflate(R.layout.licence_view, null);
         WebView wv = (WebView) view.findViewById(R.id.webvju);
         wv.loadUrl("file:///android_asset/mvp.html");
         btmDialog = new BottomSheetDialog(getActivity());

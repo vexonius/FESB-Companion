@@ -46,6 +46,7 @@ import okhttp3.Response;
 public class Kolegiji extends Fragment {
 
     final RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+            .allowWritesOnUiThread(true)
             .name("kolegiji.realm")
             .deleteRealmIfMigrationNeeded()
             .schemaVersion(9)

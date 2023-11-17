@@ -1,18 +1,20 @@
 package com.tstudioz.fax.fme.Application
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.multidex.MultiDex
-import androidx.work.*
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
-import com.google.android.gms.ads.MobileAds
 import com.orhanobut.hawk.Hawk
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.di.module
 import com.tstudioz.fax.fme.migrations.CredMigration
-import com.tstudioz.fax.fme.workers.ScheduledWorker
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -24,27 +26,22 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import java.io.File
 import java.security.SecureRandom
-import java.util.concurrent.TimeUnit
 
 
 @InternalCoroutinesApi
 class FESBCompanion : Application() {
 
     var CredRealmCf: RealmConfiguration? = null
-    var sP: SharedPreferences? = null
-
 
     override fun onCreate() {
         super.onCreate()
-
-        sP = this.getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
-        Hawk.init(this).build()
 
         instance = this
 
         Realm.init(this)
 
         CredRealmCf = RealmConfiguration.Builder()
+                .allowWritesOnUiThread(true)
                 .name("encryptedv2.realm")
                 .schemaVersion(7)
                 .migration(CredMigration())
@@ -55,34 +52,14 @@ class FESBCompanion : Application() {
         checkOldVersion()
 
         startKoin {
-            androidLogger(level = Level.DEBUG)
+            androidLogger(level = Level.ERROR)
             androidContext(this@FESBCompanion)
             modules(module)
         }
 
-        MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006")
+        //MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006")
 
-        setupTimetableSyncWorker()
-    }
-
-    private fun setupTimetableSyncWorker() {
-        val worker = WorkManager.getInstance(this)
-
-        if (sP!!.getBoolean("timetable_sync_enabled", true)) {
-            val constraints = Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .setRequiresBatteryNotLow(true)
-                    .build()
-
-            val request = PeriodicWorkRequest
-                    .Builder(ScheduledWorker::class.java, 25, TimeUnit.MINUTES)
-                    .setConstraints(constraints)
-                    .build()
-
-            worker.enqueueUniquePeriodicWork("fc_timetable_sync", ExistingPeriodicWorkPolicy.KEEP, request)
-        } else {
-            worker.cancelUniqueWork("fc_timetable_sync")
-        }
+        //sendNotification()
     }
 
     override fun attachBaseContext(base: Context) {
@@ -92,9 +69,11 @@ class FESBCompanion : Application() {
 
     fun checkOldVersion() {
         val newRealmFile = File(CredRealmCf!!.path)
+        val bb = !newRealmFile.exists()
         if (!newRealmFile.exists()) {
             // Migrate old Realm and delete old
             val old = RealmConfiguration.Builder()
+                    .allowWritesOnUiThread(true)
                     .name("encrypted.realm")
                     .schemaVersion(7)
                     .migration(CredMigration())
@@ -108,6 +87,7 @@ class FESBCompanion : Application() {
 
     private val realmKey: ByteArray
         private get() {
+            Hawk.init(this).build()
             if (Hawk.contains("masterKey")) {
                 return Hawk.get("masterKey")
             }
@@ -117,6 +97,11 @@ class FESBCompanion : Application() {
             return bytes
         }
 
+    val sP: SharedPreferences?
+        get() {
+            if (shPref == null) shPref = getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
+            return shPref
+        }
 
     val okHttpInstance: OkHttpClient?
         get() {
@@ -134,11 +119,9 @@ class FESBCompanion : Application() {
 
     companion object {
         private var okHttpClient: OkHttpClient? = null
-
         @JvmStatic
         var instance: FESBCompanion? = null
             private set
+        private var shPref: SharedPreferences? = null
     }
-
-
 }

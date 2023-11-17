@@ -15,12 +15,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -74,9 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
     public String date = null;
     public long back_pressed;
-
     private Realm realmLog;
-
     private OkHttpClient client;
     private Home hf;
     private Snackbar snack;
@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
+            .allowWritesOnUiThread(true)
             .name("glavni.realm")
             .schemaVersion(3)
             .deleteRealmIfMigrationNeeded()
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         checkVersion();
         shouldShowGDPRDialog();
 
+
     }
 
     public void isThereAction() {
@@ -124,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setDefaultScreen() {
-        getSupportActionBar().hide();
+        //getSupportActionBar().hide();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         hf = new Home();
         ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
@@ -167,8 +169,11 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("RestrictedApi")
     public void setUpToolbar() {
-        getSupportActionBar().setElevation(0.0f);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        ActionBar actionbar = getSupportActionBar();
+        //actionbar.hide();
+        actionbar.setShowHideAnimationEnabled(false);
+        actionbar.setElevation(1.0f);
+        actionbar.setDisplayShowHomeEnabled(false);
     }
 
     public void testBottomBar() {
@@ -188,11 +193,9 @@ public class MainActivity extends AppCompatActivity {
     public void setFragmentTab() {
         binding.bottomBar.setOnTabSelectListener(new AnimatedBottomBar.OnTabSelectListener() {
             @Override
-            public void onTabSelected(int i, @Nullable AnimatedBottomBar.Tab tab, int i1,
-                                      @NotNull AnimatedBottomBar.Tab tab1) {
+            public void onTabSelected(int i, @Nullable AnimatedBottomBar.Tab tab, int i1, @NotNull AnimatedBottomBar.Tab tab1) {
                 beginFragTransaction(tab1.getId());
             }
-
             @Override
             public void onTabReselected(int i, @NotNull AnimatedBottomBar.Tab tab) {
 
@@ -248,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case 3:
-                getSupportActionBar().hide();
+                getSupportActionBar().setTitle("FESB Companion");
                 Home hf0 = new Home();
                 ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                 ft.replace(R.id.frame, hf0);
@@ -262,7 +265,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -283,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -479,17 +484,14 @@ public class MainActivity extends AppCompatActivity {
         } else {
             switch (getIntent().getAction()) {
                 case "raspored":
-                    shortPosition = 2;
-                    binding.bottomBar.selectTabAt(2, true);
+                    shortPosition = 1;
                     break;
                 case "prisutnost":
-                    shortPosition = 1;
-                    binding.bottomBar.selectTabAt(1, true);
+                    shortPosition = 2;
                     break;
             }
             beginFragTransaction(shortPosition);
         }
-
     }
 
     public void checkVersion() {

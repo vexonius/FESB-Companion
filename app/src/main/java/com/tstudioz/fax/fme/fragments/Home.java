@@ -37,6 +37,7 @@ import com.tstudioz.fax.fme.databinding.HomeTabBinding;
 import com.tstudioz.fax.fme.weather.Current;
 import com.tstudioz.fax.fme.weather.Forecast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,14 +54,11 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import timber.log.Timber;
 
 import static android.content.ContentValues.TAG;
 
 public class Home extends Fragment {
 
-
-    private static final String myApiKey = BuildConfig.DARKSKY_API_KEY;
     private static final double mLatitude = 43.511287;
     private static final double mLongitude = 16.469252;
 
@@ -73,12 +71,14 @@ public class Home extends Fragment {
     private HomeTabBinding binding;
 
     public RealmConfiguration realmTaskConfiguration = new RealmConfiguration.Builder()
+            .allowWritesOnUiThread(true)
             .name("tasks.realm")
             .deleteRealmIfMigrationNeeded()
             .schemaVersion(1)
             .build();
 
     public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
+            .allowWritesOnUiThread(true)
             .name("glavni.realm")
             .schemaVersion(3)
             .deleteRealmIfMigrationNeeded()
@@ -86,12 +86,13 @@ public class Home extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         binding = HomeTabBinding.inflate(inflater, container, false);
+
+        //getActivity().setActionBar(binding.customToolbar);
 
         setHasOptionsMenu(true);
         setCyanStatusBarColor();
@@ -106,7 +107,6 @@ public class Home extends Fragment {
         taskRealm = Realm.getInstance(realmTaskConfiguration);
         loadNotes();
 
-        loadAdsOnHome();
         loadIksicaAd();
         loadMenzaView();
 
@@ -130,13 +130,12 @@ public class Home extends Fragment {
         // OkHttp stuff
         OkHttpClient client = FESBCompanion.getInstance().getOkHttpInstance();
         Request request = new Request.Builder()
-                .url(url)
-                .build();
+                .url(url).header("Accept","application/xml").header("User-Agent", "YourAppName/1.0").build();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Timber.e(TAG, "Exception caught", e);
+                Log.e(TAG, "Exception caught", e);
             }
 
             @Override
@@ -156,7 +155,7 @@ public class Home extends Fragment {
                         alertUserAboutError();
                     }
                 } catch (IOException | JSONException e) {
-                    Timber.e(e, "Exception caught: ");
+                    Log.e(TAG, "Exception caught: ", e);
                 }
             }
         });
@@ -168,16 +167,13 @@ public class Home extends Fragment {
         units = shared.getString("weather_units", "&units=ca");
 
         // get your own API KEY from developer.forecast.io and fill it in.
-        final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr" + units;
-        Timber.d(forecastUrl);
-        final String testUrl = "http://34.65.18.132/forecast";
-
+        //final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr" + units;
+        final String forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" + mLatitude + "&lon=" + mLongitude;
         if (isNetworkAvailable()) {
-            getForecast(testUrl);
+            getForecast(forecastUrl);
         } else {
             showSnacOffline();
         }
-
     }
 
 
@@ -205,8 +201,9 @@ public class Home extends Fragment {
     }
 
     private Forecast parseForecastDetails(String jsonData) throws JSONException {
-        jsonData = jsonData.replaceAll("\\\\\"", "\"");
+        /*jsonData = jsonData.replaceAll("\\\\\"", "\"");
         jsonData = jsonData.substring(1, jsonData.length()-1);
+        Log.d("REGEX OUTPUT", jsonData);*/
         Forecast forecast = new Forecast();
         forecast.setCurrent(getCurrentDetails(jsonData));
 
@@ -215,20 +212,22 @@ public class Home extends Fragment {
 
     private Current getCurrentDetails(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
+        // String timezone = forecast.getString("timezone");
 
-        JSONObject currently = forecast.getJSONObject("currently");
+        JSONObject currently0 = forecast.getJSONObject("properties");
+        JSONArray currentlyArray = currently0.getJSONArray("timeseries");
+        JSONObject currently = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("instant").getJSONObject("details");
 
         Current current = new Current();
-        current.setHumidity(currently.getDouble("humidity"));
-        current.setIcon(currently.getString("icon"));
-        current.setPrecipChance(currently.getDouble("precipProbability"));
-        current.setSummary(currently.getString("summary"));
-        current.setWind(currently.getDouble("windSpeed"));
-        current.setTemperature(currently.getDouble("temperature"));
+        current.setHumidity(currently.getDouble("relative_humidity"));
+        current.setIcon("clear-day");
+        current.setPrecipChance(11.0);
+        current.setSummary("antilopa");
+        current.setWind(currently.getDouble("wind_speed"));
+        current.setTemperature(currently.getDouble("air_temperature"));
 
         return current;
     }
-
 
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -293,22 +292,6 @@ public class Home extends Fragment {
     }
 
 
-    public void loadAdsOnHome() {
-
-      //   if(isNetworkAvailable()) {
-      //       homeAdView.setVisibility(View.VISIBLE);
-      //       AdRequest adRequest = new AdRequest.Builder().build();
-      //       homeAdView.setAdListener(new AdListener(){
-      //           @Override
-      //           public void onAdFailedToLoad(int errorCode){
-      //               homeAdView.setVisibility(View.GONE);
-      //           }
-      //       });
-      //       homeAdView.loadAd(adRequest);
-      //   } else {
-        binding.adViewHome.setVisibility(View.GONE);
-      //   }
-    }
 
     public void loadIksicaAd() {
         binding.iksicaAd.setOnClickListener(new View.OnClickListener() {

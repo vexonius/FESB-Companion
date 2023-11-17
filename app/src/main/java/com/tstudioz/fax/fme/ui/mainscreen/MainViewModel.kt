@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
-import timber.log.Timber
 
 
 @ExperimentalCoroutinesApi
@@ -22,7 +21,7 @@ class MainViewModel : ViewModel() {
     private val repository: Repository by inject(Repository::class.java)
 
     init {
-     //   loginUser()
+        loginUser()
         fetchUserTimetable()
     }
 
@@ -31,7 +30,7 @@ class MainViewModel : ViewModel() {
             repository.attemptLogin()
                     .onStart { println("Started") }
                     .catch { println("Doslo je do pogreske") }
-                    .collect { result -> Timber.d(result.fullname) }
+                    .collect { result -> Log.d("hello", result.fullname) }
         }
     }
 
@@ -39,7 +38,7 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.fetchTimetable("spomenka", "2020-04-06", "2020-04-12")
                     .onStart { println("started Fetching Timetable for user") }
-                    .catch { e -> Timber.e(e.toString()) }
+                    .catch { e -> Log.e("Error timetable", e.toString()) }
                     .collect { list -> list.forEach { println(it.name)} }
         }
     }

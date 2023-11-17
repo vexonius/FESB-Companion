@@ -52,6 +52,7 @@ import okhttp3.Response;
 public class Prisutnost extends Fragment {
 
     public RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+            .allowWritesOnUiThread(true)
             .name("prisutnost.realm")
             .schemaVersion(10)
             .deleteRealmIfMigrationNeeded()
@@ -77,7 +78,6 @@ public class Prisutnost extends Fragment {
         hideRecyc();
 
         startFetching();
-        loadAds();
 
         return binding.getRoot();
     }
@@ -379,21 +379,7 @@ public class Prisutnost extends Fragment {
 
     }
 
-    public void loadAds() {
-        //  if(isNetworkAvailable()) {
-        //      mAdView.setVisibility(View.VISIBLE);
-        //      AdRequest adRequest = new AdRequest.Builder().build();
-        //      mAdView.setAdListener(new AdListener(){
-        //          @Override
-        //          public void onAdFailedToLoad(int errorCode){
-        //              mAdView.setVisibility(View.GONE);
-        //          }
-        //      });
-        //      mAdView.loadAd(adRequest);
-        //  } else {
-        binding.adView.setVisibility(View.GONE);
-        //  }
-    }
+
 
 
     @Override
