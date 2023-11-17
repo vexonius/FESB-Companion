@@ -26,8 +26,8 @@ val module = module {
 
 fun provideOkHttpClient(context: Context) : OkHttpClient {
     return OkHttpClient.Builder()
-            .callTimeout(30, TimeUnit.SECONDS)
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .callTimeout(15, TimeUnit.SECONDS)
+            .connectTimeout(15, TimeUnit.SECONDS)
             .cookieJar(PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context)))
             .build()
 }

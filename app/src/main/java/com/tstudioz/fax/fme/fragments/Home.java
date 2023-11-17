@@ -53,6 +53,7 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import timber.log.Timber;
 
 import static android.content.ContentValues.TAG;
 
@@ -91,8 +92,6 @@ public class Home extends Fragment {
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         binding = HomeTabBinding.inflate(inflater, container, false);
-
-        getActivity().setActionBar(binding.customToolbar);
 
         setHasOptionsMenu(true);
         setCyanStatusBarColor();
@@ -137,7 +136,7 @@ public class Home extends Fragment {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "Exception caught", e);
+                Timber.e(TAG, "Exception caught", e);
             }
 
             @Override
@@ -157,7 +156,7 @@ public class Home extends Fragment {
                         alertUserAboutError();
                     }
                 } catch (IOException | JSONException e) {
-                    Log.e(TAG, "Exception caught: ", e);
+                    Timber.e(e, "Exception caught: ");
                 }
             }
         });
@@ -170,7 +169,7 @@ public class Home extends Fragment {
 
         // get your own API KEY from developer.forecast.io and fill it in.
         final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr" + units;
-        Log.d("Dark", forecastUrl);
+        Timber.d(forecastUrl);
         final String testUrl = "http://34.65.18.132/forecast";
 
         if (isNetworkAvailable()) {
@@ -208,7 +207,6 @@ public class Home extends Fragment {
     private Forecast parseForecastDetails(String jsonData) throws JSONException {
         jsonData = jsonData.replaceAll("\\\\\"", "\"");
         jsonData = jsonData.substring(1, jsonData.length()-1);
-        Log.d("REGEX OUTPUT", jsonData);
         Forecast forecast = new Forecast();
         forecast.setCurrent(getCurrentDetails(jsonData));
 
