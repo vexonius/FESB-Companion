@@ -1,134 +1,119 @@
-package com.tstudioz.fax.fme.fragments;
+package com.tstudioz.fax.fme.fragments
 
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Typeface
+import android.net.ConnectivityManager
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog
+import com.philliphsu.bottomsheetpickers.date.DatePickerDialog
+import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
+import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.adapters.EmployeeRVAdapterTable
+import com.tstudioz.fax.fme.database.Korisnik
+import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.databinding.TimetableTabBinding
+import io.realm.Case
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import kotlinx.coroutines.InternalCoroutinesApi
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import org.jsoup.Jsoup
+import java.io.IOException
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.UUID
 
-import android.content.Context;
-import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import com.google.android.material.snackbar.Snackbar;
-import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog;
-import com.philliphsu.bottomsheetpickers.date.DatePickerDialog;
-import com.tstudioz.fax.fme.Application.FESBCompanion;
-import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.adapters.EmployeeRVAdapterTable;
-import com.tstudioz.fax.fme.database.Korisnik;
-import com.tstudioz.fax.fme.database.Predavanja;
-import com.tstudioz.fax.fme.databinding.TimetableTabBinding;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.UUID;
-
-import io.realm.Case;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmResults;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-import static android.content.ContentValues.TAG;
-
-
-public class TimeTable extends Fragment implements DatePickerDialog.OnDateSetListener {
-
-    RealmConfiguration tempRealm = new RealmConfiguration.Builder()
-            .allowWritesOnUiThread(true)
-            .name("temporary.realm")
-            .schemaVersion(12)
-            .deleteRealmIfMigrationNeeded()
-            .build();
-
-    public final RealmConfiguration mainRealmConfig = new RealmConfiguration.Builder()
-            .allowWritesOnUiThread(true)
-            .name("glavni.realm")
-            .schemaVersion(3)
-            .deleteRealmIfMigrationNeeded()
-            .build();
-
-    Realm rlm, prealm, ptrealm, urealm, utrealm, srealm, strealm, crealm, ctrealm, petrealm,
-            pettrealm, subrealm, subtrealm;
-
-    private Snackbar snack;
-    private EmployeeRVAdapterTable adapterPonTemp, adapterUtoTemp, adapterSriTemp, adapterCetTemp
-            , adapterPetTemp, adapterSubTemp;
-    private OkHttpClient client;
-    private Typeface bold;
-
-    private TimetableTabBinding binding;
-
-    @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
+class TimeTable : Fragment(), DatePickerDialog.OnDateSetListener {
+    var tempRealm = RealmConfiguration.Builder()
+        .allowWritesOnUiThread(true)
+        .name("temporary.realm")
+        .schemaVersion(12)
+        .deleteRealmIfMigrationNeeded()
+        .build()
+    val mainRealmConfig = RealmConfiguration.Builder()
+        .allowWritesOnUiThread(true)
+        .name("glavni.realm")
+        .schemaVersion(3)
+        .deleteRealmIfMigrationNeeded()
+        .build()
+    var rlm: Realm? = null
+    var prealm: Realm? = null
+    var ptrealm: Realm? = null
+    var urealm: Realm? = null
+    var utrealm: Realm? = null
+    var srealm: Realm? = null
+    var strealm: Realm? = null
+    var crealm: Realm? = null
+    var ctrealm: Realm? = null
+    var petrealm: Realm? = null
+    var pettrealm: Realm? = null
+    var subrealm: Realm? = null
+    var subtrealm: Realm? = null
+    private var snack: Snackbar? = null
+    private var adapterPonTemp: EmployeeRVAdapterTable? = null
+    private var adapterUtoTemp: EmployeeRVAdapterTable? = null
+    private var adapterSriTemp: EmployeeRVAdapterTable? = null
+    private var adapterCetTemp: EmployeeRVAdapterTable? = null
+    private var adapterPetTemp: EmployeeRVAdapterTable? = null
+    private var adapterSubTemp: EmployeeRVAdapterTable? = null
+    private var client: OkHttpClient? = null
+    private var bold: Typeface? = null
+    private var binding: TimetableTabBinding? = null
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true)
 
         //set the layout you want to display in First Fragment
-        binding = TimetableTabBinding.inflate(inflater, container, false);
-
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                showPon();
-                showUto();
-                showSri();
-                showCet();
-                showPet();
-                showSub();
-            }
-        });
-
-
-        Calendar min = Calendar.getInstance();
-        Calendar now = Calendar.getInstance();
-        Calendar max = Calendar.getInstance();
-        max.add(Calendar.YEAR, 10);
-        min.add(Calendar.YEAR, -1);
-        final BottomSheetPickerDialog.Builder builder = new DatePickerDialog.Builder(
-                TimeTable.this,
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH));
-        DatePickerDialog.Builder dateDialogBuilder = (DatePickerDialog.Builder) builder;
+        binding = TimetableTabBinding.inflate(inflater, container, false)
+        requireActivity().runOnUiThread {
+            showPon()
+            showUto()
+            showSri()
+            showCet()
+            showPet()
+            showSub()
+        }
+        val min = Calendar.getInstance()
+        val now = Calendar.getInstance()
+        val max = Calendar.getInstance()
+        max.add(Calendar.YEAR, 10)
+        min.add(Calendar.YEAR, -1)
+        val builder: BottomSheetPickerDialog.Builder = DatePickerDialog.Builder(
+            this@TimeTable,
+            now[Calendar.YEAR],
+            now[Calendar.MONTH],
+            now[Calendar.DAY_OF_MONTH]
+        )
+        val dateDialogBuilder = builder as DatePickerDialog.Builder
         dateDialogBuilder.setMaxDate(max)
-                .setMinDate(min)
-                .setFirstDayOfWeek(Calendar.MONDAY)
-                .setThemeDark(true)
-                .setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark))
-                .setHeaderColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-
-        checkNetwork();
-
-        binding.odaberiDan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                builder.build().show(getFragmentManager(), TAG);
-            }
-        });
+            .setMinDate(min)
+            .setFirstDayOfWeek(Calendar.MONDAY)
+            .setThemeDark(true)
+            .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
+            .setHeaderColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
+        checkNetwork()
+        binding!!.odaberiDan.setOnClickListener {
+            builder.build().show(requireFragmentManager(), ContentValues.TAG)
+        }
         // Get the root frame layout
-       /* View rootFrameLayout = binding.getRoot();
+        /* View rootFrameLayout = binding.getRoot();
 
         // Get the layout parameters of the root frame layout
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) rootFrameLayout.getLayoutParams();
@@ -137,488 +122,433 @@ public class TimeTable extends Fragment implements DatePickerDialog.OnDateSetLis
         params.bottomMargin = 64;
 
         // Apply the modified layout parameters
-        rootFrameLayout.setLayoutParams(params);*/
-
-        setSetDates(now);
-        boldOut();
-        return binding.getRoot();
-
+        rootFrameLayout.setLayoutParams(params);*/setSetDates(now)
+        boldOut()
+        return binding!!.root
     }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.refresMe).setVisible(true);
-        super.onPrepareOptionsMenu(menu);
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.findItem(R.id.refresMe).isVisible = true
+        super.onPrepareOptionsMenu(menu)
     }
 
-    @Override
-    public void onDateSet(DatePickerDialog dialog, int year, int monthOfYear, int dayOfMonth) {
-
-        Calendar kal = Calendar.getInstance();
-        kal.set(Calendar.YEAR, year);
-        kal.set(Calendar.MONTH, monthOfYear);
-        kal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-        DateFormat sday = new SimpleDateFormat("dd");
-        DateFormat smonth = new SimpleDateFormat("MM");
-        DateFormat syear = new SimpleDateFormat("yyyy");
-
-        kal.get(Calendar.DAY_OF_WEEK);
-        kal.add(Calendar.DAY_OF_MONTH, -(kal.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY));
-
-        String mMonth = smonth.format(kal.getTime());
-        String mDay = sday.format(kal.getTime());
-        String mYear = syear.format(kal.getTime());
-
-        kal.add(Calendar.DAY_OF_MONTH, 5);
-
-        String sMonth = smonth.format(kal.getTime());
-        String sDay = sday.format(kal.getTime());
-        String sYear = syear.format(kal.getTime());
-
-        mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear);
-        binding.odaberiDan.setText("Raspored za " + mDay + "." + mMonth + " - " + sDay + "." + sMonth);
-
+    override fun onDateSet(dialog: DatePickerDialog, year: Int, monthOfYear: Int, dayOfMonth: Int) {
+        val kal = Calendar.getInstance()
+        kal[Calendar.YEAR] = year
+        kal[Calendar.MONTH] = monthOfYear
+        kal[Calendar.DAY_OF_MONTH] = dayOfMonth
+        val sday: DateFormat = SimpleDateFormat("dd")
+        val smonth: DateFormat = SimpleDateFormat("MM")
+        val syear: DateFormat = SimpleDateFormat("yyyy")
+        kal[Calendar.DAY_OF_WEEK]
+        kal.add(Calendar.DAY_OF_MONTH, -(kal[Calendar.DAY_OF_WEEK] - Calendar.MONDAY))
+        val mMonth = smonth.format(kal.time)
+        val mDay = sday.format(kal.time)
+        val mYear = syear.format(kal.time)
+        kal.add(Calendar.DAY_OF_MONTH, 5)
+        val sMonth = smonth.format(kal.time)
+        val sDay = sday.format(kal.time)
+        val sYear = syear.format(kal.time)
+        mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear)
+        binding!!.odaberiDan.text = "Raspored za $mDay.$mMonth - $sDay.$sMonth"
     }
 
-    public void mojRaspored(final Calendar cal, String mMonth, String mDay, String mYear,
-                            String sMonth, String sDay, String sYear) {
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                binding.linearParent.setVisibility(View.INVISIBLE);
-                binding.rasporedProgress.setVisibility(View.VISIBLE);
-                showPonTemp();
-                showUtoTemp();
-                showSriTemp();
-                showCetTemp();
-                showPetTemp();
-                showSubTemp();
-
-            }
-        });
-
-        rlm = Realm.getDefaultInstance();
-        Korisnik kor = rlm.where(Korisnik.class).findFirst();
-
-        client = FESBCompanion.getInstance().getOkHttpInstance();
-
-        final Request request = new Request.Builder()
-                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" +
-                        "=" + kor.getUsername().toString() + "&MinDate=" + mMonth + "%2F" + mDay + "%2F" + mYear + "%2022%3A44%3A48&MaxDate=" + sMonth + "%2F" + sDay + "%2F" + sYear + "%2022%3A44%3A48")
-                .get()
-                .build();
-
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "Exception caught", e);
+    @OptIn(InternalCoroutinesApi::class)
+    fun mojRaspored(
+        cal: Calendar, mMonth: String, mDay: String, mYear: String,
+        sMonth: String, sDay: String, sYear: String
+    ) {
+        requireActivity().runOnUiThread {
+            binding!!.linearParent.visibility = View.INVISIBLE
+            binding!!.rasporedProgress.visibility = View.VISIBLE
+            showPonTemp()
+            showUtoTemp()
+            showSriTemp()
+            showCetTemp()
+            showPetTemp()
+            showSubTemp()
+        }
+        rlm = Realm.getDefaultInstance()
+        val kor = rlm?.where(Korisnik::class.java)?.findFirst()
+        client = instance!!.okHttpInstance
+        val request: Request = Request.Builder()
+            .url(
+                "https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" +
+                        "=" + kor!!.getUsername()
+                    .toString() + "&MinDate=" + mMonth + "%2F" + mDay + "%2F" + mYear + "%2022%3A44%3A48&MaxDate=" + sMonth + "%2F" + sDay + "%2F" + sYear + "%2022%3A44%3A48"
+            )
+            .get()
+            .build()
+        val call = client!!.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(ContentValues.TAG, "Exception caught", e)
             }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
+            @Throws(IOException::class)
+            override fun onResponse(call: Call, response: Response) {
                 try {
-
-                    if (response.code() == 500) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showSnackError();
-                            }
-                        });
-
+                    if (response.code == 500) {
+                        activity!!.runOnUiThread { showSnackError() }
                     } else {
-                        Document doc = Jsoup.parse(response.body().string());
-
-                        Realm trealm = Realm.getInstance(tempRealm);
-                        trealm.beginTransaction();
-                        RealmResults<Predavanja> svaPredavanja =
-                                trealm.where(Predavanja.class).findAll();
-                        svaPredavanja.deleteAllFromRealm();
-                        trealm.commitTransaction();
-
-                        if (response.isSuccessful()) {
-                            Elements elements = doc.select("div.event");
+                        val doc = Jsoup.parse(response.body!!.string())
+                        val trealm = Realm.getInstance(tempRealm)
+                        trealm.beginTransaction()
+                        val svaPredavanja = trealm.where(
+                            Predavanja::class.java
+                        ).findAll()
+                        svaPredavanja.deleteAllFromRealm()
+                        trealm.commitTransaction()
+                        if (response.isSuccessful) {
+                            val elements = doc.select("div.event")
                             try {
-
-                                trealm.beginTransaction();
-
-                                for (final Element e : elements) {
-
-                                    Predavanja predavanja = trealm.createObject(Predavanja.class,
-                                            UUID.randomUUID().toString());
-
+                                trealm.beginTransaction()
+                                for (e in elements) {
+                                    val predavanja = trealm.createObject(
+                                        Predavanja::class.java,
+                                        UUID.randomUUID().toString()
+                                    )
                                     if (e.hasAttr("data-id")) {
-                                        String attr = e.attr("data-id");
-                                        predavanja.setObjectId(Integer.parseInt(attr));
+                                        val attr = e.attr("data-id")
+                                        predavanja.objectId = attr.toInt()
                                     }
-
-                                    predavanja.setPredavanjeIme(e.select("span.groupCategory").text());
-                                    predavanja.setPredmetPredavanja((e.select("span.name.normal").text()));
-                                    predavanja.setRasponVremena(e.select("div.timespan").text());
-                                    predavanja.setGrupa(e.select("span.group.normal").text());
-                                    predavanja.setGrupaShort(e.select("span.group.short").text());
-                                    predavanja.setDvorana(e.select("span.resource").text());
-                                    predavanja.setDetaljnoVrijeme(e.select("div.detailItem" +
-                                            ".datetime").text());
-                                    predavanja.setProfesor(e.select("div.detailItem.user").text());
-
+                                    predavanja.predavanjeIme = e.select("span.groupCategory").text()
+                                    predavanja.predmetPredavanja =
+                                        e.select("span.name.normal").text()
+                                    predavanja.rasponVremena = e.select("div.timespan").text()
+                                    predavanja.grupa = e.select("span.group.normal").text()
+                                    predavanja.grupaShort = e.select("span.group.short").text()
+                                    predavanja.dvorana = e.select("span.resource").text()
+                                    predavanja.detaljnoVrijeme = e.select(
+                                        "div.detailItem" +
+                                                ".datetime"
+                                    ).text()
+                                    predavanja.profesor = e.select("div.detailItem.user").text()
                                 }
-                                trealm.commitTransaction();
-
+                                trealm.commitTransaction()
                             } finally {
-                                trealm.close();
+                                trealm.close()
                             }
-
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    updateTemporaryWeek();
-                                    setSetDates(cal);
-
-                                    if (adapterSubTemp.getItemCount() > 0) {
-                                        binding.linearParent.setWeightSum(6);
-                                        binding.linearSub.setVisibility(View.VISIBLE);
-                                        binding.linearParent.invalidate();
-                                    } else {
-                                        binding.linearSub.setVisibility(View.INVISIBLE);
-                                        binding.linearParent.setWeightSum(5);
-                                        binding.linearParent.invalidate();
-                                    }
-
-                                    binding.rasporedProgress.setVisibility(View.INVISIBLE);
-                                    binding.linearParent.setVisibility(View.VISIBLE);
+                            activity!!.runOnUiThread {
+                                updateTemporaryWeek()
+                                setSetDates(cal)
+                                if (adapterSubTemp!!.itemCount > 0) {
+                                    binding!!.linearParent.weightSum = 6f
+                                    binding!!.linearSub.visibility = View.VISIBLE
+                                    binding!!.linearParent.invalidate()
+                                } else {
+                                    binding!!.linearSub.visibility = View.INVISIBLE
+                                    binding!!.linearParent.weightSum = 5f
+                                    binding!!.linearParent.invalidate()
                                 }
-                            });
+                                binding!!.rasporedProgress.visibility = View.INVISIBLE
+                                binding!!.linearParent.visibility = View.VISIBLE
+                            }
                         }
                     }
-                } catch (IOException e) {
-                    Log.e(TAG, "Exception caught: ", e);
+                } catch (e: IOException) {
+                    Log.e(ContentValues.TAG, "Exception caught: ", e)
                 }
             }
-
-        });
+        })
     }
 
-    public void setSetDates(Calendar calendar) {
-
-        DateFormat format = new SimpleDateFormat("d");
-
-        calendar.get(Calendar.DAY_OF_WEEK);
-        calendar.add(Calendar.DAY_OF_MONTH,
-                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY));
-
-        String pon = format.format(calendar.getTime());
-        binding.ponDate.setText(pon);
-
-        calendar.add(Calendar.DAY_OF_MONTH,
-                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.TUESDAY));
-        String uto = format.format(calendar.getTime());
-
-        binding.utoDate.setText(uto);
-
-        calendar.add(Calendar.DAY_OF_MONTH,
-                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.WEDNESDAY));
-        String sri = format.format(calendar.getTime());
-
-        binding.sriDate.setText(sri);
-
-        calendar.add(Calendar.DAY_OF_MONTH,
-                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.THURSDAY));
-        String cet = format.format(calendar.getTime());
-
-        binding.cetDate.setText(cet);
-
-        calendar.add(Calendar.DAY_OF_MONTH,
-                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.FRIDAY));
-        String pet = format.format(calendar.getTime());
-
-        binding.petDate.setText(pet);
-
-        calendar.add(Calendar.DAY_OF_MONTH,
-                -(calendar.get(Calendar.DAY_OF_WEEK) - Calendar.SATURDAY));
-        String sub = format.format(calendar.getTime());
-
-        binding.subDate.setText(sub);
-
+    fun setSetDates(calendar: Calendar) {
+        val format: DateFormat = SimpleDateFormat("d")
+        calendar[Calendar.DAY_OF_WEEK]
+        calendar.add(
+            Calendar.DAY_OF_MONTH,
+            -(calendar[Calendar.DAY_OF_WEEK] - Calendar.MONDAY)
+        )
+        val pon = format.format(calendar.time)
+        binding!!.ponDate.text = pon
+        calendar.add(
+            Calendar.DAY_OF_MONTH,
+            -(calendar[Calendar.DAY_OF_WEEK] - Calendar.TUESDAY)
+        )
+        val uto = format.format(calendar.time)
+        binding!!.utoDate.text = uto
+        calendar.add(
+            Calendar.DAY_OF_MONTH,
+            -(calendar[Calendar.DAY_OF_WEEK] - Calendar.WEDNESDAY)
+        )
+        val sri = format.format(calendar.time)
+        binding!!.sriDate.text = sri
+        calendar.add(
+            Calendar.DAY_OF_MONTH,
+            -(calendar[Calendar.DAY_OF_WEEK] - Calendar.THURSDAY)
+        )
+        val cet = format.format(calendar.time)
+        binding!!.cetDate.text = cet
+        calendar.add(
+            Calendar.DAY_OF_MONTH,
+            -(calendar[Calendar.DAY_OF_WEEK] - Calendar.FRIDAY)
+        )
+        val pet = format.format(calendar.time)
+        binding!!.petDate.text = pet
+        calendar.add(
+            Calendar.DAY_OF_MONTH,
+            -(calendar[Calendar.DAY_OF_WEEK] - Calendar.SATURDAY)
+        )
+        val sub = format.format(calendar.time)
+        binding!!.subDate.text = sub
     }
 
-    public void boldOut() {
-        bold = Typeface.createFromAsset(getContext().getAssets(), "fonts/OpenSans-Bold.ttf");
-
-        binding.mPon.setTypeface(bold);
-        binding.mUto.setTypeface(bold);
-        binding.mSri.setTypeface(bold);
-        binding.mCet.setTypeface(bold);
-        binding.mPet.setTypeface(bold);
-        binding.mSub.setTypeface(bold);
-
+    fun boldOut() {
+        bold = Typeface.createFromAsset(requireContext().assets, "fonts/OpenSans-Bold.ttf")
+        binding!!.mPon.typeface = bold
+        binding!!.mUto.typeface = bold
+        binding!!.mSri.typeface = bold
+        binding!!.mCet.typeface = bold
+        binding!!.mPet.typeface = bold
+        binding!!.mSub.typeface = bold
     }
 
-    public void showPon() {
-        prealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiPon = prealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
-
-        EmployeeRVAdapterTable adapter = new EmployeeRVAdapterTable(rezulatiPon);
-        binding.recyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerPon.setHasFixedSize(true);
-        binding.recyclerPon.setAdapter(adapter);
-
+    fun showPon() {
+        prealm = Realm.getInstance(mainRealmConfig)
+        val rezulatiPon = prealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE
+        )?.findAll()
+        val adapter = rezulatiPon?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerPon.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerPon.setHasFixedSize(true)
+        binding!!.recyclerPon.adapter = adapter
     }
 
-    public void showPonTemp() {
-        ptrealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiPon1 = ptrealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE).findAll();
-
-
-        adapterPonTemp = new EmployeeRVAdapterTable(rezulatiPon1);
-        binding.recyclerPon.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerPon.setHasFixedSize(true);
-        binding.recyclerPon.setAdapter(adapterPonTemp);
-
+    fun showPonTemp() {
+        ptrealm = Realm.getInstance(tempRealm)
+        val rezulatiPon1 = ptrealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE
+        )?.findAll()
+        adapterPonTemp = rezulatiPon1?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerPon.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerPon.setHasFixedSize(true)
+        binding!!.recyclerPon.adapter = adapterPonTemp
     }
 
-    public void showUto() {
-        urealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiUto = urealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
-
-        EmployeeRVAdapterTable adapter2 = new EmployeeRVAdapterTable(rezulatiUto);
-        binding.recyclerUto.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerUto.setHasFixedSize(true);
-        binding.recyclerUto.setAdapter(adapter2);
-
+    fun showUto() {
+        urealm = Realm.getInstance(mainRealmConfig)
+        val rezulatiUto = urealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Utorak", Case.INSENSITIVE
+        )?.findAll()
+        val adapter2 = rezulatiUto?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerUto.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerUto.setHasFixedSize(true)
+        binding!!.recyclerUto.adapter = adapter2
     }
 
-    public void showUtoTemp() {
-        utrealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiUto1 = utrealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Utorak", Case.INSENSITIVE).findAll();
-
-        adapterUtoTemp = new EmployeeRVAdapterTable(rezulatiUto1);
-        binding.recyclerUto.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerUto.setHasFixedSize(true);
-        binding.recyclerUto.setAdapter(adapterUtoTemp);
-
+    fun showUtoTemp() {
+        utrealm = Realm.getInstance(tempRealm)
+        val rezulatiUto1 = utrealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Utorak", Case.INSENSITIVE
+        )?.findAll()
+        adapterUtoTemp = rezulatiUto1?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerUto.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerUto.setHasFixedSize(true)
+        binding!!.recyclerUto.adapter = adapterUtoTemp
     }
 
-    public void showSri() {
-        srealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiSri = srealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
-
-        EmployeeRVAdapterTable adapter3 = new EmployeeRVAdapterTable(rezulatiSri);
-        binding.recyclerSri.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerSri.setHasFixedSize(true);
-        binding.recyclerSri.setAdapter(adapter3);
-
+    fun showSri() {
+        srealm = Realm.getInstance(mainRealmConfig)
+        val rezulatiSri = srealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE
+        )?.findAll()
+        val adapter3 = rezulatiSri?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerSri.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerSri.setHasFixedSize(true)
+        binding!!.recyclerSri.adapter = adapter3
     }
 
-    public void showSriTemp() {
-        strealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiSri1 = strealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE).findAll();
-
-        adapterSriTemp = new EmployeeRVAdapterTable(rezulatiSri1);
-        binding.recyclerSri.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerSri.setHasFixedSize(true);
-        binding.recyclerSri.setAdapter(adapterSriTemp);
-
+    fun showSriTemp() {
+        strealm = Realm.getInstance(tempRealm)
+        val rezulatiSri1 = strealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE
+        )?.findAll()
+        adapterSriTemp = rezulatiSri1?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerSri.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerSri.setHasFixedSize(true)
+        binding!!.recyclerSri.adapter = adapterSriTemp
     }
 
-    public void showCet() {
-        crealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiCet = crealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
-
-        EmployeeRVAdapterTable adapter4 = new EmployeeRVAdapterTable(rezulatiCet);
-        binding.recyclerCet.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerCet.setHasFixedSize(true);
-        binding.recyclerCet.setAdapter(adapter4);
-
+    fun showCet() {
+        crealm = Realm.getInstance(mainRealmConfig)
+        val rezulatiCet = crealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE
+        )?.findAll()
+        val adapter4 = rezulatiCet?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerCet.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerCet.setHasFixedSize(true)
+        binding!!.recyclerCet.adapter = adapter4
     }
 
-    public void showCetTemp() {
-        ctrealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiCet1 = ctrealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE).findAll();
-
-        adapterCetTemp = new EmployeeRVAdapterTable(rezulatiCet1);
-        binding.recyclerCet.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerCet.setHasFixedSize(true);
-        binding.recyclerCet.setAdapter(adapterCetTemp);
-
+    fun showCetTemp() {
+        ctrealm = Realm.getInstance(tempRealm)
+        val rezulatiCet1 = ctrealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE
+        )?.findAll()
+        adapterCetTemp = rezulatiCet1?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerCet.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerCet.setHasFixedSize(true)
+        binding!!.recyclerCet.adapter = adapterCetTemp
     }
 
-    public void showPet() {
-        petrealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiPet = petrealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
-
-        EmployeeRVAdapterTable adapter5 = new EmployeeRVAdapterTable(rezulatiPet);
-        binding.recyclerPet.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerPet.setHasFixedSize(true);
-        binding.recyclerPet.setAdapter(adapter5);
-
+    fun showPet() {
+        petrealm = Realm.getInstance(mainRealmConfig)
+        val rezulatiPet = petrealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Petak", Case.INSENSITIVE
+        )?.findAll()
+        val adapter5 = rezulatiPet?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerPet.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerPet.setHasFixedSize(true)
+        binding!!.recyclerPet.adapter = adapter5
     }
 
-    public void showPetTemp() {
-        pettrealm = Realm.getInstance(tempRealm);
-        RealmResults<Predavanja> rezulatiPet1 = pettrealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Petak", Case.INSENSITIVE).findAll();
-
-        adapterPetTemp = new EmployeeRVAdapterTable(rezulatiPet1);
-        binding.recyclerPet.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerPet.setHasFixedSize(true);
-        binding.recyclerPet.setAdapter(adapterPetTemp);
-
+    fun showPetTemp() {
+        pettrealm = Realm.getInstance(tempRealm)
+        val rezulatiPet1 = pettrealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Petak", Case.INSENSITIVE
+        )?.findAll()
+        adapterPetTemp = rezulatiPet1?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerPet.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerPet.setHasFixedSize(true)
+        binding!!.recyclerPet.adapter = adapterPetTemp
     }
 
-    public void showSub() {
-        subrealm = Realm.getInstance(mainRealmConfig);
-        RealmResults<Predavanja> rezulatiSub = subrealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
-
-        if (rezulatiSub.isEmpty()) {
-            binding.linearSub.setVisibility(View.GONE);
-            binding.linearParent.setWeightSum(5);
-
+    fun showSub() {
+        subrealm = Realm.getInstance(mainRealmConfig)
+        val rezulatiSub = subrealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Subota", Case.INSENSITIVE
+        )?.findAll()
+        if (rezulatiSub?.isEmpty() == true) {
+            binding!!.linearSub.visibility = View.GONE
+            binding!!.linearParent.weightSum = 5f
         } else {
-            binding.linearSub.setVisibility(View.VISIBLE);
-            binding.linearParent.setWeightSum(6);
-            EmployeeRVAdapterTable adapter6 = new EmployeeRVAdapterTable(rezulatiSub);
-            binding.recyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
-            binding.recyclerSub.setHasFixedSize(true);
-            binding.recyclerSub.setAdapter(adapter6);
+            binding!!.linearSub.visibility = View.VISIBLE
+            binding!!.linearParent.weightSum = 6f
+            val adapter6 = rezulatiSub?.let { EmployeeRVAdapterTable(it) }
+            binding!!.recyclerSub.layoutManager = LinearLayoutManager(activity)
+            binding!!.recyclerSub.setHasFixedSize(true)
+            binding!!.recyclerSub.adapter = adapter6
         }
     }
 
-    public void showSubTemp() {
-
-        subtrealm = Realm.getInstance(tempRealm);
-
-        RealmResults<Predavanja> rezulatiSub1 = subtrealm.where(Predavanja.class).contains(
-                "detaljnoVrijeme", "Subota", Case.INSENSITIVE).findAll();
-
-        adapterSubTemp = new EmployeeRVAdapterTable(rezulatiSub1);
-        binding.recyclerSub.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerSub.setAdapter(adapterSubTemp);
-
+    fun showSubTemp() {
+        subtrealm = Realm.getInstance(tempRealm)
+        val rezulatiSub1 = subtrealm?.where(Predavanja::class.java)?.contains(
+            "detaljnoVrijeme", "Subota", Case.INSENSITIVE
+        )?.findAll()
+        adapterSubTemp = rezulatiSub1?.let { EmployeeRVAdapterTable(it) }
+        binding!!.recyclerSub.layoutManager = LinearLayoutManager(activity)
+        binding!!.recyclerSub.adapter = adapterSubTemp
     }
 
-    public void updateTemporaryWeek() {
-        adapterPonTemp.notifyDataSetChanged();
-        adapterUtoTemp.notifyDataSetChanged();
-        adapterSriTemp.notifyDataSetChanged();
-        adapterCetTemp.notifyDataSetChanged();
-        adapterPetTemp.notifyDataSetChanged();
-        adapterSubTemp.notifyDataSetChanged();
+    fun updateTemporaryWeek() {
+        adapterPonTemp!!.notifyDataSetChanged()
+        adapterUtoTemp!!.notifyDataSetChanged()
+        adapterSriTemp!!.notifyDataSetChanged()
+        adapterCetTemp!!.notifyDataSetChanged()
+        adapterPetTemp!!.notifyDataSetChanged()
+        adapterSubTemp!!.notifyDataSetChanged()
     }
 
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager manager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-
-        boolean isAvailable = false;
-        if (networkInfo != null && networkInfo.isConnected()) {
-            isAvailable = true;
-        }
-
-        return isAvailable;
-    }
-
-    public void checkNetwork() {
-        if (isNetworkAvailable()) {
-            binding.odaberiDan.setVisibility(View.VISIBLE);
-        } else {
-            binding.odaberiDan.setVisibility(View.INVISIBLE);
-            showSnacOffline();
-        }
-    }
-
-    public void showSnacOffline() {
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste povezani" +
-                ".\nPrikazuje se raspored ovog tjedna.", Snackbar.LENGTH_INDEFINITE);
-        View vjuz = snack.getView();
-        vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
-        snack.setAction("OSVJEŽI", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snack.dismiss();
-                checkNetwork();
+    private val isNetworkAvailable: Boolean
+        private get() {
+            val manager =
+                activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = manager.activeNetworkInfo
+            var isAvailable = false
+            if (networkInfo != null && networkInfo.isConnected) {
+                isAvailable = true
             }
-        });
-        snack.setActionTextColor(getResources().getColor(R.color.white));
-        snack.show();
+            return isAvailable
+        }
+
+    fun checkNetwork() {
+        if (isNetworkAvailable) {
+            binding!!.odaberiDan.visibility = View.VISIBLE
+        } else {
+            binding!!.odaberiDan.visibility = View.INVISIBLE
+            showSnacOffline()
+        }
     }
 
-    public void showSnackError() {
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
-                "pogreške pri dohvaćanju rasporeda", Snackbar.LENGTH_SHORT);
-        View vjuzs = snack.getView();
-        vjuzs.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
-        snack.show();
+    fun showSnacOffline() {
+        snack = Snackbar.make(
+            activity!!.findViewById(R.id.coordinatorLayout), """
+     Niste povezani.
+     Prikazuje se raspored ovog tjedna.
+     """.trimIndent(), Snackbar.LENGTH_INDEFINITE
+        )
+        val vjuz = snack!!.view
+        vjuz.setBackgroundColor(ContextCompat.getColor(activity!!, R.color.red_nice))
+        snack!!.setAction("OSVJEŽI") {
+            snack!!.dismiss()
+            checkNetwork()
+        }
+        snack!!.setActionTextColor(resources.getColor(R.color.white))
+        snack!!.show()
     }
 
-    public void onStop() {
-        super.onStop();
+    fun showSnackError() {
+        snack = Snackbar.make(
+            activity!!.findViewById(R.id.coordinatorLayout), "Došlo je do " +
+                    "pogreške pri dohvaćanju rasporeda", Snackbar.LENGTH_SHORT
+        )
+        val vjuzs = snack!!.view
+        vjuzs.setBackgroundColor(ContextCompat.getColor(activity!!, R.color.red_nice))
+        snack!!.show()
+    }
+
+    override fun onStop() {
+        super.onStop()
         if (snack != null) {
-            snack.dismiss();
+            snack!!.dismiss()
         }
-
         if (client != null) {
-            client.dispatcher().cancelAll();
+            client!!.dispatcher.cancelAll()
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    override fun onDestroy() {
+        super.onDestroy()
         if (rlm != null) {
-            rlm.close();
+            rlm!!.close()
         }
         if (prealm != null) {
-            prealm.close();
+            prealm!!.close()
         }
         if (ptrealm != null) {
-            ptrealm.close();
+            ptrealm!!.close()
         }
         if (urealm != null) {
-            urealm.close();
+            urealm!!.close()
         }
         if (utrealm != null) {
-            utrealm.close();
+            utrealm!!.close()
         }
         if (srealm != null) {
-            srealm.close();
+            srealm!!.close()
         }
         if (strealm != null) {
-            strealm.close();
+            strealm!!.close()
         }
         if (crealm != null) {
-            crealm.close();
+            crealm!!.close()
         }
         if (ctrealm != null) {
-            ctrealm.close();
+            ctrealm!!.close()
         }
         if (petrealm != null) {
-            petrealm.close();
+            petrealm!!.close()
         }
         if (pettrealm != null) {
-            pettrealm.close();
+            pettrealm!!.close()
         }
         if (subrealm != null) {
-            subrealm.close();
+            subrealm!!.close()
         }
         if (subtrealm != null) {
-            subtrealm.close();
+            subtrealm!!.close()
         }
     }
 }
