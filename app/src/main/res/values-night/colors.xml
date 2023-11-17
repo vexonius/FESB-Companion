@@ -3,7 +3,7 @@
     <color name="colorPrimary">#000000</color>
     <color name="colorPrimaryDark">#1e262a</color>
     <color name="deepBlue">#000000</color>
-    <color name="colorAccent">#00C4FF</color>
+    <color name="colorAccent">#002d3b</color>
     <color name="home_color">#ffffff</color>
     <color name="white">#ffffff</color>
     <color name="_20white">#70ffffff</color>
@@ -13,8 +13,8 @@
     <color name="left_color">#006735</color>
     <color name="right_color">#263238</color>
     <color name="my_color">#1d1d1d</color>
-    <color name="dark_cyan">#0097a7</color>
-    <color name="darker_cyan">#00838f</color>
+    <color name="dark_cyan">#015c66</color>
+    <color name="darker_cyan">#015c66</color>
 
 
     //bottomNavigation
