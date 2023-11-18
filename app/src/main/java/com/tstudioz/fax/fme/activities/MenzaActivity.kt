@@ -1,263 +1,190 @@
-package com.tstudioz.fax.fme.activities;
+package com.tstudioz.fax.fme.activities
 
-import android.content.Context;
-import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
+import android.graphics.Typeface
+import android.net.ConnectivityManager
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
+import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.adapters.MeniesAdapter
+import com.tstudioz.fax.fme.database.Meni
+import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import kotlinx.coroutines.InternalCoroutinesApi
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.IOException
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import com.google.android.material.snackbar.Snackbar;
-import com.tstudioz.fax.fme.Application.FESBCompanion;
-import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.adapters.MeniesAdapter;
-import com.tstudioz.fax.fme.database.Meni;
-import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.IOException;
-
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmResults;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-public class MenzaActivity extends AppCompatActivity {
-
-
-    RealmConfiguration menzaRealmConf = new RealmConfiguration.Builder()
-            .allowWritesOnUiThread(true)
-            .name("menza.realm")
-            .schemaVersion(1)
-            .deleteRealmIfMigrationNeeded()
-            .build();
-
-    private Realm mRealm, nRealm;
-    private Snackbar snack;
-    private OkHttpClient okHttpClient;
-
-    private ActivityMenzaBinding binding;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityMenzaBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        setTextTypeface();
-
-        checkConditions();
+class MenzaActivity : AppCompatActivity() {
+    var menzaRealmConf = RealmConfiguration.Builder()
+        .allowWritesOnUiThread(true)
+        .name("menza.realm")
+        .schemaVersion(1)
+        .deleteRealmIfMigrationNeeded()
+        .build()
+    private var mRealm: Realm? = null
+    private var nRealm: Realm? = null
+    private var snack: Snackbar? = null
+    private var okHttpClient: OkHttpClient? = null
+    private var binding: ActivityMenzaBinding? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMenzaBinding.inflate(layoutInflater)
+        setContentView(binding!!.root)
+        setTextTypeface()
+        checkConditions()
         //  loadAds();
-
     }
 
-    public void checkConditions() {
-        if (isNetworkAvailable()) {
-            startParsing();
+    fun checkConditions() {
+        if (isNetworkAvailable) {
+            startParsing()
         } else {
-            showSnacOffline();
-            binding.menzaProgress.setVisibility(View.VISIBLE);
+            showSnacOffline()
+            binding!!.menzaProgress.visibility = View.VISIBLE
         }
     }
 
-
-    public void startParsing() {
-
-        okHttpClient = FESBCompanion.getInstance().getOkHttpInstance();
-
-        Request request = new Request.Builder()
-                .url("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
-                .get()
-                .build();
-
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
-                mRealm = Realm.getInstance(menzaRealmConf);
-                mRealm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        mRealm.deleteAll();
-                    }
-                });
-
-                String json = response.body().string();
+    @OptIn(InternalCoroutinesApi::class)
+    fun startParsing() {
+        okHttpClient = instance!!.okHttpInstance
+        val request: Request = Request.Builder()
+            .url("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
+            .get()
+            .build()
+        val call = okHttpClient!!.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+            @Throws(IOException::class)
+            override fun onResponse(call: Call, response: Response) {
+                mRealm = Realm.getInstance(menzaRealmConf)
+                mRealm?.executeTransaction(Realm.Transaction { mRealm?.deleteAll() })
+                val json = response.body!!.string()
                 try {
-                    JSONObject jsonResponse = new JSONObject(json);
-
-                    JSONArray array = jsonResponse.getJSONArray("values");
-
-                    for (int j = 7; j <= 9; j++) {
-
+                    val jsonResponse = JSONObject(json)
+                    val array = jsonResponse.getJSONArray("values")
+                    for (j in 7..9) {
                         try {
-                            JSONArray itemsArray = array.getJSONArray(j);
-
-                            final Meni meni = new Meni();
-                            meni.setId(itemsArray.getString(0));
-                            meni.setType(itemsArray.getString(1));
-                            meni.setJelo1(itemsArray.getString(2));
-                            meni.setJelo2(itemsArray.getString(3));
-                            meni.setJelo3(itemsArray.getString(4));
-                            meni.setJelo4(itemsArray.getString(5));
-                            meni.setDesert(itemsArray.getString(6));
-                            meni.setCijena(itemsArray.getString(7));
-
-
-                            mRealm.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    mRealm.copyToRealm(meni);
-                                }
-                            });
-
-
-                        } catch (Exception ex) {
-                            Log.d("Menza activity", ex.toString());
-                        }
-
-                    }
-
-                    for (int k = 13; k <= 15; k++) {
-
-                        try {
-                            JSONArray itemsArray = array.getJSONArray(k);
-
-                            final Meni izborniMeni = new Meni();
-                            izborniMeni.setId(itemsArray.getString(0));
-                            izborniMeni.setJelo1(itemsArray.getString(1).substring(0,
-                                    itemsArray.getString(1).length() - 6));
-                            izborniMeni.setCijena(itemsArray.getString(1).substring(itemsArray.getString(1).length() - 6, itemsArray.getString(1).length()));
-
-
-                            mRealm.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    mRealm.copyToRealm(izborniMeni);
-                                }
-                            });
-
-
-                        } catch (Exception exc) {
-                            Log.d("Menza activity", exc.toString());
+                            val itemsArray = array.getJSONArray(j)
+                            val meni = Meni()
+                            meni.id = itemsArray.getString(0)
+                            meni.type = itemsArray.getString(1)
+                            meni.jelo1 = itemsArray.getString(2)
+                            meni.jelo2 = itemsArray.getString(3)
+                            meni.jelo3 = itemsArray.getString(4)
+                            meni.jelo4 = itemsArray.getString(5)
+                            meni.desert = itemsArray.getString(6)
+                            meni.cijena = itemsArray.getString(7) + " eur"
+                            mRealm?.executeTransaction(Realm.Transaction { mRealm?.copyToRealm(meni) })
+                        } catch (ex: Exception) {
+                            Log.d("Menza activity", ex.toString())
                         }
                     }
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            binding.menzaProgress.setVisibility(View.INVISIBLE);
-                            showMenies();
+                    for (k in 13..15) {
+                        try {
+                            val itemsArray = array.getJSONArray(k)
+                            val izborniMeni = Meni()
+                            izborniMeni.id = itemsArray.getString(0)
+                            izborniMeni.jelo1 = itemsArray.getString(1).substring(0,
+                                itemsArray.getString(1).length - 4                            )
+                            izborniMeni.cijena = itemsArray.getString(1).substring(
+                                itemsArray.getString(1).length - 4,
+                                itemsArray.getString(1).length
+                            ) + " eur"
+                            mRealm?.executeTransaction(Realm.Transaction {
+                                mRealm?.copyToRealm(
+                                    izborniMeni
+                                )
+                            })
+                        } catch (exc: Exception) {
+                            Log.d("Menza activity", exc.toString())
                         }
-                    });
-
-                } catch (Exception ex) {
-                    Log.d("MenzaActivity", ex.getMessage());
+                    }
+                    runOnUiThread {
+                        binding!!.menzaProgress.visibility = View.INVISIBLE
+                        showMenies()
+                    }
+                } catch (ex: Exception) {
+                    Log.d("MenzaActivity", ex.message!!)
                 } finally {
-                    mRealm.close();
+                    mRealm?.close()
                 }
             }
-        });
-
+        })
     }
 
-    public void showMenies() {
-
-        nRealm = Realm.getInstance(menzaRealmConf);
-
-        RealmResults<Meni> results = nRealm.where(Meni.class).findAll();
-
-        if (!results.isEmpty()) {
-
-            MeniesAdapter adapter = new MeniesAdapter(results);
-            binding.menzaRecyclerview.setLayoutManager(new LinearLayoutManager(this));
-            binding.menzaRecyclerview.setHasFixedSize(true);
-            binding.menzaRecyclerview.setAdapter(adapter);
-
+    fun showMenies() {
+        nRealm = Realm.getInstance(menzaRealmConf)
+        val results = nRealm?.where(Meni::class.java)?.findAll()
+        if (!results?.isEmpty()!!) {
+            val adapter = MeniesAdapter(results)
+            binding!!.menzaRecyclerview.layoutManager = LinearLayoutManager(this)
+            binding!!.menzaRecyclerview.setHasFixedSize(true)
+            binding!!.menzaRecyclerview.adapter = adapter
         } else {
-            binding.menzaRecyclerview.setVisibility(View.INVISIBLE);
-            binding.cookieHeaderRoot.setVisibility(View.VISIBLE);
+            binding!!.menzaRecyclerview.visibility = View.INVISIBLE
+            binding!!.cookieHeaderRoot.visibility = View.VISIBLE
         }
-
     }
 
-    public void setTextTypeface() {
-        Typeface typeBold = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Bold.ttf");
-        Typeface regular = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Regular.ttf");
-        binding.menzaTitle.setTypeface(typeBold);
-        binding.cookieHeaderText.setTypeface(regular);
+    fun setTextTypeface() {
+        val typeBold = Typeface.createFromAsset(assets, "fonts/OpenSans-Bold.ttf")
+        val regular = Typeface.createFromAsset(assets, "fonts/OpenSans-Regular.ttf")
+        binding!!.menzaTitle.typeface = typeBold
+        binding!!.cookieHeaderText.typeface = regular
     }
 
-    public void onBackPressed() {
+    override fun onBackPressed() {
         //  if (mInterstitialAd.isLoaded()) {
         //      mInterstitialAd.show();
         //  } else {
-        finish();
+        finish()
         //  }
     }
 
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager manager =
-                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-
-        boolean isAvailable = false;
-        if (networkInfo != null && networkInfo.isConnected()) {
-            isAvailable = true;
+    private val isNetworkAvailable: Boolean
+        private get() {
+            val manager = this.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = manager.activeNetworkInfo
+            var isAvailable = false
+            if (networkInfo != null && networkInfo.isConnected) {
+                isAvailable = true
+            }
+            return isAvailable
         }
 
-        return isAvailable;
+    fun showSnacOffline() {
+        snack = Snackbar.make(
+            findViewById(R.id.menza_root), "Niste povezani",
+            Snackbar.LENGTH_INDEFINITE
+        )
+        val vjuz = snack!!.view
+        vjuz.setBackgroundColor(ContextCompat.getColor(baseContext, R.color.red_nice))
+        snack!!.setAction("PONOVI") {
+            snack!!.dismiss()
+            checkConditions()
+        }
+        snack!!.setActionTextColor(resources.getColor(R.color.white))
+        snack!!.show()
     }
 
-    public void showSnacOffline() {
-        snack = Snackbar.make(findViewById(R.id.menza_root), "Niste povezani",
-                Snackbar.LENGTH_INDEFINITE);
-        View vjuz = snack.getView();
-        vjuz.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.red_nice));
-        snack.setAction("PONOVI", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snack.dismiss();
-                checkConditions();
-            }
-        });
-        snack.setActionTextColor(getResources().getColor(R.color.white));
-        snack.show();
+    public override fun onStop() {
+        super.onStop()
+        if (okHttpClient != null) okHttpClient!!.dispatcher.cancelAll()
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        if (okHttpClient != null)
-            okHttpClient.dispatcher().cancelAll();
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (nRealm != null)
-            nRealm.close();
-
+    public override fun onDestroy() {
+        super.onDestroy()
+        if (nRealm != null) nRealm!!.close()
     }
 }
