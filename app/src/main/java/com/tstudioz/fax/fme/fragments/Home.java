@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
@@ -49,6 +50,7 @@ import java.util.Calendar;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
+import kotlinx.coroutines.InternalCoroutinesApi;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -171,7 +173,8 @@ public class Home extends Fragment {
         //final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr" + units;
         final String forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" + mLatitude + "&lon=" + mLongitude;
         if (isNetworkAvailable()) {
-            getForecast(forecastUrl);
+            showSnacOffline();
+            //getForecast(forecastUrl);
         } else {
             showSnacOffline();
         }

@@ -134,21 +134,28 @@ class TimeTable : Fragment(), DatePickerDialog.OnDateSetListener {
 
     override fun onDateSet(dialog: DatePickerDialog, year: Int, monthOfYear: Int, dayOfMonth: Int) {
         val kal = Calendar.getInstance()
+
         kal[Calendar.YEAR] = year
         kal[Calendar.MONTH] = monthOfYear
         kal[Calendar.DAY_OF_MONTH] = dayOfMonth
+
         val sday: DateFormat = SimpleDateFormat("dd")
         val smonth: DateFormat = SimpleDateFormat("MM")
         val syear: DateFormat = SimpleDateFormat("yyyy")
+
         kal[Calendar.DAY_OF_WEEK]
         kal.add(Calendar.DAY_OF_MONTH, -(kal[Calendar.DAY_OF_WEEK] - Calendar.MONDAY))
+
         val mMonth = smonth.format(kal.time)
         val mDay = sday.format(kal.time)
         val mYear = syear.format(kal.time)
+
         kal.add(Calendar.DAY_OF_MONTH, 5)
+
         val sMonth = smonth.format(kal.time)
         val sDay = sday.format(kal.time)
         val sYear = syear.format(kal.time)
+
         mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear)
         binding!!.odaberiDan.text = "Raspored za $mDay.$mMonth - $sDay.$sMonth"
     }

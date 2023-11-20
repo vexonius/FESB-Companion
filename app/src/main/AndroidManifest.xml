@@ -18,8 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true"
-        tools:replace="label">
-        <meta-data
+        tools:replace="label"
+        android:forceDarkAllowed="false">
+
+    <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
         <meta-data

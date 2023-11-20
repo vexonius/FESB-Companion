@@ -14,8 +14,6 @@ public class CredMigration implements RealmMigration {
     public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
         RealmSchema shema = realm.getSchema();
 
-
-
         if(oldVersion == 5){
             shema.create("LeanTask")
                     .addField("id", String.class, FieldAttribute.PRIMARY_KEY)

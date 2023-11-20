@@ -21,6 +21,7 @@
             android:summary="Vrijednost temperature će biti prkazana u celzijusima"
             android:defaultValue="true"/>
         <androidx.preference.SwitchPreference
+            android:id="@+id/amoled_theme_switch"
             android:key="amoled_theme"
             android:title="Koristi amoled tamnu temu"
             android:summary=""

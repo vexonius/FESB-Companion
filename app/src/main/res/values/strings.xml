@@ -42,5 +42,7 @@
     <string name="osvje_i">Osvježi</string>
     <string name="ljetni_semestar">LJETNI SEMESTAR</string>
     <string name="zimski_semestar">ZIMSKI SEMESTAR</string>
+    <string name="home">Home</string>
+    <string name="raspored">Raspored</string>
 
 </resources>

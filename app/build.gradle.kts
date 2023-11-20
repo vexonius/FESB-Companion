@@ -49,7 +49,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:1.9.2")
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("io.coil-kt:coil:0.9.5")
-    implementation("nl.joery.animatedbottombar:library:1.0.7")
+    implementation("nl.joery.animatedbottombar:library:1.1.0")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     androidTestImplementation("androidx.test.espresso:espresso-core:3.1.0") {
         exclude(group = "com.android.support", module = "support-annotations")

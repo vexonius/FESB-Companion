@@ -15,6 +15,7 @@ import android.webkit.CookieSyncManager
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
@@ -27,6 +28,9 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.activities.LoginActivity
 import com.tstudioz.fax.fme.database.Korisnik
 import io.realm.Realm
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.BuildCompat
+
 
 class SettingsFragment : PreferenceFragmentCompat() {
     private var rlmLog: Realm? = null
@@ -36,47 +40,49 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var mySPrefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
 
-    /* public class MySettingsFragment extends PreferenceFragmentCompat {
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 
-            setPreferencesFromResource(R.xml.app_prefrences, rootKey);
+    private val modeChangeListener = object : Preference.OnPreferenceChangeListener {
+        override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
+            rlmLog = Realm.getDefaultInstance()
+            newValue as? Boolean
 
-            CheckBoxPreference amoledPreference = findPreference("amoled_theme");
-
-            if (amoledPreference != null) {
-                boolean isAmoledThemeEnabled = amoledPreference.isChecked();
-                if (isAmoledThemeEnabled) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            Log.i("newValue", newValue.toString())
+            updateTheme(AppCompatDelegate.MODE_NIGHT_NO)
+            when (newValue) {
+                true -> {
+                    updateTheme(R.style.AppTheme)
                 }
-                else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                false -> {
+                    //updateTheme(R.style.AppTheme_Custom)
+                }
+                else -> {
+                    if (BuildCompat.isAtLeastQ()) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                    } else {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
+                    }
                 }
             }
+            return true
         }
     }
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        String darkModeString = getString(R.string.dark_mode);
-        if (key != null && key.equals(darkModeString)) {
-            if (sharedPreferences != null) {
-                String[] darkModeValues = getResources().getStringArray(R.array.dark_mode_values);
-                String selectedMode = sharedPreferences.getString(darkModeString, darkModeValues[0]);
-
-                switch (selectedMode) {
-                    case darkModeValues[1]:
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                        break;
-                    case darkModeValues[2]:
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                        break;
-                }
-            }
-        }
-    }*/
+    private fun updateTheme(nightMode: Int): Boolean {
+        editor = mySPrefs?.edit()
+        editor?.putString("Theme_mode", nightMode.toString())
+        editor?.apply()
+        if(editor !=null)
+            editor?.commit()
+        requireActivity().setTheme(nightMode)
+        requireActivity().recreate()
+        return true
+    }
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.app_prefrences)
         mySPrefs = requireActivity().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
+
+        //val preference = findPreference<Preference>("amoled_theme")
+        //preference?.onPreferenceChangeListener = modeChangeListener
+
         val prefLogOut = findPreference("logout") as Preference?
         rlmLog = Realm.getDefaultInstance()
         try {
