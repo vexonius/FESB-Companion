@@ -122,7 +122,8 @@ class TimeTable : Fragment(), DatePickerDialog.OnDateSetListener {
         params.bottomMargin = 64;
 
         // Apply the modified layout parameters
-        rootFrameLayout.setLayoutParams(params);*/setSetDates(now)
+        rootFrameLayout.setLayoutParams(params);*/
+        setSetDates(now)
         boldOut()
         return binding!!.root
     }
@@ -461,7 +462,7 @@ class TimeTable : Fragment(), DatePickerDialog.OnDateSetListener {
     private val isNetworkAvailable: Boolean
         private get() {
             val manager =
-                activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val networkInfo = manager.activeNetworkInfo
             var isAvailable = false
             if (networkInfo != null && networkInfo.isConnected) {
@@ -481,13 +482,13 @@ class TimeTable : Fragment(), DatePickerDialog.OnDateSetListener {
 
     fun showSnacOffline() {
         snack = Snackbar.make(
-            activity!!.findViewById(R.id.coordinatorLayout), """
+            requireActivity().findViewById(R.id.coordinatorLayout), """
      Niste povezani.
      Prikazuje se raspored ovog tjedna.
      """.trimIndent(), Snackbar.LENGTH_INDEFINITE
         )
         val vjuz = snack!!.view
-        vjuz.setBackgroundColor(ContextCompat.getColor(activity!!, R.color.red_nice))
+        vjuz.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
         snack!!.setAction("OSVJEŽI") {
             snack!!.dismiss()
             checkNetwork()
@@ -498,11 +499,11 @@ class TimeTable : Fragment(), DatePickerDialog.OnDateSetListener {
 
     fun showSnackError() {
         snack = Snackbar.make(
-            activity!!.findViewById(R.id.coordinatorLayout), "Došlo je do " +
+            requireActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
                     "pogreške pri dohvaćanju rasporeda", Snackbar.LENGTH_SHORT
         )
         val vjuzs = snack!!.view
-        vjuzs.setBackgroundColor(ContextCompat.getColor(activity!!, R.color.red_nice))
+        vjuzs.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
         snack!!.show()
     }
 

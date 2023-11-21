@@ -144,10 +144,8 @@ public class Prisutnost extends Fragment {
                             try {
                                 Element zimski = doc.select("div.semster.winter").first();
                                 Element litnji = doc.select("div.semster.summer").first();
-                                Element zimskaPredavanja =
-                                        zimski.select("div.body.clearfix").first();
-                                Element litnjaPredavanja =
-                                        litnji.select("div.body.clearfix").first();
+                                Element zimskaPredavanja = zimski.select("div.body.clearfix").first();
+                                Element litnjaPredavanja = litnji.select("div.body.clearfix").first();
 
 
                                 if (zimski.getElementsByClass("emptyList").first() == null) {
