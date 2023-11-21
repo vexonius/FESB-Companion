@@ -1,49 +1,43 @@
-package com.tstudioz.fax.fme.weather;
+package com.tstudioz.fax.fme.weather
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.tstudioz.fax.fme.R
 
-import androidx.fragment.app.Fragment;
-
-import com.tstudioz.fax.fme.R;
-
-
-public class DailyWeather extends Fragment {
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+class DailyWeather : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         //set the layout you want to display in First Fragment
-        View view = inflater.inflate(R.layout.daily,
-                container, false);
+        val view = inflater.inflate(
+            R.layout.daily,
+            container, false
+        )
+        val bundle = this.requireArguments()
+        val temperatura = bundle.getString("temperatura")
+        val vlazno = bundle.getString("vlaznost")
+        val vjetar = bundle.getString("vjetar")
+        val oborina = bundle.getString("oborina")
 
 
-        Bundle bundle = this.getArguments();
-        String temperatura = bundle.getString("temperatura");
-        String vlazno = bundle.getString("vlaznost");
-        String vjetar = bundle.getString("vjetar");
-        String oborina = bundle.getString("oborina");
+        /*mtemperaturaDaily.setText(temperatura);
+        mtrenutni_vjetar1.setText(vjetar);
+        mvlaznost_vrijednost1.setText(vlazno);
+        moborine_vrijednost1.setText(oborina);
 
 
-        //       mtemperaturaDaily.setText(temperatura);
-        //       mtrenutni_vjetar1.setText(vjetar);
-        //       mvlaznost_vrijednost1.setText(vlazno);
-        //       moborine_vrijednost1.setText(oborina);
-//
-//
-        //   mPoweredBy.setOnClickListener(new View.OnClickListener() {
-        //       @Override
-        //       public void onClick(View view) {
-        //           Uri uri = Uri.parse("https://darksky.net/poweredby/");
-        //           Intent in = new Intent(Intent.ACTION_VIEW, uri);
-        //           startActivity(in);
-        //       }
-        //   });
-
-        return view;
-
+        mPoweredBy.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Uri uri = Uri.parse("https://darksky.net/poweredby/");
+            Intent in = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(in);
+            }
+           });*/
+        return view
     }
 }

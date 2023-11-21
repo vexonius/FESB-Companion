@@ -1,93 +1,42 @@
-package com.tstudioz.fax.fme.weather;
+package com.tstudioz.fax.fme.weather
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.TimeZone
 
+class Current {
+    var icon: String? = null
+        get() = field
+        set
+    var time: Long = 0
+    private var mTemperature = 0.0
+    private var mWind = 0.0
+    var humidity = 0.0
+    private var mPrecipChance = 0.0
+    var summary: String? = null
+    var timeZone: String? = null
+    val formattedTime: String
+        get() {
+            val formatter = SimpleDateFormat("h:mm a")
+            formatter.timeZone = TimeZone.getTimeZone(timeZone)
+            val dateTime = Date(time * 1000)
+            return formatter.format(dateTime)
+        }
+    val temperature: Int
+        get() = Math.round(mTemperature).toInt()
 
-public class Current {
-    private String mIcon;
-    private long mTime;
-    private double mTemperature;
-    private double mWind;
-    private double mHumidity;
-    private double mPrecipChance;
-    private String mSummary;
-
-    public String getTimeZone() {
-        return mTimeZone;
+    fun setTemperature(temperature: Double) {
+        mTemperature = temperature
     }
 
-    public void setTimeZone(String timeZone) {
-        mTimeZone = timeZone;
-    }
-
-    private String mTimeZone;
-
-    public String getIcon() {
-        return mIcon;
-    }
-
-    public void setIcon(String icon) {
-        mIcon = icon;
-    }
-
-    public int getIconId() {
-        return Forecast.getIconId(mIcon);
-    }
-
-    public long getTime() {
-        return mTime;
-    }
-
-    public String getFormattedTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("h:mm a");
-        formatter.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
-        Date dateTime = new Date(getTime() * 1000);
-
-        return formatter.format(dateTime);
-    }
-
-    public void setTime(long time) {
-        mTime = time;
-    }
-
-    public int getTemperature() {
-        return (int) Math.round(mTemperature);
-    }
-
-    public void setTemperature(double temperature) {
-        mTemperature = temperature;
-    }
-
-    public double getHumidity() {
-        return mHumidity;
-    }
-
-    public void setHumidity(double humidity) {
-        mHumidity = humidity;
-    }
-
-    public int getPrecipChance() {
-        double precipPercentage = mPrecipChance * 100;
-        return (int) Math.round(precipPercentage);
-    }
-
-    public void setPrecipChance(double precipChance) {
-        mPrecipChance = precipChance;
-    }
-
-    public double getWind(){return (mWind);}
-
-    public void setWind(double wind){
-        mWind = wind;
-    }
-
-    public String getSummary() {
-        return mSummary;
-    }
-
-    public void setSummary(String summary) {
-        mSummary = summary;
-    }
+    var precipChance: Double
+        get() = mPrecipChance
+        set(precipChance) {
+            mPrecipChance = precipChance
+        }
+    var wind: Double
+        get() = mWind
+        set(wind) {
+            mWind = wind
+        }
 }

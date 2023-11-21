@@ -406,23 +406,23 @@
                                     android:layout_gravity="center"
                                     android:layout_weight="1">
 
-                                    <TextView
-                                        android:id="@+id/trenutni_vjetar"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:text=""
-                                        android:textAlignment="center"
-                                        android:textColor="#ffffff"
-                                        android:textSize="12dp" />
-
                                     <ImageView
                                         android:id="@+id/vjetrovito"
                                         android:layout_width="25dp"
                                         android:layout_height="25dp"
-                                        android:layout_below="@+id/trenutni_vjetar"
                                         android:layout_centerHorizontal="true"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/wind" />
+
+                                    <TextView
+                                        android:id="@+id/trenutni_vjetar"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_below="@+id/vjetrovito"
+                                        android:text=""
+                                        android:textAlignment="center"
+                                        android:textColor="#ffffff"
+                                        android:textSize="12dp" />
 
                                 </RelativeLayout>
 
@@ -432,25 +432,25 @@
                                     android:layout_weight="1"
                                     android:gravity="center">
 
-
-                                    <TextView
-                                        android:id="@+id/vlaznost_vrijednost"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:text=""
-                                        android:textAlignment="center"
-                                        android:textColor="#ffffff"
-                                        android:textSize="12dp" />
 
                                     <ImageView
                                         android:id="@+id/vlaznost"
                                         android:layout_width="22dp"
                                         android:layout_height="22dp"
-                                        android:layout_below="@+id/vlaznost_vrijednost"
                                         android:layout_centerHorizontal="true"
                                         android:paddingTop="3dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/vlaga" />
+
+                                    <TextView
+                                        android:id="@+id/vlaznost_vrijednost"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_below="@+id/vlaznost"
+                                        android:text=""
+                                        android:textAlignment="center"
+                                        android:textColor="#ffffff"
+                                        android:textSize="12dp" />
 
                                 </RelativeLayout>
 
@@ -460,23 +460,23 @@
                                     android:layout_weight="1"
                                     android:gravity="center">
 
-                                    <TextView
-                                        android:id="@+id/oborine_vrijednost"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:text=""
-                                        android:textAlignment="center"
-                                        android:textColor="#ffffff"
-                                        android:textSize="12dp" />
-
                                     <ImageView
                                         android:id="@+id/oborine"
                                         android:layout_width="25dp"
                                         android:layout_height="25dp"
-                                        android:layout_below="@+id/oborine_vrijednost"
                                         android:layout_centerHorizontal="true"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/oborine" />
+
+                                    <TextView
+                                        android:id="@+id/oborine_vrijednost"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_below="@+id/oborine"
+                                        android:text=""
+                                        android:textAlignment="center"
+                                        android:textColor="#ffffff"
+                                        android:textSize="12dp" />
 
                                 </RelativeLayout>
 

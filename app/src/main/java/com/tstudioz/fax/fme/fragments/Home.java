@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.squareup.moshi.Json;
 import com.tstudioz.fax.fme.Application.FESBCompanion;
 import com.tstudioz.fax.fme.BuildConfig;
 import com.tstudioz.fax.fme.R;
@@ -57,7 +58,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+
 import static android.content.ContentValues.TAG;
+import static androidx.browser.customtabs.CustomTabsClient.getPackageName;
 
 public class Home extends Fragment {
 
@@ -133,7 +136,7 @@ public class Home extends Fragment {
         // OkHttp stuff
         OkHttpClient client = FESBCompanion.getInstance().getOkHttpInstance();
         Request request = new Request.Builder()
-                .url(url).header("Accept","application/xml").header("User-Agent", "YourAppName/1.0").build();
+                .url(url).header("Accept","application/xml").header("User-Agent", "FesbCompanion/1.0").build();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @Override
@@ -173,8 +176,7 @@ public class Home extends Fragment {
         //final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr" + units;
         final String forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" + mLatitude + "&lon=" + mLongitude;
         if (isNetworkAvailable()) {
-            showSnacOffline();
-            //getForecast(forecastUrl);
+            getForecast(forecastUrl);
         } else {
             showSnacOffline();
         }
@@ -185,9 +187,9 @@ public class Home extends Fragment {
         Current current = mForecast.getCurrent();
 
         String pTemperatura = current.getTemperature() + "°";
-        String pHumidity = current.getHumidity() + "";
+        String pHumidity = current.getHumidity() + " %";
         String pWind = current.getWind() + " km/h";
-        String pPrecip = current.getPrecipChance() + "%";
+        String pPrecip = current.getPrecipChance() + " mm" ;
         String pSummary = current.getSummary();
 
         binding.temperaturaVrijednost.setText(pTemperatura);
@@ -199,7 +201,8 @@ public class Home extends Fragment {
         binding.shimmerWeather.setVisibility(View.GONE);
         binding.cardHome.setVisibility(View.VISIBLE);
 
-        Drawable drawable = getResources().getDrawable(current.getIconId());
+        Drawable drawable = getResources().getDrawable(getResources().getIdentifier(current.getIcon(), "drawable", getContext().getPackageName()));
+
         binding.vrijemeImage.setImageDrawable(drawable);
 
     }
@@ -221,12 +224,22 @@ public class Home extends Fragment {
         JSONObject currently0 = forecast.getJSONObject("properties");
         JSONArray currentlyArray = currently0.getJSONArray("timeseries");
         JSONObject currently = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("instant").getJSONObject("details");
+        JSONObject currently_next_one_hours = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("next_1_hours");
+        JSONObject currently_next_one_hours_summary = currently_next_one_hours.getJSONObject("summary");
+        JSONObject currently_next_one_hours_details = currently_next_one_hours.getJSONObject("details");
+        String unparsedsummary = currently_next_one_hours_summary.getString("symbol_code");
+        String summary = "";
+        if (unparsedsummary.contains("_")) {
+           summary = unparsedsummary.substring(0, unparsedsummary.indexOf('_'));
+        } else {
+            summary = unparsedsummary;
+        }
 
         Current current = new Current();
         current.setHumidity(currently.getDouble("relative_humidity"));
-        current.setIcon("clear-day");
-        current.setPrecipChance(11.0);
-        current.setSummary("antilopa");
+        current.setIcon(currently_next_one_hours_summary.getString("symbol_code"));
+        current.setPrecipChance(currently_next_one_hours_details.getDouble("precipitation_amount"));
+        current.setSummary(getString(getResources().getIdentifier(summary, "string", getContext().getPackageName())));
         current.setWind(currently.getDouble("wind_speed"));
         current.setTemperature(currently.getDouble("air_temperature"));
 
