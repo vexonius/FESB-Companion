@@ -56,9 +56,7 @@ class CourseActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    protected fun shouldAskPermissions(): Boolean {
-        return Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1
-    }
+    protected fun shouldAskPermissions(): Boolean = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1
 
     @TargetApi(23)
     protected fun askPermissions() {
