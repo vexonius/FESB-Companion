@@ -20,9 +20,11 @@ class CourseActivity : AppCompatActivity() {
         val imeKolegija = intent.getStringExtra("kolegij")
         //     getSupportActionBar().setTitle(imeKolegija);
         //    styledNavigation();
+
         if (shouldAskPermissions()) {
             askPermissions()
         }
+
         val bundle = Bundle()
         bundle.putString("link_kolegija", intent.getStringExtra("link_na_kolegij"))
         bundle.putString("kolegij", intent.getStringExtra("kolegij"))
