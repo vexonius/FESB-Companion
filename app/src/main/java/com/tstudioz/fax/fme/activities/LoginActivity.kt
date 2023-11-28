@@ -60,30 +60,24 @@ class LoginActivity : AppCompatActivity() {
         }
 
     private fun loadBlueButton() {
-        binding.loginButton.setOnClickListener(object : View.OnClickListener {
+        binding.loginButton.setOnClickListener { view ->
+            if (NetworkUtils.isNetworkAvailable(this@LoginActivity)) {
 
-            override fun onClick(view: View) {
-                if (NetworkUtils.isNetworkAvailable(this@LoginActivity)) {
-
-                    val username = binding.loginInput.text.toString()
-                    val password = binding.loginPass.text.toString()
-                    if (username.isEmpty() || password.isEmpty()) {
-                        showErrorSnack("Niste unijeli korisničke podatke")
-                    }
-                    else if (username.contains("@")){
-                            showErrorSnack("Potrebno je unijeti korisničko ime, ne email")
-                    }
-                    else {
-                            binding.progressLogin.visibility = View.VISIBLE
-                            binding.loginButton.visibility = View.INVISIBLE
-                            validateUser(username, password, view)
-                    }
+                val username = binding.loginInput.text.toString()
+                val password = binding.loginPass.text.toString()
+                if (username.isEmpty() || password.isEmpty()) {
+                    showErrorSnack("Niste unijeli korisničke podatke")
+                } else if (username.contains("@")) {
+                    showErrorSnack("Potrebno je unijeti korisničko ime, ne email")
+                } else {
+                    binding.progressLogin.visibility = View.VISIBLE
+                    binding.loginButton.visibility = View.INVISIBLE
+                    validateUser(username, password, view)
                 }
-                else {
-                    showErrorSnack("Niste povezani")
-                }
+            } else {
+                showErrorSnack("Niste povezani")
             }
-        })
+        }
     }
 
     private fun helpMe() {
