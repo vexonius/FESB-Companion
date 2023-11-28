@@ -197,7 +197,7 @@ class Home : Fragment() {
         }
         val current = Current()
         current.humidity = currently.getDouble("relative_humidity")
-        current.icon = currentlyNextOneHoursDetails.getString("symbol_code")
+        current.icon = currentlyNextOneHoursSummary.getString("symbol_code")
         current.precipChance = currentlyNextOneHoursDetails.getDouble("precipitation_amount")
         current.summary = getString(resources.getIdentifier(summary, "string", requireContext().packageName))
         current.wind = currently.getDouble("wind_speed")
@@ -258,17 +258,10 @@ class Home : Fragment() {
             } catch (anfe: Exception) {
                 try {
                     startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("market://details?id=$appPackageName")
-                        )
-                    )
+                        Intent(Intent.ACTION_VIEW,Uri.parse("market://details?id=$appPackageName")))
                 } catch (ex: ActivityNotFoundException) {
                     startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-                        )
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName"))
                     )
                 }
             }
@@ -277,29 +270,15 @@ class Home : Fragment() {
 
     private fun loadMenzaView() {
         binding!!.menzaRelative.setOnClickListener {
-            startActivity(
-                Intent(
-                    activity,
-                    MenzaActivity::class.java
-                )
-            )
+            startActivity(Intent(activity, MenzaActivity::class.java))
         }
         binding!!.eindexRelative.setOnClickListener {
-            startActivity(
-                Intent(
-                    activity,
-                    IndexActivity::class.java
-                )
-            )
+            startActivity(Intent(activity, IndexActivity::class.java))
         }
     }
 
     private fun showSnacOffline() {
-        snack = Snackbar.make(
-            requireActivity().findViewById(R.id.coordinatorLayout),
-            "Niste povezani",
-            Snackbar.LENGTH_LONG
-        )
+        snack = Snackbar.make(requireActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG)
         val vjuz = snack!!.view
         vjuz.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
         snack!!.show()
@@ -320,15 +299,9 @@ class Home : Fragment() {
         super.onStop()
         (activity as AppCompatActivity?)!!.supportActionBar!!
             .setBackgroundDrawable(
-                ColorDrawable(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.colorPrimary
-                    )
-                )
+                ColorDrawable(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
             )
-        requireActivity().window.statusBarColor =
-            ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
+        requireActivity().window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
         if (mrealm != null) {
             mrealm!!.close()
         }

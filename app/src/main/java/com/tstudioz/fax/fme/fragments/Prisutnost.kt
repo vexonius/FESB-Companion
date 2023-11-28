@@ -1,471 +1,408 @@
-package com.tstudioz.fax.fme.fragments;
+package com.tstudioz.fax.fme.fragments
 
+import android.content.pm.ActivityInfo
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.franmontiel.persistentcookiejar.PersistentCookieJar
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
+import com.google.android.material.snackbar.Snackbar
+import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
+import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.adapters.DolasciAdapter
+import com.tstudioz.fax.fme.database.Dolazak
+import com.tstudioz.fax.fme.database.Korisnik
+import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
+import com.tstudioz.fax.fme.networking.NetworkUtils
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import io.realm.RealmResults
+import kotlinx.coroutines.InternalCoroutinesApi
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.CookieJar
+import okhttp3.FormBody.Builder
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.Response
+import org.jsoup.Jsoup
+import java.io.IOException
+import java.util.StringTokenizer
+import java.util.UUID
 
-import android.content.Context;
-import android.content.pm.ActivityInfo;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import com.franmontiel.persistentcookiejar.PersistentCookieJar;
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
-import com.google.android.material.snackbar.Snackbar;
-import com.tstudioz.fax.fme.Application.FESBCompanion;
-import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.adapters.DolasciAdapter;
-import com.tstudioz.fax.fme.database.Dolazak;
-import com.tstudioz.fax.fme.database.Korisnik;
-import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-import java.util.StringTokenizer;
-import java.util.UUID;
-
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmResults;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.CookieJar;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
-
-public class Prisutnost extends Fragment {
-
-    public RealmConfiguration realmConfig = new RealmConfiguration.Builder()
-            .allowWritesOnUiThread(true)
-            .name("prisutnost.realm")
-            .schemaVersion(10)
-            .deleteRealmIfMigrationNeeded()
-            .build();
-
-
-    private Snackbar snack;
-    private DolasciAdapter winterAdapter, summerAdapter;
-    private Realm nRealm, cRealm, sRealm, wRealm;
-    private OkHttpClient okHttpClient;
-
-    private PrisutnostTabBinding binding;
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        setHasOptionsMenu(true);
-        binding = PrisutnostTabBinding.inflate(inflater, container, false);
-
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-
-        hideRecyc();
-
-        startFetching();
-
-        return binding.getRoot();
+class Prisutnost : Fragment() {
+    var realmConfig: RealmConfiguration = RealmConfiguration.Builder()
+        .allowWritesOnUiThread(true)
+        .name("prisutnost.realm")
+        .schemaVersion(10)
+        .deleteRealmIfMigrationNeeded()
+        .build()
+    private var snack: Snackbar? = null
+    private var winterAdapter: DolasciAdapter? = null
+    private var summerAdapter: DolasciAdapter? = null
+    private var nRealm: Realm? = null
+    private var cRealm: Realm? = null
+    private var sRealm: Realm? = null
+    private var wRealm: Realm? = null
+    private var okHttpClient: OkHttpClient? = null
+    private var binding: PrisutnostTabBinding? = null
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        setHasOptionsMenu(true)
+        binding = PrisutnostTabBinding.inflate(inflater, container, false)
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        hideRecyc()
+        startFetching()
+        return binding!!.root
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-    }
-
-    public void fetchPrisutnost() {
-
-        final CookieJar cookieJar = new PersistentCookieJar(new SetCookieCache(),
-                new SharedPrefsCookiePersistor(getActivity()));
-
-        okHttpClient = FESBCompanion.getInstance().getOkHttpInstance();
-
-        deletePreviousResults();
-
-        cRealm = Realm.getDefaultInstance();
-        Korisnik korisnik = cRealm.where(Korisnik.class).findFirst();
-
-        final RequestBody formData = new FormBody.Builder()
-                .add("Username", korisnik.getUsername())
-                .add("Password", korisnik.getLozinka())
-                .add("IsRememberMeChecked", "true")
-                .build();
-
-        final Request rq = new Request.Builder()
-                .url("https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb" +
-                        ".unist.hr")
-                .post(formData)
-                .build();
-
-        Call call0 = okHttpClient.newCall(rq);
-        call0.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("pogreska", "failure");
+    @OptIn(InternalCoroutinesApi::class)
+    fun fetchPrisutnost() {
+        val cookieJar: CookieJar = PersistentCookieJar(
+            SetCookieCache(),
+            SharedPrefsCookiePersistor(activity)
+        )
+        okHttpClient = instance!!.okHttpInstance
+        deletePreviousResults()
+        cRealm = Realm.getDefaultInstance()
+        val korisnik = cRealm?.where(Korisnik::class.java)?.findFirst()
+        val formData: RequestBody = Builder()
+            .add("Username", korisnik!!.getUsername())
+            .add("Password", korisnik.getLozinka())
+            .add("IsRememberMeChecked", "true")
+            .build()
+        val rq: Request = Request.Builder()
+            .url(
+                "https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb" +
+                        ".unist.hr"
+            )
+            .post(formData)
+            .build()
+        val call0 = okHttpClient!!.newCall(rq)
+        call0.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.d("pogreska", "failure")
             }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
-                Request request = new Request.Builder()
-                        .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
-                        .get()
-                        .build();
-
-                Call call1 = okHttpClient.newCall(request);
-                call1.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        Log.d("pogreska", "failure");
+            @Throws(IOException::class)
+            override fun onResponse(call: Call, response: Response) {
+                val request: Request = Request.Builder()
+                    .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
+                    .get()
+                    .build()
+                val call1 = okHttpClient!!.newCall(request)
+                call1.enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        Log.d("pogreska", "failure")
                     }
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-
-                        if (response.code() != 500) {
-
-                            Document doc = Jsoup.parse(response.body().string());
-
+                    @Throws(IOException::class)
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.code != 500) {
+                            val doc = Jsoup.parse(response.body!!.string())
                             try {
-                                Element zimski = doc.select("div.semster.winter").first();
-                                Element litnji = doc.select("div.semster.summer").first();
-                                Element zimskaPredavanja = zimski.select("div.body.clearfix").first();
-                                Element litnjaPredavanja = litnji.select("div.body.clearfix").first();
-
-
+                                val zimski = doc.select("div.semster.winter").first()
+                                val litnji = doc.select("div.semster.summer").first()
+                                val zimskaPredavanja = zimski.select("div.body.clearfix").first()
+                                val litnjaPredavanja = litnji.select("div.body.clearfix").first()
                                 if (zimski.getElementsByClass("emptyList").first() == null) {
-
-                                    Elements zimskiKolegiji = zimskaPredavanja.select("a");
-
-                                    for (final Element element : zimskiKolegiji) {
-
-                                        Request request = new Request.Builder()
-                                                .url("https://raspored.fesb.unist.hr" + element.attr("href").toString())
-                                                .get()
-                                                .build();
-
-                                        Call callonme = okHttpClient.newCall(request);
-                                        callonme.enqueue(new Callback() {
-                                            @Override
-                                            public void onFailure(Call call, IOException e) {
-                                                Log.d("pogreska", "failure");
+                                    val zimskiKolegiji = zimskaPredavanja.select("a")
+                                    for (element in zimskiKolegiji) {
+                                        val request: Request = Request.Builder()
+                                            .url(
+                                                "https://raspored.fesb.unist.hr" + element.attr("href")
+                                                    .toString()
+                                            )
+                                            .get()
+                                            .build()
+                                        val callonme = okHttpClient!!.newCall(request)
+                                        callonme.enqueue(object : Callback {
+                                            override fun onFailure(call: Call, e: IOException) {
+                                                Log.d("pogreska", "failure")
                                             }
 
-                                            @Override
-                                            public void onResponse(Call call, Response response) throws IOException {
-                                                Document document =
-                                                        Jsoup.parse(response.body().string());
-                                                Realm mRealm1 = Realm.getInstance(realmConfig);
-
+                                            @Throws(IOException::class)
+                                            override fun onResponse(
+                                                call: Call,
+                                                response: Response
+                                            ) {
+                                                val document = Jsoup.parse(
+                                                    response.body!!.string()
+                                                )
+                                                val mRealm1 = Realm.getInstance(realmConfig)
                                                 try {
-
-                                                    Element content =
-                                                            document.getElementsByClass(
-                                                                    "courseCategories").first();
-                                                    final Elements kategorije = content.select(
-                                                            "div.courseCategory");
-
-                                                    mRealm1.executeTransaction(new Realm.Transaction() {
-                                                        @Override
-                                                        public void execute(Realm realm) {
-                                                            for (Element kat : kategorije) {
-                                                                final Dolazak mDolazak =
-                                                                        realm.createObject(Dolazak.class, UUID.randomUUID().toString());
-
-                                                                mDolazak.setSemestar(1);
-                                                                mDolazak.setPredmet(element.select("div.cellContent").first().text());
-                                                                mDolazak.setVrsta(kat.getElementsByClass("name").first().text());
-                                                                mDolazak.setAttended(Integer.parseInt(kat.select("div.attended > span.num").first().text()));
-                                                                mDolazak.setAbsent(Integer.parseInt(kat.select("div.absent > span.num").first().text()));
-                                                                mDolazak.setRequired(kat.select(
-                                                                        "div.required-attendance " +
-                                                                                "> span").first().text());
-
-                                                                String string = kat.select("div" +
+                                                    val content = document.getElementsByClass(
+                                                        "courseCategories"
+                                                    ).first()
+                                                    val kategorije = content.select(
+                                                        "div.courseCategory"
+                                                    )
+                                                    mRealm1.executeTransaction { realm ->
+                                                        for (kat in kategorije) {
+                                                            val mDolazak = realm.createObject(
+                                                                Dolazak::class.java,
+                                                                UUID.randomUUID().toString()
+                                                            )
+                                                            mDolazak.setSemestar(1)
+                                                            mDolazak.setPredmet(
+                                                                element.select("div.cellContent")
+                                                                    .first().text()
+                                                            )
+                                                            mDolazak.setVrsta(
+                                                                kat.getElementsByClass(
+                                                                    "name"
+                                                                ).first().text()
+                                                            )
+                                                            mDolazak.setAttended(
+                                                                kat.select("div.attended > span.num")
+                                                                    .first().text().toInt()
+                                                            )
+                                                            mDolazak.setAbsent(
+                                                                kat.select("div.absent > span.num")
+                                                                    .first().text().toInt()
+                                                            )
+                                                            mDolazak.setRequired(
+                                                                kat.select(
+                                                                    "div.required-attendance " +
+                                                                            "> span"
+                                                                ).first().text()
+                                                            )
+                                                            val string = kat.select(
+                                                                "div" +
                                                                         ".required-attendance > " +
-                                                                        "span").first().text();
-                                                                StringTokenizer st =
-                                                                        new StringTokenizer(string, " ");
-                                                                String ric1 = st.nextToken();
-                                                                String ric2 = st.nextToken();
-                                                                String max = st.nextToken();
-
-                                                                mDolazak.setTotal(Integer.parseInt(max));
-
-                                                            }
+                                                                        "span"
+                                                            ).first().text()
+                                                            val st = StringTokenizer(string, " ")
+                                                            val ric1 = st.nextToken()
+                                                            val ric2 = st.nextToken()
+                                                            val max = st.nextToken()
+                                                            mDolazak.setTotal(max.toInt())
                                                         }
-                                                    });
-
-                                                } catch (Exception exception) {
-                                                    Log.d("Exception prisutnost",
-                                                            exception.getMessage());
-                                                    exception.printStackTrace();
+                                                    }
+                                                } catch (exception: Exception) {
+                                                    Log.d(
+                                                        "Exception prisutnost",
+                                                        exception.message!!
+                                                    )
+                                                    exception.printStackTrace()
                                                 } finally {
-                                                    mRealm1.close();
+                                                    mRealm1.close()
                                                 }
-
                                             }
-
-                                        });
-
-
+                                        })
                                     }
                                 }
-
-
                                 if (litnji.getElementsByClass("emptyList").first() == null) {
-
-                                    Elements litnjiKolegiji = litnjaPredavanja.select("a");
-
-                                    for (final Element element : litnjiKolegiji) {
-
-                                        Request request = new Request.Builder()
-                                                .url("https://raspored.fesb.unist.hr" + element.attr("href").toString())
-                                                .get()
-                                                .build();
-
-                                        Call callonme1 = okHttpClient.newCall(request);
-                                        callonme1.enqueue(new Callback() {
-                                            @Override
-                                            public void onFailure(Call call, IOException e) {
-                                                showSnackError();
+                                    val litnjiKolegiji = litnjaPredavanja.select("a")
+                                    for (element in litnjiKolegiji) {
+                                        val request: Request = Request.Builder()
+                                            .url(
+                                                "https://raspored.fesb.unist.hr" + element.attr("href")
+                                                    .toString()
+                                            )
+                                            .get()
+                                            .build()
+                                        val callonme1 = okHttpClient!!.newCall(request)
+                                        callonme1.enqueue(object : Callback {
+                                            override fun onFailure(call: Call, e: IOException) {
+                                                showSnackError()
                                             }
 
-                                            @Override
-                                            public void onResponse(Call call, Response response) throws IOException {
-                                                Document document =
-                                                        Jsoup.parse(response.body().string());
-
-                                                Realm mRealm2 = Realm.getInstance(realmConfig);
-
+                                            @Throws(IOException::class)
+                                            override fun onResponse(
+                                                call: Call,
+                                                response: Response
+                                            ) {
+                                                val document = Jsoup.parse(
+                                                    response.body!!.string()
+                                                )
+                                                val mRealm2 = Realm.getInstance(realmConfig)
                                                 try {
-                                                    Element content =
-                                                            document.getElementsByClass(
-                                                                    "courseCategories").first();
-                                                    final Elements kategorije = content.select(
-                                                            "div.courseCategory");
-
-                                                    mRealm2.executeTransaction(new Realm.Transaction() {
-                                                        @Override
-                                                        public void execute(Realm realm) {
-                                                            for (Element kat : kategorije) {
-                                                                final Dolazak mDolazak =
-                                                                        realm.createObject(Dolazak.class, UUID.randomUUID().toString());
-
-                                                                mDolazak.setSemestar(2);
-                                                                mDolazak.setPredmet(element.select("div.cellContent").first().text());
-                                                                mDolazak.setVrsta(kat.getElementsByClass("name").first().text());
-                                                                mDolazak.setAttended(Integer.parseInt(kat.select("div.attended > span.num").first().text()));
-                                                                mDolazak.setAbsent(Integer.parseInt(kat.select("div.absent > span.num").first().text()));
-                                                                mDolazak.setRequired(kat.select(
-                                                                        "div.required-attendance " +
-                                                                                "> span").first().text());
-
-                                                                String string = kat.select("div" +
+                                                    val content = document.getElementsByClass(
+                                                        "courseCategories"
+                                                    ).first()
+                                                    val kategorije = content.select(
+                                                        "div.courseCategory"
+                                                    )
+                                                    mRealm2.executeTransaction { realm ->
+                                                        for (kat in kategorije) {
+                                                            val mDolazak = realm.createObject(
+                                                                Dolazak::class.java,
+                                                                UUID.randomUUID().toString()
+                                                            )
+                                                            mDolazak.setSemestar(2)
+                                                            mDolazak.setPredmet(
+                                                                element.select("div.cellContent")
+                                                                    .first().text()
+                                                            )
+                                                            mDolazak.setVrsta(
+                                                                kat.getElementsByClass(
+                                                                    "name"
+                                                                ).first().text()
+                                                            )
+                                                            mDolazak.setAttended(
+                                                                kat.select("div.attended > span.num")
+                                                                    .first().text().toInt()
+                                                            )
+                                                            mDolazak.setAbsent(
+                                                                kat.select("div.absent > span.num")
+                                                                    .first().text().toInt()
+                                                            )
+                                                            mDolazak.setRequired(
+                                                                kat.select(
+                                                                    "div.required-attendance " +
+                                                                            "> span"
+                                                                ).first().text()
+                                                            )
+                                                            val string = kat.select(
+                                                                "div" +
                                                                         ".required-attendance > " +
-                                                                        "span").first().text();
-                                                                StringTokenizer st =
-                                                                        new StringTokenizer(string, " ");
-                                                                String ric1 = st.nextToken();
-                                                                String ric2 = st.nextToken();
-                                                                String max = st.nextToken();
-
-                                                                mDolazak.setTotal(Integer.parseInt(max));
-
-                                                            }
+                                                                        "span"
+                                                            ).first().text()
+                                                            val st = StringTokenizer(string, " ")
+                                                            val ric1 = st.nextToken()
+                                                            val ric2 = st.nextToken()
+                                                            val max = st.nextToken()
+                                                            mDolazak.setTotal(max.toInt())
                                                         }
-                                                    });
-
-                                                } catch (Exception e) {
-                                                    Log.d("Exception prisutnost", e.getMessage());
-                                                    e.printStackTrace();
+                                                    }
+                                                } catch (e: Exception) {
+                                                    Log.d("Exception prisutnost", e.message!!)
+                                                    e.printStackTrace()
                                                 } finally {
-                                                    mRealm2.close();
+                                                    mRealm2.close()
                                                 }
                                             }
-                                        });
-
+                                        })
                                     }
                                 }
-
-                            } catch (Exception ex) {
-                                Log.d("Exception pris", ex.getMessage());
-                                ex.printStackTrace();
+                            } catch (ex: Exception) {
+                                Log.d("Exception pris", ex.message!!)
+                                ex.printStackTrace()
                             }
-
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        showRecyclerviewWinterSem();
-                                        showRecyclerviewSummerSem();
-                                        binding.progressAttend.setVisibility(View.INVISIBLE);
-                                        binding.nestedAttend.setVisibility(View.VISIBLE);
-                                    }
-                                });
+                            if (activity != null) {
+                                activity!!.runOnUiThread {
+                                    showRecyclerviewWinterSem()
+                                    showRecyclerviewSummerSem()
+                                    binding!!.progressAttend.visibility = View.INVISIBLE
+                                    binding!!.nestedAttend.visibility = View.VISIBLE
+                                }
                             }
-
                         } else {
-                            showSnackError();
+                            showSnackError()
                         }
                     }
-
-                });
+                })
             }
-        });
-
+        })
     }
 
-    public void showRecyclerviewWinterSem() {
-
-        wRealm = Realm.getInstance(realmConfig);
-        RealmResults<Dolazak> dolasciWinter =
-                wRealm.where(Dolazak.class).equalTo("semestar", 1).findAll();
-
+    fun showRecyclerviewWinterSem() {
+        wRealm = Realm.getInstance(realmConfig)
+        val dolasciWinter: RealmResults<Dolazak>? =
+            wRealm?.where(Dolazak::class.java)?.equalTo("semestar", 1.toInt())?.findAll()
         try {
-            binding.recyclerZimski.setLayoutManager(new LinearLayoutManager(getActivity(),
-                    LinearLayoutManager.HORIZONTAL, false));
-            winterAdapter = new DolasciAdapter(dolasciWinter);
-            binding.recyclerZimski.setAdapter(winterAdapter);
+            binding!!.recyclerZimski.layoutManager = LinearLayoutManager(activity,
+                LinearLayoutManager.HORIZONTAL, false
+            )
+            winterAdapter = DolasciAdapter(dolasciWinter)
+            binding!!.recyclerZimski.adapter = winterAdapter
         } finally {
-            wRealm.close();
+            wRealm?.close()
         }
     }
 
-    public void showRecyclerviewSummerSem() {
-
-        sRealm = Realm.getInstance(realmConfig);
-        RealmResults<Dolazak> dolasciSummer =
-                sRealm.where(Dolazak.class).equalTo("semestar", 2).findAll();
-
+    fun showRecyclerviewSummerSem() {
+        sRealm = Realm.getInstance(realmConfig)
+        val dolasciSummer: RealmResults<Dolazak>? =
+            sRealm?.where(Dolazak::class.java)?.equalTo("semestar", 2.toInt())?.findAll()
         try {
-            binding.recyclerLItnji.setLayoutManager(new LinearLayoutManager(getActivity(),
-                    LinearLayoutManager.HORIZONTAL, false));
-            summerAdapter = new DolasciAdapter(dolasciSummer);
-            binding.recyclerLItnji.setAdapter(summerAdapter);
+            binding!!.recyclerLItnji.layoutManager = LinearLayoutManager(activity,
+                LinearLayoutManager.HORIZONTAL, false
+            )
+            summerAdapter = DolasciAdapter(dolasciSummer)
+            binding!!.recyclerLItnji.adapter = summerAdapter
         } finally {
-            sRealm.close();
+            sRealm?.close()
         }
     }
 
-    private void deletePreviousResults() {
-        nRealm = Realm.getInstance(realmConfig);
-
-        final RealmResults<Dolazak> svaPrisutnost = nRealm.where(Dolazak.class).findAll();
-
-        nRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                svaPrisutnost.deleteAllFromRealm();
-            }
-        });
-
+    private fun deletePreviousResults() {
+        nRealm = Realm.getInstance(realmConfig)
+        val svaPrisutnost = nRealm?.where(Dolazak::class.java)?.findAll()
+        nRealm?.executeTransaction { svaPrisutnost?.deleteAllFromRealm() }
     }
 
-
-
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.refresMe).setVisible(false);
-        super.onPrepareOptionsMenu(menu);
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.findItem(R.id.refresMe).isVisible = false
+        super.onPrepareOptionsMenu(menu)
     }
 
-    public void startFetching() {
-        if (isNetworkAvailable()) {
-            fetchPrisutnost();
+    private fun startFetching() {
+        if (NetworkUtils.isNetworkAvailable(requireContext())) {
+            fetchPrisutnost()
         } else {
-            showSnacOffline();
+            showSnacOffline()
         }
     }
 
-    public void showSnacOffline() {
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Niste " +
-                "povezani", Snackbar.LENGTH_INDEFINITE);
-        View vjuz = snack.getView();
-        vjuz.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
-        snack.setAction("PONOVI", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snack.dismiss();
-                startFetching();
-            }
-        });
-        snack.setActionTextColor(getResources().getColor(R.color.white));
-        snack.show();
-    }
-
-    public void showSnackError() {
-        snack = Snackbar.make(getActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
-                "pogreške", Snackbar.LENGTH_LONG);
-        View okvir = snack.getView();
-        okvir.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_nice));
-        snack.setAction(("PONOVI"), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snack.dismiss();
-                startFetching();
-            }
-        });
-        snack.setActionTextColor(getResources().getColor(R.color.white));
-        snack.show();
-    }
-
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager manager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-
-        boolean isAvailable = false;
-        if (networkInfo != null && networkInfo.isConnected()) {
-            isAvailable = true;
+    private fun showSnacOffline() {
+        snack = Snackbar.make(
+            requireActivity().findViewById(R.id.coordinatorLayout), "Niste " +
+                    "povezani", Snackbar.LENGTH_INDEFINITE
+        )
+        val vjuz = snack!!.view
+        vjuz.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
+        snack!!.setAction("PONOVI") {
+            snack!!.dismiss()
+            startFetching()
         }
-        return isAvailable;
+        snack!!.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+
+        snack!!.show()
     }
 
-    private void hideRecyc() {
-        binding.nestedAttend.setVisibility(View.INVISIBLE);
-        binding.progressAttend.setVisibility(View.VISIBLE);
+    fun showSnackError() {
+        snack = Snackbar.make(
+            requireActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
+                    "pogreške", Snackbar.LENGTH_LONG
+        )
+        val okvir = snack!!.view
+        okvir.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
+        snack!!.setAction("PONOVI") {
+            snack!!.dismiss()
+            startFetching()
+        }
+        snack!!.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        snack!!.show()
     }
 
-    public void onStop() {
-        super.onStop();
+    private fun hideRecyc() {
+        binding!!.nestedAttend.visibility = View.INVISIBLE
+        binding!!.progressAttend.visibility = View.VISIBLE
+    }
 
+    override fun onStop() {
+        super.onStop()
         if (snack != null) {
-            snack.dismiss();
+            snack!!.dismiss()
         }
-
-        if (okHttpClient != null)
-            okHttpClient.dispatcher().cancelAll();
-
-        if (cRealm != null)
-            cRealm.close();
+        if (okHttpClient != null) okHttpClient!!.dispatcher.cancelAll()
+        if (cRealm != null) cRealm!!.close()
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (nRealm != null)
-            nRealm.close();
-
+    override fun onDestroy() {
+        super.onDestroy()
+        if (nRealm != null) nRealm!!.close()
     }
-
 }
-

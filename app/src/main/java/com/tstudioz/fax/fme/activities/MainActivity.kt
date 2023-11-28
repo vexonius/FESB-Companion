@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Typeface
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -18,19 +17,17 @@ import android.view.View
 import android.webkit.WebView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
-import com.tstudioz.fax.fme.R/*
-import com.tstudioz.fax.fme.database.AmoledSetting*/
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
@@ -38,21 +35,18 @@ import com.tstudioz.fax.fme.fragments.Home
 import com.tstudioz.fax.fme.fragments.Prisutnost
 import com.tstudioz.fax.fme.fragments.TimeTable
 import com.tstudioz.fax.fme.networking.NetworkUtils
-import com.tstudioz.fax.fme.ui.mainscreen.MainViewModel
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmException
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
-import nl.joery.animatedbottombar.BottomBarStyle
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.Jsoup
-import org.koin.java.KoinJavaComponent.get
 import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -69,8 +63,6 @@ class MainActivity : AppCompatActivity() {
     private var bottomSheet: BottomSheetDialog? = null
     private var shPref: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
-    @OptIn(InternalCoroutinesApi::class)
-    private val viewModel = get(MainViewModel::class.java)
     private var binding: ActivityMainBinding? = null
     val mainRealmConfig = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
@@ -128,22 +120,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    /*private fun setTheme(){
-
-        try {
-            realmLog = Realm.getDefaultInstance()
-            if (realmLog?.where(AmoledSetting::class.java)?.findFirst()!!.themeSetting){
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            }
-            else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-        } catch (e: Exception) {
-            Log.e("settings exp", e.message!!)
-        } finally {
-            realmLog?.close()
-        }
-    }*/
     private fun setDefaultScreen() {
         //getSupportActionBar().hide();
         val ft = supportFragmentManager.beginTransaction()
@@ -199,9 +175,9 @@ class MainActivity : AppCompatActivity() {
         bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.command_line), "Home", 3));
         bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.courses), "Kolegiji", 4));
         bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.mail), "Outlook", 5));*/
-        bar.addTab(bar.createTab(getDrawable(R.drawable.attend), "Prisutnost", R.id.tab_prisutnost))
-        bar.addTab(bar.createTab(getDrawable(R.drawable.command_line), "Home", R.id.tab_home))
-        bar.addTab(bar.createTab(getDrawable(R.drawable.cal), "Raspored", R.id.tab_raspored))
+        bar.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.attend), "Prisutnost", R.id.tab_prisutnost))
+        bar.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.command_line), "Home", R.id.tab_home))
+        bar.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.cal), "Raspored", R.id.tab_raspored))
         bar.selectTabById(R.id.tab_home, true)
     }
 
@@ -504,7 +480,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 val builder = CustomTabsIntent.Builder()
                 val customTabsIntent =
-                    builder.setToolbarColor(resources.getColor(R.color.colorPrimaryDark)).build()
+                    builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)).build()
                 customTabsIntent.launchUrl(
                     view.context, Uri.parse(
                         "http://tstud" +
