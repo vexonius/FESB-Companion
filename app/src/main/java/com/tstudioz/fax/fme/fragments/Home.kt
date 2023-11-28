@@ -6,9 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.drawable.ColorDrawable
-import android.net.ConnectivityManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -56,13 +54,13 @@ class Home : Fragment() {
     private var mrealm: Realm? = null
     private var taskRealm: Realm? = null
     private var binding: HomeTabBinding? = null
-    var realmTaskConfiguration = RealmConfiguration.Builder()
+    var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("tasks.realm")
         .deleteRealmIfMigrationNeeded()
         .schemaVersion(1)
         .build()
-    val mainRealmConfig = RealmConfiguration.Builder()
+    val mainRealmConfig: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("glavni.realm")
         .schemaVersion(3)
@@ -143,10 +141,7 @@ class Home : Fragment() {
         val shared = requireActivity().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
         units = shared.getString("weather_units", "&units=ca")
 
-        // get your own API KEY from developer.forecast.io and fill it in.
-        //final String forecastUrl = "https://api.forecast.io/forecast/" + myApiKey + "/" + mLatitude + "," + mLongitude + "?lang=hr" + units;
-        val forecastUrl =
-            "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" + mLatitude + "&lon=" + mLongitude
+        val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
             getForecast(forecastUrl)
         } else {
@@ -190,22 +185,21 @@ class Home : Fragment() {
         val currently0 = forecast.getJSONObject("properties")
         val currentlyArray = currently0.getJSONArray("timeseries")
         val currently = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("instant").getJSONObject("details")
-        val currently_next_one_hours = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("next_1_hours")
-        val currently_next_one_hours_summary = currently_next_one_hours.getJSONObject("summary")
-        val currently_next_one_hours_details = currently_next_one_hours.getJSONObject("details")
-        val unparsedsummary = currently_next_one_hours_summary.getString("symbol_code")
-        var summary: String? = ""
-        summary = if (unparsedsummary.contains("_")) {
+        val currentlyNextOneHours = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("next_1_hours")
+        val currentlyNextOneHoursSummary = currentlyNextOneHours.getJSONObject("summary")
+        val currentlyNextOneHoursDetails = currentlyNextOneHours.getJSONObject("details")
+        val unparsedsummary = currentlyNextOneHoursSummary.getString("symbol_code")
+        val summary: String? = if (unparsedsummary.contains("_"))
+        {
             unparsedsummary.substring(0, unparsedsummary.indexOf('_'))
         } else {
             unparsedsummary
         }
         val current = Current()
         current.humidity = currently.getDouble("relative_humidity")
-        current.icon = currently_next_one_hours_summary.getString("symbol_code")
-        current.precipChance = currently_next_one_hours_details.getDouble("precipitation_amount")
-        current.summary =
-            getString(resources.getIdentifier(summary, "string", requireContext().packageName))
+        current.icon = currentlyNextOneHoursDetails.getString("symbol_code")
+        current.precipChance = currentlyNextOneHoursDetails.getDouble("precipitation_amount")
+        current.summary = getString(resources.getIdentifier(summary, "string", requireContext().packageName))
         current.wind = currently.getDouble("wind_speed")
         current.setTemperature(currently.getDouble("air_temperature"))
         return current
@@ -214,7 +208,7 @@ class Home : Fragment() {
     fun showList() {
         mrealm = Realm.getInstance(mainRealmConfig)
         val rezultati =
-            mrealm?.where(Predavanja::class.java)?.contains("detaljnoVrijeme", date)?.findAll()
+            date?.let {mrealm?.where(Predavanja::class.java)?.contains("detaljnoVrijeme", it)?.findAll()}
         if (rezultati !=null && rezultati.isEmpty()) {
             binding!!.rv.visibility = View.INVISIBLE
             binding!!.nemaPredavanja.visibility = View.VISIBLE
@@ -229,7 +223,7 @@ class Home : Fragment() {
         }
     }
 
-    fun setCyanStatusBarColor() {
+    private fun setCyanStatusBarColor() {
         (activity as AppCompatActivity?)!!.supportActionBar!!
             .setBackgroundDrawable(
                 ColorDrawable(
@@ -243,7 +237,7 @@ class Home : Fragment() {
             ContextCompat.getColor(requireContext(), R.color.darker_cyan)
     }
 
-    fun loadNotes() {
+    private fun loadNotes() {
         val tasks = taskRealm!!.where(LeanTask::class.java).findAll()
         val dodajNovi = LeanTask()
         dodajNovi.setId("ACTION_ADD")
@@ -255,7 +249,7 @@ class Home : Fragment() {
         binding!!.recyclerTask.adapter = leanTaskAdapter
     }
 
-    fun loadIksicaAd() {
+    private fun loadIksicaAd() {
         binding!!.iksicaAd.setOnClickListener {
             val appPackageName = "com.tstud.iksica"
             try {
@@ -281,7 +275,7 @@ class Home : Fragment() {
         }
     }
 
-    fun loadMenzaView() {
+    private fun loadMenzaView() {
         binding!!.menzaRelative.setOnClickListener {
             startActivity(
                 Intent(
@@ -300,7 +294,7 @@ class Home : Fragment() {
         }
     }
 
-    fun showSnacOffline() {
+    private fun showSnacOffline() {
         snack = Snackbar.make(
             requireActivity().findViewById(R.id.coordinatorLayout),
             "Niste povezani",
@@ -333,10 +327,8 @@ class Home : Fragment() {
                     )
                 )
             )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            requireActivity().window.statusBarColor =
-                ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
-        }
+        requireActivity().window.statusBarColor =
+            ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
         if (mrealm != null) {
             mrealm!!.close()
         }
