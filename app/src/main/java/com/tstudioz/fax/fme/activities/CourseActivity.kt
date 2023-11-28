@@ -20,9 +20,11 @@ class CourseActivity : AppCompatActivity() {
         val imeKolegija = intent.getStringExtra("kolegij")
         //     getSupportActionBar().setTitle(imeKolegija);
         //    styledNavigation();
+
         if (shouldAskPermissions()) {
             askPermissions()
         }
+
         val bundle = Bundle()
         bundle.putString("link_kolegija", intent.getStringExtra("link_na_kolegij"))
         bundle.putString("kolegij", intent.getStringExtra("kolegij"))
@@ -54,9 +56,7 @@ class CourseActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    protected fun shouldAskPermissions(): Boolean {
-        return Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1
-    }
+    protected fun shouldAskPermissions(): Boolean = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1
 
     @TargetApi(23)
     protected fun askPermissions() {
