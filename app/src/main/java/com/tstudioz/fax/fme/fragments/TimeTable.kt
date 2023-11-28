@@ -22,6 +22,7 @@ import com.tstudioz.fax.fme.adapters.EmployeeRVAdapterTable
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.TimetableTabBinding
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import io.realm.Case
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -459,20 +460,8 @@ class TimeTable : Fragment(), DatePickerDialog.OnDateSetListener {
         adapterSubTemp!!.notifyDataSetChanged()
     }
 
-    private val isNetworkAvailable: Boolean
-        private get() {
-            val manager =
-                requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val networkInfo = manager.activeNetworkInfo
-            var isAvailable = false
-            if (networkInfo != null && networkInfo.isConnected) {
-                isAvailable = true
-            }
-            return isAvailable
-        }
-
     fun checkNetwork() {
-        if (isNetworkAvailable) {
+        if (context?.let { NetworkUtils.isNetworkAvailable(it) } == true) {
             binding!!.odaberiDan.visibility = View.VISIBLE
         } else {
             binding!!.odaberiDan.visibility = View.INVISIBLE

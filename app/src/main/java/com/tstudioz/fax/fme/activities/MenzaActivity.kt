@@ -14,6 +14,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.adapters.MeniesAdapter
 import com.tstudioz.fax.fme.database.Meni
 import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -47,7 +48,7 @@ class MenzaActivity : AppCompatActivity() {
     }
 
     fun checkConditions() {
-        if (isNetworkAvailable) {
+        if (NetworkUtils.isNetworkAvailable(this)) {
             startParsing()
         } else {
             showSnacOffline()
@@ -151,17 +152,6 @@ class MenzaActivity : AppCompatActivity() {
         finish()
         //  }
     }
-
-    private val isNetworkAvailable: Boolean
-        private get() {
-            val manager = this.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-            val networkInfo = manager.activeNetworkInfo
-            var isAvailable = false
-            if (networkInfo != null && networkInfo.isConnected) {
-                isAvailable = true
-            }
-            return isAvailable
-        }
 
     fun showSnacOffline() {
         snack = Snackbar.make(

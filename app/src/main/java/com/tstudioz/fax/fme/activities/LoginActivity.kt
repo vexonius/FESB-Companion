@@ -1,8 +1,11 @@
 package com.tstudioz.fax.fme.activities
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,6 +18,7 @@ import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityLoginBinding
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import com.tstudioz.fax.fme.util.CircularAnim
 import io.realm.Realm
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -57,38 +61,30 @@ class LoginActivity : AppCompatActivity() {
 
     private fun loadBlueButton() {
         binding.loginButton.setOnClickListener(object : View.OnClickListener {
+
             override fun onClick(view: View) {
-                if (isNetworkAvailable == true) {
+                if (NetworkUtils.isNetworkAvailable(this@LoginActivity)) {
+
                     val username = binding.loginInput.text.toString()
                     val password = binding.loginPass.text.toString()
                     if (username.isEmpty() || password.isEmpty()) {
                         showErrorSnack("Niste unijeli korisničke podatke")
-                    } else {
-                        if (username.contains("@")) {
+                    }
+                    else if (username.contains("@")){
                             showErrorSnack("Potrebno je unijeti korisničko ime, ne email")
-                        } else {
+                    }
+                    else {
                             binding.progressLogin.visibility = View.VISIBLE
                             binding.loginButton.visibility = View.INVISIBLE
                             validateUser(username, password, view)
-                        }
                     }
-                } else {
+                }
+                else {
                     showErrorSnack("Niste povezani")
                 }
             }
         })
     }
-
-    private val isNetworkAvailable: Boolean
-        get() {
-            val manager = this.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-            val networkInfo = manager.activeNetworkInfo
-            var isAvailable = false
-            if (networkInfo != null && networkInfo.isConnected) {
-                isAvailable = true
-            }
-            return isAvailable
-        }
 
     private fun helpMe() {
         val dialog = Dialog(this)

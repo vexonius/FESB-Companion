@@ -37,6 +37,7 @@ import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.fragments.Home
 import com.tstudioz.fax.fme.fragments.Prisutnost
 import com.tstudioz.fax.fme.fragments.TimeTable
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import com.tstudioz.fax.fme.ui.mainscreen.MainViewModel
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -259,7 +260,7 @@ class MainActivity : AppCompatActivity() {
         val id = item.itemId
         when (id) {
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.refresMe -> if (isNetworkAvailable) {
+            R.id.refresMe -> if (NetworkUtils.isNetworkAvailable(this)) {
                 mojRaspored
             } else {
                 showSnacOffline()
@@ -396,17 +397,6 @@ class MainActivity : AppCompatActivity() {
         val df: DateFormat = SimpleDateFormat("d.M.yyyy.")
         date = df.format(Calendar.getInstance().time)
     }
-
-    private val isNetworkAvailable: Boolean
-        private get() {
-            val manager = this.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-            val networkInfo = manager.activeNetworkInfo
-            var isAvailable = false
-            if (networkInfo != null && networkInfo.isConnected) {
-                isAvailable = true
-            }
-            return isAvailable
-        }
 
     fun showSnacOffline() {
         snack = Snackbar.make(
