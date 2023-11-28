@@ -51,9 +51,6 @@ dependencies {
     implementation("io.coil-kt:coil:0.9.5")
     implementation("nl.joery.animatedbottombar:library:1.1.0")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.1.0") {
-        exclude(group = "com.android.support", module = "support-annotations")
-    }
     implementation("com.philliphsu:bottomsheetpickers:2.4.1")
     implementation("androidx.appcompat:appcompat:1.1.0")
     implementation("com.google.android.material:material:1.1.0")
@@ -74,6 +71,7 @@ dependencies {
     implementation("com.orhanobut:hawk:2.0.1")
     testImplementation("junit:junit:4.12")
     implementation("androidx.appcompat:appcompat:1.6.1")
+
 
     val multidex_version = "2.0.1"
     implementation("androidx.multidex:multidex:$multidex_version")

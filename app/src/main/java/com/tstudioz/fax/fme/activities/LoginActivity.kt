@@ -28,23 +28,23 @@ import java.io.IOException
 
 class LoginActivity : AppCompatActivity() {
     private var snack: Snackbar? = null
-    private var binding: ActivityLoginBinding? = null
+    private lateinit var binding: ActivityLoginBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
-        val view: View = binding!!.root
+        val view: View = binding.root
         setContentView(view)
-        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         isUserLoggedIn
         loadBlueButton()
         helpListener()
     }
 
-    val isUserLoggedIn: Unit
+    private val isUserLoggedIn: Unit
         get() {
             val sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)
-            val prvi_put = sharedPreferences.getBoolean("first_open", true)
-            if (prvi_put) {
+            val prviPut = sharedPreferences.getBoolean("first_open", true)
+            if (prviPut) {
                 startActivity(Intent(this@LoginActivity, Welcome::class.java))
             }
             val prijavljen = sharedPreferences.getBoolean("loged_in", false)
@@ -56,19 +56,19 @@ class LoginActivity : AppCompatActivity() {
         }
 
     private fun loadBlueButton() {
-        binding!!.loginButton.setOnClickListener(object : View.OnClickListener {
+        binding.loginButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
                 if (isNetworkAvailable == true) {
-                    val username = binding!!.loginInput.text.toString()
-                    val password = binding!!.loginPass.text.toString()
+                    val username = binding.loginInput.text.toString()
+                    val password = binding.loginPass.text.toString()
                     if (username.isEmpty() || password.isEmpty()) {
                         showErrorSnack("Niste unijeli korisničke podatke")
                     } else {
                         if (username.contains("@")) {
                             showErrorSnack("Potrebno je unijeti korisničko ime, ne email")
                         } else {
-                            binding!!.progressLogin.visibility = View.VISIBLE
-                            binding!!.loginButton.visibility = View.INVISIBLE
+                            binding.progressLogin.visibility = View.VISIBLE
+                            binding.loginButton.visibility = View.INVISIBLE
                             validateUser(username, password, view)
                         }
                     }
@@ -106,7 +106,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun showErrorSnack(message: String?) {
-        snack = Snackbar.make(binding!!.root, message!!, Snackbar.LENGTH_SHORT)
+        snack = Snackbar.make(binding.root, message!!, Snackbar.LENGTH_SHORT)
         val snackBarView2 = snack!!.view
         snackBarView2.setBackgroundColor(
             ContextCompat.getColor(
@@ -118,11 +118,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     @OptIn(InternalCoroutinesApi::class)
-    fun validateUser(user: String?, pass: String?, mView: View?) {
+    fun validateUser(user: String, pass: String, mView: View?) {
         val okHttpClient = instance!!.okHttpInstance
         val formData: RequestBody = Builder()
-            .add("Username", user!!)
-            .add("Password", pass!!)
+            .add("Username", user)
+            .add("Password", pass)
             .add("IsRememberMeChecked", "true")
             .build()
         val rq: Request = Request.Builder()
@@ -142,8 +142,8 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     runOnUiThread {
                         showErrorSnack("Uneseni podatci su pogrešni!")
-                        binding!!.progressLogin.visibility = View.INVISIBLE
-                        binding!!.loginButton.visibility = View.VISIBLE
+                        binding.progressLogin.visibility = View.INVISIBLE
+                        binding.loginButton.visibility = View.VISIBLE
                     }
                 }
             }
@@ -179,6 +179,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun helpListener() {
-        binding!!.loginPomoc.setOnClickListener { helpMe() }
+        binding.loginPomoc.setOnClickListener { helpMe() }
     }
 }
