@@ -11,7 +11,7 @@ class Welcome : AppIntro2() {
         super.onCreate(savedInstanceState)
         addSlide(SampleSlide.newInstance(R.layout.welcome_intro))
         addSlide(SampleSlide.newInstance(R.layout.welcome_timetable))
-        addSlide(SampleSlide.newInstance(R.layout.welcome_files))
+        //addSlide(SampleSlide.newInstance(R.layout.welcome_files))
         addSlide(SampleSlide.newInstance(R.layout.welcome_attendance))
     }
 

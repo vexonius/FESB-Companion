@@ -54,6 +54,8 @@ class Home : Fragment() {
     private var mrealm: Realm? = null
     private var taskRealm: Realm? = null
     private var binding: HomeTabBinding? = null
+    private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
+
     var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("tasks.realm")
@@ -141,7 +143,6 @@ class Home : Fragment() {
         val shared = requireActivity().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
         units = shared.getString("weather_units", "&units=ca")
 
-        val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
             getForecast(forecastUrl)
         } else {

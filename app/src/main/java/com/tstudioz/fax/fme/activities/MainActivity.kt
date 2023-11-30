@@ -2,7 +2,6 @@ package com.tstudioz.fax.fme.activities
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -17,12 +16,13 @@ import android.view.View
 import android.webkit.WebView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -61,7 +61,8 @@ class MainActivity : AppCompatActivity() {
     private var hf: Home? = null
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
-    private var shPref: SharedPreferences? = null
+    @OptIn(InternalCoroutinesApi::class)
+    private var shPref: SharedPreferences? =  instance?.sP
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     val mainRealmConfig = RealmConfiguration.Builder()
@@ -77,7 +78,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
-
+        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Back is pressed... Finishing the activity
+                finish()
+            }
+        })
 
         setUpToolbar()
         getDate()
@@ -91,27 +97,7 @@ class MainActivity : AppCompatActivity() {
         shouldShowGDPRDialog()
     }
 
-    private fun checkTheme() {
-        shPref = getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
-        val themeMode = shPref?.getString("Theme_mode", "1")?.toInt()
-        when (themeMode) {
-            1 -> {
-                //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                //setTheme(R.style.AppTheme)
-            }
-
-            2 -> {
-                //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                //setTheme(R.style.AppTheme_Custom)
-            }
-
-            0 -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                delegate.applyDayNight()
-            }
-        }
-    }
-    val isThereAction: Unit
+    private val isThereAction: Unit
         get() {
             if (intent.action != null) {
                 showShortcutView()
@@ -121,17 +107,10 @@ class MainActivity : AppCompatActivity() {
         }
 
     private fun setDefaultScreen() {
-        //getSupportActionBar().hide();
-        val ft = supportFragmentManager.beginTransaction()
-        hf = Home()
-        ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
-        ft.replace(R.id.frame, hf!!)
-        ft.addToBackStack(null)
-        ft.commit()
+        beginFragTransaction(R.id.tab_home)
     }
 
-    @OptIn(InternalCoroutinesApi::class)
-    fun checkUser() {
+    private fun checkUser() {
         realmLog = Realm.getDefaultInstance()
         if (realmLog != null) {
             var korisnik: Korisnik? = null
@@ -148,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                 invalidCreds()
             }
         } else {
-            shPref = instance!!.sP
+            //shPref = instance?.sP
             assert(shPref != null)
             editor = shPref!!.edit()
             editor?.putBoolean("loged_in", false)
@@ -167,62 +146,47 @@ class MainActivity : AppCompatActivity() {
         actionbar.setDisplayShowHomeEnabled(false)
     }
 
-    fun testBottomBar() {
+    private fun testBottomBar() {
         val bar = binding!!.bottomBar
 
-        /*bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.attend), "Prisutnost", 1));
-        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.cal), "Raspored", 2));
-        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.command_line), "Home", 3));
-        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.courses), "Kolegiji", 4));
-        bar.addTab(new AnimatedBottomBar.Tab(getDrawable(R.drawable.mail), "Outlook", 5));*/
         bar.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.attend), "Prisutnost", R.id.tab_prisutnost))
         bar.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.command_line), "Home", R.id.tab_home))
         bar.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.cal), "Raspored", R.id.tab_raspored))
         bar.selectTabById(R.id.tab_home, true)
     }
 
-    fun setFragmentTab() {
+    private fun setFragmentTab() {
         binding!!.bottomBar.setOnTabSelectListener(object : AnimatedBottomBar.OnTabSelectListener {
-            override fun onTabSelected(i: Int, tab: Tab?, i1: Int, tab1: Tab) {
-                beginFragTransaction(tab1.id)
+            override fun onTabSelected(lastIndex: Int, lastTab: Tab?, newIndex: Int, newTab: Tab) {
+                beginFragTransaction(newTab.id)
             }
 
-            override fun onTabReselected(i: Int, tab: Tab) {}
+            override fun onTabReselected(index: Int, tab: Tab) {}
         })
     }
 
     fun beginFragTransaction(pos: Int) {
         val ft = supportFragmentManager.beginTransaction()
+        ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
         when (pos) {
             R.id.tab_prisutnost-> {
                 val ik = Prisutnost()
-                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                supportActionBar?.title = "Prisutnost"
                 ft.replace(R.id.frame, ik)
-                ft.addToBackStack(null)
-                ft.commit()
-                supportActionBar!!.title = "Prisutnost"
-                supportActionBar!!.show()
             }
-
             R.id.tab_home -> {
-                supportActionBar!!.title = "FESB Companion"
                 val hf0 = Home()
-                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                supportActionBar?.title = "FESB Companion"
                 ft.replace(R.id.frame, hf0)
-                ft.addToBackStack(null)
-                ft.commit()
             }
-
             R.id.tab_raspored -> {
                 val lf = TimeTable()
-                ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                supportActionBar?.title = "Raspored"
                 ft.replace(R.id.frame, lf)
-                ft.addToBackStack(null)
-                ft.commit()
-                supportActionBar!!.title = "Raspored"
-                supportActionBar!!.show()
             }
         }
+        ft.addToBackStack(null)
+        ft.commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -233,8 +197,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        when (id) {
+        when (item.itemId) {
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
             R.id.refresMe -> if (NetworkUtils.isNetworkAvailable(this)) {
                 mojRaspored
@@ -243,10 +206,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBackPressed() {
-        exitApp()
     }
 
     @OptIn(InternalCoroutinesApi::class)
@@ -271,7 +230,7 @@ class MainActivity : AppCompatActivity() {
             val sday: DateFormat = SimpleDateFormat("dd")
             val smonth: DateFormat = SimpleDateFormat("MM")
             val syear: DateFormat = SimpleDateFormat("yyyy")
-            client = instance!!.okHttpInstance
+            client = instance?.okHttpInstance
             val request: Request = Request.Builder()
                 .url(
                     "https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" +
@@ -284,8 +243,8 @@ class MainActivity : AppCompatActivity() {
                 )
                 .get()
                 .build()
-            val call = client!!.newCall(request)
-            call.enqueue(object : Callback {
+            val call = client?.newCall(request)
+            call?.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Log.e(ContentValues.TAG, "Exception caught", e)
                 }
@@ -352,9 +311,7 @@ class MainActivity : AppCompatActivity() {
             realmLog?.close()
         }
 
-    @OptIn(InternalCoroutinesApi::class)
     fun invalidCreds() {
-        shPref = instance!!.sP
         editor = shPref!!.edit()
         editor?.putBoolean("loged_in", false)
         editor?.apply()
@@ -415,8 +372,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @OptIn(InternalCoroutinesApi::class)
-    fun checkVersion() {
+    /*fun checkVersion() {
         shPref = instance!!.sP
         val staraVerzija = shPref!!.getInt("version_number", 14)
         val trenutnaVerzija = versionCode
@@ -428,9 +384,21 @@ class MainActivity : AppCompatActivity() {
         } else {
             return
         }
+    }*/
+    //val shPref = instance?.sP
+    private fun checkVersion() {
+        val staraVerzija = shPref?.getInt("version_number", 14) ?: 14
+        val trenutnaVerzija = versionCode
+
+        if (staraVerzija < trenutnaVerzija) {
+            showChangelog()
+            shPref?.edit {
+                putInt("version_number", trenutnaVerzija)
+            }
+        }
     }
 
-    val versionCode: Int
+    private val versionCode: Int
         get() {
             var versionCode = 0
             try {
@@ -454,9 +422,7 @@ class MainActivity : AppCompatActivity() {
         bottomSheet!!.show()
     }
 
-    @OptIn(InternalCoroutinesApi::class)
     private fun shouldShowGDPRDialog() {
-        shPref = instance!!.sP
         val bool = shPref!!.getBoolean("GDPR_agreed", false)
         if (!bool) {
             showGDPRCompliance()
