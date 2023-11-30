@@ -1,10 +1,11 @@
 package com.tstudioz.fax.fme.activities
 
+import android.content.Context
 import android.graphics.Typeface
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -41,116 +42,111 @@ class MenzaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMenzaBinding.inflate(layoutInflater)
-        setContentView(binding!!.root)
+        setContentView(binding?.root)
         setTextTypeface()
         checkConditions()
-        //  loadAds();
+        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Back is pressed... Finishing the activity
+                finish()
+            }
+        })
     }
 
-    fun checkConditions() {
+    private fun checkConditions() {
         if (NetworkUtils.isNetworkAvailable(this)) {
             startParsing()
         } else {
             showSnacOffline()
-            binding!!.menzaProgress.visibility = View.VISIBLE
+            binding?.menzaProgress?.visibility = View.VISIBLE
         }
     }
 
     @OptIn(InternalCoroutinesApi::class)
     fun startParsing() {
-        okHttpClient = instance!!.okHttpInstance
+        okHttpClient = instance?.okHttpInstance
         val request: Request = Request.Builder()
             .url("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
             .get()
             .build()
-        val call = okHttpClient!!.newCall(request)
-        call.enqueue(object : Callback {
+        val call = okHttpClient?.newCall(request)
+        call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {}
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                mRealm = Realm.getInstance(menzaRealmConf)
-                mRealm?.executeTransaction(Realm.Transaction { mRealm?.deleteAll() })
-                val json = response.body!!.string()
-                try {
-                    val jsonResponse = JSONObject(json)
-                    val array = jsonResponse.getJSONArray("values")
-                    for (j in 7..9) {
-                        try {
-                            val itemsArray = array.getJSONArray(j)
-                            val meni = Meni()
-                            meni.id = itemsArray.getString(0)
-                            meni.type = itemsArray.getString(1)
-                            meni.jelo1 = itemsArray.getString(2)
-                            meni.jelo2 = itemsArray.getString(3)
-                            meni.jelo3 = itemsArray.getString(4)
-                            meni.jelo4 = itemsArray.getString(5)
-                            meni.desert = itemsArray.getString(6)
-                            meni.cijena = itemsArray.getString(7) + " eur"
-                            mRealm?.executeTransaction(Realm.Transaction { mRealm?.copyToRealm(meni) })
-                        } catch (ex: Exception) {
-                            Log.d("Menza activity", ex.toString())
-                        }
-                    }
-                    for (k in 13..15) {
-                        try {
-                            val itemsArray = array.getJSONArray(k)
-                            val izborniMeni = Meni()
-                            izborniMeni.id = itemsArray.getString(0)
-                            izborniMeni.jelo1 = itemsArray.getString(1).substring(0,
-                                itemsArray.getString(1).length - 4                            )
-                            izborniMeni.cijena = itemsArray.getString(1).substring(
-                                itemsArray.getString(1).length - 4,
-                                itemsArray.getString(1).length
-                            ) + " eur"
-                            mRealm?.executeTransaction(Realm.Transaction {
-                                mRealm?.copyToRealm(
-                                    izborniMeni
-                                )
-                            })
-                        } catch (exc: Exception) {
-                            Log.d("Menza activity", exc.toString())
-                        }
-                    }
-                    runOnUiThread {
-                        binding!!.menzaProgress.visibility = View.INVISIBLE
-                        showMenies()
-                    }
-                } catch (ex: Exception) {
-                    Log.d("MenzaActivity", ex.message!!)
-                } finally {
-                    mRealm?.close()
-                }
+                val json = response.body?.string()
+                parsePage(json)
             }
         })
+    }
+    fun parsePage(json:String?){
+        mRealm = Realm.getInstance(menzaRealmConf)
+        mRealm?.executeTransaction(Realm.Transaction { mRealm?.deleteAll() })
+        try {
+            val jsonResponse = json?.let { JSONObject(it) }
+            val array = jsonResponse?.getJSONArray("values")
+            for (j in 7..9) {
+                try {
+                    val itemsArray = array?.getJSONArray(j)
+                    val meni = Meni()
+                    meni.id = itemsArray?.getString(0)
+                    meni.type = itemsArray?.getString(1)
+                    meni.jelo1 = itemsArray?.getString(2)
+                    meni.jelo2 = itemsArray?.getString(3)
+                    meni.jelo3 = itemsArray?.getString(4)
+                    meni.jelo4 = itemsArray?.getString(5)
+                    meni.desert = itemsArray?.getString(6)
+                    meni.cijena = itemsArray?.getString(7) + " eur"
+                    mRealm?.executeTransaction(Realm.Transaction { mRealm?.copyToRealm(meni) })
+                } catch (ex: Exception) {
+                    Log.d("Menza activity", ex.toString())
+                }
+            }
+            for (k in 13..15) {
+                try {
+                    val itemsArray = array?.getJSONArray(k)
+                    val izborniMeni = Meni()
+                    izborniMeni.id = itemsArray?.getString(0)
+                    izborniMeni.jelo1 = itemsArray?.getString(1)?.substring(0,
+                        itemsArray.getString(1).length - 4)
+                    izborniMeni.cijena = itemsArray?.getString(1)?.substring(
+                        itemsArray.getString(1).length - 4,
+                        itemsArray.getString(1).length) + " eur"
+                    mRealm?.executeTransaction { mRealm?.copyToRealm(izborniMeni)}
+                } catch (exc: Exception) {
+                    Log.d("Menza activity", exc.toString())
+                }
+            }
+            runOnUiThread {
+                binding?.menzaProgress?.visibility = View.INVISIBLE
+                showMenies()
+            }
+        } catch (ex: Exception) {
+            ex.message?.let { Log.d("MenzaActivity", it) }
+        } finally {
+            mRealm?.close()
+        }
     }
 
     fun showMenies() {
         nRealm = Realm.getInstance(menzaRealmConf)
         val results = nRealm?.where(Meni::class.java)?.findAll()
-        if (!results?.isEmpty()!!) {
+        if ((results?.isEmpty()) != null) {
             val adapter = MeniesAdapter(results)
-            binding!!.menzaRecyclerview.layoutManager = LinearLayoutManager(this)
-            binding!!.menzaRecyclerview.setHasFixedSize(true)
-            binding!!.menzaRecyclerview.adapter = adapter
+            binding?.menzaRecyclerview?.layoutManager = LinearLayoutManager(this)
+            binding?.menzaRecyclerview?.setHasFixedSize(true)
+            binding?.menzaRecyclerview?.adapter = adapter
         } else {
-            binding!!.menzaRecyclerview.visibility = View.INVISIBLE
-            binding!!.cookieHeaderRoot.visibility = View.VISIBLE
+            binding?.menzaRecyclerview?.visibility = View.INVISIBLE
+            binding?.cookieHeaderRoot?.visibility = View.VISIBLE
         }
     }
 
     fun setTextTypeface() {
         val typeBold = Typeface.createFromAsset(assets, "fonts/OpenSans-Bold.ttf")
         val regular = Typeface.createFromAsset(assets, "fonts/OpenSans-Regular.ttf")
-        binding!!.menzaTitle.typeface = typeBold
-        binding!!.cookieHeaderText.typeface = regular
-    }
-
-    override fun onBackPressed() {
-        //  if (mInterstitialAd.isLoaded()) {
-        //      mInterstitialAd.show();
-        //  } else {
-        finish()
-        //  }
+        binding?.menzaTitle?.typeface = typeBold
+        binding?.cookieHeaderText?.typeface = regular
     }
 
     fun showSnacOffline() {
@@ -158,23 +154,23 @@ class MenzaActivity : AppCompatActivity() {
             findViewById(R.id.menza_root), "Niste povezani",
             Snackbar.LENGTH_INDEFINITE
         )
-        val vjuz = snack!!.view
-        vjuz.setBackgroundColor(ContextCompat.getColor(baseContext, R.color.red_nice))
-        snack!!.setAction("PONOVI") {
-            snack!!.dismiss()
+        val vjuz = snack?.view
+        vjuz?.setBackgroundColor(ContextCompat.getColor(baseContext, R.color.red_nice))
+        snack?.setAction("PONOVI") {
+            snack?.dismiss()
             checkConditions()
         }
-        snack!!.setActionTextColor(resources.getColor(R.color.white))
-        snack!!.show()
+        snack?.setActionTextColor(ContextCompat.getColor(this , R.color.white))
+        snack?.show()
     }
 
     public override fun onStop() {
         super.onStop()
-        if (okHttpClient != null) okHttpClient!!.dispatcher.cancelAll()
+        if (okHttpClient != null) okHttpClient?.dispatcher?.cancelAll()
     }
 
     public override fun onDestroy() {
         super.onDestroy()
-        if (nRealm != null) nRealm!!.close()
+        if (nRealm != null) nRealm?.close()
     }
 }

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -22,11 +21,11 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
+import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
@@ -55,7 +54,6 @@ import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
     var date: String? = null
-    var back_pressed: Long = 0
     private var realmLog: Realm? = null
     private var client: OkHttpClient? = null
     private var hf: Home? = null
@@ -73,8 +71,6 @@ class MainActivity : AppCompatActivity() {
         .build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //checkTheme()
-        //setTheme(R.style.AppTheme_Custom)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
@@ -116,9 +112,11 @@ class MainActivity : AppCompatActivity() {
             var korisnik: Korisnik? = null
             try {
                 korisnik = realmLog!!.where(Korisnik::class.java).findFirst()
-            } catch (ex: Exception) {
+            }
+            catch (ex: Exception) {
                 ex.printStackTrace()
-            } finally {
+            }
+            finally {
                 realmLog!!.close()
             }
             if (korisnik != null) {
@@ -127,7 +125,6 @@ class MainActivity : AppCompatActivity() {
                 invalidCreds()
             }
         } else {
-            //shPref = instance?.sP
             assert(shPref != null)
             editor = shPref!!.edit()
             editor?.putBoolean("loged_in", false)
@@ -140,7 +137,6 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("RestrictedApi")
     fun setUpToolbar() {
         val actionbar = supportActionBar
-        //actionbar.hide();
         actionbar!!.setShowHideAnimationEnabled(false)
         actionbar.elevation = 1.0f
         actionbar.setDisplayShowHomeEnabled(false)
@@ -160,7 +156,6 @@ class MainActivity : AppCompatActivity() {
             override fun onTabSelected(lastIndex: Int, lastTab: Tab?, newIndex: Int, newTab: Tab) {
                 beginFragTransaction(newTab.id)
             }
-
             override fun onTabReselected(index: Int, tab: Tab) {}
         })
     }
@@ -232,15 +227,10 @@ class MainActivity : AppCompatActivity() {
             val syear: DateFormat = SimpleDateFormat("yyyy")
             client = instance?.okHttpInstance
             val request: Request = Request.Builder()
-                .url(
-                    "https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" +
-                            "=" + kor!!.getUsername()
-                        .toString() + "&MinDate=" + dfmonth.format(c.time) +
-                            "%2F" + dfday.format(c.time) + "%2F" + dfyear.format(c.time) + "%2022%3A44%3A48&MaxDate=" +
-                            smonth.format(s.time) + "%2F" + sday.format(s.time) + "%2F" + syear.format(
-                        s.time
-                    ) + "%2022%3A44%3A48"
-                )
+                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" + "=" + kor!!.getUsername()
+                        .toString() + "&MinDate=" + dfmonth.format(c.time) + "%2F" + dfday.format(c.time) + "%2F"
+                        + dfyear.format(c.time) + "%2022%3A44%3A48&MaxDate=" +
+                        smonth.format(s.time) + "%2F" + sday.format(s.time) + "%2F" + syear.format(s.time) + "%2022%3A44%3A48")
                 .get()
                 .build()
             val call = client?.newCall(request)
@@ -341,22 +331,7 @@ class MainActivity : AppCompatActivity() {
         snack!!.show()
     }
 
-    fun exitApp() {
-        if (back_pressed + 2000 > System.currentTimeMillis()) {
-            finish()
-        } else {
-            snack = Snackbar.make(
-                findViewById(R.id.coordinatorLayout), "Pritisnite nazad za " +
-                        "izlazak iz aplikacije", Snackbar.LENGTH_SHORT
-            )
-            val viewto = snack!!.view
-            viewto.setBackgroundColor(ContextCompat.getColor(baseContext, R.color.grey_nice))
-            snack!!.show()
-        }
-        back_pressed = System.currentTimeMillis()
-    }
-
-    fun showShortcutView() {
+    private fun showShortcutView() {
         var shortPosition = 0
         if (intent.action == "podsjetnik") {
             val newIntent = Intent(this@MainActivity, NoteActivity::class.java)
@@ -372,43 +347,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /*fun checkVersion() {
-        shPref = instance!!.sP
-        val staraVerzija = shPref!!.getInt("version_number", 14)
-        val trenutnaVerzija = versionCode
-        if (staraVerzija < trenutnaVerzija) {
+    private fun checkVersion() {
+        val staraVerzija = shPref?.getInt("version_number", 14)
+        val trenutnaVerzija: Int = BuildConfig.VERSION_CODE
+
+        if ((staraVerzija != null) && (staraVerzija < trenutnaVerzija)) {
             showChangelog()
-            editor = shPref!!.edit()
+            editor = shPref?.edit()
             editor?.putInt("version_number", trenutnaVerzija)
             editor?.commit()
         } else {
             return
         }
-    }*/
-    //val shPref = instance?.sP
-    private fun checkVersion() {
-        val staraVerzija = shPref?.getInt("version_number", 14) ?: 14
-        val trenutnaVerzija = versionCode
-
-        if (staraVerzija < trenutnaVerzija) {
-            showChangelog()
-            shPref?.edit {
-                putInt("version_number", trenutnaVerzija)
-            }
-        }
     }
-
-    private val versionCode: Int
-        get() {
-            var versionCode = 0
-            try {
-                val pInfo = this.packageManager.getPackageInfo(packageName, 0)
-                versionCode = pInfo.versionCode
-            } catch (e: PackageManager.NameNotFoundException) {
-                e.printStackTrace()
-            }
-            return versionCode
-        }
 
     private fun showChangelog() {
         val view =
