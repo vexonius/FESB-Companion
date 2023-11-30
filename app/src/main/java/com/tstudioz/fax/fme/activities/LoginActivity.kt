@@ -23,6 +23,7 @@ import com.tstudioz.fax.fme.ui.mainscreen.LoginViewModel
 import com.tstudioz.fax.fme.util.CircularAnim
 import io.realm.Realm
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.FormBody.Builder
@@ -89,7 +90,9 @@ class LoginActivity : AppCompatActivity() {
                 else {
                     binding.progressLogin.visibility = View.VISIBLE
                     binding.loginButton.visibility = View.INVISIBLE
-                    loginViewModel.loginUser(User(username, password, username+"fesb.hr"))
+                    runBlocking {
+                        loginViewModel.loginUser(User(username, password, username+"fesb.hr"))
+                    }
 
                 }
                 val sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)

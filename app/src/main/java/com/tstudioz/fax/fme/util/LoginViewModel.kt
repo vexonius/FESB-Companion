@@ -41,7 +41,7 @@ class LoginViewModel(application: Application)  : AndroidViewModel(application) 
     private val repository: Repository by inject(Repository::class.java)
     init{
     }
-    fun loginUser(user:User){
+    suspend fun loginUser(user:User){
         viewModelScope.launch {
             repository.attemptLogin(user)
                 .onStart {
