@@ -1,12 +1,13 @@
 package com.tstudioz.fax.fme.networking
 
 import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.User
 import kotlinx.coroutines.flow.Flow
 
 
 interface FService {
 
-    suspend fun loginUser(): Flow<Result.LoginResult>
+    suspend fun loginUser(user: User): Flow<Result.LoginResult>
     fun logoutUser(): Flow<Result.LogoutResult>
 }
 

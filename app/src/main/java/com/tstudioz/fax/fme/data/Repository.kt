@@ -20,8 +20,8 @@ class Repository {
     private val service: PortalService by inject(PortalService::class.java)
     private val networkService: NetworkService by inject(NetworkService::class.java)
 
-    suspend fun attemptLogin(): Flow<User> = flow {
-        service.loginUser().collect { result ->
+    suspend fun attemptLogin(user:User): Flow<User> = flow {
+        service.loginUser(user).collect { result ->
             when (result) {
                 is Result.LoginResult.Success -> emit(result.data)
                 is Result.LoginResult.Failure -> Log.d(TAG, "Doslo je do pogreske")
