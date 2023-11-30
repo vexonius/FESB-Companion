@@ -1,136 +1,107 @@
-package com.tstudioz.fax.fme.adapters;
+package com.tstudioz.fax.fme.adapters
 
+import android.content.Context
+import android.graphics.Typeface
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.RelativeLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.IValueFormatter
+import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.adapters.DolasciAdapter.DolazakViewHolder
+import com.tstudioz.fax.fme.database.Dolazak
+import io.realm.RealmChangeListener
+import io.realm.RealmResults
 
-import android.graphics.Typeface;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+class DolasciAdapter(private val context: Context, private val mDolazak: RealmResults<Dolazak>) : RecyclerView.Adapter<DolazakViewHolder?>(), RealmChangeListener<Any?> {
+    var regulartf: Typeface? = null
 
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.IValueFormatter;
-import com.github.mikephil.charting.utils.ViewPortHandler;
-import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.database.Dolazak;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import io.realm.RealmChangeListener;
-import io.realm.RealmResults;
-
-
-public class DolasciAdapter extends RecyclerView.Adapter<DolasciAdapter.DolazakViewHolder> implements RealmChangeListener {
-    private RealmResults<Dolazak> mDolazak;
-    Typeface regulartf;
-
-    public DolasciAdapter(RealmResults<Dolazak> dolazak) {
-        this.mDolazak = dolazak;
-        mDolazak.addChangeListener(this);
+    init {
+        mDolazak.addChangeListener(this as RealmChangeListener<RealmResults<Dolazak>>)
     }
 
-    @Override
-    public DolazakViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item_attendance
-                , parent, false);
-        return new DolazakViewHolder(view);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DolazakViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(
+            R.layout.row_item_attendance, parent, false
+        )
+        return DolazakViewHolder(view)
     }
 
-    @Override
-    public void onBindViewHolder(DolazakViewHolder holder, int position) {
-
-        Dolazak predavanja = mDolazak.get(position);
-        holder.name.setText(predavanja.getPredmet());
-        holder.name.setTypeface(regulartf);
-
-        holder.type.setText(predavanja.getVrsta());
-
-        holder.dolazakNum.setText("Obavezno " + predavanja.getRequired());
-
-        List<PieEntry> entries = new ArrayList<>();
-
-        entries.add(new PieEntry(predavanja.getAttended()));
-        entries.add(new PieEntry(predavanja.getAbsent()));
-        PieEntry neood =
-                new PieEntry(predavanja.getTotal() - predavanja.getAbsent() - predavanja.getAttended());
-        if (neood.getValue() != 0.0) {
-            entries.add(neood);
+    override fun onBindViewHolder(holder: DolazakViewHolder, position: Int) {
+        val predavanja = mDolazak[position]
+        holder.name.text = predavanja!!.getPredmet()
+        holder.name.typeface = regulartf
+        holder.type.text = predavanja.getVrsta()
+        holder.dolazakNum.text = "Obavezno " + predavanja.getRequired()
+        val entries: MutableList<PieEntry> = ArrayList()
+        entries.add(PieEntry(predavanja.getAttended().toFloat()))
+        entries.add(PieEntry(predavanja.getAbsent().toFloat()))
+        val neood =
+            PieEntry((predavanja.getTotal() - predavanja.getAbsent() - predavanja.getAttended()).toFloat())
+        if (neood.value.toDouble() != 0.0) {
+            entries.add(neood)
         }
-
-        IValueFormatter formatter = new IValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, Entry entry, int dataSetIndex,
-                                            ViewPortHandler viewPortHandler) {
-                return ((int) value) + "";
-            }
-        };
-
-        holder.chart.setHoleColor(android.R.color.transparent);
-        holder.chart.setDrawCenterText(false);
-        holder.chart.setDrawEntryLabels(false);
-
-        holder.chart.getLegend().setEnabled(false);
-        holder.chart.getDescription().setEnabled(false);
-
-        PieDataSet set = new PieDataSet(entries, null);
-        set.setValueTextSize(14f);
-        set.setValueTextColor(holder.colorWhite);
-        set.setValueTypeface(regulartf);
-        set.setColors(holder.colors);
-        set.setValueFormatter(formatter);
-        PieData data = new PieData(set);
-        holder.chart.setData(data);
+        val formatter = IValueFormatter { value, entry, dataSetIndex, viewPortHandler ->
+            value.toInt()
+                .toString() + ""
+        }
+        holder.chart.setHoleColor(android.R.color.transparent)
+        holder.chart.setDrawCenterText(false)
+        holder.chart.setDrawEntryLabels(false)
+        holder.chart.legend.isEnabled = false
+        holder.chart.description.isEnabled = false
+        val set = PieDataSet(entries, null)
+        set.valueTextSize = 14f
+        set.valueTextColor = holder.colorWhite
+        set.valueTypeface = regulartf
+        set.setColors(*holder.colors)
+        set.valueFormatter = formatter
+        val data = PieData(set)
+        holder.chart.data = data
 
         // holder.chart.invalidate(); // refresh
-        holder.chart.animateY(600);
-
+        holder.chart.animateY(600)
     }
 
-    @Override
-    public int getItemCount() {
-        return mDolazak.size();
+    override fun getItemCount(): Int {
+        return mDolazak.size
     }
 
-    public class DolazakViewHolder extends RecyclerView.ViewHolder {
-        TextView name, type, dolazakNum;
-        RelativeLayout root;
-        PieChart chart;
-        int colors[];
-        int colorWhite;
+    inner class DolazakViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var name: TextView
+        var type: TextView
+        var dolazakNum: TextView
+        var root: RelativeLayout
+        var chart: PieChart
+        var colors: IntArray
+        var colorWhite: Int
 
-
-        public DolazakViewHolder(View itemView) {
-            super(itemView);
-            root = (RelativeLayout) itemView.findViewById(R.id.attend_row_root);
-
-            name = (TextView) itemView.findViewById(R.id.predmetName);
-            regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts" +
-                    "/OpenSans-Regular.ttf");
-            name.setTypeface(regulartf);
-
-            type = (TextView) itemView.findViewById(R.id.predmetType);
-            type.setTypeface(regulartf);
-
-            dolazakNum = (TextView) itemView.findViewById(R.id.dolazakNum);
-            dolazakNum.setTypeface(regulartf);
-
-            colors = itemView.getResources().getIntArray(R.array.rainbow);
-            colorWhite = itemView.getResources().getColor(R.color.white);
-
-            chart = (PieChart) itemView.findViewById(R.id.chart);
+        init {
+            root = itemView.findViewById<View>(R.id.attend_row_root) as RelativeLayout
+            name = itemView.findViewById<View>(R.id.predmetName) as TextView
+            regulartf = Typeface.createFromAsset(
+                itemView.context.assets, "fonts" +
+                        "/OpenSans-Regular.ttf"
+            )
+            name.typeface = regulartf
+            type = itemView.findViewById<View>(R.id.predmetType) as TextView
+            type.typeface = regulartf
+            dolazakNum = itemView.findViewById<View>(R.id.dolazakNum) as TextView
+            dolazakNum.typeface = regulartf
+            colors = itemView.resources.getIntArray(R.array.rainbow)
+            colorWhite = ContextCompat.getColor(context, R.color.white)
+            chart = itemView.findViewById<View>(R.id.chart) as PieChart
         }
     }
 
-    @Override
-    public void onChange(Object element) {
-        notifyDataSetChanged();
+    override fun onChange(element: Any?) {
+        notifyDataSetChanged()
     }
-
 }

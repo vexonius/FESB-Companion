@@ -315,7 +315,8 @@ class Prisutnost : Fragment() {
             binding!!.recyclerZimski.layoutManager = LinearLayoutManager(activity,
                 LinearLayoutManager.HORIZONTAL, false
             )
-            winterAdapter = DolasciAdapter(dolasciWinter)
+            if (dolasciWinter!=null)
+                winterAdapter = context?.let { DolasciAdapter(it, dolasciWinter) }
             binding!!.recyclerZimski.adapter = winterAdapter
         } finally {
             wRealm?.close()
@@ -330,7 +331,8 @@ class Prisutnost : Fragment() {
             binding!!.recyclerLItnji.layoutManager = LinearLayoutManager(activity,
                 LinearLayoutManager.HORIZONTAL, false
             )
-            summerAdapter = DolasciAdapter(dolasciSummer)
+            if(dolasciSummer!=null)
+                summerAdapter = context?.let { DolasciAdapter(it, dolasciSummer) }
             binding!!.recyclerLItnji.adapter = summerAdapter
         } finally {
             sRealm?.close()

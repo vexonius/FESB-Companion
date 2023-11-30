@@ -1,11 +1,7 @@
 package com.tstudioz.fax.fme.activities
 
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -141,19 +137,19 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun register(username: String?, password: String?, nView: View?) {
-        val mLogRealm: Realm
         val sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)
         val editor = sharedPref.edit()
         editor.putBoolean("loged_in", true)
-        editor.commit()
-        mLogRealm = Realm.getDefaultInstance()
+        editor.apply()
+        val mLogRealm: Realm = Realm.getDefaultInstance()
         try {
             mLogRealm.executeTransaction { realm ->
                 val user = realm.createObject(Korisnik::class.java)
                 user.setUsername(username)
                 user.setLozinka(password)
             }
-        } finally {
+        }
+        finally {
             mLogRealm.close()
         }
         if (nView != null) {
