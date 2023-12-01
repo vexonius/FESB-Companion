@@ -24,7 +24,10 @@ class Repository {
         service.loginUser(user).collect { result ->
             when (result) {
                 is Result.LoginResult.Success -> emit(result.data)
-                is Result.LoginResult.Failure -> Log.d(TAG, "Doslo je do pogreske")
+                is Result.LoginResult.Failure -> {
+                    emit(User("","",""))
+                    Log.d(TAG, "Doslo je do pogreske")
+                }
             }
         }
 

@@ -12,6 +12,9 @@ import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.R
@@ -23,6 +26,10 @@ import com.tstudioz.fax.fme.ui.mainscreen.LoginViewModel
 import com.tstudioz.fax.fme.util.CircularAnim
 import io.realm.Realm
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.Call
 import okhttp3.Callback
@@ -38,6 +45,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     @OptIn(InternalCoroutinesApi::class)
     lateinit var loginViewModel: LoginViewModel
+
     @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +65,27 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(a)
             }
         })
+        activateLoggedInListener(view)
+
+    }
+    @OptIn(InternalCoroutinesApi::class)
+    private fun activateLoggedInListener(view: View){
+        loginViewModel.loggedIn.observe(this) { loggedIn ->
+            if (loggedIn) {
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(view.windowToken, 0)
+                CircularAnim.fullActivity(this@LoginActivity, view)
+                    .colorOrImageRes(R.color.colorAccent)
+                    .go {
+                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        finish()
+                    }
+            }else{
+                showErrorSnack("Uneseni podatci su pogrešni!")
+                binding.progressLogin.visibility = View.INVISIBLE
+                binding.loginButton.visibility = View.VISIBLE
+            }
+        }
     }
 
     private val isUserLoggedIn: Unit
@@ -90,33 +119,17 @@ class LoginActivity : AppCompatActivity() {
                 else {
                     binding.progressLogin.visibility = View.VISIBLE
                     binding.loginButton.visibility = View.INVISIBLE
-                    runBlocking {
-                        loginViewModel.loginUser(User(username, password, username+"fesb.hr"))
+                    lifecycleScope.launch{
+                        loginViewModel.firstloginUser(
+                            User(username, password, username + "fesb.hr"))
                     }
-
-                }
-                val sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)
-                val loggedIn = sharedPreferences.getBoolean("loged_in", true)
-                if (view != null && loggedIn) {
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(view.windowToken, 0)
-                    CircularAnim.fullActivity(this@LoginActivity, view)
-                    .colorOrImageRes(R.color.colorAccent)
-                        .go {
-                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                            finish()
-                        }
-                } else{
-                    showErrorSnack("Uneseni podatci su pogrešni!")
-                    binding.progressLogin.visibility = View.INVISIBLE
-                    binding.loginButton.visibility = View.VISIBLE
-                }
-
+            }
             } else {
                 showErrorSnack("Niste povezani")
             }
         }
     }
+
 
     private fun helpMe() {
         val dialog = Dialog(this)

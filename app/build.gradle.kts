@@ -6,13 +6,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(33)
-
+    compileSdk = 33
     defaultConfig {
         multiDexEnabled = true
         applicationId = "com.tstudioz.fax.fme"
-        minSdkVersion(21)
-        targetSdkVersion(33)
+        minSdk = 21
+        targetSdk = 33
         versionCode = 21
         versionName = "2.3.0 build #2307"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
