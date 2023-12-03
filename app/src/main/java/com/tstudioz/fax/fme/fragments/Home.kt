@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
@@ -73,7 +74,7 @@ class Home : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): CoordinatorLayout? {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         binding = HomeTabBinding.inflate(inflater, container, false)
 
@@ -92,7 +93,7 @@ class Home : Fragment() {
         loadNotes()
         loadIksicaAd()
         loadMenzaView()
-        return binding!!.root
+        return binding?.root
     }
 
     override fun onResume() {
@@ -109,12 +110,12 @@ class Home : Fragment() {
     @OptIn(InternalCoroutinesApi::class)
     private fun getForecast(url: String) {
         // OkHttp stuff
-        val client = instance!!.okHttpInstance
+        val client = instance?.okHttpInstance
         val request: Request = Builder()
             .url(url).header("Accept", "application/xml").header("User-Agent", "FesbCompanion/1.0")
             .build()
-        val call = client!!.newCall(request)
-        call.enqueue(object : Callback {
+        val call = client?.newCall(request)
+        call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e(ContentValues.TAG, "Exception caught", e)
             }
@@ -122,10 +123,10 @@ class Home : Fragment() {
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
                 try {
-                    val jsonData = response.body!!.string()
+                    val jsonData = response.body?.string()
                     if (response.isSuccessful) {
-                        mForecast = parseForecastDetails(jsonData)
-                        activity!!.runOnUiThread { updateDisplay() }
+                        mForecast = jsonData?.let { parseForecastDetails(it) }
+                        activity?.runOnUiThread { updateDisplay() }
                     } else {
                         alertUserAboutError()
                     }
@@ -151,22 +152,22 @@ class Home : Fragment() {
     }
 
     private fun updateDisplay() {
-        val current = mForecast!!.current
-        val pTemperatura = current!!.temperature.toString() + "°"
-        val pHumidity = current.humidity.toString() + " %"
-        val pWind = current.wind.toString() + " km/h"
-        val pPrecip = current.precipChance.toString() + " mm"
-        val pSummary = current.summary
-        binding!!.temperaturaVrijednost.text = pTemperatura
-        binding!!.vlaznostVrijednost.text = pHumidity
-        binding!!.oborineVrijednost.text = pPrecip
-        binding!!.trenutniVjetar.text = pWind
-        binding!!.opis.text = pSummary
-        binding!!.shimmerWeather.visibility = View.GONE
-        binding!!.cardHome.visibility = View.VISIBLE
-        val drawable = ResourcesCompat.getDrawable(resources, resources.getIdentifier(current.icon, "drawable", requireContext().packageName),null)
+        val current = mForecast?.current
+        val pTemperatura = current?.temperature.toString() + "°"
+        val pHumidity = current?.humidity.toString() + " %"
+        val pWind = current?.wind.toString() + " km/h"
+        val pPrecip = current?.precipChance.toString() + " mm"
+        val pSummary = current?.summary
+        binding?.temperaturaVrijednost?.text = pTemperatura
+        binding?.vlaznostVrijednost?.text = pHumidity
+        binding?.oborineVrijednost?.text = pPrecip
+        binding?.trenutniVjetar?.text = pWind
+        binding?.opis?.text = pSummary
+        binding?.shimmerWeather?.visibility = View.GONE
+        binding?.cardHome?.visibility = View.VISIBLE
+        val drawable = ResourcesCompat.getDrawable(resources, resources.getIdentifier(current?.icon, "drawable", requireContext().packageName),null)
 
-        binding!!.vrijemeImage.setImageDrawable(drawable)
+        binding?.vrijemeImage?.setImageDrawable(drawable)
     }
 
     @Throws(JSONException::class)
@@ -211,22 +212,22 @@ class Home : Fragment() {
         val rezultati =
             date?.let {mrealm?.where(Predavanja::class.java)?.contains("detaljnoVrijeme", it)?.findAll()}
         if (rezultati !=null && rezultati.isEmpty()) {
-            binding!!.rv.visibility = View.INVISIBLE
-            binding!!.nemaPredavanja.visibility = View.VISIBLE
+            binding?.rv?.visibility = View.INVISIBLE
+            binding?.nemaPredavanja?.visibility = View.VISIBLE
         } else {
-            binding!!.nemaPredavanja.visibility = View.INVISIBLE
+            binding?.nemaPredavanja?.visibility = View.INVISIBLE
             val adapter = EmployeeRVAdapter(rezultati)
-            binding!!.rv.layoutManager = LinearLayoutManager(activity)
-            ViewCompat.setNestedScrollingEnabled(binding!!.rv, false)
-            binding!!.rv.adapter = adapter
-            binding!!.nemaPredavanja.visibility = View.GONE
-            binding!!.rv.visibility = View.VISIBLE
+            binding?.rv?.layoutManager = LinearLayoutManager(activity)
+            binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
+            binding?.rv?.adapter = adapter
+            binding?.nemaPredavanja?.visibility = View.GONE
+            binding?.rv?.visibility = View.VISIBLE
         }
     }
 
     private fun setCyanStatusBarColor() {
-        (activity as AppCompatActivity?)!!.supportActionBar!!
-            .setBackgroundDrawable(
+        (activity as AppCompatActivity?)?.supportActionBar
+            ?.setBackgroundDrawable(
                 ColorDrawable(
                     ContextCompat.getColor(
                         requireContext(),
@@ -239,19 +240,19 @@ class Home : Fragment() {
     }
 
     private fun loadNotes() {
-        val tasks = taskRealm!!.where(LeanTask::class.java).findAll()
+        val tasks = taskRealm?.where(LeanTask::class.java)?.findAll()
         val dodajNovi = LeanTask()
         dodajNovi.setId("ACTION_ADD")
         dodajNovi.setTaskTekst("Dodaj novi podsjetnik")
-        taskRealm!!.executeTransaction { realm -> realm.insertOrUpdate(dodajNovi) }
+        taskRealm?.executeTransaction { realm -> realm.insertOrUpdate(dodajNovi) }
         val leanTaskAdapter = LeanTaskAdapter(tasks)
-        binding!!.recyclerTask.layoutManager = LinearLayoutManager(activity)
-        ViewCompat.setNestedScrollingEnabled(binding!!.recyclerTask, false)
-        binding!!.recyclerTask.adapter = leanTaskAdapter
+        binding?.recyclerTask?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerTask?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
+        binding?.recyclerTask?.adapter = leanTaskAdapter
     }
 
     private fun loadIksicaAd() {
-        binding!!.iksicaAd.setOnClickListener {
+        binding?.iksicaAd?.setOnClickListener {
             val appPackageName = "com.tstud.iksica"
             try {
                 val intent = requireActivity().packageManager.getLaunchIntentForPackage(appPackageName)
@@ -270,19 +271,19 @@ class Home : Fragment() {
     }
 
     private fun loadMenzaView() {
-        binding!!.menzaRelative.setOnClickListener {
+        binding?.menzaRelative?.setOnClickListener {
             startActivity(Intent(activity, MenzaActivity::class.java))
         }
-        binding!!.eindexRelative.setOnClickListener {
+        binding?.eindexRelative?.setOnClickListener {
             startActivity(Intent(activity, IndexActivity::class.java))
         }
     }
 
     private fun showSnacOffline() {
         snack = Snackbar.make(requireActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG)
-        val vjuz = snack!!.view
-        vjuz.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
-        snack!!.show()
+        val vjuz = snack?.view
+        vjuz?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
+        snack?.show()
     }
 
     fun alertUserAboutError() {
@@ -291,27 +292,27 @@ class Home : Fragment() {
             "Došlo je do pogreške pri dohvaćanju prognoze",
             Snackbar.LENGTH_LONG
         )
-        val vjuz = snack!!.view
-        vjuz.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
-        snack!!.show()
+        val vjuz = snack?.view
+        vjuz?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
+        snack?.show()
     }
 
     override fun onStop() {
         super.onStop()
-        (activity as AppCompatActivity?)!!.supportActionBar!!
-            .setBackgroundDrawable(
+        (activity as AppCompatActivity?)?.supportActionBar
+            ?.setBackgroundDrawable(
                 ColorDrawable(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
             )
         requireActivity().window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
         if (mrealm != null) {
-            mrealm!!.close()
+            mrealm?.close()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         if (taskRealm != null) {
-            taskRealm!!.close()
+            taskRealm?.close()
         }
     }
 
