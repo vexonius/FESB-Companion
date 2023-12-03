@@ -30,7 +30,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
-import com.tstudioz.fax.fme.fragments.Home
+import com.tstudioz.fax.fme.home.Home
 import com.tstudioz.fax.fme.fragments.Prisutnost
 import com.tstudioz.fax.fme.fragments.TimeTable
 import com.tstudioz.fax.fme.networking.NetworkUtils

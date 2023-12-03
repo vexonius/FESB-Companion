@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.fragments
+package com.tstudioz.fax.fme.home
 
 import android.content.ActivityNotFoundException
 import android.content.ContentValues
@@ -12,17 +12,23 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContentProviderCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.activities.IndexActivity
+import com.tstudioz.fax.fme.activities.MainActivity
 import com.tstudioz.fax.fme.activities.MenzaActivity
 import com.tstudioz.fax.fme.adapters.EmployeeRVAdapter
 import com.tstudioz.fax.fme.adapters.LeanTaskAdapter
@@ -30,11 +36,17 @@ import com.tstudioz.fax.fme.database.LeanTask
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.HomeTabBinding
 import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.ui.mainscreen.HomeViewModel
+import com.tstudioz.fax.fme.ui.mainscreen.LoginViewModel
+import com.tstudioz.fax.fme.util.CircularAnim
 import com.tstudioz.fax.fme.weather.Current
 import com.tstudioz.fax.fme.weather.Forecast
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -48,14 +60,15 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 class Home : Fragment() {
-    private var date: String? = null
-    private var units: String? = null
-    private var mForecast: Forecast? = null
-    private var snack: Snackbar? = null
-    private var mrealm: Realm? = null
-    private var taskRealm: Realm? = null
     private var binding: HomeTabBinding? = null
     private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
+    @OptIn(InternalCoroutinesApi::class)
+    lateinit var homeViewModel: HomeViewModel
+    private var mrealm: Realm? = null
+    private var taskRealm: Realm? = null
+    private var date: String? = null
+    private var units: String? = null
+    private var snack: Snackbar? = null
 
     var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
@@ -70,25 +83,20 @@ class Home : Fragment() {
         .deleteRealmIfMigrationNeeded()
         .build()
 
+    @OptIn(InternalCoroutinesApi::class)
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): CoordinatorLayout? {
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?): CoordinatorLayout?
+    {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         binding = HomeTabBinding.inflate(inflater, container, false)
+        homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
-        //getActivity().setActionBar(binding.customToolbar);
         setHasOptionsMenu(true)
         setCyanStatusBarColor()
         getDate()
-        try {
-            start()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
+        start()
+
         taskRealm = Realm.getInstance(realmTaskConfiguration)
         loadNotes()
         loadIksicaAd()
@@ -108,56 +116,37 @@ class Home : Fragment() {
     }
 
     @OptIn(InternalCoroutinesApi::class)
-    private fun getForecast(url: String) {
-        // OkHttp stuff
-        val client = instance?.okHttpInstance
-        val request: Request = Builder()
-            .url(url).header("Accept", "application/xml").header("User-Agent", "FesbCompanion/1.0")
-            .build()
-        val call = client?.newCall(request)
-        call?.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e(ContentValues.TAG, "Exception caught", e)
-            }
-
-            @Throws(IOException::class)
-            override fun onResponse(call: Call, response: Response) {
-                try {
-                    val jsonData = response.body?.string()
-                    if (response.isSuccessful) {
-                        mForecast = jsonData?.let { parseForecastDetails(it) }
-                        activity?.runOnUiThread { updateDisplay() }
-                    } else {
-                        alertUserAboutError()
-                    }
-                } catch (e: IOException) {
-                    Log.e(ContentValues.TAG, "Exception caught: ", e)
-                } catch (e: JSONException) {
-                    Log.e(ContentValues.TAG, "Exception caught: ", e)
-                }
-            }
-        })
-    }
-
     @Throws(IOException::class, JSONException::class)
     private fun start() {
-        val shared = requireActivity().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
-        units = shared.getString("weather_units", "&units=ca")
-
-        if (NetworkUtils.isNetworkAvailable(requireContext())) {
-            getForecast(forecastUrl)
+        try {
+            if (NetworkUtils.isNetworkAvailable(requireContext())) {
+            lifecycleScope.launch { homeViewModel.getForecast(forecastUrl) }
+            homeViewModel.forecastGot.observe(viewLifecycleOwner) { forecastGot ->
+                if (forecastGot) {
+                    activity?.runOnUiThread { updateDisplay() }
+                } else {
+                    alertUserAboutError()
+                }
+            }
         } else {
             showSnacOffline()
         }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
     }
 
+    @OptIn(InternalCoroutinesApi::class)
     private fun updateDisplay() {
-        val current = mForecast?.current
+        val current = homeViewModel.mForecast?.current
         val pTemperatura = current?.temperature.toString() + "°"
         val pHumidity = current?.humidity.toString() + " %"
         val pWind = current?.wind.toString() + " km/h"
         val pPrecip = current?.precipChance.toString() + " mm"
-        val pSummary = current?.summary
+        val pSummary = getString(resources.getIdentifier(current?.summary , "string", requireContext().packageName))
         binding?.temperaturaVrijednost?.text = pTemperatura
         binding?.vlaznostVrijednost?.text = pHumidity
         binding?.oborineVrijednost?.text = pPrecip
@@ -168,43 +157,6 @@ class Home : Fragment() {
         val drawable = ResourcesCompat.getDrawable(resources, resources.getIdentifier(current?.icon, "drawable", requireContext().packageName),null)
 
         binding?.vrijemeImage?.setImageDrawable(drawable)
-    }
-
-    @Throws(JSONException::class)
-    private fun parseForecastDetails(jsonData: String): Forecast {
-        /*jsonData = jsonData.replaceAll("\\\\\"", "\"");
-        jsonData = jsonData.substring(1, jsonData.length()-1);
-        Log.d("REGEX OUTPUT", jsonData);*/
-        val forecast = Forecast()
-        forecast.current = getCurrentDetails(jsonData)
-        return forecast
-    }
-
-    @Throws(JSONException::class)
-    private fun getCurrentDetails(jsonData: String): Current {
-        val forecast = JSONObject(jsonData)
-        // String timezone = forecast.getString("timezone");
-        val currently0 = forecast.getJSONObject("properties")
-        val currentlyArray = currently0.getJSONArray("timeseries")
-        val currently = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("instant").getJSONObject("details")
-        val currentlyNextOneHours = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("next_1_hours")
-        val currentlyNextOneHoursSummary = currentlyNextOneHours.getJSONObject("summary")
-        val currentlyNextOneHoursDetails = currentlyNextOneHours.getJSONObject("details")
-        val unparsedsummary = currentlyNextOneHoursSummary.getString("symbol_code")
-        val summary: String? = if (unparsedsummary.contains("_"))
-        {
-            unparsedsummary.substring(0, unparsedsummary.indexOf('_'))
-        } else {
-            unparsedsummary
-        }
-        val current = Current()
-        current.humidity = currently.getDouble("relative_humidity")
-        current.icon = currentlyNextOneHoursSummary.getString("symbol_code")
-        current.precipChance = currentlyNextOneHoursDetails.getDouble("precipitation_amount")
-        current.summary = getString(resources.getIdentifier(summary, "string", requireContext().packageName))
-        current.wind = currently.getDouble("wind_speed")
-        current.setTemperature(currently.getDouble("air_temperature"))
-        return current
     }
 
     fun showList() {
