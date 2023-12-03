@@ -38,8 +38,11 @@
     <string name="delete">Izbriši bilješku</string>
     <string name="terms">Uvjeti korištenja</string>
     <string name="terms_desc">Sukladno s GDPR zakonom ovim pristankom prihvaćate uvjete korištenja ove aplikacije.</string>
-    <string name="lozinka">Lozinka</string>
-    <string name="fesb_korisni_ko_ime">FESB korisničko ime</string>
-    <string name="prijava">Prijava</string>
+    <string name="postavke">Postavke</string>
+    <string name="osvje_i">Osvježi</string>
+    <string name="ljetni_semestar">LJETNI SEMESTAR</string>
+    <string name="zimski_semestar">ZIMSKI SEMESTAR</string>
+    <string name="home">Home</string>
+    <string name="raspored">Raspored</string>
 
 </resources>

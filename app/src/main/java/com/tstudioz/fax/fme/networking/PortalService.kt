@@ -16,22 +16,21 @@ class PortalService : FService {
 
     private val client: OkHttpClient by inject(OkHttpClient::class.java)
 
-    override suspend fun loginUser(): Flow<Result.LoginResult> = flow {
+    override suspend fun loginUser(user:User): Flow<Result.LoginResult> = flow {
         val requestBody = FormBody.Builder()
-                .add("Username", "temer00")
-                .add("Password", "Jc72028N")
+                .add("Username", user.username)
+                .add("Password", user.password)
                 .add("IsRememberMeChecked", "true")
                 .build()
 
         val request = Request.Builder()
-                .url("https://korisnik.fesb.unist.hr/prijava?returnURL=https://elearning.fesb" +
-                             ".unist.hr/login/index.php")
+                .url("https://korisnik.fesb.unist.hr/prijava")
                 .post(requestBody)
                 .build();
 
         val response = client.newCall(request).execute()
 
-        if (response.isSuccessful) emit(Result.LoginResult.Success(User("temi", "Tino", "temi@fesb.hr")))
+        if (response.request.url.toString() == "https://korisnik.fesb.unist.hr/") emit(Result.LoginResult.Success(User(user.username, user.password, user.username+"fesb.hr")))
         else emit(Result.LoginResult.Failure(Throwable("Doslo je do pogreske prilikom prijave")))
 
     }.flowOn(context = Dispatchers.IO)

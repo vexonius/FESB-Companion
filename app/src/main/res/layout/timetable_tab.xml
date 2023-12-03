@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorPrimaryDark"
     android:orientation="vertical">
 
@@ -265,17 +267,19 @@
         android:id="@+id/odaberiDan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="6dp"
         android:background="@drawable/button_blue"
-        android:paddingBottom="15dp"
         android:paddingLeft="20dp"
-        android:paddingRight="20dp"
         android:paddingTop="15dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="15dp"
         android:text="Odaberi tjedan"
         android:textColor="@color/white"
+        android:visibility="visible"
         ads:layout_constraintBottom_toBottomOf="@+id/linear_parent"
         ads:layout_constraintEnd_toEndOf="parent"
-        ads:layout_constraintStart_toStartOf="parent" />
+        ads:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>
