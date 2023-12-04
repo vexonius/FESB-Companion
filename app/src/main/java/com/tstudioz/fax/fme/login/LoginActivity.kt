@@ -57,6 +57,7 @@ class LoginActivity : AppCompatActivity() {
         isUserLoggedIn
         loadBlueButton()
         helpListener()
+        
         onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val a = Intent(Intent.ACTION_MAIN)
