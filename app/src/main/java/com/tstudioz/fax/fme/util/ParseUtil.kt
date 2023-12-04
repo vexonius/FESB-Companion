@@ -58,7 +58,7 @@ private fun parseClassDuration(element: Element?): Int {
             duration = it.toInt()
         }
     } catch (e: Exception){
-        Log.e("Parsing util", e.message)
+        e.message?.let { Log.e("Parsing util", it) }
     }
     return duration
 }

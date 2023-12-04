@@ -8,6 +8,7 @@ import com.tstudioz.fax.fme.data.Repository
 import com.tstudioz.fax.fme.networking.NetworkService
 import com.tstudioz.fax.fme.networking.PortalService
 import com.tstudioz.fax.fme.ui.mainscreen.MainViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
@@ -15,19 +16,20 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @InternalCoroutinesApi
 val module = module {
     single { Repository() }
     single { PortalService() }
     single { NetworkService() }
-    single<OkHttpClient> { provideOkHttpClient(androidContext()) }
+    single { provideOkHttpClient(androidContext()) }
     viewModel { MainViewModel() }
 }
 
 fun provideOkHttpClient(context: Context) : OkHttpClient {
     return OkHttpClient.Builder()
-            .callTimeout(15, TimeUnit.SECONDS)
-            .connectTimeout(15, TimeUnit.SECONDS)
+            .callTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
             .cookieJar(PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context)))
             .build()
 }

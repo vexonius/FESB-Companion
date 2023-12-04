@@ -14,6 +14,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/blue_nice"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -24,13 +25,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/opensans_bold"
-            android:textSize="16dp"
             android:maxLines="1"
             android:paddingTop="7dp"
             android:paddingBottom="2dp"
             android:textAlignment="center"
             android:textAllCaps="true"
             android:textColor="@color/white"
+            android:textSize="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +43,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            tools:text="8.15 - 11.00"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="11dp"
@@ -50,7 +50,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/table_name"
-          />
+            tools:text="8.15 - 11.00" />
 
         <TextView
             android:id="@+id/table_mjesto"
@@ -58,13 +58,13 @@
             android:layout_height="wrap_content"
             android:paddingBottom="5dp"
             android:singleLine="true"
-            tools:text="A100"
             android:textAlignment="center"
             android:textColor="@color/cardview_light_background"
             android:textSize="12dp"
             android:textStyle="normal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/table_type" />
+            app:layout_constraintTop_toBottomOf="@id/table_type"
+            tools:text="A100" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

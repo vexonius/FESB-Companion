@@ -3,17 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.preference.PreferenceCategory
-        android:title="EKSPERIMENTALNO">
-
-        <androidx.preference.SwitchPreference
-            android:key="scheduled_workmanager_enabled"
-            android:title="Sinkronizacija rasporeda"
-            android:summaryOff="Raspored se neće sinkronizirati u pozadini i nećete biti obaviješteni o promjenama "
-            android:summaryOn="Raspored je sinkroniziran i obavijesti o promjenama su uključene"/>
-
-    </androidx.preference.PreferenceCategory>
-
-    <androidx.preference.PreferenceCategory
         android:title="KORISNIK">
 
         <androidx.preference.Preference
@@ -31,6 +20,13 @@
             android:title="Koristi celzijuse pri prikazu temperature"
             android:summary="Vrijednost temperature će biti prkazana u celzijusima"
             android:defaultValue="true"/>
+        <androidx.preference.SwitchPreference
+            android:id="@+id/amoled_theme_switch"
+            android:key="amoled_theme"
+            android:title="Koristi amoled tamnu temu"
+            android:summary=""
+            android:defaultValue="false"/>
+
 
         <androidx.preference.Preference
             android:key="cache"
