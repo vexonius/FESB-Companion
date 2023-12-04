@@ -212,8 +212,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         get() {
             var ver = "undefined"
             try {
-                val pInfo = activity!!.packageManager.getPackageInfo(
-                    activity!!.packageName, 0
+                val pInfo = requireActivity().packageManager.getPackageInfo(
+                    requireActivity().packageName, 0
                 )
                 ver = pInfo.versionName
             } catch (e: PackageManager.NameNotFoundException) {
@@ -227,7 +227,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             LayoutInflater.from(activity).inflate(R.layout.licence_view, null) as NestedScrollView
         val wv = view.findViewById<View>(R.id.webvju) as WebView
         wv.loadUrl("file:///android_asset/legal.html")
-        btmDialog = BottomSheetDialog(activity!!)
+        btmDialog = BottomSheetDialog(requireActivity())
         btmDialog!!.setCancelable(true)
         btmDialog!!.setContentView(view)
         btmDialog!!.setCanceledOnTouchOutside(true)
@@ -239,7 +239,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             LayoutInflater.from(activity).inflate(R.layout.licence_view, null) as NestedScrollView
         val wv = view.findViewById<View>(R.id.webvju) as WebView
         wv.loadUrl("file:///android_asset/mvp.html")
-        btmDialog = BottomSheetDialog(activity!!)
+        btmDialog = BottomSheetDialog(requireActivity())
         btmDialog!!.setCancelable(true)
         btmDialog!!.setContentView(view)
         btmDialog!!.setCanceledOnTouchOutside(true)
@@ -248,7 +248,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     fun sendFeedMail(title: String, body: String?) {
         val version = buildVersion
-        ShareCompat.IntentBuilder.from(activity!!)
+        ShareCompat.IntentBuilder.from(requireActivity())
             .setType("message/rfc822")
             .addEmailTo("info@tstud.io")
             .setSubject("$title v$version")
