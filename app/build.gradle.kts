@@ -10,7 +10,7 @@ android {
     defaultConfig {
         multiDexEnabled = true
         applicationId = "com.tstudioz.fax.fme"
-        minSdk = 21
+        minSdk = 24
         targetSdk = 33
         versionCode = 21
         versionName = "2.3.0 build #2307"
