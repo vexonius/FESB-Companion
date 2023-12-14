@@ -1,5 +1,7 @@
 package com.tstudioz.fax.fme.models
 
+import com.tstudioz.fax.fme.models.data.User
+
 
 sealed class Result {
 

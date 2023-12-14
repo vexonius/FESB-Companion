@@ -13,7 +13,7 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.orhanobut.hawk.Hawk
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.di.module
+import com.tstudioz.fax.fme.models.di.module
 import com.tstudioz.fax.fme.migrations.CredMigration
 import io.realm.Realm
 import io.realm.RealmConfiguration

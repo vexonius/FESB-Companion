@@ -1,11 +1,9 @@
 package com.tstudioz.fax.fme.networking
 
 import com.tstudioz.fax.fme.models.Result
-import com.tstudioz.fax.fme.models.User
-import kotlinx.coroutines.Dispatchers
+import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.models.interfaces.FService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -16,7 +14,7 @@ class PortalService : FService {
 
     private val client: OkHttpClient by inject(OkHttpClient::class.java)
 
-    override suspend fun loginUser(user:User): Result.LoginResult {        val requestBody = FormBody.Builder()
+    override suspend fun loginUser(user: User): Result.LoginResult {        val requestBody = FormBody.Builder()
                 .add("Username", user.username)
                 .add("Password", user.password)
                 .add("IsRememberMeChecked", "true")

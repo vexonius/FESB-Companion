@@ -29,7 +29,7 @@
             android:value="ca-app-pub-5944203368510130~8955475006"/>
 
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".view.activities.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Simple"
             android:exported="true">
@@ -43,36 +43,36 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".activities.NoteActivity"
+            android:name=".view.activities.NoteActivity"
             android:label=""
-            android:parentActivityName=".activities.MainActivity"
+            android:parentActivityName=".view.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".view.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             />
         <activity
             android:name=".activities.CourseActivity"
             android:label=" "
-            android:parentActivityName=".activities.MainActivity"
+            android:parentActivityName=".view.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Simple" />
         <activity
-            android:name=".activities.Welcome"
+            android:name=".view.activities.Welcome"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.SettingsActivity"
+            android:name=".view.activities.SettingsActivity"
             android:label="Postavke"
-            android:parentActivityName=".activities.MainActivity"
+            android:parentActivityName=".view.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SettingsTheme" />
         <activity
-            android:name=".activities.MenzaActivity"
+            android:name=".view.activities.MenzaActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Simple" />
-        <activity android:name=".activities.IndexActivity"
+        <activity android:name=".view.activities.IndexActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
