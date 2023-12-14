@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 /**
  * Created by amarthus on 17-Sep-17.
  */
-class SampleSlideFragment : Fragment() {
+class WelcomeSlideFragment : Fragment() {
     private var layoutResId = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +27,8 @@ class SampleSlideFragment : Fragment() {
 
     companion object {
         private const val ARG_LAYOUT_RES_ID = "layoutResId"
-        fun newInstance(layoutResId: Int): SampleSlideFragment {
-            val sampleSlide = SampleSlideFragment()
+        fun newInstance(layoutResId: Int): WelcomeSlideFragment {
+            val sampleSlide = WelcomeSlideFragment()
             val args = Bundle()
             args.putInt(ARG_LAYOUT_RES_ID, layoutResId)
             sampleSlide.arguments = args

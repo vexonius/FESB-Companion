@@ -1,101 +1,99 @@
-package com.tstudioz.fax.fme.view.adapters;
+package com.tstudioz.fax.fme.view.adapters
 
-import android.graphics.Typeface;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.graphics.Typeface
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.database.Meni
+import com.tstudioz.fax.fme.view.adapters.MeniesAdapter.MeniViewHolder
+import io.realm.RealmChangeListener
+import io.realm.RealmResults
 
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.tstudioz.fax.fme.R;
-import com.tstudioz.fax.fme.database.Meni;
-
-import io.realm.RealmChangeListener;
-import io.realm.RealmResults;
-
-
-public class MeniesAdapter extends RecyclerView.Adapter<MeniesAdapter.MeniViewHolder> implements RealmChangeListener {
-
-    public RealmResults<Meni> mMenies;
-
-    public MeniesAdapter(RealmResults<Meni> meni) {
-        this.mMenies = meni;
-        mMenies.addChangeListener(this);
+class MeniesAdapter(var mMenies: RealmResults<Meni>) : RecyclerView.Adapter<MeniViewHolder>(),
+    RealmChangeListener<Any?> {
+    init {
+        mMenies.addChangeListener(this as RealmChangeListener<RealmResults<Meni>>)
     }
 
-    @Override
-    public MeniViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.meni_item, parent,
-                false);
-        return new MeniViewHolder(view);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeniViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(
+            R.layout.meni_item, parent,
+            false
+        )
+        return MeniViewHolder(view)
     }
 
-    @Override
-    public void onBindViewHolder(MeniViewHolder holder, int position) {
-        Meni meni = mMenies.get(position);
-
-        holder.title.setTypeface(holder.regulartf);
-        holder.jelo1.setTypeface(holder.lighttf);
-        holder.jelo2.setTypeface(holder.lighttf);
-        holder.jelo3.setTypeface(holder.lighttf);
-        holder.jelo4.setTypeface(holder.lighttf);
-        holder.jelo5.setTypeface(holder.lighttf);
-        holder.cijena.setTypeface(holder.regulartf);
-
-        if (meni.getId().equals("R-MENI")) {
-            holder.title.setText(meni.getType());
-            holder.jelo1.setText(meni.getJelo1());
-            holder.jelo2.setText(meni.getJelo2());
-            holder.jelo3.setText(meni.getJelo3());
-            holder.jelo4.setText(meni.getJelo4());
-            holder.jelo5.setText(meni.getDesert());
-            holder.cijena.setText(meni.getCijena());
-
-        } else if (meni.getId().equals("R-JELO PO IZBORU")) {
-            holder.title.setText("JELO PO IZBORU");
-            holder.jelo1.setText(meni.getJelo1());
-            holder.cijena.setText(meni.getCijena());
-
-            holder.jelo2.setVisibility(View.GONE);
-            holder.jelo3.setVisibility(View.GONE);
-            holder.jelo4.setVisibility(View.GONE);
-            holder.jelo5.setVisibility(View.GONE);
+    override fun onBindViewHolder(holder: MeniViewHolder, position: Int) {
+        val meni = mMenies[position]
+        holder.title.typeface = holder.regulartf
+        holder.jelo1.typeface = holder.lighttf
+        holder.jelo2.typeface = holder.lighttf
+        holder.jelo3.typeface = holder.lighttf
+        holder.jelo4.typeface = holder.lighttf
+        holder.jelo5.typeface = holder.lighttf
+        holder.cijena.typeface = holder.regulartf
+        if (meni?.id == "R-MENI") {
+            holder.title.text = meni.type
+            holder.jelo1.text = meni.jelo1
+            holder.jelo2.text = meni.jelo2
+            holder.jelo3.text = meni.jelo3
+            holder.jelo4.text = meni.jelo4
+            holder.jelo5.text = meni.desert
+            holder.cijena.text = meni.cijena
+        } else if (meni?.id == "R-JELO PO IZBORU") {
+            holder.title.text = "JELO PO IZBORU"
+            holder.jelo1.text = meni.jelo1
+            holder.cijena.text = meni.cijena
+            holder.jelo2.visibility = View.GONE
+            holder.jelo3.visibility = View.GONE
+            holder.jelo4.visibility = View.GONE
+            holder.jelo5.visibility = View.GONE
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return mMenies.size();
+    override fun getItemCount(): Int {
+        return mMenies.size
     }
 
-    public class MeniViewHolder extends RecyclerView.ViewHolder {
-        TextView title, jelo1, jelo2, jelo3, jelo4, jelo5, cijena;
-        Typeface regulartf, lighttf, boldtf;
+    inner class MeniViewHolder(mView: View) : RecyclerView.ViewHolder(mView) {
+        var title: TextView
+        var jelo1: TextView
+        var jelo2: TextView
+        var jelo3: TextView
+        var jelo4: TextView
+        var jelo5: TextView
+        var cijena: TextView
+        var regulartf: Typeface
+        var lighttf: Typeface
+        var boldtf: Typeface
 
-        public MeniViewHolder(final View mView) {
-            super(mView);
-
-            title = (TextView) mView.findViewById(R.id.meni_title);
-            jelo1 = (TextView) mView.findViewById(R.id.meni_jelo1);
-            jelo2 = (TextView) mView.findViewById(R.id.meni_jelo2);
-            jelo3 = (TextView) mView.findViewById(R.id.meni_jelo3);
-            jelo4 = (TextView) mView.findViewById(R.id.meni_jelo4);
-            jelo5 = (TextView) mView.findViewById(R.id.meni_jelo5);
-            cijena = (TextView) mView.findViewById(R.id.meni_cijena);
-
-            regulartf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts" +
-                    "/OpenSans-Regular.ttf");
-            lighttf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans" +
-                    "-Light.ttf");
-            boldtf = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/OpenSans" +
-                    "-Bold.ttf");
+        init {
+            title = mView.findViewById<View>(R.id.meni_title) as TextView
+            jelo1 = mView.findViewById<View>(R.id.meni_jelo1) as TextView
+            jelo2 = mView.findViewById<View>(R.id.meni_jelo2) as TextView
+            jelo3 = mView.findViewById<View>(R.id.meni_jelo3) as TextView
+            jelo4 = mView.findViewById<View>(R.id.meni_jelo4) as TextView
+            jelo5 = mView.findViewById<View>(R.id.meni_jelo5) as TextView
+            cijena = mView.findViewById<View>(R.id.meni_cijena) as TextView
+            regulartf = Typeface.createFromAsset(
+                itemView.context.assets, "fonts" +
+                        "/OpenSans-Regular.ttf"
+            )
+            lighttf = Typeface.createFromAsset(
+                itemView.context.assets, "fonts/OpenSans" +
+                        "-Light.ttf"
+            )
+            boldtf = Typeface.createFromAsset(
+                itemView.context.assets, "fonts/OpenSans" +
+                        "-Bold.ttf"
+            )
         }
-
     }
 
-    @Override
-    public void onChange(Object element) {
-        notifyDataSetChanged();
+    override fun onChange(element: Any?) {
+        notifyDataSetChanged()
     }
 }

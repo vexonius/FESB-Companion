@@ -8,7 +8,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.view.adapters.EmployeeRVAdapterTable.EmployeeViewHolderTable
+import com.tstudioz.fax.fme.view.adapters.PredavanjaRaspAdapterTable.PredavanjaRaspViewHolderTable
 import com.tstudioz.fax.fme.database.Predavanja
 import io.realm.RealmChangeListener
 import io.realm.RealmResults
@@ -16,23 +16,23 @@ import io.realm.RealmResults
 /**
  * Created by amarthus on 25-Mar-17.
  */
-class EmployeeRVAdapterTable(private var mEmployees: RealmResults<Predavanja>) : RecyclerView.Adapter<EmployeeViewHolderTable>(), RealmChangeListener<Any?> {
+class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanja>) : RecyclerView.Adapter<PredavanjaRaspViewHolderTable>(), RealmChangeListener<Any?> {
     var dialog: BottomSheetDialog? = null
 
     init {
-        mEmployees.addChangeListener(this as RealmChangeListener<RealmResults<Predavanja>>)
+        mPredavanja.addChangeListener(this as RealmChangeListener<RealmResults<Predavanja>>)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmployeeViewHolderTable {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PredavanjaRaspViewHolderTable {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.table_row_item,
                                                                parent, false)
-        return EmployeeViewHolderTable(view)
+        return PredavanjaRaspViewHolderTable(view)
     }
 
-    override fun onBindViewHolder(holder: EmployeeViewHolderTable, position: Int) {
+    override fun onBindViewHolder(holder: PredavanjaRaspViewHolderTable, position: Int) {
         val compactImePredavanja = StringBuilder()
 
-        val predavanja = mEmployees[position]
+        val predavanja = mPredavanja[position]
 
         if (predavanja?.predmetPredavanja != null && !predavanja.predmetPredavanja.isEmpty() && predavanja.predmetPredavanja.contains(" ")) {
             for (str in predavanja.predmetPredavanja.split(" ").toTypedArray())
@@ -59,10 +59,10 @@ class EmployeeRVAdapterTable(private var mEmployees: RealmResults<Predavanja>) :
     }
 
     override fun getItemCount(): Int {
-        return mEmployees.size
+        return mPredavanja.size
     }
 
-    inner class EmployeeViewHolderTable(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class PredavanjaRaspViewHolderTable(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         var tablename: TextView
         var tabletype: TextView
         var tablemjesto: TextView
@@ -87,7 +87,7 @@ class EmployeeRVAdapterTable(private var mEmployees: RealmResults<Predavanja>) :
 
     fun onShowBottomsheet(view: View, position: Int) {
         val context = view.context
-        val predavanja = mEmployees[position]
+        val predavanja = mPredavanja[position]
         val infoKolegij: TextView
         val infoPredavanje: TextView
         val infoProf: TextView

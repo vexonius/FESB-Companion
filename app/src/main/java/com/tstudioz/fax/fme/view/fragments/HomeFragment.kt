@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.activities.MenzaActivity
-import com.tstudioz.fax.fme.view.adapters.EmployeeRVAdapter
+import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
 import com.tstudioz.fax.fme.view.adapters.LeanTaskAdapter
 import com.tstudioz.fax.fme.database.LeanTask
 import com.tstudioz.fax.fme.database.Predavanja
@@ -148,7 +148,7 @@ class HomeFragment : Fragment() {
             binding?.nemaPredavanja?.visibility = View.VISIBLE
         } else {
             binding?.nemaPredavanja?.visibility = View.INVISIBLE
-            val adapter = EmployeeRVAdapter(rezultati)
+            val adapter = rezultati?.let { HomePredavanjaAdapter(it) }
             binding?.rv?.layoutManager = LinearLayoutManager(activity)
             binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
             binding?.rv?.adapter = adapter
@@ -177,7 +177,7 @@ class HomeFragment : Fragment() {
         dodajNovi.setId("ACTION_ADD")
         dodajNovi.setTaskTekst("Dodaj novi podsjetnik")
         taskRealm?.executeTransaction { realm -> realm.insertOrUpdate(dodajNovi) }
-        val leanTaskAdapter = LeanTaskAdapter(tasks)
+        val leanTaskAdapter = tasks?.let { LeanTaskAdapter(it) }
         binding?.recyclerTask?.layoutManager = LinearLayoutManager(activity)
         binding?.recyclerTask?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
         binding?.recyclerTask?.adapter = leanTaskAdapter

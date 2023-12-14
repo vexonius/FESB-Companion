@@ -4,15 +4,15 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro2
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.view.fragments.SampleSlideFragment
+import com.tstudioz.fax.fme.view.fragments.WelcomeSlideFragment
 
 class Welcome : AppIntro2() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        addSlide(SampleSlideFragment.newInstance(R.layout.welcome_intro))
-        addSlide(SampleSlideFragment.newInstance(R.layout.welcome_timetable))
+        addSlide(WelcomeSlideFragment.newInstance(R.layout.welcome_intro))
+        addSlide(WelcomeSlideFragment.newInstance(R.layout.welcome_timetable))
         //addSlide(SampleSlide.newInstance(R.layout.welcome_files))
-        addSlide(SampleSlideFragment.newInstance(R.layout.welcome_attendance))
+        addSlide(WelcomeSlideFragment.newInstance(R.layout.welcome_attendance))
     }
 
     override fun onSkipPressed(currentFragment: Fragment) {

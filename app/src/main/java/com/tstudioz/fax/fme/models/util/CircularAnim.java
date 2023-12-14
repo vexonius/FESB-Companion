@@ -102,11 +102,6 @@ public class CircularAnim {
             mOnAnimationEndListener = onAnimationEndListener;
 
 
-            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
-                doOnEnd();
-                return;
-            }
-
             int rippleCX, rippleCY, maxRadius;
             if (mTriggerView != null) {
                 int[] tvLocation = new int[2];

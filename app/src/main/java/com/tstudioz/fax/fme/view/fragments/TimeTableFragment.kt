@@ -16,7 +16,7 @@ import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.view.adapters.EmployeeRVAdapterTable
+import com.tstudioz.fax.fme.view.adapters.PredavanjaRaspAdapterTable
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.TimetableTabBinding
@@ -64,12 +64,12 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     var subrealm: Realm? = null
     var subtrealm: Realm? = null
     private var snack: Snackbar? = null
-    private var adapterPonTemp: EmployeeRVAdapterTable? = null
-    private var adapterUtoTemp: EmployeeRVAdapterTable? = null
-    private var adapterSriTemp: EmployeeRVAdapterTable? = null
-    private var adapterCetTemp: EmployeeRVAdapterTable? = null
-    private var adapterPetTemp: EmployeeRVAdapterTable? = null
-    private var adapterSubTemp: EmployeeRVAdapterTable? = null
+    private var adapterPonTemp: PredavanjaRaspAdapterTable? = null
+    private var adapterUtoTemp: PredavanjaRaspAdapterTable? = null
+    private var adapterSriTemp: PredavanjaRaspAdapterTable? = null
+    private var adapterCetTemp: PredavanjaRaspAdapterTable? = null
+    private var adapterPetTemp: PredavanjaRaspAdapterTable? = null
+    private var adapterSubTemp: PredavanjaRaspAdapterTable? = null
     private var client: OkHttpClient? = null
     private var bold: Typeface? = null
     private var binding: TimetableTabBinding? = null
@@ -316,7 +316,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiPon = prealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE
         )?.findAll()
-        val adapter = rezulatiPon?.let { EmployeeRVAdapterTable(it) }
+        val adapter = rezulatiPon?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerPon.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerPon.setHasFixedSize(true)
         binding!!.recyclerPon.adapter = adapter
@@ -327,7 +327,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiPon1 = ptrealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE
         )?.findAll()
-        adapterPonTemp = rezulatiPon1?.let { EmployeeRVAdapterTable(it) }
+        adapterPonTemp = rezulatiPon1?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerPon.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerPon.setHasFixedSize(true)
         binding!!.recyclerPon.adapter = adapterPonTemp
@@ -338,7 +338,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiUto = urealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "Utorak", Case.INSENSITIVE
         )?.findAll()
-        val adapter2 = rezulatiUto?.let { EmployeeRVAdapterTable(it) }
+        val adapter2 = rezulatiUto?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerUto.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerUto.setHasFixedSize(true)
         binding!!.recyclerUto.adapter = adapter2
@@ -349,7 +349,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiUto1 = utrealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "Utorak", Case.INSENSITIVE
         )?.findAll()
-        adapterUtoTemp = rezulatiUto1?.let { EmployeeRVAdapterTable(it) }
+        adapterUtoTemp = rezulatiUto1?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerUto.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerUto.setHasFixedSize(true)
         binding!!.recyclerUto.adapter = adapterUtoTemp
@@ -360,7 +360,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiSri = srealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE
         )?.findAll()
-        val adapter3 = rezulatiSri?.let { EmployeeRVAdapterTable(it) }
+        val adapter3 = rezulatiSri?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerSri.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerSri.setHasFixedSize(true)
         binding!!.recyclerSri.adapter = adapter3
@@ -371,7 +371,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiSri1 = strealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE
         )?.findAll()
-        adapterSriTemp = rezulatiSri1?.let { EmployeeRVAdapterTable(it) }
+        adapterSriTemp = rezulatiSri1?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerSri.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerSri.setHasFixedSize(true)
         binding!!.recyclerSri.adapter = adapterSriTemp
@@ -382,7 +382,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiCet = crealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE
         )?.findAll()
-        val adapter4 = rezulatiCet?.let { EmployeeRVAdapterTable(it) }
+        val adapter4 = rezulatiCet?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerCet.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerCet.setHasFixedSize(true)
         binding!!.recyclerCet.adapter = adapter4
@@ -393,7 +393,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiCet1 = ctrealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE
         )?.findAll()
-        adapterCetTemp = rezulatiCet1?.let { EmployeeRVAdapterTable(it) }
+        adapterCetTemp = rezulatiCet1?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerCet.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerCet.setHasFixedSize(true)
         binding!!.recyclerCet.adapter = adapterCetTemp
@@ -404,7 +404,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiPet = petrealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "Petak", Case.INSENSITIVE
         )?.findAll()
-        val adapter5 = rezulatiPet?.let { EmployeeRVAdapterTable(it) }
+        val adapter5 = rezulatiPet?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerPet.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerPet.setHasFixedSize(true)
         binding!!.recyclerPet.adapter = adapter5
@@ -415,7 +415,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiPet1 = pettrealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "Petak", Case.INSENSITIVE
         )?.findAll()
-        adapterPetTemp = rezulatiPet1?.let { EmployeeRVAdapterTable(it) }
+        adapterPetTemp = rezulatiPet1?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerPet.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerPet.setHasFixedSize(true)
         binding!!.recyclerPet.adapter = adapterPetTemp
@@ -432,7 +432,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         } else {
             binding!!.linearSub.visibility = View.VISIBLE
             binding!!.linearParent.weightSum = 6f
-            val adapter6 = rezulatiSub?.let { EmployeeRVAdapterTable(it) }
+            val adapter6 = rezulatiSub?.let { PredavanjaRaspAdapterTable(it) }
             binding!!.recyclerSub.layoutManager = LinearLayoutManager(activity)
             binding!!.recyclerSub.setHasFixedSize(true)
             binding!!.recyclerSub.adapter = adapter6
@@ -444,7 +444,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val rezulatiSub1 = subtrealm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", "Subota", Case.INSENSITIVE
         )?.findAll()
-        adapterSubTemp = rezulatiSub1?.let { EmployeeRVAdapterTable(it) }
+        adapterSubTemp = rezulatiSub1?.let { PredavanjaRaspAdapterTable(it) }
         binding!!.recyclerSub.layoutManager = LinearLayoutManager(activity)
         binding!!.recyclerSub.adapter = adapterSubTemp
     }
