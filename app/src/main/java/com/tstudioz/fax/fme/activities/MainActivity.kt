@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             assert(shPref != null)
             editor = shPref!!.edit()
-            editor?.putBoolean("loged_in", false)
+            editor?.putBoolean("logged_in", false)
             editor?.commit()
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this@MainActivity, LoginActivity::class.java))
@@ -303,7 +303,7 @@ class MainActivity : AppCompatActivity() {
 
     fun invalidCreds() {
         editor = shPref!!.edit()
-        editor?.putBoolean("loged_in", false)
+        editor?.putBoolean("logged_in", false)
         editor?.apply()
         realmLog = Realm.getDefaultInstance()
         try {

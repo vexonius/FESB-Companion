@@ -47,30 +47,31 @@ class LoginViewModel(application: Application)  : AndroidViewModel(application) 
     val loggedIn: LiveData<Boolean>
         get() = _loggedIn
 
-    suspend fun firstloginUser(user:User){
-            repository.attemptLogin(user)
-                .onStart {}.catch { println("Doslo je do pogreske") }
-                .collect { result ->
-                    if(result == user) {
-                        val editor = sharedPref.edit()
-                        editor.putBoolean("loged_in", true)
-                        editor.apply()
-                        val mLogRealm: Realm = Realm.getDefaultInstance()
-                        try {
-                            mLogRealm.executeTransaction { realm ->
-                                val userrealm = realm.createObject(Korisnik::class.java)
-                                userrealm.setUsername(user.username)
-                                userrealm.setLozinka(user.password)
-                            }
-                        } finally {
-                            mLogRealm.close()
-                        }
-                        _loggedIn.value = true
-                        Log.d("hello", result.username)
-                    }else if (result == User("","","")){
-                        _loggedIn.value = false
-                    }
+    suspend fun firstloginUser(user: User) {
+        val result = repository.attemptLogin(user)
+        if(result == user)
+        {
+            val editor = sharedPref.edit()
+            editor.putBoolean("logged_in", true)
+            editor.apply()
+            val mLogRealm: Realm = Realm.getDefaultInstance()
+            try {
+                mLogRealm.executeTransaction { realm ->
+                    val userrealm = realm.createObject(Korisnik::class.java)
+                    userrealm.setUsername(user.username)
+                    userrealm.setLozinka(user.password)
                 }
-    }
+            } finally {
+                mLogRealm.close()
+            }
+            _loggedIn.postValue(true)
 
+            Log.d("hello", result.username)
+        }else if (result == User("","",""))
+        {
+            _loggedIn.postValue(false)
+        }
+    }
 }
+
+

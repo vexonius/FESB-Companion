@@ -178,7 +178,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     fun userLogOut() {
         editor = mySPrefs!!.edit()
-        editor?.putBoolean("loged_in", false)
+        editor?.putBoolean("logged_in", false)
         editor?.apply()
         rlmLog = Realm.getDefaultInstance()
         try {

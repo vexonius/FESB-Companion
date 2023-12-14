@@ -25,6 +25,8 @@ import com.tstudioz.fax.fme.networking.NetworkUtils
 import com.tstudioz.fax.fme.ui.mainscreen.LoginViewModel
 import com.tstudioz.fax.fme.util.CircularAnim
 import io.realm.Realm
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -95,7 +97,7 @@ class LoginActivity : AppCompatActivity() {
             if (prviPut) {
                 startActivity(Intent(this@LoginActivity, Welcome::class.java))
             }
-            val prijavljen = sharedPreferences.getBoolean("loged_in", false)
+            val prijavljen = sharedPreferences.getBoolean("logged_in", false)
             if (prijavljen) {
                 val nwIntent = Intent(this@LoginActivity, MainActivity::class.java)
                 startActivity(nwIntent)
@@ -119,7 +121,7 @@ class LoginActivity : AppCompatActivity() {
                 else {
                     binding.progressLogin.visibility = View.VISIBLE
                     binding.loginButton.visibility = View.INVISIBLE
-                    lifecycleScope.launch{
+                    CoroutineScope(Dispatchers.IO).launch{
                         loginViewModel.firstloginUser(
                             User(username, password, username + "fesb.hr"))
                     }
@@ -154,67 +156,6 @@ class LoginActivity : AppCompatActivity() {
         snackBarView2.layoutParams = params
 
         snack?.show()
-    }
-
-    @OptIn(InternalCoroutinesApi::class)
-    fun validateUser(user: String, pass: String, mView: View?) {
-        val okHttpClient = instance!!.okHttpInstance
-        val formData: RequestBody = Builder()
-            .add("Username", user)
-            .add("Password", pass)
-            .add("IsRememberMeChecked", "true")
-            .build()
-        val rq: Request = Request.Builder()
-            .url("https://korisnik.fesb.unist.hr/prijava")
-            .post(formData)
-            .build()
-        val call0 = okHttpClient!!.newCall(rq)
-        call0.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.d("pogreska", "failure")
-            }
-
-            @Throws(IOException::class)
-            override fun onResponse(call: Call, response: Response) {
-                if (response.request.url.toString() == "https://korisnik.fesb.unist.hr/") {
-                    runOnUiThread { register(user, pass, mView) }
-                } else {
-                    runOnUiThread {
-                        showErrorSnack("Uneseni podatci su pogrešni!")
-                        binding.progressLogin.visibility = View.INVISIBLE
-                        binding.loginButton.visibility = View.VISIBLE
-                    }
-                }
-            }
-        })
-    }
-
-    fun register(username: String?, password: String?, nView: View?) {
-        val sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)
-        val editor = sharedPref.edit()
-        editor.putBoolean("loged_in", true)
-        editor.apply()
-        val mLogRealm: Realm = Realm.getDefaultInstance()
-        try {
-            mLogRealm.executeTransaction { realm ->
-                val user = realm.createObject(Korisnik::class.java)
-                user.setUsername(username)
-                user.setLozinka(password)
-            }
-        }
-        finally {
-            mLogRealm.close()
-        }
-        if (nView != null) {
-            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(nView.windowToken, 0)
-        }
-        CircularAnim.fullActivity(this@LoginActivity, nView)
-            .colorOrImageRes(R.color.colorAccent)
-            .go {
-                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                finish()
-            }
     }
 
     private fun helpListener() {

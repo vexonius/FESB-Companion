@@ -24,22 +24,29 @@ class MainViewModel : ViewModel() {
     private val repository: Repository by inject(Repository::class.java)
     val realmLog = Realm.getDefaultInstance()
     val kor = realmLog?.where(Korisnik::class.java)?.findFirst()
-    private val user = User(kor?.getUsername()
-        .toString(), kor?.getUsername()
-        .toString(), kor?.getUsername()
-        .toString()+"@fesb.hr")
+    private val user = User(
+        kor?.getUsername()
+            .toString(), kor?.getUsername()
+            .toString(), kor?.getUsername()
+            .toString() + "@fesb.hr"
+    )
 
     init {
         loginUser(user)
-        fetchUserTimetable()
+        //fetchUserTimetable()
     }
 
-    private fun loginUser(user:User) {
+    private fun loginUser(user: User) {
         viewModelScope.launch {
-            repository.attemptLogin(user)
-                    .onStart { println("Started") }
-                    .catch { println("Doslo je do pogreske") }
-                    .collect { result -> Log.d("hello", result.username) }
+            when (val result = repository.attemptLogin(user)) {
+                user -> {
+                    Log.d("hello", result.username)
+                    println("Started")
+                }
+
+                else -> println("Doslo je do pogreske")
+            }
+
         }
     }
 
