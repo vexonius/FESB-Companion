@@ -68,6 +68,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): CoordinatorLayout?
     {
+        super.onCreateView(inflater, container, savedInstanceState)
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         binding = HomeTabBinding.inflate(inflater, container, false)
         homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
@@ -116,7 +117,6 @@ class HomeFragment : Fragment() {
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-
     }
 
     @OptIn(InternalCoroutinesApi::class)
@@ -147,13 +147,12 @@ class HomeFragment : Fragment() {
             binding?.rv?.visibility = View.INVISIBLE
             binding?.nemaPredavanja?.visibility = View.VISIBLE
         } else {
-            binding?.nemaPredavanja?.visibility = View.INVISIBLE
-            val adapter = rezultati?.let { HomePredavanjaAdapter(it) }
-            binding?.rv?.layoutManager = LinearLayoutManager(activity)
-            binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
-            binding?.rv?.adapter = adapter
             binding?.nemaPredavanja?.visibility = View.GONE
             binding?.rv?.visibility = View.VISIBLE
+            val adapter = rezultati?.let { HomePredavanjaAdapter(it) }
+            binding?.rv?.adapter = adapter
+            binding?.rv?.layoutManager = LinearLayoutManager(activity)
+            binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
         }
     }
 
@@ -230,7 +229,6 @@ class HomeFragment : Fragment() {
     }
 
     override fun onStop() {
-        super.onStop()
         (activity as AppCompatActivity?)?.supportActionBar
             ?.setBackgroundDrawable(
                 ColorDrawable(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
@@ -239,13 +237,14 @@ class HomeFragment : Fragment() {
         if (mrealm != null) {
             mrealm?.close()
         }
+        super.onStop()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         if (taskRealm != null) {
             taskRealm?.close()
         }
+        super.onDestroy()
     }
 
     companion object {

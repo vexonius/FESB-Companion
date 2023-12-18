@@ -80,14 +80,14 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         })
-
         setUpToolbar()
         getDate()
         testBottomBar()
 
+
         isThereAction
 
-        setFragmentTab()
+        setFragmentTabListener()
         checkUser()
         checkVersion()
         shouldShowGDPRDialog()
@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity() {
         bar.selectTabById(R.id.tab_home, true)
     }
 
-    private fun setFragmentTab() {
+    private fun setFragmentTabListener() {
         binding!!.bottomBar.setOnTabSelectListener(object : AnimatedBottomBar.OnTabSelectListener {
             override fun onTabSelected(lastIndex: Int, lastTab: Tab?, newIndex: Int, newTab: Tab) {
                 beginFragTransaction(newTab.id)
@@ -248,49 +248,49 @@ class MainActivity : AppCompatActivity() {
                             invalidCreds()
                         }
                         val doc = Jsoup.parse(response.body!!.string())
-                        realm.executeTransaction { realm ->
-                            val svaPredavanja = realm.where(
-                                Predavanja::class.java
-                            ).findAll()
-                            svaPredavanja.deleteAllFromRealm()
-                        }
                         if (response.isSuccessful) {
                             val elements = doc.select("div.event")
+                            val svaFreshPredavanja = mutableListOf<Predavanja>()
                             try {
-                                realm.executeTransaction { realm ->
-                                    for (e in elements) {
-                                        val predavanja = realm.createObject(
-                                            Predavanja::class.java,
-                                            UUID.randomUUID().toString()
-                                        )
-                                        if (e.hasAttr("data-id")) {
-                                            val attr = e.attr("data-id")
-                                            predavanja.objectId = attr.toInt()
-                                        }
-                                        predavanja.predavanjeIme =
-                                            e.select("span.groupCategory").text()
-                                        predavanja.predmetPredavanja = e.select(
-                                            "span.name" +
-                                                    ".normal"
-                                        ).text()
-                                        predavanja.rasponVremena = e.select("div.timespan").text()
-                                        predavanja.grupa = e.select("span.group.normal").text()
-                                        predavanja.grupaShort = e.select("span.group.short").text()
-                                        predavanja.dvorana = e.select("span.resource").text()
-                                        predavanja.detaljnoVrijeme = e.select(
-                                            "div.detailItem" +
-                                                    ".datetime"
-                                        ).text()
-                                        predavanja.profesor = e.select("div.detailItem.user").text()
+                                for (e in elements) {
+                                    val predavanja : Predavanja = Predavanja()
+                                    if (e.hasAttr("data-id")) {
+                                        predavanja.objectId = e.attr("data-id").toInt()
+                                        predavanja.id = e.attr("data-id")
                                     }
+                                    predavanja.predavanjeIme = e.select("span.groupCategory").text()
+                                    predavanja.predmetPredavanja = e.select("span.name" + ".normal").text()
+                                    predavanja.rasponVremena = e.select("div.timespan").text()
+                                    predavanja.grupa = e.select("span.group.normal").text()
+                                    predavanja.grupaShort = e.select("span.group.short").text()
+                                    predavanja.dvorana = e.select("span.resource").text()
+                                    predavanja.detaljnoVrijeme = e.select("div.detailItem" + ".datetime").text()
+                                    predavanja.profesor = e.select("div.detailItem.user").text()
+
+                                    svaFreshPredavanja.add(predavanja)
+
                                 }
+                                realm.executeTransaction { realm ->
+                                    /*if (!isPredavanjeInRealm(realm, e.attr("data-id").toInt())|| true){
+                                        realm.executeTransaction { realm -> realm.copyToRealm(predavanja)}
+                                    }*/
+                                    var svaPredavanja = realm.where(Predavanja::class.java).findAll()
+                                    for (freshpred in svaFreshPredavanja){
+                                        if (!isPredavanjeInRealm(realm, freshpred.objectId)){
+                                            realm.copyToRealm(freshpred)
+                                        }
+                                    }
+                                    for (pred in svaPredavanja){
+                                        if (!isPredFresh(pred, svaFreshPredavanja)){
+                                            pred.deleteFromRealm()
+                                        }
+                                    }
+                                    svaPredavanja = realm.where(Predavanja::class.java).findAll()
+                                }
+                            } catch (ex: Exception) {
+                                ex.printStackTrace()
                             } finally {
                                 realm.close()
-                            }
-                        }
-                        runOnUiThread {
-                            if (hf != null) {
-                                hf!!.showList()
                             }
                         }
                     } catch (e: IOException) {
@@ -300,7 +300,22 @@ class MainActivity : AppCompatActivity() {
             })
             realmLog?.close()
         }
+    fun isPredavanjeInRealm(realm: Realm, objectId: Int): Boolean {
+        val results = realm.where(Predavanja::class.java)
+            .equalTo("objectId", objectId)
+            .findAll()
+        val rezultati = realm.where(Predavanja::class.java).findAll()
 
+        return results.isNotEmpty()
+    }
+    fun isPredFresh(predavanje: Predavanja, FreshPredavanja: MutableList<Predavanja>): Boolean {
+        for (pred in FreshPredavanja){
+            if (predavanje.id == pred.id){
+                return true
+            }
+        }
+        return false
+    }
     fun invalidCreds() {
         editor = shPref!!.edit()
         editor?.putBoolean("logged_in", false)

@@ -57,8 +57,6 @@ class FESBCompanion : Application() {
             modules(module)
         }
 
-        //MobileAds.initialize(this, "ca-app-pub-5944203368510130~8955475006")
-
         //sendNotification()
     }
 
@@ -86,7 +84,7 @@ class FESBCompanion : Application() {
     }
 
     private val realmKey: ByteArray
-        private get() {
+        get() {
             Hawk.init(this).build()
             if (Hawk.contains("masterKey")) {
                 return Hawk.get("masterKey")
