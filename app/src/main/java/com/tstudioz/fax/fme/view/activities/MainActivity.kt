@@ -56,7 +56,9 @@ class MainActivity : AppCompatActivity() {
     var date: String? = null
     private var realmLog: Realm? = null
     private var client: OkHttpClient? = null
-    private var hf: HomeFragment? = null
+    val homeFragment = HomeFragment()
+    val timeTableFragment = TimeTableFragment()
+    val prisutnostFragment = PrisutnostFragment()
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
     @OptIn(InternalCoroutinesApi::class)
@@ -165,19 +167,16 @@ class MainActivity : AppCompatActivity() {
         ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
         when (pos) {
             R.id.tab_prisutnost-> {
-                val ik = PrisutnostFragment()
                 supportActionBar?.title = "Prisutnost"
-                ft.replace(R.id.frame, ik)
+                ft.replace(R.id.frame, prisutnostFragment)
             }
             R.id.tab_home -> {
-                val hf0 = HomeFragment()
                 supportActionBar?.title = "FESB Companion"
-                ft.replace(R.id.frame, hf0)
+                ft.replace(R.id.frame, homeFragment)
             }
             R.id.tab_raspored -> {
-                val lf = TimeTableFragment()
                 supportActionBar?.title = "Raspored"
-                ft.replace(R.id.frame, lf)
+                ft.replace(R.id.frame, timeTableFragment)
             }
         }
         ft.addToBackStack(null)
@@ -291,6 +290,9 @@ class MainActivity : AppCompatActivity() {
                                 ex.printStackTrace()
                             } finally {
                                 realm.close()
+                                runOnUiThread {
+                                    homeFragment.showList()
+                                }
                             }
                         }
                     } catch (e: IOException) {

@@ -82,6 +82,7 @@ class HomeFragment : Fragment() {
         loadNotes()
         loadIksicaAd()
         loadMenzaView()
+        showList()
         return binding?.root
     }
 
