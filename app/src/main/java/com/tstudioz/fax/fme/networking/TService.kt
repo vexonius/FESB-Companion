@@ -9,5 +9,5 @@ import kotlinx.coroutines.flow.Flow
  */
 interface TService {
 
-    suspend fun fetchTimeTable(userName: String, startDate: String, endDate: String): Flow<Result.TimeTableResult>
+    suspend fun fetchTimeTable(userName: String, startDate: String, endDate: String): Result.TimeTableResult
 }

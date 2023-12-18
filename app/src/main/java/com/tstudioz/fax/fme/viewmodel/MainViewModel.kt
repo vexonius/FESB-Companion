@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.models.data.Repository
 import com.tstudioz.fax.fme.database.Korisnik
+import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.models.data.TimeTableDao
 import com.tstudioz.fax.fme.models.data.User
 import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
+
 
 
 @ExperimentalCoroutinesApi
@@ -31,8 +34,8 @@ class MainViewModel : ViewModel() {
     )
 
     init {
-        loginUser(user)
-        //fetchUserTimetable()
+        //loginUser(user)
+        fetchUserTimetable()
     }
 
     private fun loginUser(user: User) {
@@ -42,19 +45,29 @@ class MainViewModel : ViewModel() {
                     Log.d("hello", result.username)
                     println("Started")
                 }
-
                 else -> println("Doslo je do pogreske")
             }
 
         }
     }
+    fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>){
+        repository.insertOrUpdateTimeTable(freshPredavanja)
+    }
 
     private fun fetchUserTimetable(){
         viewModelScope.launch(Dispatchers.IO) {
-            repository.fetchTimetable("spomenka", "2020-04-06", "2020-04-12")
-                    .onStart { println("started Fetching Timetable for user") }
-                    .catch { e -> Log.e("Error timetable", e.toString()) }
-                    .collect { list -> list.forEach { println(it.name)} }
+            try{
+                println("started Fetching Timetable for user")
+                val list = repository.fetchTimetable("spomenka", "2023-12-18", "2023-12-25")
+                if(list.isEmpty()) {
+                    println("List is empty")
+                }
+                else {
+                    list.forEach { println(it.name) }
+                }
+            }catch (e: Exception){
+                Log.e("Error timetable", e.toString())
+            }
         }
     }
 

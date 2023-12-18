@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.models.data
 
 import android.util.Log
+import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.networking.NetworkService
 import com.tstudioz.fax.fme.networking.PortalService
@@ -16,6 +17,7 @@ class Repository {
 
     private val service: PortalService by inject(PortalService::class.java)
     private val networkService: NetworkService by inject(NetworkService::class.java)
+    private val timeTableDao: TimeTableDao = TimeTableDao()
 
     suspend fun attemptLogin(user: User): User {
         when (val result = service.loginUser(user)) {
@@ -28,13 +30,19 @@ class Repository {
 
     }
 
-    suspend fun fetchTimetable(user: String, startDate: String, endDate: String): Flow<List<TimetableItem>> = flow {
-        networkService.fetchTimeTable(user, startDate, endDate).collect { result ->
-            when(result){
-                is Result.TimeTableResult.Success -> emit(parseTimetable(result.data))
-                is Result.TimeTableResult.Failure -> Log.e(TAG, "Timetable fetching error")
+    suspend fun fetchTimetable(user: String, startDate: String, endDate: String): List<TimetableItem> {
+        return when(val result = networkService.fetchTimeTable(user, startDate, endDate)){
+            is Result.TimeTableResult.Success -> parseTimetable(result.data)
+            is Result.TimeTableResult.Failure -> {
+                Log.e(TAG, "Timetable fetching error")
+                emptyList()
             }
         }
+    }
+
+    fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>) {
+        timeTableDao.insertOrUpdateTimeTable(freshPredavanja)
+
     }
 
     companion object {

@@ -13,7 +13,7 @@ class NetworkService : TService {
 
     private val client: OkHttpClient by inject(OkHttpClient::class.java)
 
-    override suspend fun fetchTimeTable(userName: String, startDate: String, endDate: String): Flow<Result.TimeTableResult> = flow {
+    override suspend fun fetchTimeTable(userName: String, startDate: String, endDate: String): Result.TimeTableResult {
         val requestUrl: String =
                 "https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + userName + "&MinDate=" + startDate + "&MaxDate=" + endDate
 
@@ -23,10 +23,9 @@ class NetworkService : TService {
 
         val response: Response = client.newCall(request).execute()
 
-        if(response.isSuccessful && response.body != null && response.code < 400)
-            emit(Result.TimeTableResult.Success(response.body!!.string()))
-
-        else emit(Result.TimeTableResult.Failure(Throwable("Failed to fetch timetable")))
+        return if(response.isSuccessful && response.body != null && response.code < 400)
+            Result.TimeTableResult.Success(response.body!!.string())
+        else Result.TimeTableResult.Failure(Throwable("Failed to fetch timetable"))
     }
 
 }

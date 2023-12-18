@@ -22,6 +22,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
@@ -30,13 +31,17 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
+import com.tstudioz.fax.fme.models.data.TimeTableDao
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.ui.mainscreen.LoginViewModel
+import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
@@ -65,6 +70,8 @@ class MainActivity : AppCompatActivity() {
     private var shPref: SharedPreferences? =  instance?.sP
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
+    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    lateinit var mainViewModel: MainViewModel
     val mainRealmConfig = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("glavni.realm")
@@ -72,6 +79,7 @@ class MainActivity : AppCompatActivity() {
         .deleteRealmIfMigrationNeeded()
         .build()
 
+    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -82,10 +90,10 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         })
+        mainViewModel = MainViewModel()
         setUpToolbar()
         getDate()
         testBottomBar()
-
 
         isThereAction
 
@@ -202,7 +210,7 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    @OptIn(InternalCoroutinesApi::class)
+    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     val mojRaspored: Unit
         get() {
             realmLog = Realm.getDefaultInstance()
@@ -267,25 +275,8 @@ class MainActivity : AppCompatActivity() {
                                     predavanja.profesor = e.select("div.detailItem.user").text()
 
                                     svaFreshPredavanja.add(predavanja)
-
                                 }
-                                realm.executeTransaction { realm ->
-                                    /*if (!isPredavanjeInRealm(realm, e.attr("data-id").toInt())|| true){
-                                        realm.executeTransaction { realm -> realm.copyToRealm(predavanja)}
-                                    }*/
-                                    var svaPredavanja = realm.where(Predavanja::class.java).findAll()
-                                    for (freshpred in svaFreshPredavanja){
-                                        if (!isPredavanjeInRealm(realm, freshpred.objectId)){
-                                            realm.copyToRealm(freshpred)
-                                        }
-                                    }
-                                    for (pred in svaPredavanja){
-                                        if (!isPredFresh(pred, svaFreshPredavanja)){
-                                            pred.deleteFromRealm()
-                                        }
-                                    }
-                                    svaPredavanja = realm.where(Predavanja::class.java).findAll()
-                                }
+                                mainViewModel.insertOrUpdateTimeTable(svaFreshPredavanja)
                             } catch (ex: Exception) {
                                 ex.printStackTrace()
                             } finally {
