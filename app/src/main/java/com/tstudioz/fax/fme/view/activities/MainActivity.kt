@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.view.activities
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Typeface
@@ -22,7 +21,6 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
@@ -31,12 +29,11 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
-import com.tstudioz.fax.fme.models.data.TimeTableDao
+import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.networking.NetworkUtils
-import com.tstudioz.fax.fme.ui.mainscreen.LoginViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -45,7 +42,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
-import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -215,6 +211,7 @@ class MainActivity : AppCompatActivity() {
         get() {
             realmLog = Realm.getDefaultInstance()
             val kor = realmLog?.where(Korisnik::class.java)?.findFirst()
+            val user = kor?.getUsername()?.let { User(it, "", "") }
 
 
             // Get calendar set to current date and time
@@ -232,8 +229,13 @@ class MainActivity : AppCompatActivity() {
             val sday: DateFormat = SimpleDateFormat("dd")
             val smonth: DateFormat = SimpleDateFormat("MM")
             val syear: DateFormat = SimpleDateFormat("yyyy")
-            client = instance?.okHttpInstance
-            val request: Request = Request.Builder()
+            val startdate = dfyear.format(c.time) + "-" + dfmonth.format(c.time) + "-" + dfday.format(c.time)
+            val enddate = syear.format(s.time) + "-" + smonth.format(s.time) + "-" + sday.format(s.time)
+            if (user != null) {
+                mainViewModel.fetchUserTimetable(user, startdate, enddate)
+            }
+            //client = instance?.okHttpInstance
+           /* val request: Request = Request.Builder()
                 .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" + "=" + kor!!.getUsername()
                         .toString() + "&MinDate=" + dfmonth.format(c.time) + "%2F" + dfday.format(c.time) + "%2F"
                         + dfyear.format(c.time) + "%2022%3A44%3A48&MaxDate=" +
@@ -248,7 +250,6 @@ class MainActivity : AppCompatActivity() {
 
                 @Throws(IOException::class)
                 override fun onResponse(call: Call, response: Response) {
-                    val realm = Realm.getInstance(mainRealmConfig)
                     try {
                         if (response.code == 500) {
                             client!!.dispatcher.cancelAll()
@@ -280,17 +281,17 @@ class MainActivity : AppCompatActivity() {
                             } catch (ex: Exception) {
                                 ex.printStackTrace()
                             } finally {
-                                realm.close()
-                                runOnUiThread {
-                                    homeFragment.showList()
-                                }
+
                             }
                         }
                     } catch (e: IOException) {
                         Log.e(ContentValues.TAG, "Exception caught: ", e)
                     }
                 }
-            })
+            })*/
+            runOnUiThread {
+                homeFragment.showList()
+            }
             realmLog?.close()
         }
     fun isPredavanjeInRealm(realm: Realm, objectId: Int): Boolean {

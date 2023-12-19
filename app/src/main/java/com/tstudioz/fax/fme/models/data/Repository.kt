@@ -42,7 +42,6 @@ class Repository {
 
     fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>) {
         timeTableDao.insertOrUpdateTimeTable(freshPredavanja)
-
     }
 
     companion object {

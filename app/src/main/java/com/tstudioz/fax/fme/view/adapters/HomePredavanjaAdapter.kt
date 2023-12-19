@@ -38,16 +38,16 @@ class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanj
         holder.type.text = predavanja?.rasponVremena
         var imePredavanja = predavanja?.predavanjeIme
         if (!imePredavanja.isNullOrEmpty()) imePredavanja =
-            imePredavanja.substring(0, imePredavanja.length - 1)
+            imePredavanja.substring(0, imePredavanja.length)
         holder.vrstaPredavanja.text = imePredavanja
         holder.mjesto.text = predavanja?.dvorana
         when (predavanja?.predavanjeIme) {
-            "Predavanja," -> holder.boja.setBackgroundResource(R.color.blue_nice)
-            "Auditorne vježbe," -> holder.boja.setBackgroundResource(R.color.green_nice)
-            "Kolokviji," -> holder.boja.setBackgroundResource(R.color.purple_nice)
-            "Laboratorijske vježbe," -> holder.boja.setBackgroundResource(R.color.red_nice)
-            "Konstrukcijske vježbe," -> holder.boja.setBackgroundResource(R.color.grey_nice)
-            "Seminar," -> holder.boja.setBackgroundResource(R.color.blue_nice)
+            "Predavanje" -> holder.boja.setBackgroundResource(R.color.blue_nice)
+            "Auditorne vježbe" -> holder.boja.setBackgroundResource(R.color.green_nice)
+            "Kolokvij" -> holder.boja.setBackgroundResource(R.color.purple_nice)
+            "Labaratorijske vježbe" -> holder.boja.setBackgroundResource(R.color.red_nice)
+            "Konstrukcijske vježbe" -> holder.boja.setBackgroundResource(R.color.grey_nice)
+            "Seminar" -> holder.boja.setBackgroundResource(R.color.blue_nice)
             "Ispiti," -> holder.boja.setBackgroundResource(R.color.purple_dark)
         }
     }

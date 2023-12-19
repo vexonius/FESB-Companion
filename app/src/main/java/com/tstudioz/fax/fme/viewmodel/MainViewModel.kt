@@ -7,6 +7,7 @@ import com.tstudioz.fax.fme.models.data.Repository
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.models.data.TimeTableDao
+import com.tstudioz.fax.fme.models.data.TimetableItem
 import com.tstudioz.fax.fme.models.data.User
 import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +36,7 @@ class MainViewModel : ViewModel() {
 
     init {
         //loginUser(user)
-        fetchUserTimetable()
+        //fetchUserTimetable(User("spomenka","",""), "2023-12-18", "2023-12-25")
     }
 
     private fun loginUser(user: User) {
@@ -54,16 +55,33 @@ class MainViewModel : ViewModel() {
         repository.insertOrUpdateTimeTable(freshPredavanja)
     }
 
-    private fun fetchUserTimetable(){
+    fun fetchUserTimetable(user: User, startDate: String, endDate: String){
         viewModelScope.launch(Dispatchers.IO) {
             try{
                 println("started Fetching Timetable for user")
-                val list = repository.fetchTimetable("spomenka", "2023-12-18", "2023-12-25")
+                val list = repository.fetchTimetable(user.username, startDate, endDate)
                 if(list.isEmpty()) {
                     println("List is empty")
                 }
                 else {
                     list.forEach { println(it.name) }
+                    val svaFreshPredavanja = mutableListOf<Predavanja>()
+                        for (l in list) {
+                            val predavanja : Predavanja = Predavanja()
+                            predavanja.objectId = l.id
+                            predavanja.id = l.id.toString()
+                            predavanja.predavanjeIme = l.eventType.type
+                            predavanja.predmetPredavanja = l.name
+                            predavanja.rasponVremena = l.timeSpan
+                            predavanja.grupa = l.group
+                            predavanja.grupaShort = l.group
+                            predavanja.dvorana = l.room
+                            predavanja.detaljnoVrijeme = l.detailDateWithDayName
+                            predavanja.profesor = l.professor
+
+                            svaFreshPredavanja.add(predavanja)
+                        }
+                        insertOrUpdateTimeTable(svaFreshPredavanja)
                 }
             }catch (e: Exception){
                 Log.e("Error timetable", e.toString())
