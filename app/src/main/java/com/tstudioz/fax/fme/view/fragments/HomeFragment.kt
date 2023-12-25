@@ -32,6 +32,7 @@ import com.tstudioz.fax.fme.view.activities.IndexActivity
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import java.io.IOException
@@ -47,7 +48,6 @@ class HomeFragment : Fragment() {
     private var mrealm: Realm? = null
     private var taskRealm: Realm? = null
     private var date: String? = null
-    private var units: String? = null
     private var snack: Snackbar? = null
 
     var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
@@ -73,12 +73,11 @@ class HomeFragment : Fragment() {
         binding = HomeTabBinding.inflate(inflater, container, false)
         homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
+        taskRealm = Realm.getInstance(realmTaskConfiguration)
         setHasOptionsMenu(true)
         setCyanStatusBarColor()
         getDate()
         start()
-
-        taskRealm = Realm.getInstance(realmTaskConfiguration)
         loadNotes()
         loadIksicaAd()
         loadMenzaView()
@@ -161,12 +160,8 @@ class HomeFragment : Fragment() {
         (activity as AppCompatActivity?)?.supportActionBar
             ?.setBackgroundDrawable(
                 ColorDrawable(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.dark_cyan
-                    )
-                )
-            )
+                    ContextCompat.getColor(requireContext(), R.color.dark_cyan)
+                ))
         requireActivity().window.statusBarColor =
             ContextCompat.getColor(requireContext(), R.color.darker_cyan)
     }

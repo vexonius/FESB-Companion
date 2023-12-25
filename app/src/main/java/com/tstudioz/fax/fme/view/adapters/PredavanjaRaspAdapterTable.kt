@@ -24,8 +24,7 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PredavanjaRaspViewHolderTable {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.table_row_item,
-                                                               parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.table_row_item, parent, false)
         return PredavanjaRaspViewHolderTable(view)
     }
 
@@ -55,6 +54,13 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
             "Konstrukcijske vježbe" -> holder.tableboja.setBackgroundResource(R.color.grey_nice)
             "Seminar" -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
             "Ispit" -> holder.tableboja.setBackgroundResource(R.color.purple_dark)
+            "Predavanja," -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
+            "Auditorne vježbe," -> holder.tableboja.setBackgroundResource(R.color.green_nice)
+            "Kolokviji," -> holder.tableboja.setBackgroundResource(R.color.purple_nice)
+            "Laboratorijske vježbe," -> holder.tableboja.setBackgroundResource(R.color.red_nice)
+            "Konstrukcijske vježbe," -> holder.tableboja.setBackgroundResource(R.color.grey_nice)
+            "Seminar," -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
+            "Ispiti," -> holder.tableboja.setBackgroundResource(R.color.purple_dark)
         }
     }
 
@@ -104,11 +110,11 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
         infoLokacija = views.findViewById<View>(R.id.text_ispod5) as TextView
 
         var imePredavanja = predavanja?.predavanjeIme
-        if (imePredavanja!= null && imePredavanja.length > 0) {
+        if (!imePredavanja.isNullOrEmpty()) {
             imePredavanja = imePredavanja.substring(0, imePredavanja.length)
         }
         var imeGrupe = predavanja?.grupa
-        if (imeGrupe!= null && imeGrupe.length > 0) {
+        if (!imeGrupe.isNullOrEmpty()) {
             imeGrupe = imeGrupe.substring(0, imeGrupe.length - 1)
         }
         infoKolegij.text = predavanja?.predmetPredavanja
@@ -126,6 +132,13 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
             "Konstrukcijske vježbe" -> infoKolegij.setBackgroundResource(R.color.grey_nice)
             "Seminar" -> infoKolegij.setBackgroundResource(R.color.blue_nice)
             "Ispit" -> infoKolegij.setBackgroundResource(R.color.purple_dark)
+            "Predavanja," -> infoKolegij.setBackgroundResource(R.color.blue_nice)
+            "Auditorne vježbe," -> infoKolegij.setBackgroundResource(R.color.green_nice)
+            "Kolokviji," -> infoKolegij.setBackgroundResource(R.color.purple_nice)
+            "Laboratorijske vježbe," -> infoKolegij.setBackgroundResource(R.color.red_nice)
+            "Konstrukcijske vježbe," -> infoKolegij.setBackgroundResource(R.color.grey_nice)
+            "Seminar," -> infoKolegij.setBackgroundResource(R.color.blue_nice)
+            "Ispiti," -> infoKolegij.setBackgroundResource(R.color.purple_dark)
         }
 
         dialog = BottomSheetDialog(context).apply {

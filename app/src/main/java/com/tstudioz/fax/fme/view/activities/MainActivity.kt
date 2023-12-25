@@ -27,31 +27,23 @@ import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
-import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
-import com.tstudioz.fax.fme.networking.NetworkUtils
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
-import okhttp3.Callback
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import org.jsoup.Jsoup
-import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
     var date: String? = null
@@ -68,25 +60,15 @@ class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     lateinit var mainViewModel: MainViewModel
-    val mainRealmConfig = RealmConfiguration.Builder()
-        .allowWritesOnUiThread(true)
-        .name("glavni.realm")
-        .schemaVersion(3)
-        .deleteRealmIfMigrationNeeded()
-        .build()
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding!!.root)
-        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // Back is pressed... Finishing the activity
-                finish()
-            }
-        })
         mainViewModel = MainViewModel()
+        setContentView(binding?.root)
+
+        onBack()
         setUpToolbar()
         getDate()
         testBottomBar()
@@ -107,6 +89,13 @@ class MainActivity : AppCompatActivity() {
                 setDefaultScreen()
             }
         }
+    fun onBack(){
+        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
+    }
 
     private fun setDefaultScreen() {
         beginFragTransaction(R.id.tab_home)
@@ -117,13 +106,13 @@ class MainActivity : AppCompatActivity() {
         if (realmLog != null) {
             var korisnik: Korisnik? = null
             try {
-                korisnik = realmLog!!.where(Korisnik::class.java).findFirst()
+                korisnik = realmLog?.where(Korisnik::class.java)?.findFirst()
             }
             catch (ex: Exception) {
                 ex.printStackTrace()
             }
             finally {
-                realmLog!!.close()
+                realmLog?.close()
             }
             if (korisnik != null) {
                 mojRaspored
@@ -132,7 +121,7 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             assert(shPref != null)
-            editor = shPref!!.edit()
+            editor = shPref?.edit()
             editor?.putBoolean("logged_in", false)
             editor?.commit()
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
@@ -143,22 +132,22 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("RestrictedApi")
     fun setUpToolbar() {
         val actionbar = supportActionBar
-        actionbar!!.setShowHideAnimationEnabled(false)
-        actionbar.elevation = 1.0f
-        actionbar.setDisplayShowHomeEnabled(false)
+        actionbar?.setShowHideAnimationEnabled(false)
+        actionbar?.elevation = 1.0f
+        actionbar?.setDisplayShowHomeEnabled(false)
     }
 
     private fun testBottomBar() {
-        val bar = binding!!.bottomBar
+        val bar = binding?.bottomBar
 
-        bar.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.attend), "Prisutnost", R.id.tab_prisutnost))
-        bar.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.command_line), "Home", R.id.tab_home))
-        bar.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.cal), "Raspored", R.id.tab_raspored))
-        bar.selectTabById(R.id.tab_home, true)
+        bar?.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.attend), "Prisutnost", R.id.tab_prisutnost))
+        bar?.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.command_line), "Home", R.id.tab_home))
+        bar?.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.cal), "Raspored", R.id.tab_raspored))
+        bar?.selectTabById(R.id.tab_home, true)
     }
 
     private fun setFragmentTabListener() {
-        binding!!.bottomBar.setOnTabSelectListener(object : AnimatedBottomBar.OnTabSelectListener {
+        binding?.bottomBar?.setOnTabSelectListener(object : AnimatedBottomBar.OnTabSelectListener {
             override fun onTabSelected(lastIndex: Int, lastTab: Tab?, newIndex: Int, newTab: Tab) {
                 beginFragTransaction(newTab.id)
             }
@@ -234,84 +223,15 @@ class MainActivity : AppCompatActivity() {
             if (user != null) {
                 mainViewModel.fetchUserTimetable(user, startdate, enddate)
             }
-            //client = instance?.okHttpInstance
-           /* val request: Request = Request.Builder()
-                .url("https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" + "=" + kor!!.getUsername()
-                        .toString() + "&MinDate=" + dfmonth.format(c.time) + "%2F" + dfday.format(c.time) + "%2F"
-                        + dfyear.format(c.time) + "%2022%3A44%3A48&MaxDate=" +
-                        smonth.format(s.time) + "%2F" + sday.format(s.time) + "%2F" + syear.format(s.time) + "%2022%3A44%3A48")
-                .get()
-                .build()
-            val call = client?.newCall(request)
-            call?.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.e(ContentValues.TAG, "Exception caught", e)
-                }
 
-                @Throws(IOException::class)
-                override fun onResponse(call: Call, response: Response) {
-                    try {
-                        if (response.code == 500) {
-                            client!!.dispatcher.cancelAll()
-                            invalidCreds()
-                        }
-                        val doc = Jsoup.parse(response.body!!.string())
-                        if (response.isSuccessful) {
-                            val elements = doc.select("div.event")
-                            val svaFreshPredavanja = mutableListOf<Predavanja>()
-                            try {
-                                for (e in elements) {
-                                    val predavanja : Predavanja = Predavanja()
-                                    if (e.hasAttr("data-id")) {
-                                        predavanja.objectId = e.attr("data-id").toInt()
-                                        predavanja.id = e.attr("data-id")
-                                    }
-                                    predavanja.predavanjeIme = e.select("span.groupCategory").text()
-                                    predavanja.predmetPredavanja = e.select("span.name" + ".normal").text()
-                                    predavanja.rasponVremena = e.select("div.timespan").text()
-                                    predavanja.grupa = e.select("span.group.normal").text()
-                                    predavanja.grupaShort = e.select("span.group.short").text()
-                                    predavanja.dvorana = e.select("span.resource").text()
-                                    predavanja.detaljnoVrijeme = e.select("div.detailItem" + ".datetime").text()
-                                    predavanja.profesor = e.select("div.detailItem.user").text()
-
-                                    svaFreshPredavanja.add(predavanja)
-                                }
-                                mainViewModel.insertOrUpdateTimeTable(svaFreshPredavanja)
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
-                            } finally {
-
-                            }
-                        }
-                    } catch (e: IOException) {
-                        Log.e(ContentValues.TAG, "Exception caught: ", e)
-                    }
-                }
-            })*/
             runOnUiThread {
                 homeFragment.showList()
             }
             realmLog?.close()
         }
-    fun isPredavanjeInRealm(realm: Realm, objectId: Int): Boolean {
-        val results = realm.where(Predavanja::class.java)
-            .equalTo("objectId", objectId)
-            .findAll()
-        val rezultati = realm.where(Predavanja::class.java).findAll()
 
-        return results.isNotEmpty()
-    }
-    fun isPredFresh(predavanje: Predavanja, FreshPredavanja: MutableList<Predavanja>): Boolean {
-        for (pred in FreshPredavanja){
-            if (predavanje.id == pred.id){
-                return true
-            }
-        }
-        return false
-    }
     fun invalidCreds() {
-        editor = shPref!!.edit()
+        editor = shPref?.edit()
         editor?.putBoolean("logged_in", false)
         editor?.apply()
         realmLog = Realm.getDefaultInstance()
@@ -335,9 +255,9 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.coordinatorLayout), "Niste povezani",
             Snackbar.LENGTH_LONG
         )
-        val vjuz = snack!!.view
-        vjuz.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.red_nice))
-        snack!!.show()
+        val vjuz = snack?.view
+        vjuz?.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.red_nice))
+        snack?.show()
     }
 
     private fun showShortcutView() {
@@ -376,17 +296,17 @@ class MainActivity : AppCompatActivity() {
         val wv = view.findViewById<View>(R.id.webvju) as WebView
         wv.loadUrl("file:///android_asset/changelog.html")
         bottomSheet = BottomSheetDialog(this)
-        bottomSheet!!.setCancelable(true)
-        bottomSheet!!.setContentView(view)
-        bottomSheet!!.setCanceledOnTouchOutside(true)
-        bottomSheet!!.show()
+        bottomSheet?.setCancelable(true)
+        bottomSheet?.setContentView(view)
+        bottomSheet?.setCanceledOnTouchOutside(true)
+        bottomSheet?.show()
     }
 
     private fun shouldShowGDPRDialog() {
-        val bool = shPref!!.getBoolean("GDPR_agreed", false)
-        if (!bool) {
+        val bool = shPref?.getBoolean("GDPR_agreed", false)
+        if (bool==false) {
             showGDPRCompliance()
-            editor = shPref!!.edit()
+            editor = shPref?.edit()
             editor?.putBoolean("GDPR_agreed", true)
             editor?.commit()
         }
@@ -409,31 +329,29 @@ class MainActivity : AppCompatActivity() {
                     builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)).build()
                 customTabsIntent.launchUrl(
                     view.context, Uri.parse(
-                        "http://tstud" +
-                                ".io/privacy"
+                        "http://tstud" + ".io/privacy"
                     )
                 )
             } catch (ex: Exception) {
                 Toast.makeText(
-                    view.context, "Ažurirajte Chrome preglednik za pregled " +
-                            "web stranice", Toast.LENGTH_SHORT
+                    view.context, "Ažurirajte Chrome preglednik za pregled " + "web stranice", Toast.LENGTH_SHORT
                 ).show()
             }
         }
         val ok = view.findViewById<View>(R.id.button_ok) as TextView
         ok.typeface = typeBold
-        ok.setOnClickListener { bottomSheet!!.dismiss() }
+        ok.setOnClickListener { bottomSheet?.dismiss() }
         bottomSheet = BottomSheetDialog(this)
-        bottomSheet!!.setCancelable(false)
-        bottomSheet!!.setContentView(view)
-        bottomSheet!!.setCanceledOnTouchOutside(false)
-        bottomSheet!!.show()
+        bottomSheet?.setCancelable(false)
+        bottomSheet?.setContentView(view)
+        bottomSheet?.setCanceledOnTouchOutside(false)
+        bottomSheet?.show()
     }
 
     public override fun onStop() {
         super.onStop()
         if (client != null) {
-            client!!.dispatcher.cancelAll()
+            client?.dispatcher?.cancelAll()
         }
     }
 
