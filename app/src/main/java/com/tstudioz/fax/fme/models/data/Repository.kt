@@ -3,20 +3,18 @@ package com.tstudioz.fax.fme.models.data
 import android.util.Log
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.models.Result
-import com.tstudioz.fax.fme.networking.NetworkService
-import com.tstudioz.fax.fme.networking.PortalService
+import com.tstudioz.fax.fme.models.services.TimetableNetworkService
+import com.tstudioz.fax.fme.models.services.UserService
 import com.tstudioz.fax.fme.models.util.parseTimetable
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import org.koin.java.KoinJavaComponent.inject
 
 
 @InternalCoroutinesApi
 class Repository {
 
-    private val service: PortalService by inject(PortalService::class.java)
-    private val networkService: NetworkService by inject(NetworkService::class.java)
+    private val service: UserService by inject(UserService::class.java)
+    private val timetableNetworkService: TimetableNetworkService by inject(TimetableNetworkService::class.java)
     private val timeTableDao: TimeTableDao = TimeTableDao()
 
     suspend fun attemptLogin(user: User): User {
@@ -27,11 +25,10 @@ class Repository {
                 return(User("","",""))
             }
         }
-
     }
 
     suspend fun fetchTimetable(user: String, startDate: String, endDate: String): List<TimetableItem> {
-        return when(val result = networkService.fetchTimeTable(user, startDate, endDate)){
+        return when(val result = timetableNetworkService.fetchTimeTable(user, startDate, endDate)){
             is Result.TimeTableResult.Success -> parseTimetable(result.data)
             is Result.TimeTableResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")

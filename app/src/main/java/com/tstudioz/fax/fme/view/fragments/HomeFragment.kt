@@ -27,12 +27,11 @@ import com.tstudioz.fax.fme.database.LeanTask
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.HomeTabBinding
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.activities.IndexActivity
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import java.io.IOException

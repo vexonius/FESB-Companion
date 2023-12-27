@@ -4,7 +4,7 @@ import com.tstudioz.fax.fme.models.WeatherResult
 import com.tstudioz.fax.fme.weather.Current
 
 
-interface INetworkService {
+interface WeatherNetworkInterface {
     fun getDayWeatherDetails() : WeatherResult<Current>
     fun getWeekWeatherDetails() : WeatherResult<List<Current>>
 }

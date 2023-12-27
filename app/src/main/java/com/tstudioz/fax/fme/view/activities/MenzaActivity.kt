@@ -14,7 +14,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.adapters.MeniesAdapter
 import com.tstudioz.fax.fme.database.Meni
 import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.random.NetworkUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi

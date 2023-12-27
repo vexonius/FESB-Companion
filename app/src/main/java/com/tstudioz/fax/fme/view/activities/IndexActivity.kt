@@ -16,7 +16,7 @@ class IndexActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityIndexBinding.inflate(layoutInflater)
-        setContentView(binding!!.root)
+        setContentView(binding?.root)
 
         val entry = RadarEntry(5f, 0)
         val entry4 = RadarEntry(3f, 1)
@@ -61,24 +61,24 @@ class IndexActivity : AppCompatActivity() {
         data.setValueTextColor(ContextCompat.getColor(baseContext, R.color.white))
         data.labels = labels
         data.setValueTextSize(14f)
-        binding!!.radarChart.data = data
-        binding!!.radarChart.setDrawWeb(true)
-        binding!!.radarChart.webColor = ContextCompat.getColor(baseContext, R.color.white)
-        binding!!.radarChart.webColorInner = ContextCompat.getColor(
+        binding?.radarChart?.data = data
+        binding?.radarChart?.setDrawWeb(true)
+        binding?.radarChart?.webColor = ContextCompat.getColor(baseContext, R.color.white)
+        binding?.radarChart?.webColorInner = ContextCompat.getColor(
             baseContext,
             R.color.white
         )
-        binding!!.radarChart.yAxis.axisMinimum = 0f
-        binding!!.radarChart.yAxis.axisMaximum = 5f
-        binding!!.radarChart.yAxis.setDrawLabels(false)
-        binding!!.radarChart.yAxis.setDrawTopYLabelEntry(true)
-        binding!!.radarChart.legend.isEnabled = false
-        binding!!.radarChart.description.isEnabled = false
-        binding!!.radarChart.animateXY(
+        binding?.radarChart?.yAxis?.axisMinimum = 0f
+        binding?.radarChart?.yAxis?.axisMaximum = 5f
+        binding?.radarChart?.yAxis?.setDrawLabels(false)
+        binding?.radarChart?.yAxis?.setDrawTopYLabelEntry(true)
+        binding?.radarChart?.legend?.isEnabled = false
+        binding?.radarChart?.description?.isEnabled = false
+        binding?.radarChart?.animateXY(
             1400, 1400,
             Easing.EasingOption.EaseInOutQuad,
             Easing.EasingOption.EaseInOutQuad
         )
-        binding!!.radarChart.invalidate()
+        binding?.radarChart?.invalidate()
     }
 }

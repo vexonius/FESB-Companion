@@ -29,7 +29,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
@@ -45,23 +45,22 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
     var date: String? = null
     private var realmLog: Realm? = null
     private var client: OkHttpClient? = null
-    val homeFragment = HomeFragment()
-    val timeTableFragment = TimeTableFragment()
-    val prisutnostFragment = PrisutnostFragment()
+    private val homeFragment = HomeFragment()
+    private val timeTableFragment = TimeTableFragment()
+    private val prisutnostFragment = PrisutnostFragment()
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
-    @OptIn(InternalCoroutinesApi::class)
     private var shPref: SharedPreferences? =  instance?.sP
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
-    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-    lateinit var mainViewModel: MainViewModel
+    private lateinit var mainViewModel: MainViewModel
 
-    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -71,25 +70,24 @@ class MainActivity : AppCompatActivity() {
         onBack()
         setUpToolbar()
         getDate()
+        setFragmentTabListener()
         testBottomBar()
 
-        isThereAction
+        isThereAction()
 
-        setFragmentTabListener()
         checkUser()
         checkVersion()
         shouldShowGDPRDialog()
     }
 
-    private val isThereAction: Unit
-        get() {
+    private fun isThereAction() {
             if (intent.action != null) {
                 showShortcutView()
             } else {
                 setDefaultScreen()
             }
         }
-    fun onBack(){
+    private fun onBack(){
         onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
@@ -102,31 +100,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkUser() {
+        var korisnik: Korisnik? = null
         realmLog = Realm.getDefaultInstance()
+        assert(shPref != null)
+        editor = shPref?.edit()
+
         if (realmLog != null) {
-            var korisnik: Korisnik? = null
             try {
                 korisnik = realmLog?.where(Korisnik::class.java)?.findFirst()
             }
-            catch (ex: Exception) {
-                ex.printStackTrace()
-            }
+            catch (ex: Exception) { ex.printStackTrace() }
             finally {
                 realmLog?.close()
-            }
-            if (korisnik != null) {
-                mojRaspored
-            } else {
-                invalidCreds()
+                if (korisnik != null) {
+                    editor?.putString("username", korisnik.getUsername())
+                    mojRaspored()
+                } else { invalidCreds() }
             }
         } else {
-            assert(shPref != null)
-            editor = shPref?.edit()
             editor?.putBoolean("logged_in", false)
-            editor?.commit()
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this@MainActivity, LoginActivity::class.java))
         }
+        editor?.commit()
     }
 
     @SuppressLint("RestrictedApi")
@@ -187,7 +183,7 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
             R.id.refresMe -> if (NetworkUtils.isNetworkAvailable(this)) {
-                mojRaspored
+                mojRaspored()
             } else {
                 showSnacOffline()
             }
@@ -195,48 +191,38 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-    val mojRaspored: Unit
-        get() {
-            realmLog = Realm.getDefaultInstance()
-            val kor = realmLog?.where(Korisnik::class.java)?.findFirst()
-            val user = kor?.getUsername()?.let { User(it, "", "") }
 
+    private fun mojRaspored(){
+        val user = shPref?.getString("username", "")?.let { User(it, "", "") }
 
-            // Get calendar set to current date and time
-            val c = Calendar.getInstance()
-            val s = Calendar.getInstance()
+        // Get calendar set to current date and time
+        val calendar = Calendar.getInstance()
 
-            // Set the calendar to monday of the current week
-            c[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
-            val dfday: DateFormat = SimpleDateFormat("dd")
-            val dfmonth: DateFormat = SimpleDateFormat("MM")
-            val dfyear: DateFormat = SimpleDateFormat("yyyy")
+        // Set the calendar to Monday of the current week
+        calendar[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
+        val df: DateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val startdate = df.format(calendar.time)
 
-            // Set the calendar to Saturday of the current week
-            s[Calendar.DAY_OF_WEEK] = Calendar.SATURDAY
-            val sday: DateFormat = SimpleDateFormat("dd")
-            val smonth: DateFormat = SimpleDateFormat("MM")
-            val syear: DateFormat = SimpleDateFormat("yyyy")
-            val startdate = dfyear.format(c.time) + "-" + dfmonth.format(c.time) + "-" + dfday.format(c.time)
-            val enddate = syear.format(s.time) + "-" + smonth.format(s.time) + "-" + sday.format(s.time)
-            if (user != null) {
-                mainViewModel.fetchUserTimetable(user, startdate, enddate)
-            }
+        // Set the calendar to Saturday of the current week
+        calendar.add(Calendar.DAY_OF_WEEK, Calendar.SATURDAY - Calendar.MONDAY)
+        val enddate = df.format(calendar.time)
 
+        if (user != null) {
+            mainViewModel.fetchUserTimetable(user, startdate, enddate)
+        }
             runOnUiThread {
                 homeFragment.showList()
             }
-            realmLog?.close()
         }
 
-    fun invalidCreds() {
+    private fun invalidCreds() {
         editor = shPref?.edit()
         editor?.putBoolean("logged_in", false)
         editor?.apply()
+
         realmLog = Realm.getDefaultInstance()
         try {
-            realmLog?.executeTransaction(Realm.Transaction { realmLog?.deleteAll() })
+            realmLog?.executeTransaction { realmLog?.deleteAll() }
         } catch (ex: RealmException) {
             Log.e("MainActivity", ex.toString())
         } finally {
@@ -250,7 +236,7 @@ class MainActivity : AppCompatActivity() {
         date = df.format(Calendar.getInstance().time)
     }
 
-    fun showSnacOffline() {
+    private fun showSnacOffline() {
         snack = Snackbar.make(
             findViewById(R.id.coordinatorLayout), "Niste povezani",
             Snackbar.LENGTH_LONG
@@ -262,6 +248,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showShortcutView() {
         var shortPosition = 0
+
         if (intent.action == "podsjetnik") {
             val newIntent = Intent(this@MainActivity, NoteActivity::class.java)
             newIntent.putExtra("mode", 2)
@@ -285,16 +272,15 @@ class MainActivity : AppCompatActivity() {
             editor = shPref?.edit()
             editor?.putInt("version_number", trenutnaVerzija)
             editor?.commit()
-        } else {
-            return
         }
     }
 
     private fun showChangelog() {
-        val view =
-            LayoutInflater.from(this).inflate(R.layout.licence_view, null) as NestedScrollView
+        val view = LayoutInflater.from(this).inflate(R.layout.licence_view, null) as NestedScrollView
         val wv = view.findViewById<View>(R.id.webvju) as WebView
+
         wv.loadUrl("file:///android_asset/changelog.html")
+
         bottomSheet = BottomSheetDialog(this)
         bottomSheet?.setCancelable(true)
         bottomSheet?.setContentView(view)
@@ -317,11 +303,15 @@ class MainActivity : AppCompatActivity() {
         val heading = view.findViewById<View>(R.id.terms_heading) as TextView
         val desc = view.findViewById<View>(R.id.terms_text) as TextView
         val typeBold = Typeface.createFromAsset(assets, "fonts/OpenSans-Bold.ttf")
-        heading.typeface = typeBold
         val typeRegular = Typeface.createFromAsset(assets, "fonts/OpenSans-Regular.ttf")
-        desc.typeface = typeRegular
         val more = view.findViewById<View>(R.id.button_more) as TextView
+        val ok = view.findViewById<View>(R.id.button_ok) as TextView
+
+        heading.typeface = typeBold
+        desc.typeface = typeRegular
         more.typeface = typeBold
+        ok.typeface = typeBold
+
         more.setOnClickListener { view ->
             try {
                 val builder = CustomTabsIntent.Builder()
@@ -338,8 +328,7 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         }
-        val ok = view.findViewById<View>(R.id.button_ok) as TextView
-        ok.typeface = typeBold
+
         ok.setOnClickListener { bottomSheet?.dismiss() }
         bottomSheet = BottomSheetDialog(this)
         bottomSheet?.setCancelable(false)

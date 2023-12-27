@@ -5,8 +5,8 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.models.data.Repository
-import com.tstudioz.fax.fme.networking.NetworkService
-import com.tstudioz.fax.fme.networking.PortalService
+import com.tstudioz.fax.fme.models.services.TimetableNetworkService
+import com.tstudioz.fax.fme.models.services.UserService
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit
 @InternalCoroutinesApi
 val module = module {
     single { Repository() }
-    single { PortalService() }
-    single { NetworkService() }
+    single { UserService() }
+    single { TimetableNetworkService() }
     single { provideOkHttpClient(androidContext()) }
     viewModel { MainViewModel() }
 }

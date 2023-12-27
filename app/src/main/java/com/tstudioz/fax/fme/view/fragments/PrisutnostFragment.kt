@@ -20,7 +20,7 @@ import com.tstudioz.fax.fme.view.adapters.DolasciAdapter
 import com.tstudioz.fax.fme.database.Dolazak
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.random.NetworkUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmResults

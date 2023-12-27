@@ -1,15 +1,14 @@
-package com.tstudioz.fax.fme.networking
+package com.tstudioz.fax.fme.models.services
 
 import com.tstudioz.fax.fme.models.Result
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import com.tstudioz.fax.fme.models.interfaces.TimetableInterface
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.koin.java.KoinJavaComponent.inject
 
 
-class NetworkService : TService {
+class TimetableNetworkService : TimetableInterface {
 
     private val client: OkHttpClient by inject(OkHttpClient::class.java)
 

@@ -1,8 +1,8 @@
-package com.tstudioz.fax.fme.networking
+package com.tstudioz.fax.fme.models.services
 
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.models.interfaces.FService
+import com.tstudioz.fax.fme.models.interfaces.UserInterface
 import kotlinx.coroutines.flow.Flow
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
@@ -10,11 +10,12 @@ import okhttp3.Request
 import org.koin.java.KoinJavaComponent.inject
 
 
-class PortalService : FService {
+class UserService : UserInterface {
 
     private val client: OkHttpClient by inject(OkHttpClient::class.java)
 
-    override suspend fun loginUser(user: User): Result.LoginResult {        val requestBody = FormBody.Builder()
+    override suspend fun loginUser(user: User): Result.LoginResult {
+        val requestBody = FormBody.Builder()
                 .add("Username", user.username)
                 .add("Password", user.password)
                 .add("IsRememberMeChecked", "true")
@@ -23,7 +24,7 @@ class PortalService : FService {
         val request = Request.Builder()
                 .url("https://korisnik.fesb.unist.hr/prijava")
                 .post(requestBody)
-                .build();
+                .build()
 
         val response = client.newCall(request).execute()
 

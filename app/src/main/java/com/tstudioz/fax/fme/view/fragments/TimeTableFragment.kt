@@ -20,7 +20,7 @@ import com.tstudioz.fax.fme.view.adapters.PredavanjaRaspAdapterTable
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.TimetableTabBinding
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.random.NetworkUtils
 import io.realm.Case
 import io.realm.Realm
 import io.realm.RealmConfiguration

@@ -5,7 +5,7 @@ import com.tstudioz.fax.fme.models.data.User
 import kotlinx.coroutines.flow.Flow
 
 
-interface FService {
+interface UserInterface {
 
 
     suspend fun loginUser(user: User): Result.LoginResult

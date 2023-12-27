@@ -1,13 +1,12 @@
-package com.tstudioz.fax.fme.networking
+package com.tstudioz.fax.fme.models.interfaces
 
 import com.tstudioz.fax.fme.models.Result
-import kotlinx.coroutines.flow.Flow
 
 
 /**
  * Created by etino7 on 3.4.2020..
  */
-interface TService {
+interface TimetableInterface {
 
     suspend fun fetchTimeTable(userName: String, startDate: String, endDate: String): Result.TimeTableResult
 }

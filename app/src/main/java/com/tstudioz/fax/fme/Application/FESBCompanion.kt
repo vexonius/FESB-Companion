@@ -1,20 +1,15 @@
 package com.tstudioz.fax.fme.Application
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
-import androidx.core.app.NotificationCompat
 import androidx.multidex.MultiDex
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.orhanobut.hawk.Hawk
-import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.models.di.module
 import com.tstudioz.fax.fme.migrations.CredMigration
+import com.tstudioz.fax.fme.models.di.module
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -31,7 +26,7 @@ import java.security.SecureRandom
 @InternalCoroutinesApi
 class FESBCompanion : Application() {
 
-    var CredRealmCf: RealmConfiguration? = null
+    private var CredRealmCf: RealmConfiguration? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -48,7 +43,7 @@ class FESBCompanion : Application() {
                 .encryptionKey(realmKey)
                 .build()
 
-        Realm.setDefaultConfiguration(CredRealmCf)
+        CredRealmCf?.let { Realm.setDefaultConfiguration(it) }
         checkOldVersion()
 
         startKoin {
@@ -65,10 +60,9 @@ class FESBCompanion : Application() {
         MultiDex.install(this)
     }
 
-    fun checkOldVersion() {
-        val newRealmFile = File(CredRealmCf!!.path)
-        val bb = !newRealmFile.exists()
-        if (!newRealmFile.exists()) {
+    private fun checkOldVersion() {
+        val newRealmFile = CredRealmCf?.path?.let { File(it) }
+        if (newRealmFile?.exists() == false) {
             // Migrate old Realm and delete old
             val old = RealmConfiguration.Builder()
                     .allowWritesOnUiThread(true)

@@ -15,8 +15,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.databinding.ActivityLoginBinding
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.networking.NetworkUtils
-import com.tstudioz.fax.fme.ui.mainscreen.LoginViewModel
+import com.tstudioz.fax.fme.random.NetworkUtils
+import com.tstudioz.fax.fme.random.mainscreen.LoginViewModel
 import com.tstudioz.fax.fme.models.util.CircularAnim
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,13 +24,12 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
 
+@OptIn(InternalCoroutinesApi::class)
 class LoginActivity : AppCompatActivity() {
     private var snack: Snackbar? = null
     private lateinit var binding: ActivityLoginBinding
-    @OptIn(InternalCoroutinesApi::class)
     lateinit var loginViewModel: LoginViewModel
 
-    @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -41,6 +40,10 @@ class LoginActivity : AppCompatActivity() {
         isUserLoggedIn
         loadBlueButton()
         helpListener()
+        onBackListen()
+        activateLoggedInListener(view)
+    }
+    private fun onBackListen(){
         onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val a = Intent(Intent.ACTION_MAIN)
@@ -49,10 +52,8 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(a)
             }
         })
-        activateLoggedInListener(view)
-
     }
-    @OptIn(InternalCoroutinesApi::class)
+
     private fun activateLoggedInListener(view: View){
         loginViewModel.loggedIn.observe(this) { loggedIn ->
             if (loggedIn) {
@@ -87,7 +88,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-    @OptIn(InternalCoroutinesApi::class)
     private fun loadBlueButton() {
         binding.loginButton.setOnClickListener { view ->
             if (NetworkUtils.isNetworkAvailable(this@LoginActivity)) {
@@ -118,14 +118,14 @@ class LoginActivity : AppCompatActivity() {
 
     private fun helpMe() {
         val dialog = Dialog(this)
-        dialog.window!!.requestFeature(Window.FEATURE_NO_TITLE)
+        dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.help_layout)
         dialog.setTitle("Pomoć")
         dialog.show()
     }
 
     fun showErrorSnack(message: String?) {
-        snack = Snackbar.make(binding.root, message!!, Snackbar.LENGTH_SHORT)
+        snack = message?.let { Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT) }
         val snackBarView2 = snack?.view
         snackBarView2?.setBackgroundColor(
             ContextCompat.getColor(

@@ -6,7 +6,7 @@ import org.junit.Test
 /**
  * Created by etino7 on 29.3.2020..
  */
-class PortalServiceTest {
+class UserServiceTest {
 
     @Before
     fun setUp() {
