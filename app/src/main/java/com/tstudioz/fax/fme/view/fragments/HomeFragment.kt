@@ -39,30 +39,29 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
+@OptIn(InternalCoroutinesApi::class)
 class HomeFragment : Fragment() {
     private var binding: HomeTabBinding? = null
     private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
-    @OptIn(InternalCoroutinesApi::class)
-    lateinit var homeViewModel: HomeViewModel
+    private lateinit var homeViewModel: HomeViewModel
     private var mrealm: Realm? = null
     private var taskRealm: Realm? = null
     private var date: String? = null
     private var snack: Snackbar? = null
 
-    var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
+    private var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("tasks.realm")
         .deleteRealmIfMigrationNeeded()
         .schemaVersion(1)
         .build()
-    val mainRealmConfig: RealmConfiguration = RealmConfiguration.Builder()
+    private val mainRealmConfig: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("glavni.realm")
         .schemaVersion(3)
         .deleteRealmIfMigrationNeeded()
         .build()
 
-    @OptIn(InternalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): CoordinatorLayout?
@@ -95,7 +94,6 @@ class HomeFragment : Fragment() {
         date = df.format(Calendar.getInstance().time)
     }
 
-    @OptIn(InternalCoroutinesApi::class)
     @Throws(IOException::class, JSONException::class)
     private fun start() {
         try {
@@ -118,7 +116,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @OptIn(InternalCoroutinesApi::class)
     private fun updateDisplay() {
         val current = homeViewModel.mForecast?.current
         val pTemperatura = current?.temperature.toString() + "°"
@@ -212,7 +209,7 @@ class HomeFragment : Fragment() {
         snack?.show()
     }
 
-    fun alertUserAboutError() {
+    private fun alertUserAboutError() {
         snack = Snackbar.make(
             requireActivity().findViewById(R.id.coordinatorLayout),
             "Došlo je do pogreške pri dohvaćanju prognoze",

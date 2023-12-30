@@ -111,11 +111,11 @@ class MainActivity : AppCompatActivity() {
             }
             catch (ex: Exception) { ex.printStackTrace() }
             finally {
-                realmLog?.close()
                 if (korisnik != null) {
                     editor?.putString("username", korisnik.getUsername())
                     mojRaspored()
                 } else { invalidCreds() }
+                realmLog?.close()
             }
         } else {
             editor?.putBoolean("logged_in", false)

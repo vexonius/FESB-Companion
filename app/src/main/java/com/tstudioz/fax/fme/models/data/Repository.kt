@@ -18,11 +18,11 @@ class Repository {
     private val timeTableDao: TimeTableDao = TimeTableDao()
 
     suspend fun attemptLogin(user: User): User {
-        when (val result = service.loginUser(user)) {
-            is Result.LoginResult.Success -> return(result.data)
+        return when (val result = service.loginUser(user)) {
+            is Result.LoginResult.Success -> (result.data)
             is Result.LoginResult.Failure -> {
                 Log.d(TAG, "Doslo je do pogreske")
-                return(User("","",""))
+                (User("","",""))
             }
         }
     }

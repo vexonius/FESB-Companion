@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.R
@@ -31,14 +32,17 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.note_layout)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         et = findViewById<View>(R.id.textEditor) as EditText
+
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
         if (intent.extras!!.getInt("mode") == 1) {
             mTaskId = intent.extras!!.getString("task_key")
         }
+
         tRealm = Realm.getInstance(realmTaskConfiguration)
         tRealm.use { tRealm ->
             if (mTaskId != null) {
@@ -46,8 +50,14 @@ class NoteActivity : AppCompatActivity() {
                 et!!.setText(leanTask?.getTaskTekst())
             }
         }
+        saveNoteListener()
+    }
 
-        //  loadAdsInTaskView();
+    private fun saveNoteListener() {
+        val button : Button =  findViewById(R.id.saveButton)
+        button.setOnClickListener {
+            finish()
+        }
     }
 
     override fun onPause() {
@@ -84,23 +94,21 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            android.R.id.home -> {
-                // Handle the "Up" button press
-                finish() // Or navigate to the parent activity
+            R.id.home -> {
+                finish()
                 true
             }
             R.id.delete -> {
                 et!!.setText("")
                 finish()
-                return true
+                true
             }
-            // Add other cases if you have additional menu items
+            R.id.saveButton -> {
+                finish()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    override fun onBackPressed() {
-        finish()
     }
 
 }

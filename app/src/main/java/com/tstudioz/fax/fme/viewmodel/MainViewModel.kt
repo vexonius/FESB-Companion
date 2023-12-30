@@ -4,17 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.models.data.Repository
-import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
-import com.tstudioz.fax.fme.models.data.TimeTableDao
-import com.tstudioz.fax.fme.models.data.TimetableItem
 import com.tstudioz.fax.fme.models.data.User
-import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 
@@ -25,19 +19,6 @@ import org.koin.java.KoinJavaComponent.inject
 class MainViewModel : ViewModel() {
 
     private val repository: Repository by inject(Repository::class.java)
-    val realmLog = Realm.getDefaultInstance()
-    val kor = realmLog?.where(Korisnik::class.java)?.findFirst()
-    private val user = User(
-        kor?.getUsername()
-            .toString(), kor?.getUsername()
-            .toString(), kor?.getUsername()
-            .toString() + "@fesb.hr"
-    )
-
-    init {
-        //loginUser(user)
-        //fetchUserTimetable(User("spomenka","",""), "2023-12-18", "2023-12-25")
-    }
 
     private fun loginUser(user: User) {
         viewModelScope.launch {
@@ -51,7 +32,7 @@ class MainViewModel : ViewModel() {
 
         }
     }
-    fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>){
+    private fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>){
         repository.insertOrUpdateTimeTable(freshPredavanja)
     }
 
@@ -67,7 +48,7 @@ class MainViewModel : ViewModel() {
                     list.forEach { println(it.name) }
                     val svaFreshPredavanja = mutableListOf<Predavanja>()
                         for (l in list) {
-                            val predavanja : Predavanja = Predavanja()
+                            val predavanja = Predavanja()
                             predavanja.objectId = l.id
                             predavanja.id = l.id.toString()
                             predavanja.predavanjeIme = l.eventType.type

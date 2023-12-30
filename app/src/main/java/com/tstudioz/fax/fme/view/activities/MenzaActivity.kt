@@ -26,18 +26,19 @@ import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 
+@OptIn(InternalCoroutinesApi::class)
 class MenzaActivity : AppCompatActivity() {
-    var menzaRealmConf = RealmConfiguration.Builder()
-        .allowWritesOnUiThread(true)
-        .name("menza.realm")
-        .schemaVersion(1)
-        .deleteRealmIfMigrationNeeded()
-        .build()
     private var mRealm: Realm? = null
     private var nRealm: Realm? = null
     private var snack: Snackbar? = null
     private var okHttpClient: OkHttpClient? = null
     private var binding: ActivityMenzaBinding? = null
+    private var menzaRealmConf: RealmConfiguration = RealmConfiguration.Builder()
+        .allowWritesOnUiThread(true)
+        .name("menza.realm")
+        .schemaVersion(1)
+        .deleteRealmIfMigrationNeeded()
+        .build()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMenzaBinding.inflate(layoutInflater)
@@ -61,8 +62,7 @@ class MenzaActivity : AppCompatActivity() {
         }
     }
 
-    @OptIn(InternalCoroutinesApi::class)
-    fun startParsing() {
+    private fun startParsing() {
         okHttpClient = instance?.okHttpInstance
         val request: Request = Request.Builder()
             .url("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
@@ -80,7 +80,7 @@ class MenzaActivity : AppCompatActivity() {
     }
     fun parsePage(json:String?){
         mRealm = Realm.getInstance(menzaRealmConf)
-        mRealm?.executeTransaction(Realm.Transaction { mRealm?.deleteAll() })
+        mRealm?.executeTransaction { mRealm?.deleteAll() }
         try {
             val jsonResponse = json?.let { JSONObject(it) }
             val array = jsonResponse?.getJSONArray("values")
@@ -96,7 +96,7 @@ class MenzaActivity : AppCompatActivity() {
                     meni.jelo4 = itemsArray?.getString(5)
                     meni.desert = itemsArray?.getString(6)
                     meni.cijena = itemsArray?.getString(7) + " eur"
-                    mRealm?.executeTransaction(Realm.Transaction { mRealm?.copyToRealm(meni) })
+                    mRealm?.executeTransaction { mRealm?.copyToRealm(meni) }
                 } catch (ex: Exception) {
                     Log.d("Menza activity", ex.toString())
                 }
@@ -127,7 +127,7 @@ class MenzaActivity : AppCompatActivity() {
         }
     }
 
-    fun showMenies() {
+    private fun showMenies() {
         nRealm = Realm.getInstance(menzaRealmConf)
         val results = nRealm?.where(Meni::class.java)?.findAll()
         if ((results?.isEmpty()) != null) {
@@ -141,14 +141,14 @@ class MenzaActivity : AppCompatActivity() {
         }
     }
 
-    fun setTextTypeface() {
+    private fun setTextTypeface() {
         val typeBold = Typeface.createFromAsset(assets, "fonts/OpenSans-Bold.ttf")
         val regular = Typeface.createFromAsset(assets, "fonts/OpenSans-Regular.ttf")
         binding?.menzaTitle?.typeface = typeBold
         binding?.cookieHeaderText?.typeface = regular
     }
 
-    fun showSnacOffline() {
+    private fun showSnacOffline() {
         snack = Snackbar.make(
             findViewById(R.id.menza_root), "Niste povezani",
             Snackbar.LENGTH_INDEFINITE

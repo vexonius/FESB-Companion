@@ -13,8 +13,7 @@ class TimetableNetworkService : TimetableInterface {
     private val client: OkHttpClient by inject(OkHttpClient::class.java)
 
     override suspend fun fetchTimeTable(userName: String, startDate: String, endDate: String): Result.TimeTableResult {
-        val requestUrl: String =
-                "https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=" + userName + "&MinDate=" + startDate + "&MaxDate=" + endDate
+        val requestUrl = "https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId=$userName&MinDate=$startDate&MaxDate=$endDate"
 
         val request = Request.Builder()
                 .url(requestUrl)
