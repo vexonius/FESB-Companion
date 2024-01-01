@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.models
 
+import com.tstudioz.fax.fme.database.Dolazak
 import com.tstudioz.fax.fme.models.data.User
 
 
@@ -20,7 +21,7 @@ sealed class Result {
         class Failure(throwable: Throwable) : TimeTableResult()
     }
     sealed class PrisutnostResult: Result(){
-        class Success(val bu: Boolean) : PrisutnostResult()
+        class Success(val pris: List<Dolazak>) : PrisutnostResult()
         class Failure(throwable: Throwable) : PrisutnostResult()
     }
 

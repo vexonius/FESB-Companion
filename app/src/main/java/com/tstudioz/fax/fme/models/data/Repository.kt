@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.models.data
 
 import android.util.Log
+import com.tstudioz.fax.fme.database.Dolazak
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.services.PrisutnostService
@@ -18,6 +19,7 @@ class Repository {
     private val timetableNetworkService: TimetableNetworkService by inject(TimetableNetworkService::class.java)
     private val prisutnostService = PrisutnostService()
     private val timeTableDao: TimeTableDao = TimeTableDao()
+    private val prisutnostDao: PrisutnostDao = PrisutnostDao()
 
     suspend fun attemptLogin(user: User): User {
         return when (val result = service.loginUser(user)) {
@@ -40,14 +42,14 @@ class Repository {
     }
 
     suspend fun fetchPrisutnost(): Result.PrisutnostResult {
-        return when (prisutnostService.fetchPrisutnost()){
-            is Result.PrisutnostResult.Success -> Result.PrisutnostResult.Success(true)
-            is Result.PrisutnostResult.Failure -> Result.PrisutnostResult.Failure(Throwable())
-        }
+        return prisutnostService.fetchPrisutnost()
     }
 
     fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>) {
         timeTableDao.insertOrUpdateTimeTable(freshPredavanja)
+    }
+    fun insertOrUpdatePrisutnost(freshPris: List<Dolazak>) {
+        prisutnostDao.insertOrUpdatePrisutnost(freshPris)
     }
 
     companion object {

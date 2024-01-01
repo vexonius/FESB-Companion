@@ -1,18 +1,13 @@
 package com.tstudioz.fax.fme.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.database.Dolazak
 import com.tstudioz.fax.fme.models.data.Repository
-import com.tstudioz.fax.fme.database.Predavanja
-import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.Result
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 
 
@@ -28,9 +23,9 @@ class PrisutnostViewModel : ViewModel() {
         get() = _gotPri
 
     suspend fun fetchPrisutnost() {
-        val v = repository.fetchPrisutnost()
-        when (v){
+        when (val dolazci = repository.fetchPrisutnost()){
             is Result.PrisutnostResult.Success -> {
+                insertOrUpdatePrisutnost(dolazci.pris)
                 _gotPri.postValue(true)
             }
             is Result.PrisutnostResult.Failure -> {
@@ -38,6 +33,9 @@ class PrisutnostViewModel : ViewModel() {
             }
         }
 
+    }
+    private fun insertOrUpdatePrisutnost(freshPris: List<Dolazak>){
+        repository.insertOrUpdatePrisutnost(freshPris)
     }
 
 }
