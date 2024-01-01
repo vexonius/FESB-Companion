@@ -19,5 +19,9 @@ sealed class Result {
         data class Success(val data: String) : TimeTableResult()
         class Failure(throwable: Throwable) : TimeTableResult()
     }
+    sealed class PrisutnostResult: Result(){
+        class Success(val bu: Boolean) : PrisutnostResult()
+        class Failure(throwable: Throwable) : PrisutnostResult()
+    }
 
 }

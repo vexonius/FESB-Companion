@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.models.data
 import android.util.Log
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.services.PrisutnostService
 import com.tstudioz.fax.fme.models.services.TimetableNetworkService
 import com.tstudioz.fax.fme.models.services.UserService
 import com.tstudioz.fax.fme.models.util.parseTimetable
@@ -15,6 +16,7 @@ class Repository {
 
     private val service: UserService by inject(UserService::class.java)
     private val timetableNetworkService: TimetableNetworkService by inject(TimetableNetworkService::class.java)
+    private val prisutnostService = PrisutnostService()
     private val timeTableDao: TimeTableDao = TimeTableDao()
 
     suspend fun attemptLogin(user: User): User {
@@ -34,6 +36,13 @@ class Repository {
                 Log.e(TAG, "Timetable fetching error")
                 emptyList()
             }
+        }
+    }
+
+    suspend fun fetchPrisutnost(): Result.PrisutnostResult {
+        return when (prisutnostService.fetchPrisutnost()){
+            is Result.PrisutnostResult.Success -> Result.PrisutnostResult.Success(true)
+            is Result.PrisutnostResult.Failure -> Result.PrisutnostResult.Failure(Throwable())
         }
     }
 

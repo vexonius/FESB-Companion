@@ -5,6 +5,7 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.models.data.Repository
+import com.tstudioz.fax.fme.models.services.PrisutnostService
 import com.tstudioz.fax.fme.models.services.TimetableNetworkService
 import com.tstudioz.fax.fme.models.services.UserService
 import com.tstudioz.fax.fme.viewmodel.MainViewModel

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
@@ -21,10 +22,15 @@ import com.tstudioz.fax.fme.database.Dolazak
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
 import com.tstudioz.fax.fme.random.NetworkUtils
+import com.tstudioz.fax.fme.viewmodel.PrisutnostViewModel
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmResults
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.CookieJar
@@ -38,6 +44,7 @@ import java.io.IOException
 import java.util.StringTokenizer
 import java.util.UUID
 
+@OptIn(InternalCoroutinesApi::class)
 class PrisutnostFragment : Fragment() {
     var realmConfig: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
@@ -54,276 +61,62 @@ class PrisutnostFragment : Fragment() {
     private var wRealm: Realm? = null
     private var okHttpClient: OkHttpClient? = null
     private var binding: PrisutnostTabBinding? = null
+    private lateinit var prisutnostviewmodel : PrisutnostViewModel
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         setHasOptionsMenu(true)
         binding = PrisutnostTabBinding.inflate(inflater, container, false)
+        prisutnostviewmodel = PrisutnostViewModel()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         hideRecyc()
         startFetching()
         return binding!!.root
     }
 
-    @OptIn(InternalCoroutinesApi::class)
+    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     fun fetchPrisutnost() {
         val cookieJar: CookieJar = PersistentCookieJar(
             SetCookieCache(),
             SharedPrefsCookiePersistor(activity)
         )
-        okHttpClient = instance!!.okHttpInstance
         deletePreviousResults()
-        cRealm = Realm.getDefaultInstance()
-        val korisnik = cRealm?.where(Korisnik::class.java)?.findFirst()
-        val formData: RequestBody = Builder()
-            .add("Username", korisnik!!.getUsername())
-            .add("Password", korisnik.getLozinka())
-            .add("IsRememberMeChecked", "true")
-            .build()
-        val rq: Request = Request.Builder()
-            .url(
-                "https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb" +
-                        ".unist.hr"
-            )
-            .post(formData)
-            .build()
-        val call0 = okHttpClient!!.newCall(rq)
-        call0.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.d("pogreska", "failure")
+        lifecycleScope.launch { prisutnostviewmodel.fetchPrisutnost() }
+
+        prisutnostviewmodel.gotPri.observe(viewLifecycleOwner){ gotPri ->
+            if (gotPri){
+                requireActivity().runOnUiThread {
+                    showRecyclerviewWinterSem()
+                    showRecyclerviewSummerSem()
+                    binding!!.progressAttend.visibility = View.INVISIBLE
+                    binding!!.nestedAttend.visibility = View.VISIBLE
+                }
             }
-
-            @Throws(IOException::class)
-            override fun onResponse(call: Call, response: Response) {
-                val request: Request = Request.Builder()
-                    .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
-                    .get()
-                    .build()
-                val call1 = okHttpClient!!.newCall(request)
-                call1.enqueue(object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
-                        Log.d("pogreska", "failure")
-                    }
-
-                    @Throws(IOException::class)
-                    override fun onResponse(call: Call, response: Response) {
-                        if (response.code != 500) {
-                            val doc = Jsoup.parse(response.body!!.string())
-                            try {
-                                val zimski = doc.select("div.semster.winter").first()
-                                val litnji = doc.select("div.semster.summer").first()
-                                val zimskaPredavanja = zimski.select("div.body.clearfix").first()
-                                val litnjaPredavanja = litnji.select("div.body.clearfix").first()
-                                if (zimski.getElementsByClass("emptyList").first() == null) {
-                                    val zimskiKolegiji = zimskaPredavanja.select("a")
-                                    for (element in zimskiKolegiji) {
-                                        val request: Request = Request.Builder()
-                                            .url(
-                                                "https://raspored.fesb.unist.hr" + element.attr("href")
-                                                    .toString()
-                                            )
-                                            .get()
-                                            .build()
-                                        val callonme = okHttpClient!!.newCall(request)
-                                        callonme.enqueue(object : Callback {
-                                            override fun onFailure(call: Call, e: IOException) {
-                                                Log.d("pogreska", "failure")
-                                            }
-
-                                            @Throws(IOException::class)
-                                            override fun onResponse(
-                                                call: Call,
-                                                response: Response
-                                            ) {
-                                                val document = Jsoup.parse(
-                                                    response.body!!.string()
-                                                )
-                                                val mRealm1 = Realm.getInstance(realmConfig)
-                                                try {
-                                                    val content = document.getElementsByClass(
-                                                        "courseCategories"
-                                                    ).first()
-                                                    val kategorije = content.select(
-                                                        "div.courseCategory"
-                                                    )
-                                                    mRealm1.executeTransaction { realm ->
-                                                        for (kat in kategorije) {
-                                                            val mDolazak = realm.createObject(
-                                                                Dolazak::class.java,
-                                                                UUID.randomUUID().toString()
-                                                            )
-                                                            mDolazak.setSemestar(1)
-                                                            mDolazak.setPredmet(
-                                                                element.select("div.cellContent")
-                                                                    .first().text()
-                                                            )
-                                                            mDolazak.setVrsta(
-                                                                kat.getElementsByClass(
-                                                                    "name"
-                                                                ).first().text()
-                                                            )
-                                                            mDolazak.setAttended(
-                                                                kat.select("div.attended > span.num")
-                                                                    .first().text().toInt()
-                                                            )
-                                                            mDolazak.setAbsent(
-                                                                kat.select("div.absent > span.num")
-                                                                    .first().text().toInt()
-                                                            )
-                                                            mDolazak.setRequired(
-                                                                kat.select(
-                                                                    "div.required-attendance " +
-                                                                            "> span"
-                                                                ).first().text()
-                                                            )
-                                                            val string = kat.select(
-                                                                "div" +
-                                                                        ".required-attendance > " +
-                                                                        "span"
-                                                            ).first().text()
-                                                            val st = StringTokenizer(string, " ")
-                                                            val ric1 = st.nextToken()
-                                                            val ric2 = st.nextToken()
-                                                            val max = st.nextToken()
-                                                            mDolazak.setTotal(max.toInt())
-                                                        }
-                                                    }
-                                                } catch (exception: Exception) {
-                                                    Log.d(
-                                                        "Exception prisutnost",
-                                                        exception.message!!
-                                                    )
-                                                    exception.printStackTrace()
-                                                } finally {
-                                                    mRealm1.close()
-                                                }
-                                            }
-                                        })
-                                    }
-                                }
-                                if (litnji.getElementsByClass("emptyList").first() == null) {
-                                    val litnjiKolegiji = litnjaPredavanja.select("a")
-                                    for (element in litnjiKolegiji) {
-                                        val request: Request = Request.Builder()
-                                            .url(
-                                                "https://raspored.fesb.unist.hr" + element.attr("href")
-                                                    .toString()
-                                            )
-                                            .get()
-                                            .build()
-                                        val callonme1 = okHttpClient!!.newCall(request)
-                                        callonme1.enqueue(object : Callback {
-                                            override fun onFailure(call: Call, e: IOException) {
-                                                showSnackError()
-                                            }
-
-                                            @Throws(IOException::class)
-                                            override fun onResponse(
-                                                call: Call,
-                                                response: Response
-                                            ) {
-                                                val document = Jsoup.parse(
-                                                    response.body!!.string()
-                                                )
-                                                val mRealm2 = Realm.getInstance(realmConfig)
-                                                try {
-                                                    val content = document.getElementsByClass(
-                                                        "courseCategories"
-                                                    ).first()
-                                                    val kategorije = content.select(
-                                                        "div.courseCategory"
-                                                    )
-                                                    mRealm2.executeTransaction { realm ->
-                                                        for (kat in kategorije) {
-                                                            val mDolazak = realm.createObject(
-                                                                Dolazak::class.java,
-                                                                UUID.randomUUID().toString()
-                                                            )
-                                                            mDolazak.setSemestar(2)
-                                                            mDolazak.setPredmet(
-                                                                element.select("div.cellContent")
-                                                                    .first().text()
-                                                            )
-                                                            mDolazak.setVrsta(
-                                                                kat.getElementsByClass(
-                                                                    "name"
-                                                                ).first().text()
-                                                            )
-                                                            mDolazak.setAttended(
-                                                                kat.select("div.attended > span.num")
-                                                                    .first().text().toInt()
-                                                            )
-                                                            mDolazak.setAbsent(
-                                                                kat.select("div.absent > span.num")
-                                                                    .first().text().toInt()
-                                                            )
-                                                            mDolazak.setRequired(
-                                                                kat.select(
-                                                                    "div.required-attendance " +
-                                                                            "> span"
-                                                                ).first().text()
-                                                            )
-                                                            val string = kat.select(
-                                                                "div" +
-                                                                        ".required-attendance > " +
-                                                                        "span"
-                                                            ).first().text()
-                                                            val st = StringTokenizer(string, " ")
-                                                            val ric1 = st.nextToken()
-                                                            val ric2 = st.nextToken()
-                                                            val max = st.nextToken()
-                                                            mDolazak.setTotal(max.toInt())
-                                                        }
-                                                    }
-                                                } catch (e: Exception) {
-                                                    Log.d("Exception prisutnost", e.message!!)
-                                                    e.printStackTrace()
-                                                } finally {
-                                                    mRealm2.close()
-                                                }
-                                            }
-                                        })
-                                    }
-                                }
-                            } catch (ex: Exception) {
-                                Log.d("Exception pris", ex.message!!)
-                                ex.printStackTrace()
-                            }
-                            if (activity != null) {
-                                activity!!.runOnUiThread {
-                                    showRecyclerviewWinterSem()
-                                    showRecyclerviewSummerSem()
-                                    binding!!.progressAttend.visibility = View.INVISIBLE
-                                    binding!!.nestedAttend.visibility = View.VISIBLE
-                                }
-                            }
-                        } else {
-                            showSnackError()
-                        }
-                    }
-                })
+            else {
+                showSnackError()
             }
-        })
+        }
     }
 
-    fun showRecyclerviewWinterSem() {
+    private fun showRecyclerviewWinterSem() {
         wRealm = Realm.getInstance(realmConfig)
         val dolasciWinter: RealmResults<Dolazak>? =
             wRealm?.where(Dolazak::class.java)?.equalTo("semestar", 1.toInt())?.findAll()
         try {
-            binding!!.recyclerZimski.layoutManager = LinearLayoutManager(activity,
+            binding?.recyclerZimski?.layoutManager = LinearLayoutManager(activity,
                 LinearLayoutManager.HORIZONTAL, false
             )
             if (dolasciWinter!=null)
                 winterAdapter = context?.let { DolasciAdapter(it, dolasciWinter) }
-            binding!!.recyclerZimski.adapter = winterAdapter
+            binding?.recyclerZimski?.adapter = winterAdapter
         } finally {
             wRealm?.close()
         }
     }
 
-    fun showRecyclerviewSummerSem() {
+    private fun showRecyclerviewSummerSem() {
         sRealm = Realm.getInstance(realmConfig)
         val dolasciSummer: RealmResults<Dolazak>? =
             sRealm?.where(Dolazak::class.java)?.equalTo("semestar", 2.toInt())?.findAll()

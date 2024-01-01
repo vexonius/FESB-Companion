@@ -22,7 +22,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.activities.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
-import com.tstudioz.fax.fme.view.adapters.LeanTaskAdapter
+import com.tstudioz.fax.fme.view.adapters.NoteAdapter
 import com.tstudioz.fax.fme.database.LeanTask
 import com.tstudioz.fax.fme.database.Predavanja
 import com.tstudioz.fax.fme.databinding.HomeTabBinding
@@ -168,10 +168,10 @@ class HomeFragment : Fragment() {
         dodajNovi.setId("ACTION_ADD")
         dodajNovi.setTaskTekst("Dodaj novi podsjetnik")
         taskRealm?.executeTransaction { realm -> realm.insertOrUpdate(dodajNovi) }
-        val leanTaskAdapter = tasks?.let { LeanTaskAdapter(it) }
+        val noteAdapter = tasks?.let { NoteAdapter(it) }
         binding?.recyclerTask?.layoutManager = LinearLayoutManager(activity)
         binding?.recyclerTask?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
-        binding?.recyclerTask?.adapter = leanTaskAdapter
+        binding?.recyclerTask?.adapter = noteAdapter
     }
 
     private fun loadIksicaAd() {

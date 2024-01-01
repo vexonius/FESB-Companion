@@ -13,14 +13,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.LeanTask
 import com.tstudioz.fax.fme.view.activities.NoteActivity
-import com.tstudioz.fax.fme.view.adapters.LeanTaskAdapter.LeanTaskViewHolder
+import com.tstudioz.fax.fme.view.adapters.NoteAdapter.NoteViewHolder
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import io.realm.RealmConfiguration
 import io.realm.RealmResults
 
-class LeanTaskAdapter(private val mTasks: RealmResults<LeanTask>) :
-    RecyclerView.Adapter<LeanTaskViewHolder>(), RealmChangeListener<Any?> {
+class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
+    RecyclerView.Adapter<NoteViewHolder>(), RealmChangeListener<Any?> {
     var light: Typeface? = null
     var realmTaskConfiguration = RealmConfiguration.Builder()
         .name("tasks.realm")
@@ -32,24 +32,24 @@ class LeanTaskAdapter(private val mTasks: RealmResults<LeanTask>) :
         mTasks.addChangeListener(this as RealmChangeListener<RealmResults<LeanTask>>)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LeanTaskViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val view: View
         if (viewType == ADD_NEW) {
             view = LayoutInflater.from(parent.context).inflate(
                 R.layout.add_lean_task_item,
                 parent, false
             )
-            return LeanTaskViewHolder(view)
+            return NoteViewHolder(view)
         } else {
             view = LayoutInflater.from(parent.context).inflate(
                 R.layout.lean_task_item,
                 parent, false
             )
-            return LeanTaskViewHolder(view)
+            return NoteViewHolder(view)
         }
     }
 
-    override fun onBindViewHolder(holder: LeanTaskViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         val leanTask = mTasks[position]
         holder.taskText.text = leanTask?.getTaskTekst()
         when (holder.itemViewType) {
@@ -79,7 +79,7 @@ class LeanTaskAdapter(private val mTasks: RealmResults<LeanTask>) :
         }
     }
 
-    inner class LeanTaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+    inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener, OnLongClickListener {
         var taskText: TextView
         var point: ImageView
