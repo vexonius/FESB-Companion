@@ -21,9 +21,9 @@ class TimetableNetworkService : TimetableInterface {
 
         val response: Response = client.newCall(request).execute()
 
-        return if(response.isSuccessful && response.body != null && response.code < 400)
+        return if(response.isSuccessful && response.body != null && response.code < 400) {
             Result.TimeTableResult.Success(response.body!!.string())
-        else Result.TimeTableResult.Failure(Throwable("Failed to fetch timetable"))
+        } else Result.TimeTableResult.Failure(Throwable("Failed to fetch timetable"))
     }
 
 }

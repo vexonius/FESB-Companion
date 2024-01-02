@@ -34,20 +34,20 @@ class NoteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.note_layout)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         et = findViewById<View>(R.id.textEditor) as EditText
 
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
-        if (intent.extras!!.getInt("mode") == 1) {
-            mTaskId = intent.extras!!.getString("task_key")
+        if (intent.extras?.getInt("mode") == 1) {
+            mTaskId = intent.extras?.getString("task_key")
         }
 
         tRealm = Realm.getInstance(realmTaskConfiguration)
         tRealm.use { tRealm ->
             if (mTaskId != null) {
                 val leanTask = tRealm?.where(LeanTask::class.java)?.equalTo("id", mTaskId)?.findFirst()
-                et!!.setText(leanTask?.getTaskTekst())
+                et?.setText(leanTask?.getTaskTekst())
             }
         }
         saveNoteListener()
@@ -63,7 +63,7 @@ class NoteActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         val sRealm = Realm.getInstance(realmTaskConfiguration)
-        val stringBiljeska = et!!.text.toString()
+        val stringBiljeska = et?.text.toString()
         sRealm.use { sRealm ->
             if (mTaskId != null && stringBiljeska.trim { it <= ' ' } != "") {
                 sRealm.executeTransaction { realm ->
@@ -99,7 +99,7 @@ class NoteActivity : AppCompatActivity() {
                 true
             }
             R.id.delete -> {
-                et!!.setText("")
+                et?.setText("")
                 finish()
                 true
             }

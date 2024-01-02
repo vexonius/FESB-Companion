@@ -70,7 +70,7 @@ class PrisutnostService : PrisutnostInterface{
                                 ljetnaPris = getDetailedPrisutnost(litnjaPredavanja, 2)
                             }
                         } catch (ex: Exception) {
-                            Log.d("Exception pris", ex.message!!)
+                            ex.message?.let { Log.d("Exception pris", it) }
                             ex.printStackTrace()
                         }
                     }
