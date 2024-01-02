@@ -62,9 +62,12 @@ class PrisutnostFragment : Fragment() {
         // FATAL EXCEPTION: main
         // Process: com.tstudioz.fax.fme, PID: 10798
         // java.lang.IllegalStateException: This Realm instance has already been closed, making it unusable.
+        // val korisnik = cRealm?.where(Korisnik::class.java)?.findFirst()
 
+        if (NetworkUtils.isNetworkAvailable(requireContext())) {
+            lifecycleScope.launch { prisutnostviewmodel.fetchPrisutnost() }
+        }
 
-        lifecycleScope.launch { prisutnostviewmodel.fetchPrisutnost() }
         prisutnostviewmodel.gotPri.observe(viewLifecycleOwner){ gotPri ->
             if (gotPri){
                 requireActivity().runOnUiThread {
@@ -121,6 +124,7 @@ class PrisutnostFragment : Fragment() {
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
             fetchPrisutnost()
         } else {
+            fetchPrisutnost()
             showSnacOffline()
         }
     }
