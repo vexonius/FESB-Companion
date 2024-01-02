@@ -29,7 +29,4 @@ class SettingsActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-    override fun onBackPressed() {
-        finish()
-    }
 }

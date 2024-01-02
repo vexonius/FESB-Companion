@@ -34,7 +34,7 @@ suspend fun parseTimetable(body: String): List<TimetableItem> {
             val room = e?.selectFirst("div.eventContent > div.eventInfo > span.resource")?.text() ?: ""
             val detailTime = e?.selectFirst("div.detailItem.datetime")?.text() ?: ""
             val professor = e?.selectFirst("div.detailItem.user")?.text() ?: ""
-            val repetsType = parseNumbersFromString(e?.selectFirst("div.recurring > span.type > span") ?: null)
+            val repetsType = parseNumbersFromString(e?.selectFirst("div.recurring > span.type > span"))
             val isItRecurring = !(repetsType== EventRecurring.ONCE || repetsType== EventRecurring.UNDEFINED)
             val classDruration = parseClassDuration(e?.selectFirst("div.detailItem.datetime > span"))
 

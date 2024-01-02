@@ -40,7 +40,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var editor: SharedPreferences.Editor? = null
 
 
-    private val modeChangeListener = object : Preference.OnPreferenceChangeListener {
+    /*private val modeChangeListener = object : Preference.OnPreferenceChangeListener {
         override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
             rlmLog = Realm.getDefaultInstance()
             newValue as? Boolean
@@ -74,7 +74,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         requireActivity().setTheme(nightMode)
         requireActivity().recreate()
         return true
-    }
+    }*/
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.app_prefrences)
         mySPrefs = requireActivity().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
