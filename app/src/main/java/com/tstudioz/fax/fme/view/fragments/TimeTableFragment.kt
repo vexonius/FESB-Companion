@@ -108,7 +108,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
             .setHeaderColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
         checkNetwork()
-        binding!!.odaberiDan.setOnClickListener {
+        binding?.odaberiDan?.setOnClickListener {
             builder.build().show(requireFragmentManager(), ContentValues.TAG)
         }
         // Get the root frame layout
@@ -124,7 +124,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         rootFrameLayout.setLayoutParams(params);*/
         setSetDates(now)
         boldOut()
-        return binding!!.root
+        return binding?.root
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -157,7 +157,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val sYear = syear.format(kal.time)
 
         mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear)
-        binding!!.odaberiDan.text = "Raspored za $mDay.$mMonth - $sDay.$sMonth"
+        binding?.odaberiDan?.text = "Raspored za $mDay.$mMonth - $sDay.$sMonth"
     }
 
     @OptIn(InternalCoroutinesApi::class)
@@ -166,8 +166,8 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         sMonth: String, sDay: String, sYear: String
     ) {
         requireActivity().runOnUiThread {
-            binding!!.linearParent.visibility = View.INVISIBLE
-            binding!!.rasporedProgress.visibility = View.VISIBLE
+            binding?.linearParent?.visibility = View.INVISIBLE
+            binding?.rasporedProgress?.visibility = View.VISIBLE
             showPonTemp()
             showUtoTemp()
             showSriTemp()
@@ -177,17 +177,17 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
         rlm = Realm.getDefaultInstance()
         val kor = rlm?.where(Korisnik::class.java)?.findFirst()
-        client = instance!!.okHttpInstance
+        client = instance?.okHttpInstance
         val request: Request = Request.Builder()
             .url(
                 "https://raspored.fesb.unist.hr/part/raspored/kalendar?DataType=User&DataId" +
-                        "=" + kor!!.getUsername()
+                        "=" + kor?.getUsername()
                     .toString() + "&MinDate=" + mMonth + "%2F" + mDay + "%2F" + mYear + "%2022%3A44%3A48&MaxDate=" + sMonth + "%2F" + sDay + "%2F" + sYear + "%2022%3A44%3A48"
             )
             .get()
             .build()
-        val call = client!!.newCall(request)
-        call.enqueue(object : Callback {
+        val call = client?.newCall(request)
+        call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e(ContentValues.TAG, "Exception caught", e)
             }
@@ -196,9 +196,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             override fun onResponse(call: Call, response: Response) {
                 try {
                     if (response.code == 500) {
-                        activity!!.runOnUiThread { showSnackError() }
+                        activity?.runOnUiThread { showSnackError() }
                     } else {
-                        val doc = Jsoup.parse(response.body!!.string())
+                        val doc = Jsoup.parse(response.body?.string())
                         val trealm = Realm.getInstance(tempRealm)
                         trealm.beginTransaction()
                         val svaPredavanja = trealm.where(
@@ -236,20 +236,20 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                             } finally {
                                 trealm.close()
                             }
-                            activity!!.runOnUiThread {
+                            activity?.runOnUiThread {
                                 updateTemporaryWeek()
                                 setSetDates(cal)
-                                if (adapterSubTemp!!.itemCount > 0) {
-                                    binding!!.linearParent.weightSum = 6f
-                                    binding!!.linearSub.visibility = View.VISIBLE
-                                    binding!!.linearParent.invalidate()
+                                if (adapterSubTemp?.itemCount != 0) {
+                                    binding?.linearParent?.weightSum = 6f
+                                    binding?.linearSub?.visibility = View.VISIBLE
+                                    binding?.linearParent?.invalidate()
                                 } else {
-                                    binding!!.linearSub.visibility = View.INVISIBLE
-                                    binding!!.linearParent.weightSum = 5f
-                                    binding!!.linearParent.invalidate()
+                                    binding?.linearSub?.visibility = View.INVISIBLE
+                                    binding?.linearParent?.weightSum = 5f
+                                    binding?.linearParent?.invalidate()
                                 }
-                                binding!!.rasporedProgress.visibility = View.INVISIBLE
-                                binding!!.linearParent.visibility = View.VISIBLE
+                                binding?.rasporedProgress?.visibility = View.INVISIBLE
+                                binding?.linearParent?.visibility = View.VISIBLE
                             }
                         }
                     }
@@ -268,47 +268,47 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             -(calendar[Calendar.DAY_OF_WEEK] - Calendar.MONDAY)
         )
         val pon = format.format(calendar.time)
-        binding!!.ponDate.text = pon
+        binding?.ponDate?.text = pon
         calendar.add(
             Calendar.DAY_OF_MONTH,
             -(calendar[Calendar.DAY_OF_WEEK] - Calendar.TUESDAY)
         )
         val uto = format.format(calendar.time)
-        binding!!.utoDate.text = uto
+        binding?.utoDate?.text = uto
         calendar.add(
             Calendar.DAY_OF_MONTH,
             -(calendar[Calendar.DAY_OF_WEEK] - Calendar.WEDNESDAY)
         )
         val sri = format.format(calendar.time)
-        binding!!.sriDate.text = sri
+        binding?.sriDate?.text = sri
         calendar.add(
             Calendar.DAY_OF_MONTH,
             -(calendar[Calendar.DAY_OF_WEEK] - Calendar.THURSDAY)
         )
         val cet = format.format(calendar.time)
-        binding!!.cetDate.text = cet
+        binding?.cetDate?.text = cet
         calendar.add(
             Calendar.DAY_OF_MONTH,
             -(calendar[Calendar.DAY_OF_WEEK] - Calendar.FRIDAY)
         )
         val pet = format.format(calendar.time)
-        binding!!.petDate.text = pet
+        binding?.petDate?.text = pet
         calendar.add(
             Calendar.DAY_OF_MONTH,
             -(calendar[Calendar.DAY_OF_WEEK] - Calendar.SATURDAY)
         )
         val sub = format.format(calendar.time)
-        binding!!.subDate.text = sub
+        binding?.subDate?.text = sub
     }
 
     fun boldOut() {
         bold = Typeface.createFromAsset(requireContext().assets, "fonts/OpenSans-Bold.ttf")
-        binding!!.mPon.typeface = bold
-        binding!!.mUto.typeface = bold
-        binding!!.mSri.typeface = bold
-        binding!!.mCet.typeface = bold
-        binding!!.mPet.typeface = bold
-        binding!!.mSub.typeface = bold
+        binding?.mPon?.typeface = bold
+        binding?.mUto?.typeface = bold
+        binding?.mSri?.typeface = bold
+        binding?.mCet?.typeface = bold
+        binding?.mPet?.typeface = bold
+        binding?.mSub?.typeface = bold
     }
 
     fun showPon() {
@@ -317,9 +317,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE
         )?.findAll()
         val adapter = rezulatiPon?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerPon.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerPon.setHasFixedSize(true)
-        binding!!.recyclerPon.adapter = adapter
+        binding?.recyclerPon?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerPon?.setHasFixedSize(true)
+        binding?.recyclerPon?.adapter = adapter
     }
 
     fun showPonTemp() {
@@ -328,9 +328,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Ponedjeljak", Case.INSENSITIVE
         )?.findAll()
         adapterPonTemp = rezulatiPon1?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerPon.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerPon.setHasFixedSize(true)
-        binding!!.recyclerPon.adapter = adapterPonTemp
+        binding?.recyclerPon?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerPon?.setHasFixedSize(true)
+        binding?.recyclerPon?.adapter = adapterPonTemp
     }
 
     fun showUto() {
@@ -339,9 +339,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Utorak", Case.INSENSITIVE
         )?.findAll()
         val adapter2 = rezulatiUto?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerUto.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerUto.setHasFixedSize(true)
-        binding!!.recyclerUto.adapter = adapter2
+        binding?.recyclerUto?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerUto?.setHasFixedSize(true)
+        binding?.recyclerUto?.adapter = adapter2
     }
 
     fun showUtoTemp() {
@@ -350,9 +350,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Utorak", Case.INSENSITIVE
         )?.findAll()
         adapterUtoTemp = rezulatiUto1?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerUto.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerUto.setHasFixedSize(true)
-        binding!!.recyclerUto.adapter = adapterUtoTemp
+        binding?.recyclerUto?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerUto?.setHasFixedSize(true)
+        binding?.recyclerUto?.adapter = adapterUtoTemp
     }
 
     fun showSri() {
@@ -361,9 +361,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE
         )?.findAll()
         val adapter3 = rezulatiSri?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerSri.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerSri.setHasFixedSize(true)
-        binding!!.recyclerSri.adapter = adapter3
+        binding?.recyclerSri?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerSri?.setHasFixedSize(true)
+        binding?.recyclerSri?.adapter = adapter3
     }
 
     fun showSriTemp() {
@@ -372,9 +372,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Srijeda", Case.INSENSITIVE
         )?.findAll()
         adapterSriTemp = rezulatiSri1?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerSri.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerSri.setHasFixedSize(true)
-        binding!!.recyclerSri.adapter = adapterSriTemp
+        binding?.recyclerSri?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerSri?.setHasFixedSize(true)
+        binding?.recyclerSri?.adapter = adapterSriTemp
     }
 
     fun showCet() {
@@ -383,9 +383,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE
         )?.findAll()
         val adapter4 = rezulatiCet?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerCet.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerCet.setHasFixedSize(true)
-        binding!!.recyclerCet.adapter = adapter4
+        binding?.recyclerCet?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerCet?.setHasFixedSize(true)
+        binding?.recyclerCet?.adapter = adapter4
     }
 
     fun showCetTemp() {
@@ -394,9 +394,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "četvrtak", Case.INSENSITIVE
         )?.findAll()
         adapterCetTemp = rezulatiCet1?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerCet.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerCet.setHasFixedSize(true)
-        binding!!.recyclerCet.adapter = adapterCetTemp
+        binding?.recyclerCet?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerCet?.setHasFixedSize(true)
+        binding?.recyclerCet?.adapter = adapterCetTemp
     }
 
     fun showPet() {
@@ -405,9 +405,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Petak", Case.INSENSITIVE
         )?.findAll()
         val adapter5 = rezulatiPet?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerPet.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerPet.setHasFixedSize(true)
-        binding!!.recyclerPet.adapter = adapter5
+        binding?.recyclerPet?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerPet?.setHasFixedSize(true)
+        binding?.recyclerPet?.adapter = adapter5
     }
 
     fun showPetTemp() {
@@ -416,9 +416,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Petak", Case.INSENSITIVE
         )?.findAll()
         adapterPetTemp = rezulatiPet1?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerPet.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerPet.setHasFixedSize(true)
-        binding!!.recyclerPet.adapter = adapterPetTemp
+        binding?.recyclerPet?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerPet?.setHasFixedSize(true)
+        binding?.recyclerPet?.adapter = adapterPetTemp
     }
 
     fun showSub() {
@@ -427,15 +427,15 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Subota", Case.INSENSITIVE
         )?.findAll()
         if (rezulatiSub?.isEmpty() == true) {
-            binding!!.linearSub.visibility = View.GONE
-            binding!!.linearParent.weightSum = 5f
+            binding?.linearSub?.visibility = View.GONE
+            binding?.linearParent?.weightSum = 5f
         } else {
-            binding!!.linearSub.visibility = View.VISIBLE
-            binding!!.linearParent.weightSum = 6f
+            binding?.linearSub?.visibility = View.VISIBLE
+            binding?.linearParent?.weightSum = 6f
             val adapter6 = rezulatiSub?.let { PredavanjaRaspAdapterTable(it) }
-            binding!!.recyclerSub.layoutManager = LinearLayoutManager(activity)
-            binding!!.recyclerSub.setHasFixedSize(true)
-            binding!!.recyclerSub.adapter = adapter6
+            binding?.recyclerSub?.layoutManager = LinearLayoutManager(activity)
+            binding?.recyclerSub?.setHasFixedSize(true)
+            binding?.recyclerSub?.adapter = adapter6
         }
     }
 
@@ -445,24 +445,24 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             "detaljnoVrijeme", "Subota", Case.INSENSITIVE
         )?.findAll()
         adapterSubTemp = rezulatiSub1?.let { PredavanjaRaspAdapterTable(it) }
-        binding!!.recyclerSub.layoutManager = LinearLayoutManager(activity)
-        binding!!.recyclerSub.adapter = adapterSubTemp
+        binding?.recyclerSub?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerSub?.adapter = adapterSubTemp
     }
 
     fun updateTemporaryWeek() {
-        adapterPonTemp!!.notifyDataSetChanged()
-        adapterUtoTemp!!.notifyDataSetChanged()
-        adapterSriTemp!!.notifyDataSetChanged()
-        adapterCetTemp!!.notifyDataSetChanged()
-        adapterPetTemp!!.notifyDataSetChanged()
-        adapterSubTemp!!.notifyDataSetChanged()
+        adapterPonTemp?.notifyDataSetChanged()
+        adapterUtoTemp?.notifyDataSetChanged()
+        adapterSriTemp?.notifyDataSetChanged()
+        adapterCetTemp?.notifyDataSetChanged()
+        adapterPetTemp?.notifyDataSetChanged()
+        adapterSubTemp?.notifyDataSetChanged()
     }
 
     fun checkNetwork() {
         if (context?.let { NetworkUtils.isNetworkAvailable(it) } == true) {
-            binding!!.odaberiDan.visibility = View.VISIBLE
+            binding?.odaberiDan?.visibility = View.VISIBLE
         } else {
-            binding!!.odaberiDan.visibility = View.INVISIBLE
+            binding?.odaberiDan?.visibility = View.INVISIBLE
             showSnacOffline()
         }
     }
@@ -474,14 +474,14 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
      Prikazuje se raspored ovog tjedna.
      """.trimIndent(), Snackbar.LENGTH_INDEFINITE
         )
-        val vjuz = snack!!.view
-        vjuz.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
-        snack!!.setAction("OSVJEŽI") {
-            snack!!.dismiss()
+        val vjuz = snack?.view
+        vjuz?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
+        snack?.setAction("OSVJEŽI") {
+            snack?.dismiss()
             checkNetwork()
         }
-        snack!!.setActionTextColor(resources.getColor(R.color.white))
-        snack!!.show()
+        snack?.setActionTextColor(resources.getColor(R.color.white))
+        snack?.show()
     }
 
     fun showSnackError() {
@@ -489,61 +489,61 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             requireActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
                     "pogreške pri dohvaćanju rasporeda", Snackbar.LENGTH_SHORT
         )
-        val vjuzs = snack!!.view
-        vjuzs.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
-        snack!!.show()
+        val vjuzs = snack?.view
+        vjuzs?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
+        snack?.show()
     }
 
     override fun onStop() {
         super.onStop()
         if (snack != null) {
-            snack!!.dismiss()
+            snack?.dismiss()
         }
         if (client != null) {
-            client!!.dispatcher.cancelAll()
+            client?.dispatcher?.cancelAll()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         if (rlm != null) {
-            rlm!!.close()
+            rlm?.close()
         }
         if (prealm != null) {
-            prealm!!.close()
+            prealm?.close()
         }
         if (ptrealm != null) {
-            ptrealm!!.close()
+            ptrealm?.close()
         }
         if (urealm != null) {
-            urealm!!.close()
+            urealm?.close()
         }
         if (utrealm != null) {
-            utrealm!!.close()
+            utrealm?.close()
         }
         if (srealm != null) {
-            srealm!!.close()
+            srealm?.close()
         }
         if (strealm != null) {
-            strealm!!.close()
+            strealm?.close()
         }
         if (crealm != null) {
-            crealm!!.close()
+            crealm?.close()
         }
         if (ctrealm != null) {
-            ctrealm!!.close()
+            ctrealm?.close()
         }
         if (petrealm != null) {
-            petrealm!!.close()
+            petrealm?.close()
         }
         if (pettrealm != null) {
-            pettrealm!!.close()
+            pettrealm?.close()
         }
         if (subrealm != null) {
-            subrealm!!.close()
+            subrealm?.close()
         }
         if (subtrealm != null) {
-            subtrealm!!.close()
+            subtrealm?.close()
         }
     }
 }

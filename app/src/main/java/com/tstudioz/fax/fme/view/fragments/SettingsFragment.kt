@@ -85,23 +85,23 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val prefLogOut = findPreference("logout") as Preference?
         rlmLog = Realm.getDefaultInstance()
         try {
-            korisnik = rlmLog?.where(Korisnik::class.java)?.findFirst()!!.getUsername()
+            korisnik = rlmLog?.where(Korisnik::class.java)?.findFirst()?.getUsername()
         } catch (e: Exception) {
-            Log.e("settings exp", e.message!!)
+            e.message?.let { Log.e("settings exp", it )}
         } finally {
             rlmLog?.close()
         }
-        prefLogOut!!.summary = "Prijavljeni ste kao $korisnik"
-        prefLogOut.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        prefLogOut?.summary = "Prijavljeni ste kao $korisnik"
+        prefLogOut?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             userLogOut()
             deleteWebViewCookies()
             goToLoginScreen()
             true
         }
         val weather_units = findPreference<Preference>("units") as CheckBoxPreference?
-        weather_units!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        weather_units?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             editor = mySPrefs?.edit()
-            if (weather_units.isChecked) {
+            if (weather_units != null && weather_units.isChecked) {
                 editor?.putString("weather_units", "&units=ca")
                 editor?.apply()
             } else {
@@ -113,17 +113,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
         val prefFeedback = findPreference("feedback") as Preference?
-        prefFeedback!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        prefFeedback?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             sendFeedMail("[FEEDBACK] FESB Companion", "")
             true
         }
         val prefBugreport = findPreference("bug_report") as Preference?
-        prefBugreport!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        prefBugreport?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             sendFeedMail("[BUG REPORT] FESB Companion", "")
             true
         }
         val prefBeta = findPreference("betta_particp") as Preference?
-        prefBeta!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        prefBeta?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             sendFeedMail(
                 "[BETA] Prijava beta testera za FESB Companion",
                 "Slanjem ovog maila prihvaćam sudjelovanje u internom beta testiranju s ovom email adresom. Upozorenje: beta verzije znaju biti nestabilne i nepouzdane."
@@ -131,24 +131,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
         val prefMvp = findPreference("mvp") as Preference?
-        prefMvp!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        prefMvp?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             mvpDialog()
             true
         }
         val prefInfo = findPreference("version") as Preference?
-        prefInfo!!.summary = buildVersion
-        prefInfo.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        prefInfo?.summary = buildVersion
+        prefInfo?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             i++
             if (i > 6) Toast.makeText(activity, ":)", Toast.LENGTH_SHORT).show()
             true
         }
         val prefLicence = findPreference("legal") as Preference?
-        prefLicence!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        prefLicence?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             displayLicensesAlertDialog()
             true
         }
         val prefDev = findPreference("developer") as Preference?
-        prefDev!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        prefDev?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             val builder = CustomTabsIntent.Builder()
             val customTabsIntent = builder.setToolbarColor(
                 ContextCompat.getColor(
@@ -159,7 +159,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
         val prefPriv = findPreference("privacy") as Preference?
-        prefPriv!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        prefPriv?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             try {
                 val builder = CustomTabsIntent.Builder()
                 val customTabsIntent = builder.setToolbarColor(
@@ -176,7 +176,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     fun userLogOut() {
-        editor = mySPrefs!!.edit()
+        editor = mySPrefs?.edit()
         editor?.putBoolean("logged_in", false)
         editor?.apply()
         rlmLog = Realm.getDefaultInstance()
@@ -211,10 +211,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
         get() {
             var ver = "undefined"
             try {
-                val pInfo = activity!!.packageManager.getPackageInfo(
-                    activity!!.packageName, 0
-                )
-                ver = pInfo.versionName
+                val pInfo = activity?.packageName?.let {
+                    activity?.packageManager?.getPackageInfo(
+                        it, 0
+                    )
+                }
+                if (pInfo != null) {
+                    ver = pInfo.versionName
+                }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
             }
@@ -226,34 +230,33 @@ class SettingsFragment : PreferenceFragmentCompat() {
             LayoutInflater.from(activity).inflate(R.layout.licence_view, null) as NestedScrollView
         val wv = view.findViewById<View>(R.id.webvju) as WebView
         wv.loadUrl("file:///android_asset/legal.html")
-        btmDialog = BottomSheetDialog(activity!!)
-        btmDialog!!.setCancelable(true)
-        btmDialog!!.setContentView(view)
-        btmDialog!!.setCanceledOnTouchOutside(true)
-        btmDialog!!.show()
+        btmDialog = activity?.let { BottomSheetDialog(it) }
+        btmDialog?.setCancelable(true)
+        btmDialog?.setContentView(view)
+        btmDialog?.setCanceledOnTouchOutside(true)
+        btmDialog?.show()
     }
 
     private fun mvpDialog() {
-        val view =
-            LayoutInflater.from(activity).inflate(R.layout.licence_view, null) as NestedScrollView
+        val view = LayoutInflater.from(activity).inflate(R.layout.licence_view, null) as NestedScrollView
         val wv = view.findViewById<View>(R.id.webvju) as WebView
         wv.loadUrl("file:///android_asset/mvp.html")
-        btmDialog = BottomSheetDialog(activity!!)
-        btmDialog!!.setCancelable(true)
-        btmDialog!!.setContentView(view)
-        btmDialog!!.setCanceledOnTouchOutside(true)
-        btmDialog!!.show()
+        btmDialog = activity?.let { BottomSheetDialog(it)}
+        btmDialog?.setCancelable(true)
+        btmDialog?.setContentView(view)
+        btmDialog?.setCanceledOnTouchOutside(true)
+        btmDialog?.show()
     }
 
     fun sendFeedMail(title: String, body: String?) {
         val version = buildVersion
-        ShareCompat.IntentBuilder.from(activity!!)
-            .setType("message/rfc822")
-            .addEmailTo("info@tstud.io")
-            .setSubject("$title v$version")
-            .setText(body)
-            .setChooserTitle("Pošalji email pomoću...")
-            .startChooser()
+        activity?.let { ShareCompat.IntentBuilder.from(it)}
+            ?.setType("message/rfc822")
+            ?.addEmailTo("info@tstud.io")
+            ?.setSubject("$title v$version")
+            ?.setText(body)
+            ?.setChooserTitle("Pošalji email pomoću...")
+            ?.startChooser()
     }
 
     companion object {
