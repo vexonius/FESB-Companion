@@ -19,6 +19,9 @@ import org.koin.java.KoinJavaComponent
 import java.io.IOException
 import java.util.StringTokenizer
 import java.util.UUID
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class PrisutnostService : PrisutnostInterface{
 
@@ -27,8 +30,10 @@ class PrisutnostService : PrisutnostInterface{
 
 
     override suspend fun fetchPrisutnost(): Result.PrisutnostResult {
-        var zimskaPris :MutableList<Dolazak> = mutableListOf()
-        var ljetnaPris :MutableList<Dolazak> = mutableListOf()
+
+        var zimskaPris :MutableList<MutableList<Dolazak>> = mutableListOf()
+        var ljetnaPris :MutableList<MutableList<Dolazak>> = mutableListOf()
+        val prisutnost :MutableList<Dolazak> = mutableListOf()
         cRealm = Realm.getDefaultInstance()
 
         val korisnik = cRealm?.where(Korisnik::class.java)?.findFirst()
@@ -41,50 +46,56 @@ class PrisutnostService : PrisutnostInterface{
                 .url("https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb" + ".unist.hr")
                 .post(it)
                 .build() }
-        val call0 = rq?.let { client.newCall(it) }
+        val response = rq?.let { makeNetworkCall(it) }
 
-        call0?.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) { Log.d("pogreska", "failure") }
 
-            @Throws(IOException::class)
-            override fun onResponse(call: Call, response: Response) {
+        if(response?.isSuccessful == true){
                 val request: Request = Request.Builder()
-                    .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
+                    .url("https://korisnik.fesb.unist.hr/prijava?ReturnUrl=https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
                     .get()
                     .build()
-                val call1 = client.newCall(request)
-
-                call1.enqueue(object : Callback {
-                    override fun onFailure(call: Call, e: IOException) { Log.d("pogreska", "failure") }
-
-                    @Throws(IOException::class)
-                    override fun onResponse(call: Call, response: Response) {
-                        if (response.code != 500) {
-                            val doc = Jsoup.parse(response.body?.string())
-                            try {
-                                val zimski = doc.select("div.semster.winter").first()
-                                val litnji = doc.select("div.semster.summer").first()
-                                val zimskaPredavanja = zimski.select("div.body.clearfix").first()
-                                val litnjaPredavanja = litnji.select("div.body.clearfix").first()
-                                if (zimski.getElementsByClass("emptyList").first() == null) {
-                                    zimskaPris = getDetailedPrisutnost(zimskaPredavanja, 1)
-                                }
-                                if (litnji.getElementsByClass("emptyList").first() == null) {
-                                    ljetnaPris = getDetailedPrisutnost(litnjaPredavanja, 2)
-                                }
-                            } catch (ex: Exception) {
-                                Log.d("Exception pris", ex.message!!)
-                                ex.printStackTrace()
+                val response1 = makeNetworkCall(request)
+                if(response1.isSuccessful){
+                    if (response.code != 500) {
+                        val doc = Jsoup.parse(response1.body?.string())
+                        try {
+                            val zimski = doc.select("div.semster.winter").first()
+                            val litnji = doc.select("div.semster.summer").first()
+                            val zimskaPredavanja = zimski.select("div.body.clearfix").first()
+                            val litnjaPredavanja = litnji.select("div.body.clearfix").first()
+                            if (zimski.getElementsByClass("emptyList").first() == null) {
+                                zimskaPris = getDetailedPrisutnost(zimskaPredavanja, 1)
                             }
+                            if (litnji.getElementsByClass("emptyList").first() == null) {
+                                ljetnaPris = getDetailedPrisutnost(litnjaPredavanja, 2)
+                            }
+                        } catch (ex: Exception) {
+                            Log.d("Exception pris", ex.message!!)
+                            ex.printStackTrace()
                         }
                     }
-                })
+            }}
+        for (pris in (zimskaPris + ljetnaPris)) {
+            for (p in pris) {
+                prisutnost.add(p)
             }
-        })
-        return Result.PrisutnostResult.Success(zimskaPris + ljetnaPris) //popravit ovo tako da vrati failure kada je failure
+        }
+        return Result.PrisutnostResult.Success(prisutnost) //popravit ovo tako da vrati failure kada je failure
 }
+    private suspend fun makeNetworkCall(request: Request): Response = suspendCoroutine { continuation ->
+        val callback = object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                continuation.resumeWithException(e)
+            }
 
-fun parseAndToDatabase(element: Element, response: Response, semester: Int): MutableList<Dolazak> {
+            override fun onResponse(call: Call, response: Response) {
+                continuation.resume(response)
+            }
+        }
+
+        client.newCall(request).enqueue(callback)
+    }
+private fun parseAndToDatabase(element: Element, response: Response, semester: Int): MutableList<Dolazak> {
     val document = Jsoup.parse(response.body?.string())
     val content = document.getElementsByClass("courseCategories").first()
     val kategorije = content.select("div.courseCategory")
@@ -108,8 +119,8 @@ fun parseAndToDatabase(element: Element, response: Response, semester: Int): Mut
     }
     return svaFreshPrisutnost
 }
-    fun getDetailedPrisutnost(listaPredavanja: Element, sem: Int): MutableList<Dolazak> {
-        var pris :MutableList<Dolazak> = mutableListOf()
+    private suspend fun getDetailedPrisutnost(listaPredavanja: Element, sem: Int): MutableList<MutableList<Dolazak>> {
+        val pris :MutableList<MutableList<Dolazak>> = mutableListOf()
         val kolegiji = listaPredavanja.select("a")
         for (element in kolegiji) {
             val request: Request = Request.Builder()
@@ -117,22 +128,15 @@ fun parseAndToDatabase(element: Element, response: Response, semester: Int): Mut
                         .toString())
                 .get()
                 .build()
-            val callonme = client.newCall(request)
-            callonme.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.d("pogreska", "failure")
+            val response = makeNetworkCall(request)
+            if(response.isSuccessful){
+                try {
+                    pris.add(parseAndToDatabase(element, response, sem))
+                } catch (exception: Exception) {
+                    exception.message?.let { Log.d("Exception prisutnost", it) }
+                    exception.printStackTrace()
                 }
-
-                @Throws(IOException::class)
-                override fun onResponse(call: Call, response: Response) {
-                    try {
-                        pris = parseAndToDatabase(element, response, sem)
-                    } catch (exception: Exception) {
-                        exception.message?.let { Log.d("Exception prisutnost", it) }
-                        exception.printStackTrace()
-                    }
-                }
-            })
+            }
         }
         return  pris
     }

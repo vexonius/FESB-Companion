@@ -17,7 +17,7 @@ import org.koin.java.KoinJavaComponent.inject
 class PrisutnostViewModel : ViewModel() {
 
     private val repository: Repository by inject(Repository::class.java)
-    private var _gotPri = MutableLiveData<Boolean>()
+    private var _gotPri = MutableLiveData<Boolean>(true)
 
     val gotPri: LiveData<Boolean>
         get() = _gotPri
@@ -34,7 +34,7 @@ class PrisutnostViewModel : ViewModel() {
         }
 
     }
-    private fun insertOrUpdatePrisutnost(freshPris: List<Dolazak>){
+    private fun insertOrUpdatePrisutnost(freshPris: MutableList<Dolazak>){
         repository.insertOrUpdatePrisutnost(freshPris)
     }
 

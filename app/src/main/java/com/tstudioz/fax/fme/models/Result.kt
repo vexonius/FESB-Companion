@@ -21,7 +21,7 @@ sealed class Result {
         class Failure(throwable: Throwable) : TimeTableResult()
     }
     sealed class PrisutnostResult: Result(){
-        class Success(val pris: List<Dolazak>) : PrisutnostResult()
+        class Success(val pris: MutableList<Dolazak>) : PrisutnostResult()
         class Failure(throwable: Throwable) : PrisutnostResult()
     }
 

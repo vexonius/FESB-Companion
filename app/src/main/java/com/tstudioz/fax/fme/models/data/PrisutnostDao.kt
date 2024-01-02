@@ -5,7 +5,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 
 class PrisutnostDao {
-fun insertOrUpdatePrisutnost(svaFreshPrisutnost: List<Dolazak>){
+fun insertOrUpdatePrisutnost(svaFreshPrisutnost: MutableList<Dolazak>){
         val mainRealmConfig = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("prisutnost.realm")
@@ -14,24 +14,28 @@ fun insertOrUpdatePrisutnost(svaFreshPrisutnost: List<Dolazak>){
         .build()
         val realm = Realm.getInstance(mainRealmConfig)
 
-        realm.executeTransaction { rlm ->
-            val svaPris = rlm.where(Dolazak::class.java).findAll()
-            for (freshpris in svaFreshPrisutnost){
-                if (!isPrisutnostInRealm(rlm, freshpris.id)){
-                    rlm.copyToRealm(freshpris)
+        try{
+            realm.executeTransaction { rlm ->
+                val svaPris = rlm.where(Dolazak::class.java).findAll()
+                for (fpris in svaFreshPrisutnost) {
+                    if (!isPrisutnostInRealm(rlm, fpris.id)) {
+                        rlm.copyToRealm(fpris)
+                    }
+                }
+                for (pris in svaPris) {
+                    if (!isPrisutnostInFresh(pris, svaFreshPrisutnost)) {
+                        pris.deleteFromRealm()
+                    }
                 }
             }
-            for (pris in svaPris){
-                if (!isPrisutnostInFresh(pris, svaFreshPrisutnost)){
-                    pris.deleteFromRealm()
-                }
-            }
+        } finally {
+            realm.close()
         }
     }
 
-    private fun isPrisutnostInRealm(realm: Realm, objectId: String): Boolean {
+    private fun isPrisutnostInRealm(realm: Realm, id: String): Boolean {
         val results = realm.where(Dolazak::class.java)
-            .equalTo("objectId", objectId)
+            .equalTo("id", id)
             .findAll()
 
         return results.isNotEmpty()

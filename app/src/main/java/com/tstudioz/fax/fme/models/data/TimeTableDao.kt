@@ -14,18 +14,22 @@ class TimeTableDao {
             .build()
         val realm = Realm.getInstance(mainRealmConfig)
 
-        realm.executeTransaction { rlm ->
-            val svaPredavanja = rlm.where(Predavanja::class.java).findAll()
-            for (freshpred in svaFreshPredavanja){
-                if (!isPredavanjeInRealm(rlm, freshpred.objectId)){
-                    rlm.copyToRealm(freshpred)
+        try {
+            realm.executeTransaction { rlm ->
+                val svaPredavanja = rlm.where(Predavanja::class.java).findAll()
+                for (freshpred in svaFreshPredavanja) {
+                    if (!isPredavanjeInRealm(rlm, freshpred.objectId)) {
+                        rlm.copyToRealm(freshpred)
+                    }
+                }
+                for (pred in svaPredavanja) {
+                    if (!isPredavanjeInFresh(pred, svaFreshPredavanja)) {
+                        pred.deleteFromRealm()
+                    }
                 }
             }
-            for (pred in svaPredavanja){
-                if (!isPredavanjeInFresh(pred, svaFreshPredavanja)){
-                    pred.deleteFromRealm()
-                }
-            }
+        } finally {
+            realm.close()
         }
     }
     private fun isPredavanjeInRealm(realm: Realm, objectId: Int): Boolean {
