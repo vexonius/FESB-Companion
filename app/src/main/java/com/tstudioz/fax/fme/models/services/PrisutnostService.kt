@@ -2,10 +2,9 @@ package com.tstudioz.fax.fme.models.services
 
 import android.util.Log
 import com.tstudioz.fax.fme.database.Dolazak
-import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.interfaces.PrisutnostInterface
-import io.realm.Realm
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.FormBody
@@ -25,33 +24,30 @@ import kotlin.coroutines.suspendCoroutine
 
 class PrisutnostService : PrisutnostInterface{
 
-    private var cRealm: Realm? = null
     private val client: OkHttpClient by KoinJavaComponent.inject(OkHttpClient::class.java)
 
 
-    override suspend fun fetchPrisutnost(): Result.PrisutnostResult {
+    override suspend fun fetchPrisutnost(user: User): Result.PrisutnostResult {
 
         var zimskaPris :MutableList<MutableList<Dolazak>> = mutableListOf()
         var ljetnaPris :MutableList<MutableList<Dolazak>> = mutableListOf()
         val prisutnost :MutableList<Dolazak> = mutableListOf()
-        cRealm = Realm.getDefaultInstance()
 
-        val korisnik = cRealm?.where(Korisnik::class.java)?.findFirst()
-        val formData: FormBody? = korisnik?.let { Builder()
-                .add("Username", it.getUsername())
-                .add("Password", korisnik.getLozinka())
+        val formData: FormBody = Builder()
+                .add("Username", user.username)
+                .add("Password", user.password)
                 .add("IsRememberMeChecked", "true")
-                .build() }
-        val rq: Request? = formData?.let { Request.Builder()
+                .build()
+        val rq: Request =  Request.Builder()
                 .url("https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb" + ".unist.hr")
-                .post(it)
-                .build() }
-        val response = rq?.let { makeNetworkCall(it) }
+                .post(formData)
+                .build()
+        val response = makeNetworkCall(rq)
 
 
-        if(response?.isSuccessful == true){
+        if(response.isSuccessful){
                 val request: Request = Request.Builder()
-                    .url("https://korisnik.fesb.unist.hr/prijava?ReturnUrl=https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
+                    .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
                     .get()
                     .build()
                 val response1 = makeNetworkCall(request)
@@ -102,7 +98,6 @@ private fun parseAndToDatabase(element: Element, response: Response, semester: I
     val svaFreshPrisutnost = mutableListOf<Dolazak>()
     for (kat in kategorije) {
         val mDolazak = Dolazak()
-        mDolazak.setId(UUID.randomUUID().toString() )
         mDolazak.setSemestar(semester)
         mDolazak.setPredmet(element.select("div.cellContent").first().text())
         mDolazak.setVrsta(kat.getElementsByClass("name" ).first().text())
@@ -111,10 +106,13 @@ private fun parseAndToDatabase(element: Element, response: Response, semester: I
         mDolazak.setRequired(kat.select("div.required-attendance " +"> span" ).first().text())
         val string = kat.select("div" +".required-attendance > " + "span").first().text()
         val st = StringTokenizer(string, " ")
-        val ric1 = st.nextToken()
-        val ric2 = st.nextToken()
+        st.nextToken()
+        st.nextToken()
         val max = st.nextToken()
         mDolazak.setTotal(max.toInt())
+        val str = "${mDolazak.attended}${mDolazak.absent}${mDolazak.predmet}${mDolazak.vrsta}${mDolazak.required}${mDolazak.total}${mDolazak.semestar}"
+        val id = UUID.nameUUIDFromBytes(str.toByteArray())
+        mDolazak.setId(id.toString())
         svaFreshPrisutnost.add(mDolazak)
     }
     return svaFreshPrisutnost

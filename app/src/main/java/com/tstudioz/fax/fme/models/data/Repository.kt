@@ -41,8 +41,8 @@ class Repository {
         }
     }
 
-    suspend fun fetchPrisutnost(): Result.PrisutnostResult {
-        return prisutnostService.fetchPrisutnost()
+    suspend fun fetchPrisutnost(user: User): Result.PrisutnostResult {
+        return prisutnostService.fetchPrisutnost(user)
     }
 
     fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>) {

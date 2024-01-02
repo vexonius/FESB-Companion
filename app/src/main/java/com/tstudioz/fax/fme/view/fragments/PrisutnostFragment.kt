@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.view.fragments
 
+import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,9 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Dolazak
 import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
+import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.adapters.DolasciAdapter
 import com.tstudioz.fax.fme.viewmodel.PrisutnostViewModel
@@ -40,6 +43,7 @@ class PrisutnostFragment : Fragment() {
     private var sRealm: Realm? = null
     private var wRealm: Realm? = null
     private var binding: PrisutnostTabBinding? = null
+    private var shPref: SharedPreferences? =  FESBCompanion.instance?.sP
     private lateinit var prisutnostviewmodel : PrisutnostViewModel
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
@@ -63,9 +67,16 @@ class PrisutnostFragment : Fragment() {
         // Process: com.tstudioz.fax.fme, PID: 10798
         // java.lang.IllegalStateException: This Realm instance has already been closed, making it unusable.
         // val korisnik = cRealm?.where(Korisnik::class.java)?.findFirst()
-
+        val username = shPref?.getString("username", "")
+        val password = shPref?.getString("password","")
+        val user =User("","","")
+        if (username != null && password != null){
+            user.username = username
+            user.password = password
+            user.fmail = "$username@fesb.hr"
+        }
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
-            lifecycleScope.launch { prisutnostviewmodel.fetchPrisutnost() }
+            lifecycleScope.launch { prisutnostviewmodel.fetchPrisutnost(user) }
         }
 
         prisutnostviewmodel.gotPri.observe(viewLifecycleOwner){ gotPri ->

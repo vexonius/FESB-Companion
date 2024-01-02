@@ -113,6 +113,7 @@ class MainActivity : AppCompatActivity() {
             finally {
                 if (korisnik != null) {
                     editor?.putString("username", korisnik.getUsername())
+                    editor?.putString("password", korisnik.getLozinka())
                     mojRaspored()
                 } else { invalidCreds() }
                 realmLog?.close()
