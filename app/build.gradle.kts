@@ -32,21 +32,25 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-
-    viewBinding {
+    @Suppress("UnstableApiUsage")
+    buildFeatures{
+        viewBinding = true
+        dataBinding = true
+    }
+    /*viewBinding {
         isEnabled = true
     }
     dataBinding {
         isEnabled = true
-    }
+    }*/
 }
 
 dependencies {
 
-    val koin_version = "2.1.4"
-    implementation("org.koin:koin-android:$koin_version")
-    implementation("org.koin:koin-android-scope:$koin_version")
-    implementation("org.koin:koin-android-viewmodel:$koin_version")
+    val koinVersion = "2.1.4"
+    implementation("org.koin:koin-android:$koinVersion")
+    implementation("org.koin:koin-android-scope:$koinVersion")
+    implementation("org.koin:koin-android-viewmodel:$koinVersion")
     implementation("com.squareup.retrofit2:retrofit:2.8.1")
     implementation("com.squareup.moshi:moshi-kotlin:1.9.2")
     implementation("com.facebook.shimmer:shimmer:0.5.0")
@@ -63,6 +67,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.4.1")
     implementation("org.jsoup:jsoup:1.13.1")
     implementation("io.realm:android-adapters:2.1.1")
+    implementation("io.realm:realm-gradle-plugin:10.13.3-transformer-api") // added to try to remobe the transform error
     implementation("com.github.doctoror.particlesdrawable:library:1.0.9")
     implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")
     implementation("com.github.PhilJay:MPAndroidChart:v3.0.2")

@@ -46,10 +46,8 @@ class PrisutnostFragment : Fragment() {
     private var shPref: SharedPreferences? =  FESBCompanion.instance?.sP
     private lateinit var prisutnostviewmodel : PrisutnostViewModel
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): ConstraintLayout? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): ConstraintLayout? {
+
         setHasOptionsMenu(true)
         binding = PrisutnostTabBinding.inflate(inflater, container, false)
         prisutnostviewmodel = PrisutnostViewModel()
