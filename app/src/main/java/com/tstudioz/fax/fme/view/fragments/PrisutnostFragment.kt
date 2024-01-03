@@ -137,8 +137,8 @@ class PrisutnostFragment : Fragment() {
         binding?.progressAttend?.visibility = View.VISIBLE
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
         if (snack != null) {
             snack?.dismiss()
         }
