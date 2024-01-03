@@ -75,6 +75,7 @@ class MenzaActivity : AppCompatActivity() {
             override fun onResponse(call: Call, response: Response) {
                 val json = response.body?.string()
                 parsePage(json)
+                response.body?.close()
             }
         })
     }

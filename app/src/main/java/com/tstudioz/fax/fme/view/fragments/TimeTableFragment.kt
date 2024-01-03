@@ -255,6 +255,8 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     }
                 } catch (e: IOException) {
                     Log.e(ContentValues.TAG, "Exception caught: ", e)
+                }finally {
+                    response.body?.close()
                 }
             }
         })

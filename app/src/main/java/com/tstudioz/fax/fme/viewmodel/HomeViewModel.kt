@@ -58,6 +58,8 @@ class HomeViewModel(application: Application)  : AndroidViewModel(application) {
                     Log.e(ContentValues.TAG, "Exception caught: ", e)
                 } catch (e: JSONException) {
                     Log.e(ContentValues.TAG, "Exception caught: ", e)
+                }finally {
+                    response.body?.close()
                 }
             }
         })
