@@ -37,11 +37,8 @@ class PrisutnostFragment : Fragment() {
         .deleteRealmIfMigrationNeeded()
         .build()
     private var snack: Snackbar? = null
-    private var winterAdapter: DolasciAdapter? = null
-    private var summerAdapter: DolasciAdapter? = null
-    private var cRealm: Realm? = null
-    private var sRealm: Realm? = null
-    private var wRealm: Realm? = null
+    private var semAdapter: DolasciAdapter? = null
+    private var realm: Realm? = null
     private var binding: PrisutnostTabBinding? = null
     private var shPref: SharedPreferences? =  FESBCompanion.instance?.sP
     private lateinit var prisutnostviewmodel : PrisutnostViewModel
@@ -53,18 +50,12 @@ class PrisutnostFragment : Fragment() {
         prisutnostviewmodel = PrisutnostViewModel()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         hideRecyc()
-        startFetching()
+        fetchPrisutnost()
         return binding?.root
     }
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     fun fetchPrisutnost() {
-        cRealm = Realm.getInstance(realmConfig)
-        //ako ovo uklonim nece da radi, kaze da je zatvoren realm...
-        // FATAL EXCEPTION: main
-        // Process: com.tstudioz.fax.fme, PID: 10798
-        // java.lang.IllegalStateException: This Realm instance has already been closed, making it unusable.
-        // val korisnik = cRealm?.where(Korisnik::class.java)?.findFirst()
         val username = shPref?.getString("username", "")
         val password = shPref?.getString("password","")
         val user =User("","","")
@@ -75,53 +66,43 @@ class PrisutnostFragment : Fragment() {
         }
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
             lifecycleScope.launch { prisutnostviewmodel.fetchPrisutnost(user) }
-        }
+        } else { showSnack("Offline") }
 
         prisutnostviewmodel.gotPri.observe(viewLifecycleOwner){ gotPri ->
             if (gotPri){
                 requireActivity().runOnUiThread {
-                    showRecyclerviewWinterSem()
-                    showRecyclerviewSummerSem()
+                    showRecyclerview(1)
+                    showRecyclerview(2)
                     binding?.progressAttend?.visibility = View.INVISIBLE
                     binding?.nestedAttend?.visibility = View.VISIBLE
                 }
             }
             else {
-                showSnackError()
+                showSnack("Error")
             }
         }
     }
 
-    private fun showRecyclerviewWinterSem() {
-        wRealm = Realm.getInstance(realmConfig)
-        val dolasciWinter: RealmResults<Dolazak>? =
-            wRealm?.where(Dolazak::class.java)?.equalTo("semestar", "1".toInt())?.findAll()
+    private fun showRecyclerview(sem: Int) {
+        if (realm == null || realm?.isClosed == true){
+            realm = Realm.getInstance(realmConfig) }
+        val dolasciSem: RealmResults<Dolazak>? =
+            realm?.where(Dolazak::class.java)?.equalTo("semestar", sem)?.findAll()
         try {
-            binding?.recyclerZimski?.layoutManager = LinearLayoutManager(activity,
-                LinearLayoutManager.HORIZONTAL, false
-            )
-            if (dolasciWinter!=null)
-                winterAdapter = context?.let { DolasciAdapter(it, dolasciWinter) }
-            binding?.recyclerZimski?.adapter = winterAdapter
-        } finally {
-            wRealm?.close()
-        }
-    }
-
-    private fun showRecyclerviewSummerSem() {
-        sRealm = Realm.getInstance(realmConfig)
-        val dolasciSummer: RealmResults<Dolazak>? =
-            sRealm?.where(Dolazak::class.java)?.equalTo("semestar", "2".toInt())?.findAll()
-        try {
-            binding?.recyclerLItnji?.layoutManager = LinearLayoutManager(activity,
-                LinearLayoutManager.HORIZONTAL, false
-            )
-            if(dolasciSummer!=null)
-                summerAdapter = context?.let { DolasciAdapter(it, dolasciSummer) }
-            binding?.recyclerLItnji?.adapter = summerAdapter
-        } finally {
-            sRealm?.close()
-        }
+            if (!dolasciSem.isNullOrEmpty()){
+                semAdapter = context?.let { DolasciAdapter(it, dolasciSem) }}
+            if (!dolasciSem.isNullOrEmpty() && semAdapter != null)
+                if (sem == 1){
+                    binding?.recyclerZimski?.layoutManager =
+                        LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+                    binding?.recyclerZimski?.adapter = semAdapter
+                } else if (sem == 2){
+                    binding?.recyclerLItnji?.layoutManager = LinearLayoutManager(activity,
+                        LinearLayoutManager.HORIZONTAL, false)
+                    binding?.recyclerLItnji?.adapter = semAdapter
+                }
+                semAdapter = null
+        } catch (_: Exception){}
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -129,44 +110,26 @@ class PrisutnostFragment : Fragment() {
         super.onPrepareOptionsMenu(menu)
     }
 
-    private fun startFetching() {
-        if (NetworkUtils.isNetworkAvailable(requireContext())) {
+    private fun showSnack(error: String ) {
+        val snack = when (error) {
+            "Error" -> Snackbar.make(
+                requireActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
+                        "pogreške", Snackbar.LENGTH_LONG)
+            "Offline" -> Snackbar.make(
+                requireActivity().findViewById(R.id.coordinatorLayout), "Niste " +
+                        "povezani", Snackbar.LENGTH_INDEFINITE)
+            else -> Snackbar.make(
+                requireActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
+                        "pogreške", Snackbar.LENGTH_LONG)
+        }
+        val okvir = snack.view
+        okvir.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
+        snack.setAction("Ponovi") {
+            snack.dismiss()
             fetchPrisutnost()
-        } else {
-            fetchPrisutnost()
-            showSnacOffline()
         }
-    }
-
-    private fun showSnacOffline() {
-        snack = Snackbar.make(
-            requireActivity().findViewById(R.id.coordinatorLayout), "Niste " +
-                    "povezani", Snackbar.LENGTH_INDEFINITE
-        )
-        val vjuz = snack?.view
-        vjuz?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
-        snack?.setAction("PONOVI") {
-            snack?.dismiss()
-            startFetching()
-        }
-        snack?.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-
-        snack?.show()
-    }
-
-    private fun showSnackError() {
-        snack = Snackbar.make(
-            requireActivity().findViewById(R.id.coordinatorLayout), "Došlo je do " +
-                    "pogreške", Snackbar.LENGTH_LONG
-        )
-        val okvir = snack?.view
-        okvir?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
-        snack?.setAction("PONOVI") {
-            snack?.dismiss()
-            startFetching()
-        }
-        snack?.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        snack?.show()
+        snack.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        snack.show()
     }
 
     private fun hideRecyc() {
@@ -179,6 +142,8 @@ class PrisutnostFragment : Fragment() {
         if (snack != null) {
             snack?.dismiss()
         }
-        if (cRealm != null) cRealm?.close()
+        if (realm != null) {
+            realm?.close()
+        }
     }
 }

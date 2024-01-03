@@ -36,17 +36,19 @@ class DolasciAdapter(private val context: Context, private val mDolazak: RealmRe
 
     override fun onBindViewHolder(holder: DolazakViewHolder, position: Int) {
         val predavanja = mDolazak[position]
-        holder.name.text = predavanja!!.getPredmet()
-        holder.name.typeface = regulartf
-        holder.type.text = predavanja.getVrsta()
-        holder.dolazakNum.text = "Obavezno " + predavanja.getRequired()
         val entries: MutableList<PieEntry> = ArrayList()
-        entries.add(PieEntry(predavanja.getAttended().toFloat()))
-        entries.add(PieEntry(predavanja.getAbsent().toFloat()))
-        val neood =
-            PieEntry((predavanja.getTotal() - predavanja.getAbsent() - predavanja.getAttended()).toFloat())
-        if (neood.value.toDouble() != 0.0) {
-            entries.add(neood)
+        if (predavanja !=null){
+            holder.name.text = predavanja.getPredmet()
+            holder.name.typeface = regulartf
+            holder.type.text = predavanja.getVrsta()
+            holder.dolazakNum.text = "Obavezno " + predavanja.getRequired()
+            entries.add(PieEntry(predavanja.getAttended().toFloat()))
+            entries.add(PieEntry(predavanja.getAbsent().toFloat()))
+            val neood =
+                PieEntry((predavanja.getTotal() - predavanja.getAbsent() - predavanja.getAttended()).toFloat())
+            if (neood.value.toDouble() != 0.0) {
+                entries.add(neood)
+            }
         }
         val formatter = IValueFormatter { value, entry, dataSetIndex, viewPortHandler ->
             value.toInt()
