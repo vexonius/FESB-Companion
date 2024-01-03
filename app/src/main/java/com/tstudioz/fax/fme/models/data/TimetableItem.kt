@@ -27,7 +27,7 @@ enum class TimetableEvent(val type: String) {
 
     PREDAVANJA("Predavanje"),
     AUDITORNE_VJEZBE("Auditorne vježbe"),
-    LABARATORIJSKE_VJEZBE("Labaratorijske vježbe"),
+    LABARATORIJSKE_VJEZBE("Laboratorijske vježbe"),
     KONSTRUKCIJSKE_VJEZBE("Konstrukcijske vježbe"),
     KOLOKVIJ("Kolokvij"),
     SEMINAR("Seminar"),

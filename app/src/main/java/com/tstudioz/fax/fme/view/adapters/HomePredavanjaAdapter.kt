@@ -45,7 +45,7 @@ class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanj
             "Predavanje" -> holder.boja.setBackgroundResource(R.color.blue_nice)
             "Auditorne vježbe" -> holder.boja.setBackgroundResource(R.color.green_nice)
             "Kolokvij" -> holder.boja.setBackgroundResource(R.color.purple_nice)
-            "Labaratorijske vježbe" -> holder.boja.setBackgroundResource(R.color.red_nice)
+            "Laboratorijske vježbe" -> holder.boja.setBackgroundResource(R.color.red_nice)
             "Konstrukcijske vježbe" -> holder.boja.setBackgroundResource(R.color.grey_nice)
             "Seminar" -> holder.boja.setBackgroundResource(R.color.blue_nice)
             "Ispit" -> holder.boja.setBackgroundResource(R.color.purple_dark)

@@ -41,7 +41,6 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
         } else {
             holder.tablename.text = predavanja?.predmetPredavanja ?: ""
         }
-
         holder.tablename.text = compactImePredavanja.toString()
         holder.tabletype.text = predavanja?.rasponVremena ?: ""
         holder.tablemjesto.text = predavanja?.dvorana ?: ""
@@ -50,17 +49,10 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
             "Predavanje" -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
             "Auditorne vježbe" -> holder.tableboja.setBackgroundResource(R.color.green_nice)
             "Kolokvij" -> holder.tableboja.setBackgroundResource(R.color.purple_nice)
-            "Labaratorijske vježbe" -> holder.tableboja.setBackgroundResource(R.color.red_nice)
+            "Laboratorijske vježbe" -> holder.tableboja.setBackgroundResource(R.color.red_nice)
             "Konstrukcijske vježbe" -> holder.tableboja.setBackgroundResource(R.color.grey_nice)
             "Seminar" -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
             "Ispit" -> holder.tableboja.setBackgroundResource(R.color.purple_dark)
-            "Predavanja," -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
-            "Auditorne vježbe," -> holder.tableboja.setBackgroundResource(R.color.green_nice)
-            "Kolokviji," -> holder.tableboja.setBackgroundResource(R.color.purple_nice)
-            "Laboratorijske vježbe," -> holder.tableboja.setBackgroundResource(R.color.red_nice)
-            "Konstrukcijske vježbe," -> holder.tableboja.setBackgroundResource(R.color.grey_nice)
-            "Seminar," -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
-            "Ispiti," -> holder.tableboja.setBackgroundResource(R.color.purple_dark)
         }
     }
 
@@ -116,6 +108,8 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
         var imeGrupe = predavanja?.grupa
         if (!imeGrupe.isNullOrEmpty()) {
             imeGrupe = imeGrupe.substring(0, imeGrupe.length - 1)
+        }else{
+            imeGrupe = "Jedna grupe"
         }
         infoKolegij.text = predavanja?.predmetPredavanja
         infoPredavanje.text = imePredavanja
@@ -128,17 +122,10 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
             "Predavanje" -> infoKolegij.setBackgroundResource(R.color.blue_nice)
             "Auditorne vježbe" -> infoKolegij.setBackgroundResource(R.color.green_nice)
             "Kolokvij" -> infoKolegij.setBackgroundResource(R.color.purple_nice)
-            "Labaratorijske vježbe" -> infoKolegij.setBackgroundResource(R.color.red_nice)
+            "Laboratorijske vježbe" -> infoKolegij.setBackgroundResource(R.color.red_nice)
             "Konstrukcijske vježbe" -> infoKolegij.setBackgroundResource(R.color.grey_nice)
             "Seminar" -> infoKolegij.setBackgroundResource(R.color.blue_nice)
             "Ispit" -> infoKolegij.setBackgroundResource(R.color.purple_dark)
-            "Predavanja," -> infoKolegij.setBackgroundResource(R.color.blue_nice)
-            "Auditorne vježbe," -> infoKolegij.setBackgroundResource(R.color.green_nice)
-            "Kolokviji," -> infoKolegij.setBackgroundResource(R.color.purple_nice)
-            "Laboratorijske vježbe," -> infoKolegij.setBackgroundResource(R.color.red_nice)
-            "Konstrukcijske vježbe," -> infoKolegij.setBackgroundResource(R.color.grey_nice)
-            "Seminar," -> infoKolegij.setBackgroundResource(R.color.blue_nice)
-            "Ispiti," -> infoKolegij.setBackgroundResource(R.color.purple_dark)
         }
 
         dialog = BottomSheetDialog(context).apply {
