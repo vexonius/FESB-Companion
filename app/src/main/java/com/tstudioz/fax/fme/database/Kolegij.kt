@@ -1,34 +1,11 @@
-package com.tstudioz.fax.fme.database;
+package com.tstudioz.fax.fme.database
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
+import io.realm.RealmObject
 
 /**
  * Created by amarthus on 06-May-17.
  */
-
-public class Kolegij extends RealmObject {
-
-
-    public String name;
-    public String link;
-
-
-
-    public String getLink() {
-        return link;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-
-    public void setLink(String link) {
-        this.link = link;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+open class Kolegij : RealmObject() {
+    var name: String? = null
+    var link: String? = null
 }

@@ -165,8 +165,8 @@ class HomeFragment : Fragment() {
     private fun loadNotes() {
         val tasks = taskRealm?.where(LeanTask::class.java)?.findAll()
         val dodajNovi = LeanTask()
-        dodajNovi.setId("ACTION_ADD")
-        dodajNovi.setTaskTekst("Dodaj novi podsjetnik")
+        dodajNovi.id = "ACTION_ADD"
+        dodajNovi.taskTekst = "Dodaj novi podsjetnik"
         taskRealm?.executeTransaction { realm -> realm.insertOrUpdate(dodajNovi) }
         val noteAdapter = tasks?.let { NoteAdapter(it) }
         binding?.recyclerTask?.layoutManager = LinearLayoutManager(activity)

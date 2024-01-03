@@ -38,14 +38,14 @@ class DolasciAdapter(private val context: Context, private val mDolazak: RealmRe
         val predavanja = mDolazak[position]
         val entries: MutableList<PieEntry> = ArrayList()
         if (predavanja !=null){
-            holder.name.text = predavanja.getPredmet()
+            holder.name.text = predavanja.predmet
             holder.name.typeface = regulartf
-            holder.type.text = predavanja.getVrsta()
-            holder.dolazakNum.text = "Obavezno " + predavanja.getRequired()
-            entries.add(PieEntry(predavanja.getAttended().toFloat()))
-            entries.add(PieEntry(predavanja.getAbsent().toFloat()))
+            holder.type.text = predavanja.vrsta
+            holder.dolazakNum.text = "Obavezno " + predavanja.required
+            entries.add(PieEntry(predavanja.attended.toFloat()))
+            entries.add(PieEntry(predavanja.absent.toFloat()))
             val neood =
-                PieEntry((predavanja.getTotal() - predavanja.getAbsent() - predavanja.getAttended()).toFloat())
+                PieEntry((predavanja.total - predavanja.absent - predavanja.attended).toFloat())
             if (neood.value.toDouble() != 0.0) {
                 entries.add(neood)
             }

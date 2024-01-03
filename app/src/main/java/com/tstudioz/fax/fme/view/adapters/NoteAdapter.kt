@@ -51,7 +51,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         val leanTask = mTasks[position]
-        holder.taskText.text = leanTask?.getTaskTekst()
+        holder.taskText.text = leanTask?.taskTekst
         when (holder.itemViewType) {
             NOTE -> if (mTasks[position]?.checked == true) {
                 holder.taskText.paintFlags =
@@ -72,7 +72,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
 
     override fun getItemViewType(position: Int): Int {
         val taskType = mTasks[position]
-        return if ((taskType?.getId() == "ACTION_ADD")) {
+        return if ((taskType?.id == "ACTION_ADD")) {
             2
         } else {
             1
@@ -104,7 +104,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
                             newIntent.putExtra("mode", 2)
                             newIntent.putExtra(
                                 "task_key",
-                                mTasks[adapterPosition]?.getId()
+                                mTasks[adapterPosition]?.id
                             )
                             view.context.startActivity(newIntent)
                         }
@@ -136,7 +136,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
                 ADD_NEW -> {
                     val newIntent = Intent(view.context, NoteActivity::class.java)
                     newIntent.putExtra("mode", 2)
-                    newIntent.putExtra("task_key", mTasks[adapterPosition]?.getId())
+                    newIntent.putExtra("task_key", mTasks[adapterPosition]?.id)
                     view.context.startActivity(newIntent)
                 }
 
@@ -149,14 +149,14 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
                 ADD_NEW -> {
                     val newIntent = Intent(view.context, NoteActivity::class.java)
                     newIntent.putExtra("mode", 2)
-                    newIntent.putExtra("task_key", mTasks[adapterPosition]?.getId())
+                    newIntent.putExtra("task_key", mTasks[adapterPosition]?.id)
                     view.context.startActivity(newIntent)
                 }
 
                 NOTE -> {
                     val intent = Intent(view.context, NoteActivity::class.java)
                     intent.putExtra("mode", 1)
-                    intent.putExtra("task_key", mTasks[adapterPosition]?.getId())
+                    intent.putExtra("task_key", mTasks[adapterPosition]?.id)
                     view.context.startActivity(intent)
                 }
             }

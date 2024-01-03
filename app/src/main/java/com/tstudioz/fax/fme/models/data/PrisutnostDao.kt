@@ -18,7 +18,7 @@ fun insertOrUpdatePrisutnost(svaFreshPrisutnost: MutableList<Dolazak>){
             realm.executeTransaction { rlm ->
                 val svaPris = rlm.where(Dolazak::class.java).findAll()
                 for (fpris in svaFreshPrisutnost) {
-                    if (!isPrisutnostInRealm(rlm, fpris.id)) {
+                    if (fpris.id?.let { isPrisutnostInRealm(rlm, it) }==false) {
                         rlm.copyToRealm(fpris)
                     }
                 }

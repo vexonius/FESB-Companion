@@ -47,7 +47,7 @@ class NoteActivity : AppCompatActivity() {
         tRealm.use { tRealm ->
             if (mTaskId != null) {
                 val leanTask = tRealm?.where(LeanTask::class.java)?.equalTo("id", mTaskId)?.findFirst()
-                et?.setText(leanTask?.getTaskTekst())
+                et?.setText(leanTask?.taskTekst)
             }
         }
         saveNoteListener()
@@ -68,7 +68,7 @@ class NoteActivity : AppCompatActivity() {
             if (mTaskId != null && stringBiljeska.trim { it <= ' ' } != "") {
                 sRealm.executeTransaction { realm ->
                     val leanTask = realm.where(LeanTask::class.java).equalTo("id", mTaskId).findFirst()
-                    leanTask?.setTaskTekst(stringBiljeska)
+                    leanTask?.taskTekst = stringBiljeska
                     leanTask?.checked = false
                 }
             } else if (mTaskId != null && stringBiljeska.trim { it <= ' ' } == "") {
@@ -79,7 +79,7 @@ class NoteActivity : AppCompatActivity() {
             } else if (stringBiljeska.trim { it <= ' ' } != "") {
                 sRealm.executeTransaction { realm ->
                     val leanTask = realm.createObject(LeanTask::class.java, UUID.randomUUID().toString())
-                    leanTask?.setTaskTekst(stringBiljeska)
+                    leanTask?.taskTekst = stringBiljeska
                     leanTask?.checked = false
                 }
             }

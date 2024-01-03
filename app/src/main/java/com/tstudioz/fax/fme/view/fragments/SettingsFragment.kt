@@ -85,7 +85,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val prefLogOut = findPreference("logout") as Preference?
         rlmLog = Realm.getDefaultInstance()
         try {
-            korisnik = rlmLog?.where(Korisnik::class.java)?.findFirst()?.getUsername()
+            korisnik = rlmLog?.where(Korisnik::class.java)?.findFirst()?.username
         } catch (e: Exception) {
             e.message?.let { Log.e("settings exp", it )}
         } finally {

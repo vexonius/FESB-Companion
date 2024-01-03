@@ -112,8 +112,8 @@ class MainActivity : AppCompatActivity() {
             catch (ex: Exception) { ex.printStackTrace() }
             finally {
                 if (korisnik != null) {
-                    editor?.putString("username", korisnik.getUsername())
-                    editor?.putString("password", korisnik.getLozinka())
+                    editor?.putString("username", korisnik.username)
+                    editor?.putString("password", korisnik.lozinka)
                     mojRaspored()
                 } else { invalidCreds() }
                 realmLog?.close()

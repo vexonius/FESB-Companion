@@ -33,8 +33,8 @@ class LoginViewModel(application: Application)  : AndroidViewModel(application) 
             try {
                 mLogRealm.executeTransaction { realm ->
                     val userrealm = realm.createObject(Korisnik::class.java)
-                    userrealm.setUsername(user.username)
-                    userrealm.setLozinka(user.password)
+                    userrealm.username = user.username
+                    userrealm.lozinka = user.password
                 }
             } finally {
                 mLogRealm.close()

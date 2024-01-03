@@ -98,21 +98,21 @@ private fun parseAndToDatabase(element: Element, response: Response, semester: I
     val svaFreshPrisutnost = mutableListOf<Dolazak>()
     for (kat in kategorije) {
         val mDolazak = Dolazak()
-        mDolazak.setSemestar(semester)
-        mDolazak.setPredmet(element.select("div.cellContent").first().text())
-        mDolazak.setVrsta(kat.getElementsByClass("name" ).first().text())
-        mDolazak.setAttended(kat.select("div.attended > span.num").first().text().toInt() )
-        mDolazak.setAbsent(kat.select("div.absent > span.num").first().text().toInt())
-        mDolazak.setRequired(kat.select("div.required-attendance " +"> span" ).first().text())
+        mDolazak.semestar = semester
+        mDolazak.predmet = element.select("div.cellContent").first().text()
+        mDolazak.vrsta = kat.getElementsByClass("name" ).first().text()
+        mDolazak.attended = kat.select("div.attended > span.num").first().text().toInt()
+        mDolazak.absent = kat.select("div.absent > span.num").first().text().toInt()
+        mDolazak.required = kat.select("div.required-attendance " +"> span" ).first().text()
         val string = kat.select("div" +".required-attendance > " + "span").first().text()
         val st = StringTokenizer(string, " ")
         st.nextToken()
         st.nextToken()
         val max = st.nextToken()
-        mDolazak.setTotal(max.toInt())
+        mDolazak.total = max.toInt()
         val str = "${mDolazak.attended}${mDolazak.absent}${mDolazak.predmet}${mDolazak.vrsta}${mDolazak.required}${mDolazak.total}${mDolazak.semestar}"
         val id = UUID.nameUUIDFromBytes(str.toByteArray())
-        mDolazak.setId(id.toString())
+        mDolazak.id = id.toString()
         svaFreshPrisutnost.add(mDolazak)
     }
     return svaFreshPrisutnost
