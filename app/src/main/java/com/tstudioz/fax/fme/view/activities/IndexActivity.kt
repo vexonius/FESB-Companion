@@ -24,7 +24,7 @@ class IndexActivity : AppCompatActivity() {
         val entry3 = RadarEntry(4f, 3)
         val entry2 = RadarEntry(5f, 4)
 
-        val formatter = IValueFormatter { value, entry, dataSetIndex, viewPortHandler ->
+        val formatter = IValueFormatter { value, _, _, _ ->
             value.toInt()
                 .toString() + ""
         }

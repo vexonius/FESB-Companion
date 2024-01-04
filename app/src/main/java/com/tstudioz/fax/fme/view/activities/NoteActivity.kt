@@ -64,20 +64,20 @@ class NoteActivity : AppCompatActivity() {
         super.onPause()
         val sRealm = Realm.getInstance(realmTaskConfiguration)
         val stringBiljeska = et?.text.toString()
-        sRealm.use { sRealm ->
+        sRealm.use { sRlm ->
             if (mTaskId != null && stringBiljeska.trim { it <= ' ' } != "") {
-                sRealm.executeTransaction { realm ->
+                sRlm.executeTransaction { realm ->
                     val leanTask = realm.where(LeanTask::class.java).equalTo("id", mTaskId).findFirst()
                     leanTask?.taskTekst = stringBiljeska
                     leanTask?.checked = false
                 }
             } else if (mTaskId != null && stringBiljeska.trim { it <= ' ' } == "") {
-                sRealm.executeTransaction { realm ->
+                sRlm.executeTransaction { realm ->
                     val leanTask = realm.where(LeanTask::class.java).equalTo("id", mTaskId).findFirst()
                     leanTask?.deleteFromRealm()
                 }
             } else if (stringBiljeska.trim { it <= ' ' } != "") {
-                sRealm.executeTransaction { realm ->
+                sRlm.executeTransaction { realm ->
                     val leanTask = realm.createObject(LeanTask::class.java, UUID.randomUUID().toString())
                     leanTask?.taskTekst = stringBiljeska
                     leanTask?.checked = false

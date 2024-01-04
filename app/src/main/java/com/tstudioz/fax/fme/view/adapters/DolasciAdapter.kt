@@ -41,7 +41,8 @@ class DolasciAdapter(private val context: Context, private val mDolazak: RealmRe
             holder.name.text = predavanja.predmet
             holder.name.typeface = regulartf
             holder.type.text = predavanja.vrsta
-            holder.dolazakNum.text = "Obavezno " + predavanja.required
+            val dolazaknum = "Obavezno " + predavanja.required
+            holder.dolazakNum.text = dolazaknum
             entries.add(PieEntry(predavanja.attended.toFloat()))
             entries.add(PieEntry(predavanja.absent.toFloat()))
             val neood =
@@ -50,7 +51,7 @@ class DolasciAdapter(private val context: Context, private val mDolazak: RealmRe
                 entries.add(neood)
             }
         }
-        val formatter = IValueFormatter { value, entry, dataSetIndex, viewPortHandler ->
+        val formatter = IValueFormatter { value, _, _, _ ->
             value.toInt()
                 .toString() + ""
         }

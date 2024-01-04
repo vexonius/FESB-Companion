@@ -34,6 +34,7 @@ class CredMigration : RealmMigration {
             shema.get("Predavanja")
                 ?.removeField("predavanjeVrsta")
                 ?.addField("predavanjeIme", String::class.java)
+                ?.addField("predmetPredavanja", String::class.java)
             shema.get("LeanTask")
                 ?.removeField("isChecked")
                 ?.addField("checked", Boolean::class.javaPrimitiveType)

@@ -25,4 +25,8 @@ sealed class Result {
         class Failure(throwable: Throwable) : PrisutnostResult()
     }
 
+    sealed class WeatherResult: Result()  {
+        data class Success(val data: String): WeatherResult()
+        class Failure(exception: Throwable) : WeatherResult()
+    }
 }

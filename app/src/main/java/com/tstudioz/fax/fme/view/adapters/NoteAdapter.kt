@@ -22,7 +22,7 @@ import io.realm.RealmResults
 class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
     RecyclerView.Adapter<NoteViewHolder>(), RealmChangeListener<Any?> {
     var light: Typeface? = null
-    var realmTaskConfiguration = RealmConfiguration.Builder()
+    var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
         .name("tasks.realm")
         .deleteRealmIfMigrationNeeded()
         .schemaVersion(1)
@@ -34,18 +34,18 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val view: View
-        if (viewType == ADD_NEW) {
+        return if (viewType == ADD_NEW) {
             view = LayoutInflater.from(parent.context).inflate(
                 R.layout.add_lean_task_item,
                 parent, false
             )
-            return NoteViewHolder(view)
+            NoteViewHolder(view)
         } else {
             view = LayoutInflater.from(parent.context).inflate(
                 R.layout.lean_task_item,
                 parent, false
             )
-            return NoteViewHolder(view)
+            NoteViewHolder(view)
         }
     }
 
@@ -96,39 +96,31 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
             itemView.setOnClickListener(this)
             itemView.setOnLongClickListener(this)
             mRealm = Realm.getInstance(realmTaskConfiguration)
-            point.setOnClickListener(object : View.OnClickListener {
-                override fun onClick(view: View) {
-                    when (itemViewType) {
-                        ADD_NEW -> {
-                            val newIntent = Intent(view.context, NoteActivity::class.java)
-                            newIntent.putExtra("mode", 2)
-                            newIntent.putExtra(
-                                "task_key",
-                                mTasks[adapterPosition]?.id
-                            )
-                            view.context.startActivity(newIntent)
-                        }
+            point.setOnClickListener { view ->
+                when (itemViewType) {
+                    ADD_NEW -> {
+                        val newIntent = Intent(view.context, NoteActivity::class.java)
+                        newIntent.putExtra("mode", 2)
+                        newIntent.putExtra(
+                            "task_key",
+                            mTasks[adapterPosition]?.id
+                        )
+                        view.context.startActivity(newIntent)
+                    }
 
-                        NOTE -> if (mTasks[adapterPosition]?.checked == true) {
-                            taskText.paintFlags = 0
-                            point.setImageResource(R.drawable.circle_white)
-                            mRealm.executeTransaction(Realm.Transaction {
-                                mTasks.get(
-                                    adapterPosition
-                                )?.checked = false
-                            })
-                        } else {
-                            point.setImageResource(R.drawable.circle_checked)
-                            taskText.paintFlags = taskText.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                            mRealm.executeTransaction(object : Realm.Transaction {
-                                override fun execute(realm: Realm) {
-                                    mTasks.get(adapterPosition)?.checked = true
-                                }
-                            })
+                    NOTE -> if (mTasks[adapterPosition]?.checked == true) {
+                        taskText.paintFlags = 0
+                        point.setImageResource(R.drawable.circle_white)
+                        mRealm.executeTransaction {
+                            mTasks[adapterPosition]?.checked = false
                         }
+                    } else {
+                        point.setImageResource(R.drawable.circle_checked)
+                        taskText.paintFlags = taskText.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                        mRealm.executeTransaction { mTasks[adapterPosition]?.checked = true }
                     }
                 }
-            })
+            }
         }
 
         override fun onClick(view: View) {
@@ -169,7 +161,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
     }
 
     companion object {
-        private val ADD_NEW = 2
-        private val NOTE = 1
+        private const val ADD_NEW = 2
+        private const val NOTE = 1
     }
 }

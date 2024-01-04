@@ -41,6 +41,7 @@ class PrisutnostFragment : Fragment() {
     private var realm: Realm? = null
     private var binding: PrisutnostTabBinding? = null
     private var shPref: SharedPreferences? =  FESBCompanion.instance?.sP
+    @OptIn(ExperimentalCoroutinesApi::class)
     private lateinit var prisutnostviewmodel : PrisutnostViewModel
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): ConstraintLayout? {

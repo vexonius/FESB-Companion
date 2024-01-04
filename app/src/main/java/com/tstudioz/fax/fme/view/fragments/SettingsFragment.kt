@@ -27,8 +27,6 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.activities.LoginActivity
 import com.tstudioz.fax.fme.database.Korisnik
 import io.realm.Realm
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.BuildCompat
 
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -98,10 +96,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             goToLoginScreen()
             true
         }
-        val weather_units = findPreference<Preference>("units") as CheckBoxPreference?
-        weather_units?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        val weatherUnits = findPreference<Preference>("units") as CheckBoxPreference?
+        weatherUnits?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             editor = mySPrefs?.edit()
-            if (weather_units != null && weather_units.isChecked) {
+            if (weatherUnits != null && weatherUnits.isChecked) {
                 editor?.putString("weather_units", "&units=ca")
                 editor?.apply()
             } else {
@@ -175,7 +173,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    fun userLogOut() {
+    private fun userLogOut() {
         editor = mySPrefs?.edit()
         editor?.putBoolean("logged_in", false)
         editor?.apply()
@@ -187,7 +185,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    fun deleteWebViewCookies() {
+    private fun deleteWebViewCookies() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             CookieManager.getInstance().removeAllCookies(null)
             CookieManager.getInstance().flush()
@@ -202,12 +200,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    fun goToLoginScreen() {
+    private fun goToLoginScreen() {
         val nazadNaLogin = Intent(activity, LoginActivity::class.java)
         startActivity(nazadNaLogin)
     }
 
-    val buildVersion: String
+    private val buildVersion: String
         get() {
             var ver = "undefined"
             try {
@@ -248,7 +246,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         btmDialog?.show()
     }
 
-    fun sendFeedMail(title: String, body: String?) {
+    private fun sendFeedMail(title: String, body: String?) {
         val version = buildVersion
         activity?.let { ShareCompat.IntentBuilder.from(it)}
             ?.setType("message/rfc822")

@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.random.mainscreen
+package com.tstudioz.fax.fme.viewmodel
 
 import android.app.Application
 import android.content.Context.MODE_PRIVATE

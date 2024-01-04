@@ -5,9 +5,9 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.models.data.Repository
-import com.tstudioz.fax.fme.models.services.PrisutnostService
 import com.tstudioz.fax.fme.models.services.TimetableNetworkService
 import com.tstudioz.fax.fme.models.services.UserService
+import com.tstudioz.fax.fme.models.services.WeatherNetworkService
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -23,6 +23,7 @@ val module = module {
     single { Repository() }
     single { UserService() }
     single { TimetableNetworkService() }
+    single{ WeatherNetworkService() }
     single { provideOkHttpClient(androidContext()) }
     viewModel { MainViewModel() }
 }

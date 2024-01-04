@@ -26,7 +26,7 @@ import java.security.SecureRandom
 @InternalCoroutinesApi
 class FESBCompanion : Application() {
 
-    private var CredRealmCf: RealmConfiguration? = null
+    private var credRealmCf: RealmConfiguration? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -35,7 +35,7 @@ class FESBCompanion : Application() {
 
         Realm.init(this)
 
-        CredRealmCf = RealmConfiguration.Builder()
+        credRealmCf = RealmConfiguration.Builder()
                 .allowWritesOnUiThread(true)
                 .name("encryptedv2.realm")
                 .schemaVersion(8)
@@ -43,7 +43,7 @@ class FESBCompanion : Application() {
                 .encryptionKey(realmKey)
                 .build()
 
-        CredRealmCf?.let { Realm.setDefaultConfiguration(it) }
+        credRealmCf?.let { Realm.setDefaultConfiguration(it) }
         checkOldVersion()
 
         startKoin {
@@ -61,7 +61,7 @@ class FESBCompanion : Application() {
     }
 
     private fun checkOldVersion() {
-        val newRealmFile = CredRealmCf?.path?.let { File(it) }
+        val newRealmFile = credRealmCf?.path?.let { File(it) }
         if (newRealmFile?.exists() == false) {
             // Migrate old Realm and delete old
             val old = RealmConfiguration.Builder()

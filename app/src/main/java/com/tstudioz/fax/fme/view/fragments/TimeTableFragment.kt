@@ -33,21 +33,20 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
-    var tempRealm = RealmConfiguration.Builder()
+    private var tempRealm: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("temporary.realm")
         .schemaVersion(12)
         .deleteRealmIfMigrationNeeded()
         .build()
-    val mainRealmConfig = RealmConfiguration.Builder()
+    private val mainRealmConfig: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("glavni.realm")
         .schemaVersion(3)
         .deleteRealmIfMigrationNeeded()
         .build()
-    var rlm: Realm? = null
+    private var rlm: Realm? = null
     var realm: Realm? = null
-    var trealm: Realm? = null
     private var snack: Snackbar? = null
     private var adapteriTemp:MutableList<PredavanjaRaspAdapterTable?> = mutableListOf()
     private val numberOfPredavanjaPerDay :MutableList<Int> = mutableListOf()
@@ -64,17 +63,16 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     ): View? {
         setHasOptionsMenu(true)
 
-        //set the layout you want to display in First Fragment
         binding = TimetableTabBinding.inflate(inflater, container, false)
         mainViewModel = MainViewModel()
 
         requireActivity().runOnUiThread {
-            showDay("Ponedjeljak")
-            showDay("Utorak")
-            showDay("Srijeda")
-            showDay("četvrtak")
-            showDay("Petak")
-            showDay("Subota")
+            showDay("Ponedjeljak",false)
+            showDay("Utorak", false)
+            showDay("Srijeda",false)
+            showDay("četvrtak", false)
+            showDay("Petak", false)
+            showDay("Subota", false)
         }
         val min = Calendar.getInstance()
         val now = Calendar.getInstance()
@@ -130,7 +128,8 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val sYear = syear.format(kal.time)
 
         mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear)
-        binding?.odaberiDan?.text = "Raspored za $mDay.$mMonth - $sDay.$sMonth"
+        val textdisp ="Raspored za $mDay.$mMonth - $sDay.$sMonth"
+        binding?.odaberiDan?.text = textdisp
     }
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
@@ -141,12 +140,12 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             binding?.linearParent?.visibility = View.INVISIBLE
             binding?.rasporedProgress?.visibility = View.VISIBLE
             adapteriTemp.clear()
-            showDayTemp("Ponedjeljak")
-            showDayTemp("Utorak")
-            showDayTemp("Srijeda")
-            showDayTemp("četvrtak")
-            showDayTemp("Petak")
-            showDayTemp("Subota")
+            showDay("Ponedjeljak", true)
+            showDay("Utorak", true)
+            showDay("Srijeda", true)
+            showDay("četvrtak", true)
+            showDay("Petak", true)
+            showDay("Subota", true)
         }
         rlm = Realm.getDefaultInstance()
         val kor = rlm?.where(Korisnik::class.java)?.findFirst()
@@ -197,11 +196,20 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         binding?.mSub?.typeface = bold
     }
 
-    private fun showDay(day: String) {
-        realm = Realm.getInstance(mainRealmConfig)
+    private fun showDay(day: String, isTemp: Boolean) {
+        realm =
+            if (!isTemp) {
+            Realm.getInstance(mainRealmConfig)
+        } else{
+            Realm.getInstance(tempRealm)
+        }
         val rezulatiDay = realm?.where(Predavanja::class.java)?.contains(
             "detaljnoVrijeme", day, Case.INSENSITIVE)?.findAll()
         val adapter = rezulatiDay?.let { PredavanjaRaspAdapterTable(it) }
+        if (adapter != null && isTemp){
+            adapteriTemp.add(adapter)
+            numberOfPredavanjaPerDay.add(adapter.itemCount)
+        }
         val bindDay = when (day){
             "Ponedjeljak" -> binding?.recyclerPon
             "Utorak" -> binding?.recyclerUto
@@ -218,7 +226,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             binding?.linearSub?.visibility = View.VISIBLE
             binding?.linearParent?.weightSum = 6f
             bindDay?.layoutManager = LinearLayoutManager(activity)
-            bindDay?.setHasFixedSize(true)
+            if (!isTemp){
+                bindDay?.setHasFixedSize(true)
+            }
             bindDay?.adapter = adapter
         }
         if (day != "Subota" ){
@@ -228,42 +238,10 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
     }
 
-    private fun showDayTemp(day: String) {
-        trealm = Realm.getInstance(tempRealm)
-        val rezulatiDay = trealm?.where(Predavanja::class.java)?.contains(
-            "detaljnoVrijeme", day, Case.INSENSITIVE)?.findAll()
-        val adapter = rezulatiDay?.let { PredavanjaRaspAdapterTable(it) }
-        adapteriTemp.add(adapter)
-        if (adapter != null) {
-            numberOfPredavanjaPerDay.add(adapter.itemCount)
-        }
-        val bindDay = when (day){
-            "Ponedjeljak" -> binding?.recyclerPon
-            "Utorak" -> binding?.recyclerUto
-            "Srijeda" -> binding?.recyclerSri
-            "četvrtak" -> binding?.recyclerCet
-            "Petak" -> binding?.recyclerPet
-            "Subota" -> binding?.recyclerSub
-            else -> binding?.recyclerPet
-        }
-        if (rezulatiDay?.isEmpty() == true && day == "Subota") {
-            binding?.linearSub?.visibility = View.GONE
-            binding?.linearParent?.weightSum = 5f
-        } else if (day == "Subota"){
-            binding?.linearSub?.visibility = View.VISIBLE
-            binding?.linearParent?.weightSum = 6f
-            bindDay?.layoutManager = LinearLayoutManager(activity)
-            bindDay?.adapter = adapter
-        }
-        if (day != "Subota" ){
-            bindDay?.layoutManager = LinearLayoutManager(activity)
-            bindDay?.setHasFixedSize(true)
-            bindDay?.adapter = adapter
-        }
-    }
     private fun updateTemporaryWeek(cal: Calendar) {
         for (adapter in this.adapteriTemp){
             adapter?.notifyDataSetChanged()
+            adapter?.notifyItemChanged(0)
         }
         setSetDates(cal)
         if (numberOfPredavanjaPerDay[5] != 0) {
@@ -331,9 +309,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
         if (realm != null) {
             realm?.close()
-        }
-        if (trealm != null) {
-            trealm?.close()
         }
     }
 }

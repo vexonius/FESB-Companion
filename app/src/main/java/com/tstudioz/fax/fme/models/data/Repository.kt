@@ -7,7 +7,10 @@ import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.services.PrisutnostService
 import com.tstudioz.fax.fme.models.services.TimetableNetworkService
 import com.tstudioz.fax.fme.models.services.UserService
+import com.tstudioz.fax.fme.models.services.WeatherNetworkService
 import com.tstudioz.fax.fme.models.util.parseTimetable
+import com.tstudioz.fax.fme.models.util.parseWeatherDetails
+import com.tstudioz.fax.fme.weather.Current
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.java.KoinJavaComponent.inject
 
@@ -17,6 +20,7 @@ class Repository {
 
     private val service: UserService by inject(UserService::class.java)
     private val timetableNetworkService: TimetableNetworkService by inject(TimetableNetworkService::class.java)
+    private val weatherNetworkService: WeatherNetworkService by inject(WeatherNetworkService::class.java)
     private val prisutnostService = PrisutnostService()
     private val timeTableDao: TimeTableDao = TimeTableDao()
     private val prisutnostDao: PrisutnostDao = PrisutnostDao()
@@ -36,8 +40,19 @@ class Repository {
             is Result.TimeTableResult.Success -> parseTimetable(result.data)
             is Result.TimeTableResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")
-                throw Exception("Timetable fetching error")
+                //throw Exception("Timetable fetching error")
                 emptyList()
+            }
+        }
+    }
+
+    suspend fun fetchWeatherDetails(url : String): Current? {
+        return when(val result = weatherNetworkService.fetchWeatherDetails(url)){
+            is Result.WeatherResult.Success -> parseWeatherDetails(result.data)
+            is Result.WeatherResult.Failure -> {
+                Log.e(TAG, "Timetable fetching error")
+                //throw Exception("Timetable fetching error")
+                null
             }
         }
     }

@@ -16,8 +16,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.databinding.ActivityLoginBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.random.mainscreen.LoginViewModel
-import com.tstudioz.fax.fme.models.util.CircularAnim
+import com.tstudioz.fax.fme.viewmodel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -28,7 +27,7 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
     private var snack: Snackbar? = null
     private lateinit var binding: ActivityLoginBinding
-    lateinit var loginViewModel: LoginViewModel
+    private lateinit var loginViewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,12 +58,14 @@ class LoginActivity : AppCompatActivity() {
             if (loggedIn) {
                 val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
-                CircularAnim.fullActivity(this@LoginActivity, view)
+               /* CircularAnim.fullActivity(this@LoginActivity, view)
                     .colorOrImageRes(R.color.colorAccent)
                     .go {
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
-                    }
+                    }*/
+                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                finish()
             }else{
                 showErrorSnack("Uneseni podatci su pogrešni!")
                 binding.progressLogin.visibility = View.INVISIBLE
@@ -89,7 +90,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
     private fun loadBlueButton() {
-        binding.loginButton.setOnClickListener { view ->
+        binding.loginButton.setOnClickListener { _ ->
             if (NetworkUtils.isNetworkAvailable(this@LoginActivity)) {
 
                 val username:String = binding.loginInput.text.toString()
@@ -124,7 +125,7 @@ class LoginActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    fun showErrorSnack(message: String?) {
+    private fun showErrorSnack(message: String?) {
         snack = message?.let { Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT) }
         val snackBarView2 = snack?.view
         snackBarView2?.setBackgroundColor(

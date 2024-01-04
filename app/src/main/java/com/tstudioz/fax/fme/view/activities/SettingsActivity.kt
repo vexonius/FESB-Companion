@@ -1,9 +1,9 @@
 package com.tstudioz.fax.fme.view.activities
 
-import android.R
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.fragments.SettingsFragment
 
 /**

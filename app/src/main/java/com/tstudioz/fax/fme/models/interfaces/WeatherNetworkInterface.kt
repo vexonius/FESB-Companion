@@ -1,10 +1,9 @@
 package com.tstudioz.fax.fme.models.interfaces
 
-import com.tstudioz.fax.fme.models.WeatherResult
-import com.tstudioz.fax.fme.weather.Current
+import com.tstudioz.fax.fme.models.Result
 
 
 interface WeatherNetworkInterface {
-    fun getDayWeatherDetails() : WeatherResult<Current>
-    fun getWeekWeatherDetails() : WeatherResult<List<Current>>
+    fun fetchWeatherDetails(url: String) : Result.WeatherResult
+    fun getWeekWeatherDetails() : Result.WeatherResult
 }

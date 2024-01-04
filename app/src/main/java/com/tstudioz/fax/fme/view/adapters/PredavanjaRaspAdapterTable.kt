@@ -17,7 +17,7 @@ import io.realm.RealmResults
  * Created by amarthus on 25-Mar-17.
  */
 class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanja>) : RecyclerView.Adapter<PredavanjaRaspViewHolderTable>(), RealmChangeListener<Any?> {
-    var dialog: BottomSheetDialog? = null
+    private var dialog: BottomSheetDialog? = null
 
     init {
         mPredavanja.addChangeListener(this as RealmChangeListener<RealmResults<Predavanja>>)
@@ -106,10 +106,10 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
             imePredavanja = imePredavanja.substring(0, imePredavanja.length)
         }
         var imeGrupe = predavanja?.grupa
-        if (!imeGrupe.isNullOrEmpty()) {
-            imeGrupe = imeGrupe.substring(0, imeGrupe.length - 1)
+        imeGrupe = if (!imeGrupe.isNullOrEmpty()) {
+            imeGrupe.substring(0, imeGrupe.length - 1)
         }else{
-            imeGrupe = "Jedna grupe"
+            "Jedna grupe"
         }
         infoKolegij.text = predavanja?.predmetPredavanja
         infoPredavanje.text = imePredavanja
