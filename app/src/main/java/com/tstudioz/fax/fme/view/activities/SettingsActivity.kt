@@ -2,8 +2,8 @@ package com.tstudioz.fax.fme.view.activities
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.fragments.SettingsFragment
 
 /**
@@ -14,13 +14,23 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val sf = SettingsFragment()
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.content, sf)
+        ft.replace(android.R.id.content, sf)
         ft.addToBackStack(null)
         ft.commit()
+        onBack()
     }
+
+    private fun onBack(){
+        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.home -> {
+            android.R.id.home -> {
                 // Handle the "Up" button press
                 finish() // Or navigate to the parent activity
                 true
