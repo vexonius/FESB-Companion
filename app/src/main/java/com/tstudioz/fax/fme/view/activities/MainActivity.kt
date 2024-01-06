@@ -277,7 +277,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showChangelog() {
-        val view = LayoutInflater.from(this).inflate(R.layout.licence_view, binding?.root) as NestedScrollView
+        val view = LayoutInflater.from(this).inflate(R.layout.licence_view, null) as NestedScrollView
         val wv = view.findViewById<View>(R.id.webvju) as WebView
 
         wv.loadUrl("file:///android_asset/changelog.html")
@@ -300,7 +300,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showGDPRCompliance() {
-        val view = LayoutInflater.from(this).inflate(R.layout.gdpr_layout, binding?.root) as ConstraintLayout
+        val view = LayoutInflater.from(this).inflate(R.layout.gdpr_layout, null) as ConstraintLayout
         val heading = view.findViewById<View>(R.id.terms_heading) as TextView
         val desc = view.findViewById<View>(R.id.terms_text) as TextView
         val typeBold = Typeface.createFromAsset(assets, "fonts/OpenSans-Bold.ttf")

@@ -17,14 +17,14 @@ class DailyWeather : Fragment() {
             R.layout.daily,
             container, false
         )
-        val bundle = this.requireArguments()
+        /*val bundle = this.requireArguments()
         val temperatura = bundle.getString("temperatura")
         val vlazno = bundle.getString("vlaznost")
         val vjetar = bundle.getString("vjetar")
         val oborina = bundle.getString("oborina")
 
 
-        /*mtemperaturaDaily.setText(temperatura);
+        mtemperaturaDaily.setText(tempatura);
         mtrenutni_vjetar1.setText(vjetar);
         mvlaznost_vrijednost1.setText(vlazno);
         moborine_vrijednost1.setText(oborina);
@@ -33,11 +33,12 @@ class DailyWeather : Fragment() {
         mPoweredBy.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Uri uri = Uri.parse("https://darksky.net/poweredby/");
-            Intent in = new Intent(Intent.ACTION_VIEW, uri);
-            startActivity(in);
-            }
-           });*/
+        Uri uri = Uri.parse("https://darksky.net/poweredby/");
+        Intent in = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(in);
+        }
+        });*/
+
         return view
     }
 }
