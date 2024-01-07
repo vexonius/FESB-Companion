@@ -109,6 +109,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         kal[Calendar.YEAR] = year
         kal[Calendar.MONTH] = monthOfYear
         kal[Calendar.DAY_OF_MONTH] = dayOfMonth
+        kal.add(Calendar.DAY_OF_MONTH,-1)
 
         val sday: DateFormat = SimpleDateFormat("dd")
         val smonth: DateFormat = SimpleDateFormat("MM")

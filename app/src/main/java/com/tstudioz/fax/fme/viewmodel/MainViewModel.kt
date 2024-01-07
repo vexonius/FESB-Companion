@@ -84,6 +84,7 @@ class MainViewModel : ViewModel() {
     fun fetchUserTimetableTemp(user: User, startDate: String, endDate: String){
         viewModelScope.launch(Dispatchers.IO) {
             try{
+                val svaFreshPredavanja = mutableListOf<Predavanja>()
                 println("started Fetching Timetable for user")
                 val list = repository.fetchTimetable(user.username, startDate, endDate)
                 if(list.isEmpty()) {
@@ -91,7 +92,6 @@ class MainViewModel : ViewModel() {
                 }
                 else {
                     list.forEach { println(it.name) }
-                    val svaFreshPredavanja = mutableListOf<Predavanja>()
                     for (l in list) {
                         val predavanja = Predavanja()
                         predavanja.objectId = l.id
@@ -107,9 +107,9 @@ class MainViewModel : ViewModel() {
 
                         svaFreshPredavanja.add(predavanja)
                     }
-                    insertTempTimeTable(svaFreshPredavanja)
-                    _tableGot.postValue(true)
                 }
+                insertTempTimeTable(svaFreshPredavanja)
+                _tableGot.postValue(true)
             }catch (e: Exception){
                 Log.e("Error timetable", e.toString())
                 _tableGot.postValue(false)
