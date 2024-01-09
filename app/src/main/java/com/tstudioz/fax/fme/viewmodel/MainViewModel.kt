@@ -23,8 +23,12 @@ class MainViewModel : ViewModel() {
     private val repository: Repository by inject(Repository::class.java)
 
     private var _tableGot = MutableLiveData<Boolean>()
-    val tableGot: LiveData<Boolean>
-        get() = _tableGot
+    val  tableGot: LiveData<Boolean> = MutableLiveData()
+
+    var tableGotPerm = MutableLiveData(false)
+    val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
+
+
     private fun loginUser(user: User) {
         viewModelScope.launch {
             when (val result = repository.attemptLogin(user)) {
@@ -46,31 +50,29 @@ class MainViewModel : ViewModel() {
             try{
                 println("started Fetching Timetable for user")
                 val list = repository.fetchTimetable(user.username, startDate, endDate)
-                if(list.isEmpty()) {
-                    println("List is empty")
-                }
-                else {
-                    list.forEach { println(it.name) }
-                    val svaFreshPredavanja = mutableListOf<Predavanja>()
-                        for (l in list) {
-                            val predavanja = Predavanja()
-                            predavanja.objectId = l.id
-                            predavanja.id = l.id.toString()
-                            predavanja.predavanjeIme = l.eventType.type
-                            predavanja.predmetPredavanja = l.name
-                            predavanja.rasponVremena = l.timeSpan
-                            predavanja.grupa = l.group
-                            predavanja.grupaShort = l.group
-                            predavanja.dvorana = l.room
-                            predavanja.detaljnoVrijeme = l.detailDateWithDayName
-                            predavanja.profesor = l.professor
+                val svaFreshPredavanja = mutableListOf<Predavanja>()
+                list.forEach { println(it.name) }
+                    for (l in list) {
+                        val predavanja = Predavanja()
+                        predavanja.objectId = l.id
+                        predavanja.id = l.id.toString()
+                        predavanja.predavanjeIme = l.eventType.type
+                        predavanja.predmetPredavanja = l.name
+                        predavanja.rasponVremena = l.timeSpan
+                        predavanja.grupa = l.group
+                        predavanja.grupaShort = l.group
+                        predavanja.dvorana = l.room
+                        predavanja.detaljnoVrijeme = l.detailDateWithDayName
+                        predavanja.profesor = l.professor
 
-                            svaFreshPredavanja.add(predavanja)
-                        }
-                        insertOrUpdateTimeTable(svaFreshPredavanja)
-                }
+                        svaFreshPredavanja.add(predavanja)
+                    }
+                svaFreshPredavanjaLive.postValue(svaFreshPredavanja)
+                insertOrUpdateTimeTable(svaFreshPredavanja)
+                tableGotPerm.postValue(true)
             }catch (e: Exception){
                 Log.e("Error timetable", e.toString())
+                tableGotPerm.postValue(false)
             }
         }
     }
@@ -87,26 +89,21 @@ class MainViewModel : ViewModel() {
                 val svaFreshPredavanja = mutableListOf<Predavanja>()
                 println("started Fetching Timetable for user")
                 val list = repository.fetchTimetable(user.username, startDate, endDate)
-                if(list.isEmpty()) {
-                    println("List is empty")
-                }
-                else {
-                    list.forEach { println(it.name) }
-                    for (l in list) {
-                        val predavanja = Predavanja()
-                        predavanja.objectId = l.id
-                        predavanja.id = l.id.toString()
-                        predavanja.predavanjeIme = l.eventType.type
-                        predavanja.predmetPredavanja = l.name
-                        predavanja.rasponVremena = l.timeSpan
-                        predavanja.grupa = l.group
-                        predavanja.grupaShort = l.group
-                        predavanja.dvorana = l.room
-                        predavanja.detaljnoVrijeme = l.detailDateWithDayName
-                        predavanja.profesor = l.professor
+                list.forEach { println(it.name) }
+                for (l in list) {
+                    val predavanja = Predavanja()
+                    predavanja.objectId = l.id
+                    predavanja.id = l.id.toString()
+                    predavanja.predavanjeIme = l.eventType.type
+                    predavanja.predmetPredavanja = l.name
+                    predavanja.rasponVremena = l.timeSpan
+                    predavanja.grupa = l.group
+                    predavanja.grupaShort = l.group
+                    predavanja.dvorana = l.room
+                    predavanja.detaljnoVrijeme = l.detailDateWithDayName
+                    predavanja.profesor = l.professor
 
-                        svaFreshPredavanja.add(predavanja)
-                    }
+                    svaFreshPredavanja.add(predavanja)
                 }
                 insertTempTimeTable(svaFreshPredavanja)
                 _tableGot.postValue(true)

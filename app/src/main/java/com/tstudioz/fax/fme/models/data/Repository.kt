@@ -40,8 +40,8 @@ class Repository {
             is Result.TimeTableResult.Success -> parseTimetable(result.data)
             is Result.TimeTableResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")
-                //throw Exception("Timetable fetching error")
-                emptyList()
+                throw Exception("Timetable fetching error")
+                //emptyList()
             }
         }
     }

@@ -142,7 +142,7 @@ class HomeFragment : Fragment() {
         if (rezultati !=null && rezultati.isEmpty()) {
             binding?.rv?.visibility = View.INVISIBLE
             binding?.nemaPredavanja?.visibility = View.VISIBLE
-        } else {
+        } else if (rezultati !=null){
             binding?.nemaPredavanja?.visibility = View.GONE
             binding?.rv?.visibility = View.VISIBLE
             val adapter = rezultati?.let { HomePredavanjaAdapter(it) }
@@ -179,7 +179,7 @@ class HomeFragment : Fragment() {
             val appPackageName = "com.tstud.iksica"
             try {
                 val intent = requireActivity().packageManager.getLaunchIntentForPackage(appPackageName)
-                startActivity(intent)
+                if (intent != null) { startActivity(intent) }
             } catch (anfe: Exception) {
                 try {
                     startActivity(

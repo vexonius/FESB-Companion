@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog
@@ -64,7 +65,12 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         setHasOptionsMenu(true)
 
         binding = TimetableTabBinding.inflate(inflater, container, false)
-        mainViewModel = MainViewModel()
+        activity?.let { ViewModelProvider(it)}?.get(MainViewModel::class.java)
+            .also {
+                if (it != null) {
+                    mainViewModel = it
+                }
+            }
 
         requireActivity().runOnUiThread {
             showDay("Ponedjeljak",false)

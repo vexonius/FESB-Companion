@@ -21,6 +21,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        mainViewModel = MainViewModel()
+        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
         setContentView(binding?.root)
 
         onBack()
@@ -114,16 +115,17 @@ class MainActivity : AppCompatActivity() {
                 if (korisnik != null) {
                     editor?.putString("username", korisnik.username)
                     editor?.putString("password", korisnik.lozinka)
+                    editor?.commit()
                     mojRaspored()
                 } else { invalidCreds() }
                 realmLog?.close()
             }
         } else {
             editor?.putBoolean("logged_in", false)
+            editor?.commit()
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this@MainActivity, LoginActivity::class.java))
         }
-        editor?.commit()
     }
 
     @SuppressLint("RestrictedApi")
@@ -211,9 +213,18 @@ class MainActivity : AppCompatActivity() {
         if (user != null) {
             mainViewModel.fetchUserTimetable(user, startdate, enddate)
         }
-            runOnUiThread {
-                homeFragment.showList()
+        mainViewModel.tableGotPerm.observe(this) { tableGot ->
+            if (tableGot){
+                runOnUiThread {
+                    homeFragment.showList()
+                }
             }
+            else{
+                runOnUiThread {
+                    homeFragment.showList()
+                }
+            }
+        }
         }
 
     private fun invalidCreds() {
