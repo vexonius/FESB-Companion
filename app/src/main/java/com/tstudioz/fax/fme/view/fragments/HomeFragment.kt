@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.view.fragments
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -19,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.activities.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
@@ -38,9 +40,10 @@ import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 @OptIn(InternalCoroutinesApi::class)
-class HomeFragment : Fragment() {
+class HomeFragment(private var shPref: SharedPreferences?) : Fragment() {
     private var binding: HomeTabBinding? = null
     private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private lateinit var homeViewModel: HomeViewModel
@@ -48,6 +51,7 @@ class HomeFragment : Fragment() {
     private var taskRealm: Realm? = null
     private var date: String? = null
     private var snack: Snackbar? = null
+
 
     private var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
@@ -75,6 +79,7 @@ class HomeFragment : Fragment() {
         setHasOptionsMenu(true)
         setCyanStatusBarColor()
         getDate()
+        setLastRaspGot()
         start()
         loadNotes()
         loadIksicaAd()
@@ -90,8 +95,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun getDate() {
-        val df: DateFormat = SimpleDateFormat("d.M.yyyy.")
+        val df: DateFormat = SimpleDateFormat("d.M.yyyy.", Locale.getDefault())
         date = df.format(Calendar.getInstance().time)
+    }
+
+    private fun setLastRaspGot() {
+        binding?.TimeRaspGot?.text = shPref?.getString("timeGotcurrentrasp", "")
+        binding?.TimeRaspGot?.visibility = View.VISIBLE
     }
 
     @Throws(IOException::class, JSONException::class)

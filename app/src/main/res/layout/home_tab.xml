@@ -57,15 +57,29 @@
 
             <TextView
                 android:id="@+id/pr"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/task"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
                 android:text="@string/danasnja_predavanja"
                 android:textColor="@color/shady_blue"
-                android:textSize="13dp" />
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/TimeRaspGot"
+                android:visibility="invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/task"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="3dp"
+                android:text=""
+                android:textColor="@color/shady_blue"
+                android:textSize="12sp" />
 
             <FrameLayout
                 android:id="@+id/frame_list"

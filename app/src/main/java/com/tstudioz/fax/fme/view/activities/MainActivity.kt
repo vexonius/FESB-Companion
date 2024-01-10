@@ -45,18 +45,19 @@ import okhttp3.OkHttpClient
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
     var date: String? = null
     private var realmLog: Realm? = null
     private var client: OkHttpClient? = null
-    private val homeFragment = HomeFragment()
-    private val timeTableFragment = TimeTableFragment()
-    private val prisutnostFragment = PrisutnostFragment()
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
     private var shPref: SharedPreferences? =  instance?.sP
+    private val homeFragment = HomeFragment(shPref)
+    private val timeTableFragment = TimeTableFragment()
+    private val prisutnostFragment = PrisutnostFragment()
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     private lateinit var mainViewModel: MainViewModel
@@ -77,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         isThereAction()
 
         checkUser()
+        setTableGotListener()
         checkVersion()
         shouldShowGDPRDialog()
     }
@@ -98,6 +100,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun setDefaultScreen() {
         beginFragTransaction(R.id.tab_home)
+    }
+
+    private fun setTableGotListener(){
+        mainViewModel.tableGotPerm.observe(this) { tableGot ->
+            if (tableGot){
+                runOnUiThread {
+                    homeFragment.showList()
+                    if (supportFragmentManager.findFragmentById(R.id.frame) is HomeFragment){
+                        val text: TextView = findViewById(R.id.TimeRaspGot)
+                        text.text = shPref?.getString("timeGotcurrentrasp", "")
+                        text.visibility = View.VISIBLE
+                    }
+                }
+            }
+            else{
+                runOnUiThread {
+                    homeFragment.showList()
+                }
+            }
+        }
     }
 
     private fun checkUser() {
@@ -132,8 +154,8 @@ class MainActivity : AppCompatActivity() {
     fun setUpToolbar() {
         val actionbar = supportActionBar
         actionbar?.setShowHideAnimationEnabled(false)
-        actionbar?.elevation = 1.0f
         actionbar?.setDisplayShowHomeEnabled(false)
+        actionbar?.elevation = 1.0f
     }
 
     private fun testBottomBar() {
@@ -176,7 +198,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_main, menu)
         return true
@@ -198,34 +219,23 @@ class MainActivity : AppCompatActivity() {
     private fun mojRaspored(){
         val user = shPref?.getString("username", "")?.let { User(it, "", "") }
 
-        // Get calendar set to current date and time
         val calendar = Calendar.getInstance()
 
-        // Set the calendar to Monday of the current week
+        val dfandTime: DateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
+        val dateandtime = dfandTime.format(calendar.time)
+
         calendar[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
-        val df: DateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val df: DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val startdate = df.format(calendar.time)
 
-        // Set the calendar to Saturday of the current week
         calendar.add(Calendar.DAY_OF_WEEK, Calendar.SATURDAY - Calendar.MONDAY)
         val enddate = df.format(calendar.time)
 
-        if (user != null) {
-            mainViewModel.fetchUserTimetable(user, startdate, enddate)
-        }
-        mainViewModel.tableGotPerm.observe(this) { tableGot ->
-            if (tableGot){
-                runOnUiThread {
-                    homeFragment.showList()
-                }
-            }
-            else{
-                runOnUiThread {
-                    homeFragment.showList()
-                }
-            }
-        }
-        }
+        if (user != null) { mainViewModel.fetchUserTimetable(user, startdate, enddate) }
+        editor = shPref?.edit()
+        editor?.putString("timeGotcurrentrasp", dateandtime)
+        editor?.commit()
+    }
 
     private fun invalidCreds() {
         editor = shPref?.edit()
@@ -244,7 +254,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getDate() {
-        val df: DateFormat = SimpleDateFormat("d.M.yyyy.")
+        val df: DateFormat = SimpleDateFormat("d.M.yyyy.", Locale.getDefault())
         date = df.format(Calendar.getInstance().time)
     }
 
