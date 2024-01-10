@@ -22,8 +22,7 @@ class MainViewModel : ViewModel() {
 
     private val repository: Repository by inject(Repository::class.java)
 
-    private var _tableGot = MutableLiveData<Boolean>()
-    val  tableGot: LiveData<Boolean> = MutableLiveData()
+    val tableGot: MutableLiveData<Boolean> = MutableLiveData()
 
     var tableGotPerm = MutableLiveData(false)
     val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
@@ -106,10 +105,10 @@ class MainViewModel : ViewModel() {
                     svaFreshPredavanja.add(predavanja)
                 }
                 insertTempTimeTable(svaFreshPredavanja)
-                _tableGot.postValue(true)
+                tableGot.postValue(true)
             }catch (e: Exception){
                 Log.e("Error timetable", e.toString())
-                _tableGot.postValue(false)
+                tableGot.postValue(false)
             }
         }
     }

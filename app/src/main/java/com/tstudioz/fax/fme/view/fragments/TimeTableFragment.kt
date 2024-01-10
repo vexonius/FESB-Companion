@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog
-import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
@@ -28,10 +27,10 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import okhttp3.OkHttpClient
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var tempRealm: RealmConfiguration = RealmConfiguration.Builder()
@@ -51,7 +50,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var snack: Snackbar? = null
     private var adapteriTemp:MutableList<PredavanjaRaspAdapterTable?> = mutableListOf()
     private val numberOfPredavanjaPerDay :MutableList<Int> = mutableListOf()
-    private var client: OkHttpClient? = null
     private var bold: Typeface? = null
     private var binding: TimetableTabBinding? = null
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
@@ -117,9 +115,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         kal[Calendar.DAY_OF_MONTH] = dayOfMonth
         kal.add(Calendar.DAY_OF_MONTH,-1)
 
-        val sday: DateFormat = SimpleDateFormat("dd")
-        val smonth: DateFormat = SimpleDateFormat("MM")
-        val syear: DateFormat = SimpleDateFormat("yyyy")
+        val sday: DateFormat = SimpleDateFormat("dd", Locale.getDefault())
+        val smonth: DateFormat = SimpleDateFormat("MM", Locale.getDefault())
+        val syear: DateFormat = SimpleDateFormat("yyyy", Locale.getDefault())
 
         kal[Calendar.DAY_OF_WEEK]
         kal.add(Calendar.DAY_OF_MONTH, -(kal[Calendar.DAY_OF_WEEK] - Calendar.MONDAY))
@@ -156,7 +154,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
         rlm = Realm.getDefaultInstance()
         val kor = rlm?.where(Korisnik::class.java)?.findFirst()
-        client = instance?.okHttpInstance
         val mindate = "$mMonth%2F$mDay%2F$mYear"
         val maxdate = "$sMonth%2F$sDay%2F$sYear"
         mainViewModel.deleteTempTimeTable()
@@ -174,7 +171,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
     }
     private fun setSetDates(calendar: Calendar) {
-        val format: DateFormat = SimpleDateFormat("d")
+        val format: DateFormat = SimpleDateFormat("d", Locale.getDefault())
 
         val daysOfWeek = listOf(Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY)
 
@@ -303,9 +300,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         super.onStop()
         if (snack != null) {
             snack?.dismiss()
-        }
-        if (client != null) {
-            client?.dispatcher?.cancelAll()
         }
     }
 
