@@ -43,7 +43,7 @@ import java.util.Calendar
 import java.util.Locale
 
 @OptIn(InternalCoroutinesApi::class)
-class HomeFragment(private var shPref: SharedPreferences?) : Fragment() {
+class HomeFragment(private var shPref: SharedPreferences? = null) : Fragment() {
     private var binding: HomeTabBinding? = null
     private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private lateinit var homeViewModel: HomeViewModel
@@ -71,7 +71,6 @@ class HomeFragment(private var shPref: SharedPreferences?) : Fragment() {
         savedInstanceState: Bundle?): CoordinatorLayout?
     {
         super.onCreateView(inflater, container, savedInstanceState)
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         binding = HomeTabBinding.inflate(inflater, container, false)
         homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
@@ -100,7 +99,7 @@ class HomeFragment(private var shPref: SharedPreferences?) : Fragment() {
     }
 
     private fun setLastRaspGot() {
-        binding?.TimeRaspGot?.text = shPref?.getString("timeGotcurrentrasp", "")
+        binding?.TimeRaspGot?.text = shPref?.getString("timeGotcurrentrasp", "") ?: ""
         binding?.TimeRaspGot?.visibility = View.VISIBLE
     }
 
@@ -155,7 +154,7 @@ class HomeFragment(private var shPref: SharedPreferences?) : Fragment() {
         } else if (rezultati !=null){
             binding?.nemaPredavanja?.visibility = View.GONE
             binding?.rv?.visibility = View.VISIBLE
-            val adapter = rezultati?.let { HomePredavanjaAdapter(it) }
+            val adapter = HomePredavanjaAdapter(rezultati)
             binding?.rv?.adapter = adapter
             binding?.rv?.layoutManager = LinearLayoutManager(activity)
             binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }

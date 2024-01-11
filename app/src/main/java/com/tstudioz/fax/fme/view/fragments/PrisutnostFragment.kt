@@ -49,7 +49,6 @@ class PrisutnostFragment : Fragment() {
         setHasOptionsMenu(true)
         binding = PrisutnostTabBinding.inflate(inflater, container, false)
         prisutnostviewmodel = PrisutnostViewModel()
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         hideRecyc()
         fetchPrisutnost()
         return binding?.root

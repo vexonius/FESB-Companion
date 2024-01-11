@@ -52,8 +52,7 @@
         <activity
             android:name=".view.activities.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".view.activities.Welcome"
             android:screenOrientation="portrait" />
@@ -67,7 +66,9 @@
             android:name=".view.activities.MenzaActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Simple" />
-        <activity android:name=".view.activities.IndexActivity"
+        <activity
+            android:name=".view.activities.IndexActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
