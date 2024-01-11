@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.view.activities
 
+import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
@@ -33,6 +34,7 @@ class MenzaActivity : AppCompatActivity() {
     private var snack: Snackbar? = null
     private var okHttpClient: OkHttpClient? = null
     private var binding: ActivityMenzaBinding? = null
+    private var shPref: SharedPreferences? = instance?.sP
     private var menzaRealmConf: RealmConfiguration = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("menza.realm")
@@ -82,9 +84,13 @@ class MenzaActivity : AppCompatActivity() {
     fun parsePage(json:String?){
         mRealm = Realm.getInstance(menzaRealmConf)
         mRealm?.executeTransaction { mRealm?.deleteAll() }
+
         try {
+            val editor = shPref?.edit()
             val jsonResponse = json?.let { JSONObject(it) }
             val array = jsonResponse?.getJSONArray("values")
+            editor?.putString("timeGotmenza", array?.getJSONArray(0)?.getString(3))
+            editor?.apply()
             for (j in 7..9) {
                 try {
                     val itemsArray = array?.getJSONArray(j)
@@ -131,8 +137,12 @@ class MenzaActivity : AppCompatActivity() {
     private fun showMenies() {
         nRealm = Realm.getInstance(menzaRealmConf)
         val results = nRealm?.where(Meni::class.java)?.findAll()
+        var timeGot = ""
+        if (shPref != null){
+            timeGot = shPref?.getString("timeGotmenza", "") ?: ""
+        }
         if ((results?.isEmpty()) != null) {
-            val adapter = MeniesAdapter(results)
+            val adapter = MeniesAdapter(results, timeGot)
             binding?.menzaRecyclerview?.layoutManager = LinearLayoutManager(this)
             binding?.menzaRecyclerview?.setHasFixedSize(true)
             binding?.menzaRecyclerview?.adapter = adapter
