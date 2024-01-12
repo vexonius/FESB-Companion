@@ -8,8 +8,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.models.data.Repository
 import com.tstudioz.fax.fme.database.Korisnik
+import com.tstudioz.fax.fme.migrations.CredMigration
 import com.tstudioz.fax.fme.models.data.User
 import io.realm.Realm
+import io.realm.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.java.KoinJavaComponent.inject
 
@@ -29,7 +31,13 @@ class LoginViewModel(application: Application)  : AndroidViewModel(application) 
             val editor = sharedPref.edit()
             editor.putBoolean("logged_in", true)
             editor.apply()
-            val mLogRealm: Realm = Realm.getDefaultInstance()
+            val encRealm = RealmConfiguration.Builder()
+                .allowWritesOnUiThread(true)
+                .name("encrypted.realm")
+                .schemaVersion(8)
+                .migration(CredMigration())
+                .build()
+            val mLogRealm: Realm = Realm.getInstance(encRealm)
             try {
                 mLogRealm.executeTransaction { realm ->
                     val userrealm = realm.createObject(Korisnik::class.java)

@@ -30,6 +30,7 @@ import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
+import com.tstudioz.fax.fme.migrations.CredMigration
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
@@ -37,6 +38,7 @@ import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.Realm
+import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -62,6 +64,12 @@ class MainActivity : AppCompatActivity() {
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     private lateinit var mainViewModel: MainViewModel
+    private val encRealm = RealmConfiguration.Builder()
+        .allowWritesOnUiThread(true)
+        .name("encrypted.realm")
+        .schemaVersion(8)
+        .migration(CredMigration())
+        .build()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,8 +86,8 @@ class MainActivity : AppCompatActivity() {
 
         isThereAction()
 
-        checkUser()
         setTableGotListener()
+        checkUser()
         checkVersion()
         shouldShowGDPRDialog()
     }
@@ -125,7 +133,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkUser() {
         var korisnik: Korisnik? = null
-        realmLog = Realm.getDefaultInstance()
+        realmLog = Realm.getInstance(encRealm)
         assert(shPref != null)
         editor = shPref?.edit()
 
@@ -243,7 +251,7 @@ class MainActivity : AppCompatActivity() {
         editor?.putBoolean("logged_in", false)
         editor?.apply()
 
-        realmLog = Realm.getDefaultInstance()
+        realmLog = Realm.getInstance(encRealm)
         try {
             realmLog?.executeTransaction { realmLog?.deleteAll() }
         } catch (ex: RealmException) {

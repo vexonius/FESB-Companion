@@ -92,7 +92,6 @@ class LoginActivity : AppCompatActivity() {
     private fun loadBlueButton() {
         binding.loginButton.setOnClickListener { _ ->
             if (NetworkUtils.isNetworkAvailable(this@LoginActivity)) {
-
                 val username:String = binding.loginInput.text.toString()
                 val password:String = binding.loginPass.text.toString()
                 if (username.isEmpty() || password.isEmpty()) {
@@ -109,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
                             User(username, password, username + "fesb.hr")
                         )
                     }
-            }
+                }
             } else {
                 showErrorSnack("Niste povezani")
             }

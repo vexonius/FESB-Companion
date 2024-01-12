@@ -24,7 +24,7 @@ class MainViewModel : ViewModel() {
 
     val tableGot: MutableLiveData<Boolean> = MutableLiveData()
 
-    var tableGotPerm = MutableLiveData(false)
+    var tableGotPerm = MutableLiveData<Boolean>()
     val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
 
 
