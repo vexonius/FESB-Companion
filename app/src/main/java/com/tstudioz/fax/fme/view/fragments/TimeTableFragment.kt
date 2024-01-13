@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.view.fragments
 
 import android.content.ContentValues
+import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog
+import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.database.Predavanja
@@ -52,6 +54,8 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private val numberOfPredavanjaPerDay :MutableList<Int> = mutableListOf()
     private var bold: Typeface? = null
     private var binding: TimetableTabBinding? = null
+    @OptIn(InternalCoroutinesApi::class)
+    private var shPref: SharedPreferences? =  FESBCompanion.instance?.sP
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private lateinit var mainViewModel: MainViewModel
 
@@ -153,12 +157,12 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             showDay("Subota", true)
         }
         rlm = Realm.getDefaultInstance()
-        val kor = rlm?.where(Korisnik::class.java)?.findFirst()
+        val user = shPref?.getString("username", "")?.let { User(it, "", "") }
         val mindate = "$mMonth%2F$mDay%2F$mYear"
         val maxdate = "$sMonth%2F$sDay%2F$sYear"
         mainViewModel.deleteTempTimeTable()
 
-        mainViewModel.fetchUserTimetableTemp(User(kor?.username.toString(),"",""), mindate, maxdate)
+        mainViewModel.fetchUserTimetableTemp(User(user?.username.toString(),"",""), mindate, maxdate)
 
         mainViewModel.tableGot.observe(viewLifecycleOwner) { tableGot ->
             if (tableGot) {

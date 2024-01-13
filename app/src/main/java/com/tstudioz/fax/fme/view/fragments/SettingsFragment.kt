@@ -26,7 +26,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.activities.LoginActivity
 import com.tstudioz.fax.fme.database.Korisnik
+import com.tstudioz.fax.fme.migrations.CredMigration
+import com.tstudioz.fax.fme.models.data.User
 import io.realm.Realm
+import io.realm.RealmConfiguration
 
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -77,17 +80,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
         addPreferencesFromResource(R.xml.app_prefrences)
         mySPrefs = requireActivity().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
 
+
+
         //val preference = findPreference<Preference>("amoled_theme")
         //preference?.onPreferenceChangeListener = modeChangeListener
 
         val prefLogOut = findPreference("logout") as Preference?
-        rlmLog = Realm.getDefaultInstance()
         try {
-            korisnik = rlmLog?.where(Korisnik::class.java)?.findFirst()?.username
+            korisnik = mySPrefs?.getString("username", "")
         } catch (e: Exception) {
             e.message?.let { Log.e("settings exp", it )}
-        } finally {
-            rlmLog?.close()
         }
         prefLogOut?.summary = "Prijavljeni ste kao $korisnik"
         prefLogOut?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
@@ -177,7 +179,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
         editor = mySPrefs?.edit()
         editor?.putBoolean("logged_in", false)
         editor?.apply()
-        rlmLog = Realm.getDefaultInstance()
+        val encRealm = RealmConfiguration.Builder()
+            .allowWritesOnUiThread(true)
+            .name("encrypted.realm")
+            .schemaVersion(8)
+            .migration(CredMigration())
+            .build()
+        rlmLog = Realm.getInstance(encRealm)
         try {
             rlmLog?.executeTransaction(Realm.Transaction { rlmLog?.deleteAll() })
         } finally {
