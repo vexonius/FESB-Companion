@@ -13,9 +13,9 @@ import io.realm.RealmChangeListener
 import io.realm.RealmResults
 
 class MeniesAdapter(var mMenies: RealmResults<Meni>, val timeGot: String) : RecyclerView.Adapter<MeniViewHolder>(),
-    RealmChangeListener<Any?> {
+    RealmChangeListener<RealmResults<Meni>> {
     init {
-        mMenies.addChangeListener(this as RealmChangeListener<RealmResults<Meni>>)
+        mMenies.addChangeListener(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeniViewHolder {
@@ -99,7 +99,7 @@ class MeniesAdapter(var mMenies: RealmResults<Meni>, val timeGot: String) : Recy
         }
     }
 
-    override fun onChange(element: Any?) {
+    override fun onChange(t: RealmResults<Meni>) {
         notifyDataSetChanged()
     }
 }

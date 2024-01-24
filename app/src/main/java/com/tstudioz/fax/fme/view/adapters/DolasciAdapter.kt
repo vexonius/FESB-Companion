@@ -20,11 +20,11 @@ import com.tstudioz.fax.fme.database.Dolazak
 import io.realm.RealmChangeListener
 import io.realm.RealmResults
 
-class DolasciAdapter(private val context: Context, private val mDolazak: RealmResults<Dolazak>) : RecyclerView.Adapter<DolazakViewHolder?>(), RealmChangeListener<Any?> {
+class DolasciAdapter(private val context: Context, private val mDolazak: RealmResults<Dolazak>) : RecyclerView.Adapter<DolazakViewHolder?>(), RealmChangeListener<RealmResults<Dolazak>> {
     var regulartf: Typeface? = null
 
     init {
-        mDolazak.addChangeListener(this as RealmChangeListener<RealmResults<Dolazak>>)
+        mDolazak.addChangeListener(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DolazakViewHolder {
@@ -104,7 +104,7 @@ class DolasciAdapter(private val context: Context, private val mDolazak: RealmRe
         }
     }
 
-    override fun onChange(element: Any?) {
+    override fun onChange(t: RealmResults<Dolazak>) {
         notifyDataSetChanged()
     }
 }

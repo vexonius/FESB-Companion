@@ -20,7 +20,7 @@ import io.realm.RealmConfiguration
 import io.realm.RealmResults
 
 class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
-    RecyclerView.Adapter<NoteViewHolder>(), RealmChangeListener<Any?> {
+    RecyclerView.Adapter<NoteViewHolder>(), RealmChangeListener<RealmResults<LeanTask>> {
     var light: Typeface? = null
     var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
         .name("tasks.realm")
@@ -29,7 +29,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
         .build()
 
     init {
-        mTasks.addChangeListener(this as RealmChangeListener<RealmResults<LeanTask>>)
+        mTasks.addChangeListener(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -156,12 +156,12 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
         }
     }
 
-    override fun onChange(element: Any?) {
-        notifyDataSetChanged()
-    }
-
     companion object {
         private const val ADD_NEW = 2
         private const val NOTE = 1
+    }
+
+    override fun onChange(t: RealmResults<LeanTask>) {
+        notifyDataSetChanged()
     }
 }

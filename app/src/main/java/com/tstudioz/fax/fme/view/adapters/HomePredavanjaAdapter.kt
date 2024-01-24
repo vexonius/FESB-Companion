@@ -14,13 +14,13 @@ import io.realm.RealmChangeListener
 import io.realm.RealmResults
 
 class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanja>) :
-    RecyclerView.Adapter<HomePredavanjaViewHolder>(), RealmChangeListener<Any?> {
+    RecyclerView.Adapter<HomePredavanjaViewHolder>(), RealmChangeListener<RealmResults<Predavanja>> {
     var boldtf: Typeface? = null
     var regulartf: Typeface? = null
     var lighttf: Typeface? = null
 
     init {
-        mPredavanjaDanas.addChangeListener(this as RealmChangeListener<RealmResults<Predavanja>>)
+        mPredavanjaDanas.addChangeListener(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePredavanjaViewHolder {
@@ -95,7 +95,7 @@ class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanj
         }
     }
 
-    override fun onChange(element: Any?) {
+    override fun onChange(t: RealmResults<Predavanja>) {
         notifyDataSetChanged()
     }
 }

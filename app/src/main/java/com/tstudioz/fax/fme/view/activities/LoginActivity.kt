@@ -58,12 +58,6 @@ class LoginActivity : AppCompatActivity() {
             if (loggedIn) {
                 val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
-               /* CircularAnim.fullActivity(this@LoginActivity, view)
-                    .colorOrImageRes(R.color.colorAccent)
-                    .go {
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        finish()
-                    }*/
                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                 finish()
             }else{
@@ -76,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
 
     private val isUserLoggedIn: Unit
         get() {
-            val sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)
+            val sharedPreferences = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)  // prebacit u VM i uklonit redudanciju
             val prviPut = sharedPreferences.getBoolean("first_open", true)
             if (prviPut) {
                 startActivity(Intent(this@LoginActivity, Welcome::class.java))
@@ -90,7 +84,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
     private fun loadBlueButton() {
-        binding.loginButton.setOnClickListener { _ ->
+        binding.loginButton.setOnClickListener {
             if (NetworkUtils.isNetworkAvailable(this@LoginActivity)) {
                 val username:String = binding.loginInput.text.toString()
                 val password:String = binding.loginPass.text.toString()

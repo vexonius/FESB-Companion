@@ -16,11 +16,11 @@ import io.realm.RealmResults
 /**
  * Created by amarthus on 25-Mar-17.
  */
-class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanja>) : RecyclerView.Adapter<PredavanjaRaspViewHolderTable>(), RealmChangeListener<Any?> {
+class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanja>) : RecyclerView.Adapter<PredavanjaRaspViewHolderTable>(),  RealmChangeListener<RealmResults<Predavanja>> {
     private var dialog: BottomSheetDialog? = null
 
     init {
-        mPredavanja.addChangeListener(this as RealmChangeListener<RealmResults<Predavanja>>)
+        mPredavanja.addChangeListener(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PredavanjaRaspViewHolderTable {
@@ -79,9 +79,6 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
         }
     }
 
-    override fun onChange(element: Any?) {
-        notifyDataSetChanged()
-    }
 
     fun onShowBottomsheet(view: View, position: Int) {
         val context = view.context
@@ -134,5 +131,9 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
             setContentView(views)
         }
         dialog?.show()
+    }
+
+    override fun onChange(t: RealmResults<Predavanja>) {
+        notifyDataSetChanged()
     }
 }
