@@ -13,7 +13,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
-
+import java.util.UUID
 
 
 @ExperimentalCoroutinesApi
@@ -63,6 +63,9 @@ class MainViewModel : ViewModel() {
                         predavanja.dvorana = l.room
                         predavanja.detaljnoVrijeme = l.detailDateWithDayName
                         predavanja.profesor = l.professor
+                        val str = "${predavanja.id}${predavanja.predavanjeIme}${predavanja.predmetPredavanja}${predavanja.rasponVremena}${predavanja.grupa}${predavanja.dvorana}${predavanja.detaljnoVrijeme}${predavanja.profesor}"
+                        val id = UUID.nameUUIDFromBytes(str.toByteArray())
+                        predavanja.id = id.toString()
 
                         svaFreshPredavanja.add(predavanja)
                     }
