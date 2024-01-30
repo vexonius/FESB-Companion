@@ -20,10 +20,12 @@ sealed class Result {
         data class Success(val data: String) : TimeTableResult()
         class Failure(throwable: Throwable) : TimeTableResult()
     }
+
     sealed class PrisutnostResult: Result(){
         class Success(val pris: MutableList<Dolazak>) : PrisutnostResult()
         class Failure(throwable: Throwable) : PrisutnostResult()
     }
+
 
     sealed class WeatherResult: Result()  {
         data class Success(val data: String): WeatherResult()

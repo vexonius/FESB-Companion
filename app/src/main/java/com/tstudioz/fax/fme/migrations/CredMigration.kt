@@ -6,6 +6,7 @@ import io.realm.RealmMigration
 import java.util.Date
 
 class CredMigration : RealmMigration {
+
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
         var oldVersion = oldVersion
         val shema = realm.schema
@@ -42,9 +43,7 @@ class CredMigration : RealmMigration {
         oldVersion++
     }
 
-    override fun hashCode(): Int {
-        return 6
-    }
+    override fun hashCode(): Int = 6
 
     override fun equals(o: Any?): Boolean {
         return o is CredMigration

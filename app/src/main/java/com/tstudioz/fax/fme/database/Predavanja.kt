@@ -25,6 +25,7 @@ open class Predavanja : RealmObject() {
 jh
     fun setBoja(boja: String?): Int {
         var bojaId = R.color.blue_nice
+  
         when (boja) {
             "predavanje" -> bojaId = R.color.blue_nice
             "Auditorne" -> bojaId = R.color.green_nice
@@ -33,6 +34,7 @@ jh
             "Konstrukcijske vježbe" -> bojaId = R.color.grey_nice
             "Ispiti" -> bojaId = R.color.purple_dark
         }
+
         return bojaId
     }
 }
