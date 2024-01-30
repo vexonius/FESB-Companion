@@ -52,7 +52,9 @@ import java.util.Locale
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
+
     var date: String? = null
+
     private var realmLog: Realm? = null
     private var client: OkHttpClient? = null
     private var snack: Snackbar? = null
@@ -93,12 +95,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isThereAction() {
-            if (intent.action != null) {
-                showShortcutView()
-            } else {
-                setDefaultScreen()
-            }
+        if (intent.action != null) {
+            showShortcutView()
+        } else {
+            setDefaultScreen()
         }
+    }
     private fun onBack(){
         onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

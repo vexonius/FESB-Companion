@@ -23,7 +23,7 @@ val module = module {
     single { Repository() }
     single { UserService() }
     single { TimetableNetworkService() }
-    single{ WeatherNetworkService() }
+    single { WeatherNetworkService() }
     single { provideOkHttpClient(androidContext()) }
     viewModel { MainViewModel() }
 }

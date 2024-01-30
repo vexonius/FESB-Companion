@@ -20,10 +20,13 @@ class TimetableNetworkService : TimetableInterface {
                 .build()
 
         val response: Response = client.newCall(request).execute()
+        val value = response.body?.string()
+        
+        if (!response.isSuccessful || value.isNullOrEmpty()) {
+            return Result.WeatherResult.Failure(Throwable("Failed to fetch weather")
+        }
 
-        return if(response.isSuccessful && response.body != null && response.code < 400) {
-            Result.TimeTableResult.Success(response.body!!.string())
-        } else Result.TimeTableResult.Failure(Throwable("Failed to fetch timetable"))
+        return Result.WeatherResult.Success(value)
     }
 
 }
