@@ -18,6 +18,7 @@ open class Predavanja : RealmObject() {
     var detaljnoVrijeme: String? = null
     var dvorana: String? = null
     var boja: String? = null
+
     fun setPredavanjeVrsta(predavanjeVrsta: String?) {
         predavanjeIme = predavanjeVrsta
     }
