@@ -64,12 +64,15 @@ class Repository {
     fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>) {
         timeTableDao.insertOrUpdateTimeTable(freshPredavanja)
     }
+    
     fun insertTempTimeTable(freshPredavanja: MutableList<Predavanja>) {
         timeTableDao.insertTempTimeTable(freshPredavanja)
     }
+    
     fun deleteTempTimeTable() {
         timeTableDao.deleteTempTimeTable()
     }
+    
     fun insertOrUpdatePrisutnost(freshPris: MutableList<Dolazak>) {
         prisutnostDao.insertOrUpdatePrisutnost(freshPris)
     }
