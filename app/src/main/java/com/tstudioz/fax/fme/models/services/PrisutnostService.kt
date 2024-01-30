@@ -26,7 +26,6 @@ class PrisutnostService : PrisutnostInterface{
 
     private val client: OkHttpClient by KoinJavaComponent.inject(OkHttpClient::class.java)
 
-
     override suspend fun fetchPrisutnost(user: User): Result.PrisutnostResult {
 
         var zimskaPris :MutableList<MutableList<Dolazak>> = mutableListOf()
@@ -45,7 +44,7 @@ class PrisutnostService : PrisutnostInterface{
         val response = makeNetworkCall(rq)
 
 
-        if(response.isSuccessful){
+        if (response.isSuccessful) {
                 val request: Request = Request.Builder()
                     .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
                     .get()

@@ -42,6 +42,7 @@ class LoginActivity : AppCompatActivity() {
         onBackListen()
         activateLoggedInListener(view)
     }
+
     private fun onBackListen(){
         onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

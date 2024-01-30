@@ -5,7 +5,8 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 
 class PrisutnostDao {
-fun insertOrUpdatePrisutnost(svaFreshPrisutnost: MutableList<Dolazak>){
+
+    fun insertOrUpdatePrisutnost(svaFreshPrisutnost: MutableList<Dolazak>) {
         val mainRealmConfig = RealmConfiguration.Builder()
         .allowWritesOnUiThread(true)
         .name("prisutnost.realm")
@@ -14,7 +15,7 @@ fun insertOrUpdatePrisutnost(svaFreshPrisutnost: MutableList<Dolazak>){
         .build()
         val realm = Realm.getInstance(mainRealmConfig)
 
-        try{
+        try {
             realm.executeTransaction { rlm ->
                 val svaPris = rlm.where(Dolazak::class.java).findAll()
                 for (fpris in svaFreshPrisutnost) {
@@ -40,6 +41,7 @@ fun insertOrUpdatePrisutnost(svaFreshPrisutnost: MutableList<Dolazak>){
 
         return results.isNotEmpty()
     }
+
     private fun isPrisutnostInFresh(prisutnost: Dolazak, freshPris: List<Dolazak>): Boolean {
         for (pris in freshPris){
             if (prisutnost.id == pris.id){

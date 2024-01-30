@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserInterface {
 
-
     suspend fun loginUser(user: User): Result.LoginResult
     fun logoutUser(): Flow<Result.LogoutResult>
 }
