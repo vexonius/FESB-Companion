@@ -15,6 +15,7 @@ open class Meni : RealmObject() {
     var jelo4: String? = null
     var desert: String? = null
     var cijena: String? = null
+
     override fun getRealm(): Realm {
         return super.getRealm()
     }
