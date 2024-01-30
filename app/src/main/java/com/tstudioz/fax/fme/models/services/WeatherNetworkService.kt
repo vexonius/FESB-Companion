@@ -18,10 +18,13 @@ class WeatherNetworkService : WeatherNetworkInterface {
             .build()
 
         val response: Response = client.newCall(request).execute()
+        val value = response.body?.string()
 
-        return if(response.isSuccessful && response.body != null && response.code < 400) {
-            Result.WeatherResult.Success(response.body!!.string())
-        } else Result.WeatherResult.Failure(Throwable("Failed to fetch weather"))
+        if (!response.isSuccessful || value.isNullOrEmpty()) {
+            return Result.WeatherResult.Failure(Throwable("Failed to fetch weather"))
+        }
+
+        return Result.WeatherResult.Success(value)
     }
 
     override fun getWeekWeatherDetails() : Result.WeatherResult {

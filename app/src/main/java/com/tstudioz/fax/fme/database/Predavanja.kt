@@ -5,6 +5,7 @@ import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
 open class Predavanja : RealmObject() {
+
     @PrimaryKey
     var id: String? = null
     var objectId = 0
@@ -22,7 +23,7 @@ open class Predavanja : RealmObject() {
     fun setPredavanjeVrsta(predavanjeVrsta: String?) {
         predavanjeIme = predavanjeVrsta
     }
-jh
+
     fun setBoja(boja: String?): Int {
         var bojaId = R.color.blue_nice
   
