@@ -8,7 +8,7 @@
 /captures
 .externalNativeBuild
 /gradle.properties
-.idea
+.idea/
 /.idea/caches
 /.idea/modules.xml
 /.idea/navEditor.xml

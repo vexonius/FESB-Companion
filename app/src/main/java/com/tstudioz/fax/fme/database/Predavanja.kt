@@ -21,7 +21,7 @@ open class Predavanja : RealmObject() {
     fun setPredavanjeVrsta(predavanjeVrsta: String?) {
         predavanjeIme = predavanjeVrsta
     }
-
+jh
     fun setBoja(boja: String?): Int {
         var bojaId = R.color.blue_nice
         when (boja) {
