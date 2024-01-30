@@ -40,6 +40,7 @@ fun insertOrUpdatePrisutnost(svaFreshPrisutnost: MutableList<Dolazak>){
 
         return results.isNotEmpty()
     }
+
     private fun isPrisutnostInFresh(prisutnost: Dolazak, freshPris: List<Dolazak>): Boolean {
         for (pris in freshPris){
             if (prisutnost.id == pris.id){
