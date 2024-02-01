@@ -94,10 +94,6 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.home -> {
-                finish()
-                true
-            }
             R.id.delete -> {
                 et?.setText("")
                 finish()
