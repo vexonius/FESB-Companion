@@ -28,19 +28,19 @@
         android:id="@+id/particles"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:dotColor="@color/white"
+        app:particleColor="@color/white"
         app:frameDelayMillis="10"
         app:layout_constraintBottom_toTopOf="@+id/course_week_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lineColor="@color/white"
-        app:lineDistance="110dp"
+        app:lineLength="110dp"
         app:lineThickness="1dp"
-        app:maxDotRadius="3dp"
-        app:minDotRadius="1dp"
-        app:numDots="12"
-        app:stepMultiplier="1" />
+        app:particleRadiusMax="3dp"
+        app:particleRadiusMin="1dp"
+        app:density="12"
+        app:speedFactor="1" />
 
 
     <ProgressBar

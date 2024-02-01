@@ -57,15 +57,29 @@
 
             <TextView
                 android:id="@+id/pr"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/task"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
                 android:text="@string/danasnja_predavanja"
                 android:textColor="@color/shady_blue"
-                android:textSize="13dp" />
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/TimeRaspGot"
+                android:visibility="invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/task"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="3dp"
+                android:text=""
+                android:textColor="@color/shady_blue"
+                android:textSize="12sp" />
 
             <FrameLayout
                 android:id="@+id/frame_list"
@@ -138,15 +152,15 @@
                     android:id="@+id/particles_menza"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:dotColor="@color/white"
+                    app:particleColor="@color/white"
                     app:frameDelayMillis="10"
                     app:lineColor="@color/white"
-                    app:lineDistance="110dp"
+                    app:lineLength="110dp"
                     app:lineThickness="1dp"
-                    app:maxDotRadius="3dp"
-                    app:minDotRadius="1dp"
-                    app:numDots="12"
-                    app:stepMultiplier="1" />
+                    app:particleRadiusMax="3dp"
+                    app:particleRadiusMin="1dp"
+                    app:density="12"
+                    app:speedFactor="1" />
 
                 <TextView
                     android:id="@+id/menza_text"
@@ -186,15 +200,15 @@
                     android:id="@+id/particles_iksica"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:dotColor="@color/white"
+                    app:particleColor="@color/white"
                     app:frameDelayMillis="10"
                     app:lineColor="@color/white"
-                    app:lineDistance="110dp"
+                    app:lineLength="110dp"
                     app:lineThickness="1dp"
-                    app:maxDotRadius="3dp"
-                    app:minDotRadius="1dp"
-                    app:numDots="12"
-                    app:stepMultiplier="1" />
+                    app:particleRadiusMax="3dp"
+                    app:particleRadiusMin="1dp"
+                    app:density="12"
+                    app:speedFactor="1" />
 
                 <TextView
                     android:id="@+id/iksicaText"
@@ -245,15 +259,15 @@
                     android:id="@+id/particles_indeks"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:dotColor="@color/white"
+                    app:particleColor="@color/white"
                     app:frameDelayMillis="10"
                     app:lineColor="@color/white"
-                    app:lineDistance="110dp"
+                    app:lineLength="110dp"
                     app:lineThickness="1dp"
-                    app:maxDotRadius="3dp"
-                    app:minDotRadius="1dp"
-                    app:numDots="12"
-                    app:stepMultiplier="1" />
+                    app:particleRadiusMax="3dp"
+                    app:particleRadiusMin="1dp"
+                    app:density="12"
+                    app:speedFactor="1" />
 
                 <TextView
                     android:id="@+id/eindexText"

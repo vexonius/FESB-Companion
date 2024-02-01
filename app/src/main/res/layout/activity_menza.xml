@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/welcome2"
-    tools:context="com.tstudioz.fax.fme.activities.MenzaActivity"
+    tools:context="com.tstudioz.fax.fme.view.activities.MenzaActivity"
     android:paddingBottom="@dimen/bsp_month_navigation_bar_height">
 
     <TextView

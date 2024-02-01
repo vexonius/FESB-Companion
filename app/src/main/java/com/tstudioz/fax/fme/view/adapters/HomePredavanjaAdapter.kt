@@ -1,0 +1,101 @@
+package com.tstudioz.fax.fme.view.adapters
+
+import android.graphics.Typeface
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.RelativeLayout
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter.HomePredavanjaViewHolder
+import io.realm.RealmChangeListener
+import io.realm.RealmResults
+
+class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanja>) :
+    RecyclerView.Adapter<HomePredavanjaViewHolder>(), RealmChangeListener<RealmResults<Predavanja>> {
+    var boldtf: Typeface? = null
+    var regulartf: Typeface? = null
+    var lighttf: Typeface? = null
+
+    init {
+        mPredavanjaDanas.addChangeListener(this)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePredavanjaViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(
+            R.layout.row_item, parent,
+            false
+        )
+        return HomePredavanjaViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: HomePredavanjaViewHolder, position: Int) {
+        val predavanja = mPredavanjaDanas[position]
+        holder.name.text = predavanja?.predmetPredavanja
+        holder.name.typeface = regulartf
+        holder.type.text = predavanja?.rasponVremena
+        var imePredavanja = predavanja?.predavanjeIme
+        if (!imePredavanja.isNullOrEmpty()) imePredavanja =
+            imePredavanja.substring(0, imePredavanja.length)
+        holder.vrstaPredavanja.text = imePredavanja
+        holder.mjesto.text = predavanja?.dvorana
+        when (predavanja?.predavanjeIme) {
+            "Predavanje" -> holder.boja.setBackgroundResource(R.color.blue_nice)
+            "Auditorne vježbe" -> holder.boja.setBackgroundResource(R.color.green_nice)
+            "Kolokvij" -> holder.boja.setBackgroundResource(R.color.purple_nice)
+            "Laboratorijske vježbe" -> holder.boja.setBackgroundResource(R.color.red_nice)
+            "Konstrukcijske vježbe" -> holder.boja.setBackgroundResource(R.color.grey_nice)
+            "Seminar" -> holder.boja.setBackgroundResource(R.color.blue_nice)
+            "Ispit" -> holder.boja.setBackgroundResource(R.color.purple_dark)
+            "Predavanja," -> holder.boja.setBackgroundResource(R.color.blue_nice)
+            "Auditorne vježbe," -> holder.boja.setBackgroundResource(R.color.green_nice)
+            "Kolokviji," -> holder.boja.setBackgroundResource(R.color.purple_nice)
+            "Laboratorijske vježbe," -> holder.boja.setBackgroundResource(R.color.red_nice)
+            "Konstrukcijske vježbe," -> holder.boja.setBackgroundResource(R.color.grey_nice)
+            "Seminar," -> holder.boja.setBackgroundResource(R.color.blue_nice)
+            "Ispiti," -> holder.boja.setBackgroundResource(R.color.purple_dark)
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return mPredavanjaDanas.size
+    }
+
+    inner class HomePredavanjaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var name: TextView
+        var type: TextView
+        var vrstaPredavanja: TextView
+        var mjesto: TextView
+        var boja: RelativeLayout
+
+        init {
+            name = itemView.findViewById<View>(R.id.name) as TextView
+            lighttf = Typeface.createFromAsset(
+                itemView.context.assets, "fonts/OpenSans" +
+                        "-Light.ttf"
+            )
+            boldtf = Typeface.createFromAsset(
+                itemView.context.assets, "fonts/OpenSans" +
+                        "-Bold.ttf"
+            )
+            name.typeface = regulartf
+            type = itemView.findViewById<View>(R.id.type) as TextView
+            regulartf = Typeface.createFromAsset(
+                itemView.context.assets, "fonts" +
+                        "/OpenSans-Regular.ttf"
+            )
+            type.typeface = regulartf
+            vrstaPredavanja = itemView.findViewById<View>(R.id.vrstaPredavanja) as TextView
+            vrstaPredavanja.typeface = regulartf
+            mjesto = itemView.findViewById<View>(R.id.mjesto) as TextView
+            mjesto.typeface = regulartf
+            boja = itemView.findViewById<View>(R.id.textBox) as RelativeLayout
+        }
+    }
+
+    override fun onChange(t: RealmResults<Predavanja>) {
+        notifyDataSetChanged()
+    }
+}

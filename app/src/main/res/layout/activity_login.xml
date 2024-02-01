@@ -10,19 +10,19 @@
         android:id="@+id/particles"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:dotColor="@color/blue_nice"
+        app:particleColor="@color/blue_nice"
         app:frameDelayMillis="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lineColor="@android:color/white"
-        app:lineDistance="180dp"
+        app:lineLength="180dp"
         app:lineThickness="1dp"
-        app:maxDotRadius="3dp"
-        app:minDotRadius="1dp"
-        app:numDots="37"
-        app:stepMultiplier="1" />
+        app:particleRadiusMax="3dp"
+        app:particleRadiusMin="1dp"
+        app:density="37"
+        app:speedFactor="1" />
 
         <RelativeLayout
             android:layout_width="match_parent"
