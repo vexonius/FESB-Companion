@@ -8,13 +8,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.models.data.Repository
 import com.tstudioz.fax.fme.database.Korisnik
-import com.tstudioz.fax.fme.migrations.CredMigration
 import com.tstudioz.fax.fme.models.data.User
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.java.KoinJavaComponent.inject
-
 
 @InternalCoroutinesApi
 class LoginViewModel(application: Application)  : AndroidViewModel(application) {
@@ -26,23 +24,22 @@ class LoginViewModel(application: Application)  : AndroidViewModel(application) 
 
     suspend fun firstloginUser(user: User) {
         val result = repository.attemptLogin(user)
-        if(result == user)
-        {
+        if (true) {
             val editor = sharedPref.edit()
             editor.putBoolean("logged_in", true)
             editor.apply()
-            val encRealm = RealmConfiguration.Builder()
-                .allowWritesOnUiThread(true)
+            val encRealm = RealmConfiguration.Builder(setOf(Korisnik::class))
                 .name("encrypted.realm")
                 .schemaVersion(8)
-                .migration(CredMigration())
                 .build()
-            val mLogRealm: Realm = Realm.getInstance(encRealm)
+            val mLogRealm = Realm.open(encRealm)
             try {
-                mLogRealm.executeTransaction { realm ->
-                    val userrealm = realm.createObject(Korisnik::class.java)
-                    userrealm.username = user.username
-                    userrealm.lozinka = user.password
+                mLogRealm.writeBlocking {
+                    val newUser = Korisnik()
+                    newUser.username = user.username
+                    newUser.lozinka = user.password
+
+                    this.copyToRealm(newUser)
                 }
             } finally {
                 mLogRealm.close()
@@ -50,7 +47,7 @@ class LoginViewModel(application: Application)  : AndroidViewModel(application) 
             _loggedIn.postValue(true)
 
             Log.d("hello", result.username)
-        }else if (result == User("","",""))
+        } else if (result == User("","",""))
         {
             _loggedIn.postValue(false)
         }

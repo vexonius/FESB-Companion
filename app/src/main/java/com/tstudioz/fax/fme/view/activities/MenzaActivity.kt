@@ -16,8 +16,9 @@ import com.tstudioz.fax.fme.view.adapters.MeniesAdapter
 import com.tstudioz.fax.fme.database.Meni
 import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding
 import com.tstudioz.fax.fme.random.NetworkUtils
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.Call
 import okhttp3.Callback
@@ -35,12 +36,13 @@ class MenzaActivity : AppCompatActivity() {
     private var okHttpClient: OkHttpClient? = null
     private var binding: ActivityMenzaBinding? = null
     private var shPref: SharedPreferences? = instance?.sP
-    private var menzaRealmConf: RealmConfiguration = RealmConfiguration.Builder()
-        .allowWritesOnUiThread(true)
+
+    private var menzaRealmConf: RealmConfiguration = RealmConfiguration.Builder(setOf(Meni::class))
         .name("menza.realm")
         .schemaVersion(1)
         .deleteRealmIfMigrationNeeded()
         .build()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMenzaBinding.inflate(layoutInflater)
@@ -82,8 +84,8 @@ class MenzaActivity : AppCompatActivity() {
         })
     }
     fun parsePage(json:String?){
-        mRealm = Realm.getInstance(menzaRealmConf)
-        mRealm?.executeTransaction { mRealm?.deleteAll() }
+        mRealm = Realm.open(menzaRealmConf)
+        mRealm?.writeBlocking { this.deleteAll() }
 
         try {
             val editor = shPref?.edit()
@@ -103,7 +105,8 @@ class MenzaActivity : AppCompatActivity() {
                     meni.jelo4 = itemsArray?.getString(5)
                     meni.desert = itemsArray?.getString(6)
                     meni.cijena = itemsArray?.getString(7) + " eur"
-                    mRealm?.executeTransaction { mRealm?.copyToRealm(meni) }
+
+                    mRealm?.writeBlocking { this.copyToRealm(meni) }
                 } catch (ex: Exception) {
                     Log.d("Menza activity", ex.toString())
                 }
@@ -118,7 +121,7 @@ class MenzaActivity : AppCompatActivity() {
                     izborniMeni.cijena = itemsArray?.getString(1)?.substring(
                         itemsArray.getString(1).length - 4,
                         itemsArray.getString(1).length) + " eur"
-                    mRealm?.executeTransaction { mRealm?.copyToRealm(izborniMeni)}
+                    mRealm?.writeBlocking { this.copyToRealm(izborniMeni)}
                 } catch (exc: Exception) {
                     Log.d("Menza activity", exc.toString())
                 }
@@ -135,8 +138,8 @@ class MenzaActivity : AppCompatActivity() {
     }
 
     private fun showMenies() {
-        nRealm = Realm.getInstance(menzaRealmConf)
-        val results = nRealm?.where(Meni::class.java)?.findAll()
+        nRealm = Realm.open(menzaRealmConf)
+        val results = nRealm?.query<Meni>()?.find()
         var timeGot = ""
         if (shPref != null){
             timeGot = shPref?.getString("timeGotmenza", "") ?: ""

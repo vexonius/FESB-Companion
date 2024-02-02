@@ -10,21 +10,18 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.LeanTask
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import java.util.UUID
-
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
 
 //Converted NoteActivity to kotlin, fixed return by adding a condition
-
-
 
 class NoteActivity : AppCompatActivity() {
     private var tRealm: Realm? = null
     private var mTaskId: String? = null
     private var et: EditText? = null
-    private var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
-        .allowWritesOnUiThread(true)
+
+    private var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder(setOf(LeanTask::class))
         .name("tasks.realm")
         .deleteRealmIfMigrationNeeded()
         .schemaVersion(1)
@@ -43,13 +40,13 @@ class NoteActivity : AppCompatActivity() {
             mTaskId = intent.extras?.getString("task_key")
         }
 
-        tRealm = Realm.getInstance(realmTaskConfiguration)
-        tRealm.use { tRealm ->
-            if (mTaskId != null) {
-                val leanTask = tRealm?.where(LeanTask::class.java)?.equalTo("id", mTaskId)?.findFirst()
-                et?.setText(leanTask?.taskTekst)
-            }
+        tRealm = Realm.open(realmTaskConfiguration)
+
+        if (mTaskId != null) {
+            val leanTask: LeanTask? = tRealm?.query<LeanTask>("id = $0", mTaskId)?.first()?.find()
+            et?.setText(leanTask?.taskTekst)
         }
+
         saveNoteListener()
     }
 
@@ -62,27 +59,23 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        val sRealm = Realm.getInstance(realmTaskConfiguration)
+
+        val sRealm = Realm.open(realmTaskConfiguration)
         val stringBiljeska = et?.text.toString()
-        sRealm.use { sRlm ->
+        sRealm.writeBlocking {
             if (mTaskId != null && stringBiljeska.trim { it <= ' ' } != "") {
-                sRlm.executeTransaction { realm ->
-                    val leanTask = realm.where(LeanTask::class.java).equalTo("id", mTaskId).findFirst()
-                    leanTask?.taskTekst = stringBiljeska
-                    leanTask?.checked = false
-                }
+                val leanTask = this.query<LeanTask>("id = $0", mTaskId).first().find()
+                leanTask?.taskTekst = stringBiljeska
+                leanTask?.checked = false
             } else if (mTaskId != null && stringBiljeska.trim { it <= ' ' } == "") {
-                sRlm.executeTransaction { realm ->
-                    val leanTask = realm.where(LeanTask::class.java).equalTo("id", mTaskId).findFirst()
-                    leanTask?.deleteFromRealm()
-                }
+                val leanTask = this.query<LeanTask>("id = $0", mTaskId).first().find()
+                leanTask?.let { this.delete(it) }
             } else if (stringBiljeska.trim { it <= ' ' } != "") {
-                sRlm.executeTransaction { realm ->
-                    val leanTask = realm.createObject(LeanTask::class.java, UUID.randomUUID().toString())
-                    leanTask?.taskTekst = stringBiljeska
-                    leanTask?.checked = false
+                val leanTask = LeanTask().apply {
+                    taskTekst = stringBiljeska
+                    checked = false
                 }
-            }
+            } else {}
         }
     }
 

@@ -1,10 +1,10 @@
 package com.tstudioz.fax.fme.database
 
 import com.tstudioz.fax.fme.R
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 
-open class Predavanja : RealmObject() {
+open class Predavanja : RealmObject {
 
     @PrimaryKey
     var id: String? = null

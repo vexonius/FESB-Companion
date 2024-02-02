@@ -24,12 +24,10 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.view.activities.LoginActivity
 import com.tstudioz.fax.fme.database.Korisnik
-import com.tstudioz.fax.fme.migrations.CredMigration
-import com.tstudioz.fax.fme.models.data.User
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import com.tstudioz.fax.fme.view.activities.LoginActivity
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
 
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -179,15 +177,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
         editor = mySPrefs?.edit()
         editor?.putBoolean("logged_in", false)
         editor?.apply()
-        val encRealm = RealmConfiguration.Builder()
-            .allowWritesOnUiThread(true)
+
+        val encRealm = RealmConfiguration.Builder(setOf(Korisnik::class))
             .name("encrypted.realm")
             .schemaVersion(8)
-            .migration(CredMigration())
             .build()
-        rlmLog = Realm.getInstance(encRealm)
+
+        rlmLog = Realm.open(encRealm)
+
         try {
-            rlmLog?.executeTransaction(Realm.Transaction { rlmLog?.deleteAll() })
+            rlmLog?.writeBlocking { this.deleteAll() }
         } finally {
             rlmLog?.close()
         }

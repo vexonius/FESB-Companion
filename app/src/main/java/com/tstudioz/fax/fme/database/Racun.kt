@@ -1,12 +1,11 @@
 package com.tstudioz.fax.fme.database
 
-import io.realm.RealmObject
+import io.realm.kotlin.types.RealmObject
 
-/**
- * Created by amarthus on 26-Apr-17.
- */
-open class Racun : RealmObject() {
+open class Racun : RealmObject {
+
     var pare: String? = null
     var ime_prezime: String? = null
     var broj_kartice: String? = null
+
 }

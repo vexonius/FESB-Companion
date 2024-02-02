@@ -14,23 +14,18 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.LeanTask
 import com.tstudioz.fax.fme.view.activities.NoteActivity
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter.NoteViewHolder
-import io.realm.Realm
-import io.realm.RealmChangeListener
-import io.realm.RealmConfiguration
-import io.realm.RealmResults
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.query.RealmResults
 
 class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
-    RecyclerView.Adapter<NoteViewHolder>(), RealmChangeListener<RealmResults<LeanTask>> {
+    RecyclerView.Adapter<NoteViewHolder>() {
     var light: Typeface? = null
-    var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
+    var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder(setOf(LeanTask::class))
         .name("tasks.realm")
         .deleteRealmIfMigrationNeeded()
         .schemaVersion(1)
         .build()
-
-    init {
-        mTasks.addChangeListener(this)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val view: View
@@ -95,7 +90,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
             taskText.typeface = light
             itemView.setOnClickListener(this)
             itemView.setOnLongClickListener(this)
-            mRealm = Realm.getInstance(realmTaskConfiguration)
+            mRealm = Realm.open(realmTaskConfiguration)
             point.setOnClickListener { view ->
                 when (itemViewType) {
                     ADD_NEW -> {
@@ -111,13 +106,13 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
                     NOTE -> if (mTasks[adapterPosition]?.checked == true) {
                         taskText.paintFlags = 0
                         point.setImageResource(R.drawable.circle_white)
-                        mRealm.executeTransaction {
+                        mRealm.writeBlocking {
                             mTasks[adapterPosition]?.checked = false
                         }
                     } else {
                         point.setImageResource(R.drawable.circle_checked)
                         taskText.paintFlags = taskText.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                        mRealm.executeTransaction { mTasks[adapterPosition]?.checked = true }
+                        mRealm.writeBlocking { mTasks[adapterPosition]?.checked = true }
                     }
                 }
             }
@@ -161,7 +156,4 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
         private const val NOTE = 1
     }
 
-    override fun onChange(t: RealmResults<LeanTask>) {
-        notifyDataSetChanged()
-    }
 }

@@ -9,14 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Meni
 import com.tstudioz.fax.fme.view.adapters.MeniesAdapter.MeniViewHolder
-import io.realm.RealmChangeListener
-import io.realm.RealmResults
+import io.realm.kotlin.query.RealmResults
 
-class MeniesAdapter(var mMenies: RealmResults<Meni>, val timeGot: String) : RecyclerView.Adapter<MeniViewHolder>(),
-    RealmChangeListener<RealmResults<Meni>> {
-    init {
-        mMenies.addChangeListener(this)
-    }
+class MeniesAdapter(var mMenies: RealmResults<Meni>, val timeGot: String) : RecyclerView.Adapter<MeniViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeniViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(
@@ -99,7 +94,4 @@ class MeniesAdapter(var mMenies: RealmResults<Meni>, val timeGot: String) : Recy
         }
     }
 
-    override fun onChange(t: RealmResults<Meni>) {
-        notifyDataSetChanged()
-    }
 }

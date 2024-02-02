@@ -3,7 +3,6 @@ package com.tstudioz.fax.fme.view.activities
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.ActivityInfo
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -30,16 +29,16 @@ import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
-import com.tstudioz.fax.fme.migrations.CredMigration
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.exceptions.RealmException
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.exceptions.RealmException
+import io.realm.kotlin.ext.query
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
@@ -66,11 +65,9 @@ class MainActivity : AppCompatActivity() {
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     private lateinit var mainViewModel: MainViewModel
-    private val encRealm = RealmConfiguration.Builder()
-        .allowWritesOnUiThread(true)
+    private val encRealm = RealmConfiguration.Builder(setOf(Korisnik::class))
         .name("encrypted.realm")
         .schemaVersion(8)
-        .migration(CredMigration())
         .build()
 
 
@@ -135,13 +132,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkUser() {
         var korisnik: Korisnik? = null
-        realmLog = Realm.getInstance(encRealm)
+        realmLog = Realm.open(encRealm)
         assert(shPref != null)
         editor = shPref?.edit()
 
         if (realmLog != null) {
             try {
-                korisnik = realmLog?.where(Korisnik::class.java)?.findFirst()
+                korisnik = realmLog?.query<Korisnik>()?.find()?.first()
             }
             catch (ex: Exception) { ex.printStackTrace() }
             finally {
@@ -253,9 +250,9 @@ class MainActivity : AppCompatActivity() {
         editor?.putBoolean("logged_in", false)
         editor?.apply()
 
-        realmLog = Realm.getInstance(encRealm)
+        realmLog = Realm.open(encRealm)
         try {
-            realmLog?.executeTransaction { realmLog?.deleteAll() }
+            realmLog?.writeBlocking { this.deleteAll() }
         } catch (ex: RealmException) {
             Log.e("MainActivity", ex.toString())
         } finally {

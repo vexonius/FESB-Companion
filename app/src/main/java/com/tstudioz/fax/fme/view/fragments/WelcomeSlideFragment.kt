@@ -6,9 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 
-/**
- * Created by amarthus on 17-Sep-17.
- */
 class WelcomeSlideFragment : Fragment() {
     private var layoutResId = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,6 +24,7 @@ class WelcomeSlideFragment : Fragment() {
 
     companion object {
         private const val ARG_LAYOUT_RES_ID = "layoutResId"
+
         fun newInstance(layoutResId: Int): WelcomeSlideFragment {
             val sampleSlide = WelcomeSlideFragment()
             val args = Bundle()
@@ -34,5 +32,6 @@ class WelcomeSlideFragment : Fragment() {
             sampleSlide.arguments = args
             return sampleSlide
         }
+
     }
 }

@@ -8,10 +8,9 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.orhanobut.hawk.Hawk
-import com.tstudioz.fax.fme.migrations.CredMigration
+import com.tstudioz.fax.fme.database.Korisnik
 import com.tstudioz.fax.fme.models.di.module
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.CookieJar
 import okhttp3.OkHttpClient
@@ -19,9 +18,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
-import java.io.File
 import java.security.SecureRandom
-
 
 @InternalCoroutinesApi
 class FESBCompanion : Application() {
@@ -33,18 +30,11 @@ class FESBCompanion : Application() {
 
         instance = this
 
-        Realm.init(this)
-
-        credRealmCf = RealmConfiguration.Builder()
-                .allowWritesOnUiThread(true)
-                .name("encryptedv2.realm")
-                .schemaVersion(8)
-                .migration(CredMigration())
-                .encryptionKey(realmKey)
-                .build()
-
-        credRealmCf?.let { Realm.setDefaultConfiguration(it) }
-        checkOldVersion()
+        credRealmCf = RealmConfiguration.Builder(schema = setOf(Korisnik::class))
+            .name("encryptedv2.realm")
+            .schemaVersion(8)
+            .encryptionKey(realmKey)
+            .build()
 
         startKoin {
             androidLogger(level = Level.ERROR)
@@ -58,23 +48,6 @@ class FESBCompanion : Application() {
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         MultiDex.install(this)
-    }
-
-    private fun checkOldVersion() {
-        val newRealmFile = credRealmCf?.path?.let { File(it) }
-        if (newRealmFile?.exists() == false) {
-            // Migrate old Realm and delete old
-            val old = RealmConfiguration.Builder()
-                    .allowWritesOnUiThread(true)
-                    .name("encrypted.realm")
-                    .schemaVersion(8)
-                    .migration(CredMigration())
-                    .build()
-            val realm = Realm.getInstance(old)
-            realm.writeEncryptedCopyTo(newRealmFile, realmKey)
-            realm.close()
-            Realm.deleteRealm(old)
-        }
     }
 
     private val realmKey: ByteArray
@@ -106,6 +79,7 @@ class FESBCompanion : Application() {
                         .cookieJar(cookieJar)
                         .build()
             }
+
             return okHttpClient
         }
 

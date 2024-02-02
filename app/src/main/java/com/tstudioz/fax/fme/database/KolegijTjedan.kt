@@ -1,14 +1,13 @@
 package com.tstudioz.fax.fme.database
 
-import io.realm.RealmList
-import io.realm.RealmObject
+import io.realm.kotlin.types.RealmList
+import io.realm.kotlin.types.RealmObject
 
-/**
- * Created by amarthus on 09-May-17.
- */
-open class KolegijTjedan : RealmObject() {
+open class KolegijTjedan : RealmObject {
+
     var index = 0
     var opis: String? = null
     var tjedan: String? = null
     var materijali: RealmList<Materijal>? = null
+
 }

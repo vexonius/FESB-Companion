@@ -17,15 +17,10 @@ import com.github.mikephil.charting.formatter.IValueFormatter
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.adapters.DolasciAdapter.DolazakViewHolder
 import com.tstudioz.fax.fme.database.Dolazak
-import io.realm.RealmChangeListener
-import io.realm.RealmResults
+import io.realm.kotlin.query.RealmResults
 
-class DolasciAdapter(private val context: Context, private val mDolazak: RealmResults<Dolazak>) : RecyclerView.Adapter<DolazakViewHolder?>(), RealmChangeListener<RealmResults<Dolazak>> {
+class DolasciAdapter(private val context: Context, private val mDolazak: RealmResults<Dolazak>) : RecyclerView.Adapter<DolazakViewHolder?>() {
     var regulartf: Typeface? = null
-
-    init {
-        mDolazak.addChangeListener(this)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DolazakViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(
@@ -104,7 +99,4 @@ class DolasciAdapter(private val context: Context, private val mDolazak: RealmRe
         }
     }
 
-    override fun onChange(t: RealmResults<Dolazak>) {
-        notifyDataSetChanged()
-    }
 }
