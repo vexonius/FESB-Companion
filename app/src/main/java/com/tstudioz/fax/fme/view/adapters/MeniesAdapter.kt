@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.Meni
+import com.tstudioz.fax.fme.database.models.Meni
 import com.tstudioz.fax.fme.view.adapters.MeniesAdapter.MeniViewHolder
 import io.realm.kotlin.query.RealmResults
 

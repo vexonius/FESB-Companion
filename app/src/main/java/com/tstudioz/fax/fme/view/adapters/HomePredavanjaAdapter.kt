@@ -8,7 +8,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter.HomePredavanjaViewHolder
 import io.realm.kotlin.query.RealmResults
 

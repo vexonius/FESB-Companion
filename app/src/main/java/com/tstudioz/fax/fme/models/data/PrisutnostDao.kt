@@ -1,22 +1,21 @@
 package com.tstudioz.fax.fme.models.data
 
-import com.tstudioz.fax.fme.database.Dolazak
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Dolazak
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmResults
+import org.koin.android.ext.android.inject
 
 class PrisutnostDao {
 
-    fun insertOrUpdatePrisutnost(svaFreshPrisutnost: MutableList<Dolazak>) {
-        val mainRealmConfig = RealmConfiguration.Builder(setOf(Dolazak::class))
-        .name("prisutnost.realm")
-        .schemaVersion(10)
-        .deleteRealmIfMigrationNeeded()
-        .build()
+    // TODO: Remove this, temporary fix
+    private val dbManager = DatabaseManager()
 
-        val realm = Realm.open(mainRealmConfig)
+    fun insertOrUpdatePrisutnost(svaFreshPrisutnost: MutableList<Dolazak>) {
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         try {
             realm.writeBlocking {

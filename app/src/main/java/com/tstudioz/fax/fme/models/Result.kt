@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.models
 
-import com.tstudioz.fax.fme.database.Dolazak
+import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.models.data.User
 
 

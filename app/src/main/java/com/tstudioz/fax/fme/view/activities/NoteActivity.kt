@@ -9,23 +9,20 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.LeanTask
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.LeanTask
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-
-//Converted NoteActivity to kotlin, fixed return by adding a condition
+import org.koin.android.ext.android.inject
 
 class NoteActivity : AppCompatActivity() {
-    private var tRealm: Realm? = null
+
+    private val dbManager: DatabaseManager by inject()
+
     private var mTaskId: String? = null
     private var et: EditText? = null
-
-    private var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder(setOf(LeanTask::class))
-        .name("tasks.realm")
-        .deleteRealmIfMigrationNeeded()
-        .schemaVersion(1)
-        .build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,10 +37,10 @@ class NoteActivity : AppCompatActivity() {
             mTaskId = intent.extras?.getString("task_key")
         }
 
-        tRealm = Realm.open(realmTaskConfiguration)
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         if (mTaskId != null) {
-            val leanTask: LeanTask? = tRealm?.query<LeanTask>("id = $0", mTaskId)?.first()?.find()
+            val leanTask: LeanTask? = realm.query<LeanTask>("id = $0", mTaskId).first()?.find()
             et?.setText(leanTask?.taskTekst)
         }
 
@@ -60,22 +57,29 @@ class NoteActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
 
-        val sRealm = Realm.open(realmTaskConfiguration)
-        val stringBiljeska = et?.text.toString()
-        sRealm.writeBlocking {
-            if (mTaskId != null && stringBiljeska.trim { it <= ' ' } != "") {
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
+        val stringBiljeska = et?.text.toString().trim()
+
+        if (stringBiljeska.isEmpty()) {
+            return
+        }
+
+        realm.writeBlocking {
+            if (mTaskId != null) {
                 val leanTask = this.query<LeanTask>("id = $0", mTaskId).first().find()
-                leanTask?.taskTekst = stringBiljeska
-                leanTask?.checked = false
-            } else if (mTaskId != null && stringBiljeska.trim { it <= ' ' } == "") {
-                val leanTask = this.query<LeanTask>("id = $0", mTaskId).first().find()
-                leanTask?.let { this.delete(it) }
-            } else if (stringBiljeska.trim { it <= ' ' } != "") {
+
+                leanTask?.let {
+                    it.taskTekst = stringBiljeska
+                    it.checked = false
+                    this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
+                }
+            } else {
                 val leanTask = LeanTask().apply {
                     taskTekst = stringBiljeska
                     checked = false
                 }
-            } else {}
+                this.copyToRealm(leanTask, updatePolicy = UpdatePolicy.ALL)
+            }
         }
     }
 

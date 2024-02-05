@@ -1,21 +1,20 @@
 package com.tstudioz.fax.fme.models.data
 
-import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Predavanja
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
-class TimeTableDao {
+class TimeTableDao: KoinComponent {
+
+    private val dbManager: DatabaseManager by inject()
 
     fun insertOrUpdateTimeTable(svaFreshPredavanja: MutableList<Predavanja> ){
-        val mainRealmConfig = RealmConfiguration.Builder(setOf(Predavanja::class))
-            .name("glavni.realm")
-            .schemaVersion(3)
-            .deleteRealmIfMigrationNeeded()
-            .build()
-
-        val realm = Realm.open(mainRealmConfig)
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         try {
             realm.writeBlocking {
@@ -37,13 +36,7 @@ class TimeTableDao {
     }
 
     fun insertTempTimeTable( svaFreshTempPredavanja: MutableList<Predavanja> ){
-        val mainRealmConfig = RealmConfiguration.Builder(setOf(Predavanja::class))
-            .name("temporary.realm")
-            .schemaVersion(12)
-            .deleteRealmIfMigrationNeeded()
-            .build()
-
-        val realm = Realm.open(mainRealmConfig)
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         try {
             realm.writeBlocking {
@@ -56,23 +49,17 @@ class TimeTableDao {
         }
     }
     fun deleteTempTimeTable(){
-        val tmpRealmConfig = RealmConfiguration.Builder(setOf(Predavanja::class))
-            .name("temporary.realm")
-            .schemaVersion(12)
-            .deleteRealmIfMigrationNeeded()
-            .build()
-
-        val tempRealm = Realm.open(tmpRealmConfig)
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         try {
-            tempRealm.writeBlocking {
+            realm.writeBlocking {
                 val svaPredavanja = this.query<Predavanja>().find()
                 for (pred in svaPredavanja) {
                     this.delete(pred)
                 }
             }
         } finally {
-            tempRealm.close()
+            realm.close()
         }
     }
     private fun isPredavanjeInRealm(realm: MutableRealm, id: String?): Boolean {

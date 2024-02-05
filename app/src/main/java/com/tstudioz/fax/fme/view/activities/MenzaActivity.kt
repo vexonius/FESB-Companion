@@ -12,12 +12,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.view.adapters.MeniesAdapter
-import com.tstudioz.fax.fme.database.Meni
+import com.tstudioz.fax.fme.database.models.Meni
 import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding
 import com.tstudioz.fax.fme.random.NetworkUtils
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.Call
@@ -26,22 +26,20 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
+import org.koin.android.ext.android.inject
 import java.io.IOException
 
 @OptIn(InternalCoroutinesApi::class)
 class MenzaActivity : AppCompatActivity() {
+
+    private val okHttpClient: OkHttpClient by inject()
+    private val dbManager: DatabaseManager by inject()
+
     private var mRealm: Realm? = null
     private var nRealm: Realm? = null
     private var snack: Snackbar? = null
-    private var okHttpClient: OkHttpClient? = null
     private var binding: ActivityMenzaBinding? = null
     private var shPref: SharedPreferences? = instance?.sP
-
-    private var menzaRealmConf: RealmConfiguration = RealmConfiguration.Builder(setOf(Meni::class))
-        .name("menza.realm")
-        .schemaVersion(1)
-        .deleteRealmIfMigrationNeeded()
-        .build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,13 +65,12 @@ class MenzaActivity : AppCompatActivity() {
     }
 
     private fun startParsing() {
-        okHttpClient = instance?.okHttpInstance
         val request: Request = Request.Builder()
             .url("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
             .get()
             .build()
-        val call = okHttpClient?.newCall(request)
-        call?.enqueue(object : Callback {
+        val call = okHttpClient.newCall(request)
+        call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {}
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
@@ -84,7 +81,7 @@ class MenzaActivity : AppCompatActivity() {
         })
     }
     fun parsePage(json:String?){
-        mRealm = Realm.open(menzaRealmConf)
+        mRealm = Realm.open(dbManager.getDefaultConfiguration())
         mRealm?.writeBlocking { this.deleteAll() }
 
         try {
@@ -138,7 +135,7 @@ class MenzaActivity : AppCompatActivity() {
     }
 
     private fun showMenies() {
-        nRealm = Realm.open(menzaRealmConf)
+        nRealm = Realm.open(dbManager.getDefaultConfiguration())
         val results = nRealm?.query<Meni>()?.find()
         var timeGot = ""
         if (shPref != null){
@@ -179,7 +176,8 @@ class MenzaActivity : AppCompatActivity() {
 
     public override fun onStop() {
         super.onStop()
-        if (okHttpClient != null) okHttpClient?.dispatcher?.cancelAll()
+
+        okHttpClient.dispatcher.cancelAll()
     }
 
     public override fun onDestroy() {

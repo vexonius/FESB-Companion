@@ -16,7 +16,7 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IValueFormatter
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.view.adapters.DolasciAdapter.DolazakViewHolder
-import com.tstudioz.fax.fme.database.Dolazak
+import com.tstudioz.fax.fme.database.models.Dolazak
 import io.realm.kotlin.query.RealmResults
 
 class DolasciAdapter(private val context: Context, private val mDolazak: RealmResults<Dolazak>) : RecyclerView.Adapter<DolazakViewHolder?>() {

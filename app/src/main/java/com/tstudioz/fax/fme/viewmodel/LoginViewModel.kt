@@ -6,33 +6,34 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.models.data.Repository
-import com.tstudioz.fax.fme.database.Korisnik
+import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.models.data.User
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.java.KoinJavaComponent.inject
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 @InternalCoroutinesApi
-class LoginViewModel(application: Application)  : AndroidViewModel(application) {
+class LoginViewModel(application: Application) : AndroidViewModel(application), KoinComponent {
+
+    private val dbManager: DatabaseManager by inject()
+    private val repository: Repository by inject()
+
     private val sharedPref = application.getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)
-    private val repository: Repository by inject(Repository::class.java)
     private var _loggedIn = MutableLiveData<Boolean>()
     val loggedIn: LiveData<Boolean>
         get() = _loggedIn
 
     suspend fun firstloginUser(user: User) {
         val result = repository.attemptLogin(user)
-        if (true) {
+        if (user == result) {
             val editor = sharedPref.edit()
             editor.putBoolean("logged_in", true)
             editor.apply()
-            val encRealm = RealmConfiguration.Builder(setOf(Korisnik::class))
-                .name("encrypted.realm")
-                .schemaVersion(8)
-                .build()
-            val mLogRealm = Realm.open(encRealm)
+
+            val mLogRealm = Realm.open(dbManager.getDefaultConfiguration())
             try {
                 mLogRealm.writeBlocking {
                     val newUser = Korisnik()

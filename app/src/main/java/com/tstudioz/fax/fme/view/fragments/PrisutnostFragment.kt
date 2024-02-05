@@ -14,7 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.Dolazak
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
@@ -27,15 +28,12 @@ import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 @OptIn(InternalCoroutinesApi::class)
 class PrisutnostFragment : Fragment() {
 
-    private var realmConfig: RealmConfiguration = RealmConfiguration.Builder(setOf(Dolazak::class))
-        .name("prisutnost.realm")
-        .schemaVersion(10)
-        .deleteRealmIfMigrationNeeded()
-        .build()
+    private val dbManager: DatabaseManager by inject()
 
     private var snack: Snackbar? = null
     private var semAdapter: DolasciAdapter? = null
@@ -86,9 +84,9 @@ class PrisutnostFragment : Fragment() {
 
     private fun showRecyclerview(sem: Int) {
         if (realm == null || realm?.isClosed() == true){
-            realm = Realm.open(realmConfig) }
+            realm = Realm.open(dbManager.getDefaultConfiguration()) }
         val dolasciSem: RealmResults<Dolazak>? =
-            realm?.query<Dolazak>("semestar = $0", sem.toString())?.find()
+            realm?.query<Dolazak>("semestar = $0", sem)?.find()
         try {
             if (!dolasciSem.isNullOrEmpty()){
                 semAdapter = context?.let { DolasciAdapter(it, dolasciSem) }}

@@ -27,7 +27,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.Korisnik
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
@@ -44,6 +45,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
 import okhttp3.OkHttpClient
+import org.koin.android.ext.android.inject
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -51,6 +53,8 @@ import java.util.Locale
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
+
+    private val dbManager: DatabaseManager by inject()
 
     var date: String? = null
 
@@ -65,11 +69,6 @@ class MainActivity : AppCompatActivity() {
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     private lateinit var mainViewModel: MainViewModel
-    private val encRealm = RealmConfiguration.Builder(setOf(Korisnik::class))
-        .name("encrypted.realm")
-        .schemaVersion(8)
-        .build()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,7 +131,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkUser() {
         var korisnik: Korisnik? = null
-        realmLog = Realm.open(encRealm)
+        realmLog = Realm.open(dbManager.getDefaultConfiguration())
         assert(shPref != null)
         editor = shPref?.edit()
 
@@ -250,7 +249,7 @@ class MainActivity : AppCompatActivity() {
         editor?.putBoolean("logged_in", false)
         editor?.apply()
 
-        realmLog = Realm.open(encRealm)
+        realmLog = Realm.open(dbManager.getDefaultConfiguration())
         try {
             realmLog?.writeBlocking { this.deleteAll() }
         } catch (ex: RealmException) {

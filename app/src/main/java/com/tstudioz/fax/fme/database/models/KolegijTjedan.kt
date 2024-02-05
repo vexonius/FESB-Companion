@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.database
+package com.tstudioz.fax.fme.database.models
 
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject

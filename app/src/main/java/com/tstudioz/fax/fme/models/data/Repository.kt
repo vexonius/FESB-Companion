@@ -1,8 +1,8 @@
 package com.tstudioz.fax.fme.models.data
 
 import android.util.Log
-import com.tstudioz.fax.fme.database.Dolazak
-import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.services.PrisutnostService
 import com.tstudioz.fax.fme.models.services.TimetableNetworkService

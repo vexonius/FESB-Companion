@@ -11,21 +11,21 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.LeanTask
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.LeanTask
 import com.tstudioz.fax.fme.view.activities.NoteActivity
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter.NoteViewHolder
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.query.RealmResults
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
-    RecyclerView.Adapter<NoteViewHolder>() {
+    RecyclerView.Adapter<NoteViewHolder>(), KoinComponent {
     var light: Typeface? = null
-    var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder(setOf(LeanTask::class))
-        .name("tasks.realm")
-        .deleteRealmIfMigrationNeeded()
-        .schemaVersion(1)
-        .build()
+
+    private val dbManager: DatabaseManager by inject()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val view: View
@@ -90,7 +90,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
             taskText.typeface = light
             itemView.setOnClickListener(this)
             itemView.setOnLongClickListener(this)
-            mRealm = Realm.open(realmTaskConfiguration)
+            mRealm = Realm.open(dbManager.getDefaultConfiguration())
             point.setOnClickListener { view ->
                 when (itemViewType) {
                     ADD_NEW -> {

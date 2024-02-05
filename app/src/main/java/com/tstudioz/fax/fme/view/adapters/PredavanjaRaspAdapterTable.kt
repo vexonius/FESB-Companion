@@ -8,11 +8,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.view.adapters.PredavanjaRaspAdapterTable.PredavanjaRaspViewHolderTable
 import io.realm.kotlin.query.RealmResults
 
 class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanja>) : RecyclerView.Adapter<PredavanjaRaspViewHolderTable>() {
+
     private var dialog: BottomSheetDialog? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PredavanjaRaspViewHolderTable {

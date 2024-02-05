@@ -24,10 +24,12 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.Korisnik
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.view.activities.LoginActivity
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import org.koin.android.ext.android.inject
 
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -38,6 +40,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var mySPrefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
 
+    private val dbManager: DatabaseManager by inject()
 
     /*private val modeChangeListener = object : Preference.OnPreferenceChangeListener {
         override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
@@ -178,12 +181,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         editor?.putBoolean("logged_in", false)
         editor?.apply()
 
-        val encRealm = RealmConfiguration.Builder(setOf(Korisnik::class))
-            .name("encrypted.realm")
-            .schemaVersion(8)
-            .build()
-
-        rlmLog = Realm.open(encRealm)
+        rlmLog = Realm.open(dbManager.getDefaultConfiguration())
 
         try {
             rlmLog?.writeBlocking { this.deleteAll() }

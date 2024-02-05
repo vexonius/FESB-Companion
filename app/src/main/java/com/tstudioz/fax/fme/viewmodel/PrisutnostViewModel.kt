@@ -3,7 +3,7 @@ package com.tstudioz.fax.fme.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.tstudioz.fax.fme.database.Dolazak
+import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.models.data.Repository
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.data.User

@@ -89,7 +89,6 @@ dependencies {
 
     implementation("io.realm.kotlin:library-base:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-
 }
 
 configurations.all {

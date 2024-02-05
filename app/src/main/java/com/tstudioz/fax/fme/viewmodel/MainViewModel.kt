@@ -1,12 +1,11 @@
 package com.tstudioz.fax.fme.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.models.data.Repository
-import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.models.data.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
