@@ -11,19 +11,17 @@ import com.tstudioz.fax.fme.models.services.WeatherNetworkService
 import com.tstudioz.fax.fme.models.util.parseTimetable
 import com.tstudioz.fax.fme.models.util.parseWeatherDetails
 import com.tstudioz.fax.fme.weather.Current
-import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.java.KoinJavaComponent.inject
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
+class Repository: KoinComponent {
 
-@InternalCoroutinesApi
-class Repository {
-
-    private val service: UserService by inject(UserService::class.java)
-    private val timetableNetworkService: TimetableNetworkService by inject(TimetableNetworkService::class.java)
-    private val weatherNetworkService: WeatherNetworkService by inject(WeatherNetworkService::class.java)
-    private val prisutnostService = PrisutnostService()
-    private val timeTableDao: TimeTableDao = TimeTableDao()
-    private val prisutnostDao: PrisutnostDao = PrisutnostDao()
+    private val service: UserService by inject()
+    private val timetableNetworkService: TimetableNetworkService by inject()
+    private val weatherNetworkService: WeatherNetworkService by inject()
+    private val prisutnostService: PrisutnostService by inject()
+    private val timeTableDao: TimeTableDao by inject()
+    private val attendanceDao: AttendanceDao by inject()
 
     suspend fun attemptLogin(user: User): User {
         return when (val result = service.loginUser(user)) {
@@ -57,24 +55,24 @@ class Repository {
         }
     }
 
-    suspend fun fetchPrisutnost(user: User): Result.PrisutnostResult {
+    suspend fun fetchAttendance(user: User): Result.PrisutnostResult {
         return prisutnostService.fetchPrisutnost(user)
     }
 
-    fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>) {
-        timeTableDao.insertOrUpdateTimeTable(freshPredavanja)
+    fun insertOrUpdateTimeTable(classes: List<Predavanja>) {
+        timeTableDao.insertOrUpdateTimeTable(classes)
     }
     
-    fun insertTempTimeTable(freshPredavanja: MutableList<Predavanja>) {
-        timeTableDao.insertTempTimeTable(freshPredavanja)
+    fun insertTempTimeTable(classes: List<Predavanja>) {
+        timeTableDao.insertTempTimeTable(classes)
     }
     
     fun deleteTempTimeTable() {
         timeTableDao.deleteTempTimeTable()
     }
     
-    fun insertOrUpdatePrisutnost(freshPris: MutableList<Dolazak>) {
-        prisutnostDao.insertOrUpdatePrisutnost(freshPris)
+    suspend fun insertAttendance(attendance: List<Dolazak>) {
+        attendanceDao.insert(attendance)
     }
 
     companion object {
