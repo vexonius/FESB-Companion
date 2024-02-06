@@ -29,6 +29,7 @@ import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.models.data.User
@@ -56,7 +57,7 @@ import java.util.Locale
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
 
-    private val dbManager: DatabaseManager by inject()
+    private val dbManager: DatabaseManagerInterface by inject()
 
     var date: String? = null
 

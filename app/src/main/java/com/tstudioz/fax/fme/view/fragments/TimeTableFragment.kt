@@ -18,6 +18,7 @@ import com.philliphsu.bottomsheetpickers.date.DatePickerDialog
 import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.databinding.TimetableTabBinding
@@ -38,7 +39,7 @@ import java.util.Locale
 
 class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
-    private val dbManager: DatabaseManager by inject()
+    private val dbManager: DatabaseManagerInterface by inject()
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by inject()
 

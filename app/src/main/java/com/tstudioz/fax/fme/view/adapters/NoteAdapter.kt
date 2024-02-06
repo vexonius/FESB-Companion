@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.LeanTask
 import com.tstudioz.fax.fme.view.activities.NoteActivity
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter.NoteViewHolder
@@ -25,7 +26,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
     RecyclerView.Adapter<NoteViewHolder>(), KoinComponent {
     var light: Typeface? = null
 
-    private val dbManager: DatabaseManager by inject()
+    private val dbManager: DatabaseManagerInterface by inject()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val view: View

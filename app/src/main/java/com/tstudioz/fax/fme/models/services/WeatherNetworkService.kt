@@ -7,9 +7,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.koin.java.KoinJavaComponent
 
-class WeatherNetworkService : WeatherNetworkInterface {
-
-    private val client: OkHttpClient by KoinJavaComponent.inject(OkHttpClient::class.java)
+class WeatherNetworkService(private val client: OkHttpClient) : WeatherNetworkInterface {
 
     override suspend fun fetchWeatherDetails(url: String): Result.WeatherResult {
         val request: Request = Request.Builder()

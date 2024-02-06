@@ -13,6 +13,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.view.adapters.MeniesAdapter
 import com.tstudioz.fax.fme.database.models.Meni
 import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding
@@ -33,7 +34,7 @@ import java.io.IOException
 class MenzaActivity : AppCompatActivity() {
 
     private val okHttpClient: OkHttpClient by inject()
-    private val dbManager: DatabaseManager by inject()
+    private val dbManager: DatabaseManagerInterface by inject()
 
     private var mRealm: Realm? = null
     private var nRealm: Realm? = null

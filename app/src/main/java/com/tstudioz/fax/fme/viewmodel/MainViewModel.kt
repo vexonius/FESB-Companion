@@ -4,22 +4,18 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.models.data.Repository
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.models.data.UserRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.util.UUID
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
-class MainViewModel : ViewModel(), KoinComponent {
-
-    private val repository: Repository by inject()
+class MainViewModel(private val repository: UserRepositoryInterface) : ViewModel() {
 
     val tableGot: MutableLiveData<Boolean> = MutableLiveData()
 
