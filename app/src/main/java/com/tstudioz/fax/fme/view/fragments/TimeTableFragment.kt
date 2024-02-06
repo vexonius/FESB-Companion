@@ -147,7 +147,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val user = shPref?.getString("username", "")?.let { User(it, "", "") }
         val mindate = "$mMonth%2F$mDay%2F$mYear"
         val maxdate = "$sMonth%2F$sDay%2F$sYear"
-        mainViewModel.deleteTempTimeTable()
 
         mainViewModel.fetchUserTimetableTemp(User(user?.username.toString(),"",""), mindate, maxdate)
 

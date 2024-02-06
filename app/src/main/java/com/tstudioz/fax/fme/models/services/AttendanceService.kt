@@ -4,7 +4,7 @@ import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.models.interfaces.PrisutnostInterface
+import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.FormBody
@@ -22,11 +22,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class PrisutnostService : PrisutnostInterface{
+class AttendanceService : AttendanceServiceInterface {
 
     private val client: OkHttpClient by KoinJavaComponent.inject(OkHttpClient::class.java)
 
-    override suspend fun fetchPrisutnost(user: User): Result.PrisutnostResult {
+    override suspend fun fetchAttendance(user: User): Result.PrisutnostResult {
 
         var zimskaPris :MutableList<MutableList<Dolazak>> = mutableListOf()
         var ljetnaPris :MutableList<MutableList<Dolazak>> = mutableListOf()

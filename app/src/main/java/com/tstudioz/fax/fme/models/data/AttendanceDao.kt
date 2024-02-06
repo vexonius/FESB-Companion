@@ -15,6 +15,7 @@ class AttendanceDao : KoinComponent {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         realm.write {
+            this.deleteAll()
             attendance.forEach {
                 this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
             }

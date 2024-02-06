@@ -4,7 +4,7 @@ import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.models.Result
-import com.tstudioz.fax.fme.models.services.PrisutnostService
+import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.services.TimetableNetworkService
 import com.tstudioz.fax.fme.models.services.UserService
 import com.tstudioz.fax.fme.models.services.WeatherNetworkService
@@ -19,7 +19,7 @@ class Repository: KoinComponent {
     private val service: UserService by inject()
     private val timetableNetworkService: TimetableNetworkService by inject()
     private val weatherNetworkService: WeatherNetworkService by inject()
-    private val prisutnostService: PrisutnostService by inject()
+    private val attendanceService: AttendanceServiceInterface by inject()
     private val timeTableDao: TimeTableDao by inject()
     private val attendanceDao: AttendanceDao by inject()
 
@@ -39,9 +39,12 @@ class Repository: KoinComponent {
             is Result.TimeTableResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")
                 throw Exception("Timetable fetching error")
-                //emptyList()
             }
         }
+    }
+
+    suspend fun insertTimeTable(classes: List<Predavanja>) {
+        timeTableDao.insert(classes)
     }
 
     suspend fun fetchWeatherDetails(url : String): Current? {
@@ -55,21 +58,7 @@ class Repository: KoinComponent {
         }
     }
 
-    suspend fun fetchAttendance(user: User): Result.PrisutnostResult {
-        return prisutnostService.fetchPrisutnost(user)
-    }
-
-    fun insertOrUpdateTimeTable(classes: List<Predavanja>) {
-        timeTableDao.insertOrUpdateTimeTable(classes)
-    }
-    
-    fun insertTempTimeTable(classes: List<Predavanja>) {
-        timeTableDao.insertTempTimeTable(classes)
-    }
-    
-    fun deleteTempTimeTable() {
-        timeTableDao.deleteTempTimeTable()
-    }
+    suspend fun fetchAttendance(user: User): Result.PrisutnostResult = attendanceService.fetchAttendance(user)
     
     suspend fun insertAttendance(attendance: List<Dolazak>) {
         attendanceDao.insert(attendance)

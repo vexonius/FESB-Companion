@@ -8,6 +8,8 @@ import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.models.data.AttendanceDao
 import com.tstudioz.fax.fme.models.data.Repository
 import com.tstudioz.fax.fme.models.data.TimeTableDao
+import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
+import com.tstudioz.fax.fme.models.services.AttendanceService
 import com.tstudioz.fax.fme.models.services.TimetableNetworkService
 import com.tstudioz.fax.fme.models.services.UserService
 import com.tstudioz.fax.fme.models.services.WeatherNetworkService
@@ -27,6 +29,7 @@ val module = module {
     single { UserService() }
     single { TimetableNetworkService() }
     single { WeatherNetworkService() }
+    single { AttendanceService() as AttendanceServiceInterface }
     single { provideOkHttpClient(androidContext()) }
     single { DatabaseManager() }
     single { AttendanceDao() }

@@ -21,6 +21,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -46,6 +47,7 @@ import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -68,12 +70,11 @@ class MainActivity : AppCompatActivity() {
     private val prisutnostFragment = PrisutnostFragment()
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
-    private lateinit var mainViewModel: MainViewModel
+    private val mainViewModel: MainViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
         setContentView(binding?.root)
 
         onBack()

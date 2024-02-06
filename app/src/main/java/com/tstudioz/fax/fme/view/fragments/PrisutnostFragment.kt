@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion
@@ -20,14 +19,12 @@ import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.adapters.DolasciAdapter
-import com.tstudioz.fax.fme.viewmodel.PrisutnostViewModel
+import com.tstudioz.fax.fme.viewmodel.AttendanceViewModel
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 @OptIn(InternalCoroutinesApi::class)
@@ -41,13 +38,13 @@ class PrisutnostFragment : Fragment() {
     private var binding: PrisutnostTabBinding? = null
     private var shPref: SharedPreferences? =  FESBCompanion.instance?.sP
     @OptIn(ExperimentalCoroutinesApi::class)
-    private lateinit var prisutnostviewmodel : PrisutnostViewModel
+    private lateinit var prisutnostviewmodel : AttendanceViewModel
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): ConstraintLayout? {
 
         setHasOptionsMenu(true)
         binding = PrisutnostTabBinding.inflate(inflater, container, false)
-        prisutnostviewmodel = PrisutnostViewModel()
+        prisutnostviewmodel = AttendanceViewModel()
         hideRecyc()
         fetchPrisutnost()
         return binding?.root
@@ -64,11 +61,13 @@ class PrisutnostFragment : Fragment() {
             user.fmail = "$username@fesb.hr"
         }
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
-            lifecycleScope.launch { prisutnostviewmodel.fetchPrisutnost(user) }
-        } else { showSnack("Offline") }
+            prisutnostviewmodel.fetchAttendance(user)
+        } else {
+            showSnack("Offline")
+        }
 
-        prisutnostviewmodel.gotPri.observe(viewLifecycleOwner){ gotPri ->
-            if (gotPri){
+        prisutnostviewmodel.shouldShow.observe(viewLifecycleOwner) { shouldShow ->
+            if (shouldShow) {
                 requireActivity().runOnUiThread {
                     showRecyclerview(1)
                     showRecyclerview(2)

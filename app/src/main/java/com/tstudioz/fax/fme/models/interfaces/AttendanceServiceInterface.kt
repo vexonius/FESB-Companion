@@ -3,8 +3,8 @@ package com.tstudioz.fax.fme.models.interfaces
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.data.User
 
-interface PrisutnostInterface {
+interface AttendanceServiceInterface {
 
-     suspend fun fetchPrisutnost(user: User): Result.PrisutnostResult
+     suspend fun fetchAttendance(user: User): Result.PrisutnostResult
 
 }
