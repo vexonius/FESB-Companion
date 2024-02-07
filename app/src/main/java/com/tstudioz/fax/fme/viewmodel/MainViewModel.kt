@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
+import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -25,10 +26,10 @@ class MainViewModel(private val repository: UserRepositoryInterface) : ViewModel
     private fun loginUser(user: User) {
         viewModelScope.launch(context = Dispatchers.IO) {
             when (val result = repository.attemptLogin(user.username, user.password)) {
-                true -> {
+                is UserRepositoryResult.LoginResult.Success -> {
 
                 }
-                false -> {
+                is UserRepositoryResult.LoginResult.Failure -> {
 
                 }
             }

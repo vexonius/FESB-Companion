@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.feature.login.repository
 
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.database.models.Predavanja
+import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.TimetableItem
 import com.tstudioz.fax.fme.models.data.User
@@ -9,7 +10,7 @@ import com.tstudioz.fax.fme.weather.Current
 
 interface UserRepositoryInterface {
 
-    suspend fun attemptLogin(username: String, password: String): Boolean
+    suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult
     suspend fun fetchTimetable(user: String, startDate: String, endDate: String): List<TimetableItem>
     suspend fun insertTimeTable(classes: List<Predavanja>)
     suspend fun fetchWeatherDetails(url : String): Current?

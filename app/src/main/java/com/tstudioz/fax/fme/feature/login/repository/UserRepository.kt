@@ -4,6 +4,7 @@ import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.database.models.Predavanja
+import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.AttendanceDaoInterface
 import com.tstudioz.fax.fme.models.data.TimeTableDaoInterface
@@ -28,8 +29,8 @@ class UserRepository(
     private val userDao: UserDaoInterface
     ) : UserRepositoryInterface {
 
-    override suspend fun attemptLogin(username: String, password: String): Boolean {
-        return when (val result = service.loginUser(username, password)) {
+    override suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult {
+        when (val result = service.loginUser(username, password)) {
             is NetworkServiceResult.LoginResult.Success -> {
                 val user = Korisnik().apply {
                     this.username = username
@@ -39,12 +40,13 @@ class UserRepository(
                 userDao.insert(user)
                 // TODO: saved logged_in in shared prefs
 
-                true
+                return UserRepositoryResult.LoginResult.Success(
+                    User(username, password, "${username}@fesb.hr")
+                )
             }
             is NetworkServiceResult.LoginResult.Failure -> {
                 Log.e(TAG, "User Login Failed!")
-
-                false
+                throw Exception("User Login Failed!")
             }
         }
     }
