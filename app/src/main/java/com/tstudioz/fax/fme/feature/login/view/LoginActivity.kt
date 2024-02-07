@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.view.activities
+package com.tstudioz.fax.fme.feature.login.view
 
 import android.app.Dialog
 import android.content.Intent
@@ -16,11 +16,9 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.databinding.ActivityLoginBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.viewmodel.LoginViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.tstudioz.fax.fme.view.activities.MainActivity
+import com.tstudioz.fax.fme.view.activities.Welcome
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
 import org.koin.android.viewmodel.ext.android.viewModel
 
 @OptIn(InternalCoroutinesApi::class)

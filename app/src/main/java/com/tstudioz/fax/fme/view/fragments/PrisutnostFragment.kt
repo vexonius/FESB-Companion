@@ -32,12 +32,12 @@ import org.koin.android.ext.android.inject
 class PrisutnostFragment : Fragment() {
 
     private val dbManager: DatabaseManagerInterface by inject()
+    private val shPref: SharedPreferences by inject()
 
     private var snack: Snackbar? = null
     private var semAdapter: DolasciAdapter? = null
     private var realm: Realm? = null
     private var binding: PrisutnostTabBinding? = null
-    private var shPref: SharedPreferences? =  FESBCompanion.instance?.sP
     @OptIn(ExperimentalCoroutinesApi::class)
     private lateinit var prisutnostviewmodel : AttendanceViewModel
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -53,8 +53,8 @@ class PrisutnostFragment : Fragment() {
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     fun fetchPrisutnost() {
-        val username = shPref?.getString("username", "")
-        val password = shPref?.getString("password","")
+        val username = shPref.getString("username", "")
+        val password = shPref.getString("password","")
         val user =User("","","")
         if (username != null && password != null){
             user.username = username

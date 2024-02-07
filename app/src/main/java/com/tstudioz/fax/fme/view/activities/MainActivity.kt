@@ -21,17 +21,14 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
+import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
@@ -39,9 +36,7 @@ import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.exceptions.RealmException
-import io.realm.kotlin.ext.query
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
@@ -58,6 +53,8 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     private val dbManager: DatabaseManagerInterface by inject()
+    private val shPref: SharedPreferences by inject()
+
 
     var date: String? = null
 
@@ -65,8 +62,7 @@ class MainActivity : AppCompatActivity() {
     private var client: OkHttpClient? = null
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
-    private var shPref: SharedPreferences? =  instance?.sP
-    private val homeFragment = HomeFragment(shPref)
+    private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
     private val prisutnostFragment = PrisutnostFragment()
     private var editor: SharedPreferences.Editor? = null
@@ -118,7 +114,7 @@ class MainActivity : AppCompatActivity() {
                     homeFragment.showList()
                     if (supportFragmentManager.findFragmentById(R.id.frame) is HomeFragment){
                         val text: TextView = findViewById(R.id.TimeRaspGot)
-                        text.text = shPref?.getString("timeGotcurrentrasp", "")
+                        text.text = shPref.getString("timeGotcurrentrasp", "")
                         text.visibility = View.VISIBLE
                     }
                 }
@@ -135,7 +131,7 @@ class MainActivity : AppCompatActivity() {
 //        var korisnik: Korisnik? = null
 //        realmLog = Realm.open(dbManager.getDefaultConfiguration())
 //        assert(shPref != null)
-//        editor = shPref?.edit()
+//        editor = shPref.edit()
 //
 //        if (realmLog != null) {
 //            korisnik = realmLog?.query<Korisnik>()?.find()?.first()
@@ -223,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun mojRaspored(){
-        val user = shPref?.getString("username", "")?.let { User(it, "", "") }
+        val user = shPref.getString("username", "")?.let { User(it, "", "") }
 
         val calendar = Calendar.getInstance()
 
@@ -238,13 +234,13 @@ class MainActivity : AppCompatActivity() {
         val enddate = df.format(calendar.time)
 
         if (user != null) { mainViewModel.fetchUserTimetable(user, startdate, enddate) }
-        editor = shPref?.edit()
+        editor = shPref.edit()
         editor?.putString("timeGotcurrentrasp", dateandtime)
         editor?.commit()
     }
 
     private fun invalidCreds() {
-        editor = shPref?.edit()
+        editor = shPref.edit()
         editor?.putBoolean("logged_in", false)
         editor?.apply()
 
@@ -292,12 +288,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkVersion() {
-        val staraVerzija = shPref?.getInt("version_number", 14)
+        val staraVerzija = shPref.getInt("version_number", 14)
         val trenutnaVerzija: Int = BuildConfig.VERSION_CODE
 
         if ((staraVerzija != null) && (staraVerzija < trenutnaVerzija)) {
             showChangelog()
-            editor = shPref?.edit()
+            editor = shPref.edit()
             editor?.putInt("version_number", trenutnaVerzija)
             editor?.commit()
         }
@@ -317,10 +313,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun shouldShowGDPRDialog() {
-        val bool = shPref?.getBoolean("GDPR_agreed", false)
+        val bool = shPref.getBoolean("GDPR_agreed", false)
         if (bool==false) {
             showGDPRCompliance()
-            editor = shPref?.edit()
+            editor = shPref.edit()
             editor?.putBoolean("GDPR_agreed", true)
             editor?.commit()
         }

@@ -1,10 +1,15 @@
-package com.tstudioz.fax.fme.models.data
+package com.tstudioz.fax.fme.feature.login.repository
 
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.models.NetworkServiceResult
+import com.tstudioz.fax.fme.models.data.AttendanceDaoInterface
+import com.tstudioz.fax.fme.models.data.TimeTableDaoInterface
+import com.tstudioz.fax.fme.models.data.TimetableItem
+import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.models.data.UserDaoInterface
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.UserServiceInterface
@@ -32,6 +37,7 @@ class UserRepository(
                 }
 
                 userDao.insert(user)
+                // TODO: saved logged_in in shared prefs
 
                 true
             }

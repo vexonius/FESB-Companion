@@ -35,12 +35,12 @@ class MenzaActivity : AppCompatActivity() {
 
     private val okHttpClient: OkHttpClient by inject()
     private val dbManager: DatabaseManagerInterface by inject()
+    private val shPref: SharedPreferences by inject()
 
     private var mRealm: Realm? = null
     private var nRealm: Realm? = null
     private var snack: Snackbar? = null
     private var binding: ActivityMenzaBinding? = null
-    private var shPref: SharedPreferences? = instance?.sP
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +86,7 @@ class MenzaActivity : AppCompatActivity() {
         mRealm?.writeBlocking { this.deleteAll() }
 
         try {
-            val editor = shPref?.edit()
+            val editor = shPref.edit()
             val jsonResponse = json?.let { JSONObject(it) }
             val array = jsonResponse?.getJSONArray("values")
             editor?.putString("timeGotmenza", array?.getJSONArray(0)?.getString(3))
@@ -140,7 +140,7 @@ class MenzaActivity : AppCompatActivity() {
         val results = nRealm?.query<Meni>()?.find()
         var timeGot = ""
         if (shPref != null){
-            timeGot = shPref?.getString("timeGotmenza", "") ?: ""
+            timeGot = shPref.getString("timeGotmenza", "") ?: ""
         }
         if ((results?.isEmpty()) != null) {
             val adapter = MeniesAdapter(results, timeGot)

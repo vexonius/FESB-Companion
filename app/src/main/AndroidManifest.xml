@@ -29,7 +29,7 @@
             android:value="ca-app-pub-5944203368510130~8955475006"/>
 
         <activity
-            android:name=".view.activities.LoginActivity"
+            android:name=".feature.login.view.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Simple"
             android:exported="true">
