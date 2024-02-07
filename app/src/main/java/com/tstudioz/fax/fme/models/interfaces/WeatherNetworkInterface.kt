@@ -1,9 +1,10 @@
 package com.tstudioz.fax.fme.models.interfaces
 
-import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface WeatherNetworkInterface {
-    suspend fun fetchWeatherDetails(url: String) : Result.WeatherResult
-    suspend fun getWeekWeatherDetails() : Result.WeatherResult
+
+    suspend fun fetchWeatherDetails(url: String) : NetworkServiceResult.WeatherResult
+    suspend fun getWeekWeatherDetails() : NetworkServiceResult.WeatherResult
 
 }

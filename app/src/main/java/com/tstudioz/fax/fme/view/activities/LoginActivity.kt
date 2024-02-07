@@ -21,19 +21,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-
+import org.koin.android.viewmodel.ext.android.viewModel
 
 @OptIn(InternalCoroutinesApi::class)
 class LoginActivity : AppCompatActivity() {
+
     private var snack: Snackbar? = null
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var loginViewModel: LoginViewModel
+    private val loginViewModel: LoginViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
-        loginViewModel = LoginViewModel(application)
         val view: View = binding.root
         setContentView(view)
         isUserLoggedIn
@@ -98,18 +98,16 @@ class LoginActivity : AppCompatActivity() {
                 else {
                     binding.progressLogin.visibility = View.VISIBLE
                     binding.loginButton.visibility = View.INVISIBLE
-                    CoroutineScope(Dispatchers.IO).launch{
-                        loginViewModel.firstloginUser(
-                            User(username, password, username + "fesb.hr")
-                        )
-                    }
+                    loginViewModel.tryUserLogin(
+                        User(username, password, username + "fesb.hr")
+                    )
+
                 }
             } else {
                 showErrorSnack("Niste povezani")
             }
         }
     }
-
 
     private fun helpMe() {
         val dialog = Dialog(this)

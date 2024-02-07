@@ -2,8 +2,9 @@ package com.tstudioz.fax.fme.models.data
 
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.database.models.Predavanja
-import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.UserServiceInterface
@@ -18,22 +19,34 @@ class UserRepository(
     private val weatherNetworkService: WeatherNetworkInterface,
     private val attendanceService: AttendanceServiceInterface,
     private val timeTableDao: TimeTableDaoInterface,
-    private val attendanceDao: AttendanceDaoInterface) : UserRepositoryInterface {
+    private val attendanceDao: AttendanceDaoInterface,
+    private val userDao: UserDaoInterface
+    ) : UserRepositoryInterface {
 
-    override suspend fun attemptLogin(user: User): User {
-        return when (val result = service.loginUser(user)) {
-            is Result.LoginResult.Success -> (result.data)
-            is Result.LoginResult.Failure -> {
-                Log.d(TAG, "Doslo je do pogreske")
-                (User("","",""))
+    override suspend fun attemptLogin(username: String, password: String): Boolean {
+        return when (val result = service.loginUser(username, password)) {
+            is NetworkServiceResult.LoginResult.Success -> {
+                val user = Korisnik().apply {
+                    this.username = username
+                    this.password = password
+                }
+
+                userDao.insert(user)
+
+                true
+            }
+            is NetworkServiceResult.LoginResult.Failure -> {
+                Log.e(TAG, "User Login Failed!")
+
+                false
             }
         }
     }
 
     override suspend fun fetchTimetable(user: String, startDate: String, endDate: String): List<TimetableItem> {
         return when(val result = timetableService.fetchTimeTable(user, startDate, endDate)){
-            is Result.TimeTableResult.Success -> parseTimetable(result.data)
-            is Result.TimeTableResult.Failure -> {
+            is NetworkServiceResult.TimeTableResult.Success -> parseTimetable(result.data)
+            is NetworkServiceResult.TimeTableResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")
                 throw Exception("Timetable fetching error")
             }
@@ -46,8 +59,8 @@ class UserRepository(
 
     override suspend fun fetchWeatherDetails(url : String): Current? {
         return when(val result = weatherNetworkService.fetchWeatherDetails(url)){
-            is Result.WeatherResult.Success -> parseWeatherDetails(result.data)
-            is Result.WeatherResult.Failure -> {
+            is NetworkServiceResult.WeatherResult.Success -> parseWeatherDetails(result.data)
+            is NetworkServiceResult.WeatherResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")
                 //throw Exception("Timetable fetching error")
                 null
@@ -55,7 +68,7 @@ class UserRepository(
         }
     }
 
-    override suspend fun fetchAttendance(user: User): Result.PrisutnostResult = attendanceService.fetchAttendance(user)
+    override suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult = attendanceService.fetchAttendance(user)
 
     override suspend fun insertAttendance(attendance: List<Dolazak>) {
         attendanceDao.insert(attendance)

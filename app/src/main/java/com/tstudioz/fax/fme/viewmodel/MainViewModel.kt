@@ -23,13 +23,14 @@ class MainViewModel(private val repository: UserRepositoryInterface) : ViewModel
     val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
 
     private fun loginUser(user: User) {
-        viewModelScope.launch {
-            when (val result = repository.attemptLogin(user)) {
-                user -> {
-                    Log.d("hello", result.username)
-                    println("Started")
+        viewModelScope.launch(context = Dispatchers.IO) {
+            when (val result = repository.attemptLogin(user.username, user.password)) {
+                true -> {
+
                 }
-                else -> println("Doslo je do pogreske")
+                false -> {
+
+                }
             }
         }
     }

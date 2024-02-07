@@ -4,9 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.models.Dolazak
-import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.data.UserRepositoryInterface
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -22,14 +23,14 @@ class AttendanceViewModel : ViewModel(), KoinComponent {
         private set
 
     fun fetchAttendance(user: User) {
-        viewModelScope.launch {
+        viewModelScope.launch(context = Dispatchers.IO) {
             when (val attendance = repository.fetchAttendance(user)) {
-                is Result.PrisutnostResult.Success -> {
+                is NetworkServiceResult.PrisutnostResult.Success -> {
                     insert(attendance.pris)
                     shouldShow.postValue(true)
                 }
 
-                is Result.PrisutnostResult.Failure -> {
+                is NetworkServiceResult.PrisutnostResult.Failure -> {
                     shouldShow.postValue(false)
                 }
             }

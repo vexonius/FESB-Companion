@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.models.interfaces
 
-import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface TimetableServiceInterface {
 
@@ -8,6 +8,6 @@ interface TimetableServiceInterface {
         userName: String,
         startDate: String,
         endDate: String
-    ): Result.TimeTableResult
+    ): NetworkServiceResult.TimeTableResult
 
 }

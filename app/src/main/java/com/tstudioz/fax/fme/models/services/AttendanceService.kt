@@ -2,7 +2,7 @@ package com.tstudioz.fax.fme.models.services
 
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
-import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import okhttp3.Call
@@ -24,7 +24,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInterface {
 
-    override suspend fun fetchAttendance(user: User): Result.PrisutnostResult {
+    override suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult {
         var zimskaPris: MutableList<MutableList<Dolazak>> = mutableListOf()
         var ljetnaPris: MutableList<MutableList<Dolazak>> = mutableListOf()
         val prisutnost: MutableList<Dolazak> = mutableListOf()
@@ -67,12 +67,12 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
                     } catch (ex: Exception) {
                         ex.message?.let { Log.d("Exception pris", it) }
                         ex.printStackTrace()
-                        return Result.PrisutnostResult.Failure(Throwable("Failed to parse timetable"))
+                        return NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to parse timetable"))
                     }
                 }
             }
         } else {
-            return Result.PrisutnostResult.Failure(Throwable("Failed to fetch timetable"))
+            return NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to fetch timetable"))
         }
 
         for (pris in (zimskaPris + ljetnaPris)) {
@@ -81,7 +81,7 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
             }
         }
 
-        return Result.PrisutnostResult.Success(prisutnost) //popravit ovo tako da vrati failure kada je failure
+        return NetworkServiceResult.PrisutnostResult.Success(prisutnost) //popravit ovo tako da vrati failure kada je failure
     }
 
     private suspend fun makeNetworkCall(request: Request): Response =

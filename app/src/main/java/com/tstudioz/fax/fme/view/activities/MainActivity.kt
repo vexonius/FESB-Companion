@@ -132,31 +132,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkUser() {
-        var korisnik: Korisnik? = null
-        realmLog = Realm.open(dbManager.getDefaultConfiguration())
-        assert(shPref != null)
-        editor = shPref?.edit()
-
-        if (realmLog != null) {
-            try {
-                korisnik = realmLog?.query<Korisnik>()?.find()?.first()
-            }
-            catch (ex: Exception) { ex.printStackTrace() }
-            finally {
-                if (korisnik != null) {
-                    editor?.putString("username", korisnik.username)
-                    editor?.putString("password", korisnik.lozinka)
-                    editor?.commit()
-                    mojRaspored()
-                } else { invalidCreds() }
-                realmLog?.close()
-            }
-        } else {
-            editor?.putBoolean("logged_in", false)
-            editor?.commit()
-            Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-        }
+//        var korisnik: Korisnik? = null
+//        realmLog = Realm.open(dbManager.getDefaultConfiguration())
+//        assert(shPref != null)
+//        editor = shPref?.edit()
+//
+//        if (realmLog != null) {
+//            korisnik = realmLog?.query<Korisnik>()?.find()?.first()
+//            if (korisnik != null) {
+//                editor?.putString("username", korisnik.username)
+//                editor?.putString("password", korisnik.lozinka)
+//                editor?.commit()
+//                mojRaspored()
+//            } else {
+//                invalidCreds()
+//            }
+//
+//        } else {
+//            editor?.putBoolean("logged_in", false)
+//            editor?.commit()
+//            Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
+//            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+//        }
     }
 
     @SuppressLint("RestrictedApi")
