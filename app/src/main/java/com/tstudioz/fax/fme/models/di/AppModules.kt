@@ -8,8 +8,12 @@ import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.models.data.AttendanceDao
 import com.tstudioz.fax.fme.models.data.AttendanceDaoInterface
+import com.tstudioz.fax.fme.models.data.AttendanceRepository
+import com.tstudioz.fax.fme.models.data.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.data.TimeTableDao
 import com.tstudioz.fax.fme.models.data.TimeTableDaoInterface
+import com.tstudioz.fax.fme.models.data.TimeTableRepository
+import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
@@ -38,6 +42,8 @@ val appModule = module {
     single<DatabaseManagerInterface> { DatabaseManager() }
     single<AttendanceDaoInterface> { AttendanceDao(get()) }
     single<TimeTableDaoInterface> { TimeTableDao(get()) }
+    single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
+    single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single { androidContext().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE) }
     viewModel { MainViewModel(get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
