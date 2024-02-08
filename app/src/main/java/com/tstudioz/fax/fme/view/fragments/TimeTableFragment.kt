@@ -145,11 +145,11 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             showDay("Subota", true)
         }
         rlm = Realm.open(dbManager.getDefaultConfiguration())
-        val user = shPref.getString("username", "")?.let { User(it, "", "") }
+        val user = shPref.getString("username", "")?.let { User(it, "") }
         val mindate = "$mMonth%2F$mDay%2F$mYear"
         val maxdate = "$sMonth%2F$sDay%2F$sYear"
 
-        mainViewModel.fetchUserTimetableTemp(User(user?.username.toString(),"",""), mindate, maxdate)
+        mainViewModel.fetchUserTimetableTemp(User(user?.username.toString(),""), mindate, maxdate)
 
         mainViewModel.tableGot.observe(viewLifecycleOwner) { tableGot ->
             if (tableGot) {

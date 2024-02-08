@@ -1,8 +1,6 @@
 package com.tstudioz.fax.fme.Application
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
 import com.tstudioz.fax.fme.feature.login.di.loginModule
 import com.tstudioz.fax.fme.models.di.appModule
 import kotlinx.coroutines.InternalCoroutinesApi

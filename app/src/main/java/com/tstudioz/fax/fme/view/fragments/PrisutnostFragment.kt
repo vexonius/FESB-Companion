@@ -55,11 +55,10 @@ class PrisutnostFragment : Fragment() {
     fun fetchPrisutnost() {
         val username = shPref.getString("username", "")
         val password = shPref.getString("password","")
-        val user =User("","","")
+        val user = User("","")
         if (username != null && password != null){
             user.username = username
             user.password = password
-            user.fmail = "$username@fesb.hr"
         }
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
             prisutnostviewmodel.fetchAttendance(user)

@@ -1,8 +1,8 @@
 package com.tstudioz.fax.fme.feature.login.repository
 
+import android.content.SharedPreferences
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
-import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -13,8 +13,10 @@ import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.data.UserDaoInterface
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
-import com.tstudioz.fax.fme.models.interfaces.UserServiceInterface
+import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.models.util.parseTimetable
 import com.tstudioz.fax.fme.models.util.parseWeatherDetails
 import com.tstudioz.fax.fme.weather.Current
@@ -26,23 +28,18 @@ class UserRepository(
     private val attendanceService: AttendanceServiceInterface,
     private val timeTableDao: TimeTableDaoInterface,
     private val attendanceDao: AttendanceDaoInterface,
-    private val userDao: UserDaoInterface
+    private val userDao: UserDaoInterface,
+    private val sharedPreferences: SharedPreferences
     ) : UserRepositoryInterface {
 
     override suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult {
         when (val result = service.loginUser(username, password)) {
             is NetworkServiceResult.LoginResult.Success -> {
-                val user = Korisnik().apply {
-                    this.username = username
-                    this.password = password
-                }
+                val user = result.data
+                userDao.insert(user.toRealmModel())
+                sharedPreferences[SPKey.LOGGED_IN] = true
 
-                userDao.insert(user)
-                // TODO: saved logged_in in shared prefs
-
-                return UserRepositoryResult.LoginResult.Success(
-                    User(username, password, "${username}@fesb.hr")
-                )
+                return UserRepositoryResult.LoginResult.Success(result.data)
             }
             is NetworkServiceResult.LoginResult.Failure -> {
                 Log.e(TAG, "User Login Failed!")

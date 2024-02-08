@@ -219,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun mojRaspored(){
-        val user = shPref.getString("username", "")?.let { User(it, "", "") }
+        val user = shPref.getString("username", "")?.let { User(it, "") }
 
         val calendar = Calendar.getInstance()
 

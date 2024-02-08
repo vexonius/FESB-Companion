@@ -2,7 +2,6 @@ package com.tstudioz.fax.fme.feature.login.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.models.interfaces.UserServiceInterface
 import kotlinx.coroutines.flow.Flow
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
@@ -25,7 +24,7 @@ class UserService(private val client: OkHttpClient) : UserServiceInterface {
         val response = client.newCall(request).execute()
 
         return if (response.request.url.toString() == "https://korisnik.fesb.unist.hr/") {
-            NetworkServiceResult.LoginResult.Success(User(username, password, username+"fesb.hr"))}
+            NetworkServiceResult.LoginResult.Success(User(username, password))}
         else {
             NetworkServiceResult.LoginResult.Failure(Throwable("Doslo je do pogreske prilikom prijave"))}
     }

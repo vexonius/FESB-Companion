@@ -97,7 +97,7 @@ class LoginActivity : AppCompatActivity() {
                     binding.progressLogin.visibility = View.VISIBLE
                     binding.loginButton.visibility = View.INVISIBLE
                     loginViewModel.tryUserLogin(
-                        User(username, password, username + "fesb.hr")
+                        User(username, password)
                     )
 
                 }
