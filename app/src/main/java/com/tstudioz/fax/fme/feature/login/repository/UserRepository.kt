@@ -3,9 +3,9 @@ package com.tstudioz.fax.fme.feature.login.repository
 import android.content.SharedPreferences
 import android.util.Log
 import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
+import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.UserDaoInterface
-import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey

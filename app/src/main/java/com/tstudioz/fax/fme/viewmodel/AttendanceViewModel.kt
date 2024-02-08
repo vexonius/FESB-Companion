@@ -5,20 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.models.NetworkServiceResult
+import com.tstudioz.fax.fme.models.data.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
-class AttendanceViewModel : ViewModel(), KoinComponent {
+class AttendanceViewModel(private val repository: AttendanceRepositoryInterface) : ViewModel() {
 
-    private val repository: UserRepositoryInterface by inject()
     var shouldShow = MutableLiveData(true)
         private set
 

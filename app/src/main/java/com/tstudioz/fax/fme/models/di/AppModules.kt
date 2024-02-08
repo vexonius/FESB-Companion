@@ -20,6 +20,7 @@ import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
 import com.tstudioz.fax.fme.models.services.AttendanceService
 import com.tstudioz.fax.fme.models.services.TimetableService
 import com.tstudioz.fax.fme.models.services.WeatherNetworkService
+import com.tstudioz.fax.fme.viewmodel.AttendanceViewModel
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,8 +46,10 @@ val appModule = module {
     single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single { androidContext().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE) }
-    viewModel { MainViewModel(get()) }
+    viewModel { MainViewModel(get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
+    viewModel { AttendanceViewModel(get()) }
+
 }
 
 fun provideOkHttpClient(context: Context) : OkHttpClient {

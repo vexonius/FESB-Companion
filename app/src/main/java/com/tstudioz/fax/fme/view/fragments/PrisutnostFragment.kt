@@ -11,9 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
@@ -27,25 +25,26 @@ import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.core.KoinComponent
 
 @OptIn(InternalCoroutinesApi::class)
-class PrisutnostFragment : Fragment() {
+class PrisutnostFragment : Fragment(), KoinComponent {
 
     private val dbManager: DatabaseManagerInterface by inject()
     private val shPref: SharedPreferences by inject()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val attendanceViewModel: AttendanceViewModel by viewModel() // TODO: Bad code, fix this later
 
     private var snack: Snackbar? = null
     private var semAdapter: DolasciAdapter? = null
     private var realm: Realm? = null
     private var binding: PrisutnostTabBinding? = null
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private lateinit var prisutnostviewmodel : AttendanceViewModel
-    @OptIn(ExperimentalCoroutinesApi::class)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): ConstraintLayout? {
 
         setHasOptionsMenu(true)
         binding = PrisutnostTabBinding.inflate(inflater, container, false)
-        prisutnostviewmodel = AttendanceViewModel()
         hideRecyc()
         fetchPrisutnost()
         return binding?.root
@@ -61,12 +60,12 @@ class PrisutnostFragment : Fragment() {
             user.password = password
         }
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
-            prisutnostviewmodel.fetchAttendance(user)
+            attendanceViewModel.fetchAttendance(user)
         } else {
             showSnack("Offline")
         }
 
-        prisutnostviewmodel.shouldShow.observe(viewLifecycleOwner) { shouldShow ->
+        attendanceViewModel.shouldShow.observe(viewLifecycleOwner) { shouldShow ->
             if (shouldShow) {
                 requireActivity().runOnUiThread {
                     showRecyclerview(1)

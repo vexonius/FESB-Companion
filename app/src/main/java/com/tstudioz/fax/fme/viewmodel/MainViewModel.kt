@@ -8,6 +8,9 @@ import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
+import com.tstudioz.fax.fme.models.data.AttendanceRepository
+import com.tstudioz.fax.fme.models.data.AttendanceRepositoryInterface
+import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -16,7 +19,10 @@ import java.util.UUID
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
-class MainViewModel(private val repository: UserRepositoryInterface) : ViewModel() {
+class MainViewModel(
+    private val userRepository: UserRepositoryInterface,
+    private val timeTableRepository: TimeTableRepositoryInterface
+) : ViewModel() {
 
     val tableGot: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -25,7 +31,7 @@ class MainViewModel(private val repository: UserRepositoryInterface) : ViewModel
 
     private fun loginUser(user: User) {
         viewModelScope.launch(context = Dispatchers.IO) {
-            when (val result = repository.attemptLogin(user.username, user.password)) {
+            when (val result = userRepository.attemptLogin(user.username, user.password)) {
                 is UserRepositoryResult.LoginResult.Success -> {
 
                 }
@@ -40,7 +46,7 @@ class MainViewModel(private val repository: UserRepositoryInterface) : ViewModel
         viewModelScope.launch(Dispatchers.IO) {
             try{
                 println("started Fetching Timetable for user")
-                val list = repository.fetchTimetable(user.username, startDate, endDate)
+                val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 val svaFreshPredavanja = mutableListOf<Predavanja>()
                 list.forEach { println(it.name) }
                     for (l in list) {
@@ -76,7 +82,7 @@ class MainViewModel(private val repository: UserRepositoryInterface) : ViewModel
             try{
                 val svaFreshPredavanja = mutableListOf<Predavanja>()
                 println("started Fetching Timetable for user")
-                val list = repository.fetchTimetable(user.username, startDate, endDate)
+                val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 list.forEach { println(it.name) }
                 for (l in list) {
                     val predavanja = Predavanja()
@@ -103,7 +109,7 @@ class MainViewModel(private val repository: UserRepositoryInterface) : ViewModel
     }
 
     private suspend fun insertOrUpdateTimeTable(classes: List<Predavanja>) {
-        repository.insertTimeTable(classes)
+        timeTableRepository.insertTimeTable(classes)
     }
 
 }
