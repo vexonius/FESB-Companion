@@ -149,7 +149,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val mindate = "$mMonth%2F$mDay%2F$mYear"
         val maxdate = "$sMonth%2F$sDay%2F$sYear"
 
-        mainViewModel.fetchUserTimetableTemp(User("sjurko00",""), mindate, maxdate)
+        mainViewModel.fetchUserTimetableTemp(User(user?.username ?: "",""), mindate, maxdate)
 
         mainViewModel.tableGot.observe(viewLifecycleOwner) { tableGot ->
             if (tableGot) {
