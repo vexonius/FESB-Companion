@@ -30,7 +30,7 @@ class UserRepository(
             }
             is NetworkServiceResult.LoginResult.Failure -> {
                 Log.e(TAG, "User Login Failed!")
-                throw Exception("User Login Failed!")
+                return UserRepositoryResult.LoginResult.Failure(Throwable("User Login failed!"))
             }
         }
     }
