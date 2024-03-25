@@ -10,6 +10,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.LeanTask
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
@@ -19,7 +20,7 @@ import org.koin.android.ext.android.inject
 
 class NoteActivity : AppCompatActivity() {
 
-    private val dbManager: DatabaseManager by inject()
+    private val dbManager: DatabaseManagerInterface by inject()
 
     private var mTaskId: String? = null
     private var et: EditText? = null

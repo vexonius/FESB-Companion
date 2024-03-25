@@ -3,9 +3,9 @@ package com.tstudioz.fax.fme.database
 import com.tstudioz.fax.fme.database.models.*
 import io.realm.kotlin.RealmConfiguration
 
-class DatabaseManager {
+class DatabaseManager: DatabaseManagerInterface {
 
-    fun getDefaultConfiguration(): RealmConfiguration {
+    override fun getDefaultConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder(
             setOf(
                 Korisnik::class,

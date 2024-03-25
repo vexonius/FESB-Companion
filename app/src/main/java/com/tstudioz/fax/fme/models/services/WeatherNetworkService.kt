@@ -7,11 +7,9 @@ import okhttp3.Request
 import okhttp3.Response
 import org.koin.java.KoinJavaComponent
 
-class WeatherNetworkService : WeatherNetworkInterface {
+class WeatherNetworkService(private val client: OkHttpClient) : WeatherNetworkInterface {
 
-    private val client: OkHttpClient by KoinJavaComponent.inject(OkHttpClient::class.java)
-
-    override fun fetchWeatherDetails(url: String): Result.WeatherResult {
+    override suspend fun fetchWeatherDetails(url: String): Result.WeatherResult {
         val request: Request = Request.Builder()
             .url(url).header("Accept", "application/xml")
             .header("User-Agent", "FesbCompanion/1.0")
@@ -27,7 +25,7 @@ class WeatherNetworkService : WeatherNetworkInterface {
         return Result.WeatherResult.Success(value)
     }
 
-    override fun getWeekWeatherDetails() : Result.WeatherResult {
+    override suspend fun getWeekWeatherDetails() : Result.WeatherResult {
         TODO("Not yet implemented")
     }
 }

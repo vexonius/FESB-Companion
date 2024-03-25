@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.models.data.Repository
+import com.tstudioz.fax.fme.models.data.UserRepositoryInterface
 import com.tstudioz.fax.fme.weather.Forecast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -14,8 +14,8 @@ import org.koin.java.KoinJavaComponent.inject
 
 
 @InternalCoroutinesApi
-class HomeViewModel(application: Application)  : AndroidViewModel(application) {
-    private val repository: Repository by inject(Repository::class.java)
+class HomeViewModel(application: Application,
+                    private val repository: UserRepositoryInterface) : AndroidViewModel(application) {
 
     var mForecast: Forecast? = Forecast()
     private var _forecastGot = MutableLiveData<Boolean>()
