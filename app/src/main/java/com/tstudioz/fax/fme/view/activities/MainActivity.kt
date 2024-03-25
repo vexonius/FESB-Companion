@@ -64,8 +64,6 @@ class MainActivity : AppCompatActivity() {
 
     private val dbManager: DatabaseManager by inject()
 
-    private val dbManager: DatabaseManager by inject()
-
     var date: String? = null
 
     private var realmLog: Realm? = null
@@ -141,13 +139,11 @@ class MainActivity : AppCompatActivity() {
     private fun checkUser() {
         var korisnik: Korisnik? = null
         realmLog = Realm.open(dbManager.getDefaultConfiguration())
-        realmLog = Realm.open(dbManager.getDefaultConfiguration())
         assert(shPref != null)
         editor = shPref?.edit()
 
         if (realmLog != null) {
             try {
-                korisnik = realmLog?.query<Korisnik>()?.find()?.first()
                 korisnik = realmLog?.query<Korisnik>()?.find()?.first()
             }
             catch (ex: Exception) { ex.printStackTrace() }
@@ -261,9 +257,7 @@ class MainActivity : AppCompatActivity() {
         editor?.apply()
 
         realmLog = Realm.open(dbManager.getDefaultConfiguration())
-        realmLog = Realm.open(dbManager.getDefaultConfiguration())
         try {
-            realmLog?.writeBlocking { this.deleteAll() }
             realmLog?.writeBlocking { this.deleteAll() }
         } catch (ex: RealmException) {
             Log.e("MainActivity", ex.toString())
