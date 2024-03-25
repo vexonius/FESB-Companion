@@ -15,8 +15,6 @@ import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.models.Dolazak
-import com.tstudioz.fax.fme.database.DatabaseManager
-import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils

@@ -21,15 +21,11 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
-import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
@@ -40,11 +36,6 @@ import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.exceptions.RealmException
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.exceptions.RealmException
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.ExperimentalCoroutinesApi
