@@ -17,36 +17,31 @@ import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog
 import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.Korisnik
-import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Korisnik
+import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.databinding.TimetableTabBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.adapters.PredavanjaRaspAdapterTable
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
-import io.realm.Case
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
+import org.koin.android.ext.android.inject
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
-    private var tempRealm: RealmConfiguration = RealmConfiguration.Builder()
-        .allowWritesOnUiThread(true)
-        .name("temporary.realm")
-        .schemaVersion(12)
-        .deleteRealmIfMigrationNeeded()
-        .build()
-    private val mainRealmConfig: RealmConfiguration = RealmConfiguration.Builder()
-        .allowWritesOnUiThread(true)
-        .name("glavni.realm")
-        .schemaVersion(3)
-        .deleteRealmIfMigrationNeeded()
-        .build()
+
+    private val dbManager: DatabaseManager by inject()
+    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    private val mainViewModel: MainViewModel by inject()
+
     private var rlm: Realm? = null
     var realm: Realm? = null
     private var snack: Snackbar? = null
@@ -56,10 +51,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var binding: TimetableTabBinding? = null
     @OptIn(InternalCoroutinesApi::class)
     private var shPref: SharedPreferences? =  FESBCompanion.instance?.sP
-    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-    private lateinit var mainViewModel: MainViewModel
 
-    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,12 +59,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         setHasOptionsMenu(true)
 
         binding = TimetableTabBinding.inflate(inflater, container, false)
-        activity?.let { ViewModelProvider(it)}?.get(MainViewModel::class.java)
-            .also {
-                if (it != null) {
-                    mainViewModel = it
-                }
-            }
 
         requireActivity().runOnUiThread {
             showDay("Ponedjeljak",false)
@@ -103,6 +89,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
         setSetDates(now)
         boldOut()
+
         return binding?.root
     }
 
@@ -156,7 +143,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             showDay("Petak", true)
             showDay("Subota", true)
         }
-        rlm = Realm.getDefaultInstance()
+        rlm = Realm.open(dbManager.getDefaultConfiguration())
         val user = shPref?.getString("username", "")?.let { User(it, "", "") }
         val mindate = "$mMonth%2F$mDay%2F$mYear"
         val maxdate = "$sMonth%2F$sDay%2F$sYear"
@@ -207,12 +194,11 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private fun showDay(day: String, isTemp: Boolean) {
         realm =
             if (!isTemp) {
-            Realm.getInstance(mainRealmConfig)
-        } else{
-            Realm.getInstance(tempRealm)
+            Realm.open(dbManager.getDefaultConfiguration())
+        } else {
+            Realm.open(dbManager.getDefaultConfiguration())
         }
-        val rezulatiDay = realm?.where(Predavanja::class.java)?.contains(
-            "detaljnoVrijeme", day, Case.INSENSITIVE)?.findAll()
+        val rezulatiDay = realm?.query<Predavanja>("detaljnoVrijeme TEXT $0", "$day*")?.find()
         val adapter = rezulatiDay?.let { PredavanjaRaspAdapterTable(it) }
         if (adapter != null && isTemp){
             adapteriTemp.add(adapter)

@@ -8,20 +8,15 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter.HomePredavanjaViewHolder
-import io.realm.RealmChangeListener
-import io.realm.RealmResults
+import io.realm.kotlin.query.RealmResults
 
 class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanja>) :
-    RecyclerView.Adapter<HomePredavanjaViewHolder>(), RealmChangeListener<RealmResults<Predavanja>> {
+    RecyclerView.Adapter<HomePredavanjaViewHolder>() {
     var boldtf: Typeface? = null
     var regulartf: Typeface? = null
     var lighttf: Typeface? = null
-
-    init {
-        mPredavanjaDanas.addChangeListener(this)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePredavanjaViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(
@@ -95,7 +90,4 @@ class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanj
         }
     }
 
-    override fun onChange(t: RealmResults<Predavanja>) {
-        notifyDataSetChanged()
-    }
 }

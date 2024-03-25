@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.models.services
 
 import android.util.Log
-import com.tstudioz.fax.fme.database.Dolazak
+import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.interfaces.PrisutnostInterface

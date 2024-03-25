@@ -1,10 +1,11 @@
-package com.tstudioz.fax.fme.database
+package com.tstudioz.fax.fme.database.models
 
 import com.tstudioz.fax.fme.R
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.FullText
+import io.realm.kotlin.types.annotations.PrimaryKey
 
-open class Predavanja : RealmObject() {
+open class Predavanja : RealmObject {
 
     @PrimaryKey
     var id: String? = null
@@ -16,6 +17,7 @@ open class Predavanja : RealmObject() {
     var brojSati: String? = null
     var grupa: String? = null
     var grupaShort: String? = null
+    @FullText
     var detaljnoVrijeme: String? = null
     var dvorana: String? = null
     var boja: String? = null

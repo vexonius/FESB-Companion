@@ -24,12 +24,12 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.view.activities.LoginActivity
-import com.tstudioz.fax.fme.database.Korisnik
-import com.tstudioz.fax.fme.migrations.CredMigration
-import com.tstudioz.fax.fme.models.data.User
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import org.koin.android.ext.android.inject
 
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -40,6 +40,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var mySPrefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
 
+    private val dbManager: DatabaseManager by inject()
 
     /*private val modeChangeListener = object : Preference.OnPreferenceChangeListener {
         override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
@@ -179,15 +180,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
         editor = mySPrefs?.edit()
         editor?.putBoolean("logged_in", false)
         editor?.apply()
-        val encRealm = RealmConfiguration.Builder()
-            .allowWritesOnUiThread(true)
-            .name("encrypted.realm")
-            .schemaVersion(8)
-            .migration(CredMigration())
-            .build()
-        rlmLog = Realm.getInstance(encRealm)
+
+        rlmLog = Realm.open(dbManager.getDefaultConfiguration())
+
         try {
-            rlmLog?.executeTransaction(Realm.Transaction { rlmLog?.deleteAll() })
+            rlmLog?.writeBlocking { this.deleteAll() }
         } finally {
             rlmLog?.close()
         }

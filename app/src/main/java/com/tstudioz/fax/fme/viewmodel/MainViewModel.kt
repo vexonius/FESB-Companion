@@ -1,12 +1,11 @@
 package com.tstudioz.fax.fme.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.models.data.Repository
-import com.tstudioz.fax.fme.database.Predavanja
+import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.models.data.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,7 +13,6 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 import java.util.UUID
-
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
@@ -27,7 +25,6 @@ class MainViewModel : ViewModel() {
     var tableGotPerm = MutableLiveData<Boolean>()
     val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
 
-
     private fun loginUser(user: User) {
         viewModelScope.launch {
             when (val result = repository.attemptLogin(user)) {
@@ -37,7 +34,6 @@ class MainViewModel : ViewModel() {
                 }
                 else -> println("Doslo je do pogreske")
             }
-
         }
     }
     private fun insertOrUpdateTimeTable(freshPredavanja: MutableList<Predavanja>){
@@ -72,7 +68,7 @@ class MainViewModel : ViewModel() {
                 svaFreshPredavanjaLive.postValue(svaFreshPredavanja)
                 insertOrUpdateTimeTable(svaFreshPredavanja)
                 tableGotPerm.postValue(true)
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
                 tableGotPerm.postValue(false)
             }
@@ -109,7 +105,7 @@ class MainViewModel : ViewModel() {
                 }
                 insertTempTimeTable(svaFreshPredavanja)
                 tableGot.postValue(true)
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
                 tableGot.postValue(false)
             }

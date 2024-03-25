@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.view.fragments
 
 import android.content.SharedPreferences
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -15,27 +14,27 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.Dolazak
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.adapters.DolasciAdapter
 import com.tstudioz.fax.fme.viewmodel.PrisutnostViewModel
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.RealmResults
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 @OptIn(InternalCoroutinesApi::class)
 class PrisutnostFragment : Fragment() {
-    private var realmConfig: RealmConfiguration = RealmConfiguration.Builder()
-        .allowWritesOnUiThread(true)
-        .name("prisutnost.realm")
-        .schemaVersion(10)
-        .deleteRealmIfMigrationNeeded()
-        .build()
+
+    private val dbManager: DatabaseManager by inject()
+
     private var snack: Snackbar? = null
     private var semAdapter: DolasciAdapter? = null
     private var realm: Realm? = null
@@ -84,10 +83,10 @@ class PrisutnostFragment : Fragment() {
     }
 
     private fun showRecyclerview(sem: Int) {
-        if (realm == null || realm?.isClosed == true){
-            realm = Realm.getInstance(realmConfig) }
+        if (realm == null || realm?.isClosed() == true){
+            realm = Realm.open(dbManager.getDefaultConfiguration()) }
         val dolasciSem: RealmResults<Dolazak>? =
-            realm?.where(Dolazak::class.java)?.equalTo("semestar", sem)?.findAll()
+            realm?.query<Dolazak>("semestar = $0", sem)?.find()
         try {
             if (!dolasciSem.isNullOrEmpty()){
                 semAdapter = context?.let { DolasciAdapter(it, dolasciSem) }}

@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("realm-android")
+    id("io.realm.kotlin") version "1.11.0"
 }
 
 android {
@@ -67,7 +67,6 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
     implementation("io.realm:android-adapters:2.1.1")
-    implementation("io.realm:realm-gradle-plugin:10.13.3-transformer-api") // added to try to remobe the transform error
     implementation("com.github.doctoror.particlesdrawable:library:2.0.2")
     implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")
     implementation("com.github.PhilJay:MPAndroidChart:v3.0.2")
@@ -81,17 +80,27 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.activity:activity-ktx:1.8.2")
 
-
     val multidexVersion = "2.0.1"
     implementation("androidx.multidex:multidex:$multidexVersion")
 
     val lifecycleVersion = "2.6.2"
     implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+
+    implementation("io.realm.kotlin:library-base:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
 
 configurations.all {
     resolutionStrategy {
         force("com.google.code.findbugs:jsr305:3.0.2")
+    }
+}
+
+allprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_17.toString()
+        }
     }
 }

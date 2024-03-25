@@ -18,8 +18,7 @@ data class TimetableItem(val id: Int,
                          val detailDateWithDayName: String = "",
                          val professor: String = "",
                          val classDuration: Int = 0,
-                         val recurringUntil: String = ""
-                         )
+                         val recurringUntil: String = "")
 
 enum class TimetableEvent(val type: String) {
 

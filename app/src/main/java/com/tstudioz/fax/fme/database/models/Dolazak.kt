@@ -1,12 +1,10 @@
-package com.tstudioz.fax.fme.database
+package com.tstudioz.fax.fme.database.models
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 
-/**
- * Created by amarthus on 18-May-17.
- */
-open class Dolazak : RealmObject() {
+open class Dolazak : RealmObject {
+
     @PrimaryKey
     var id: String? = null
     var predmet: String? = null
@@ -17,4 +15,5 @@ open class Dolazak : RealmObject() {
     var required: String? = null
     var semestar = 0
     var total = 0
+
 }

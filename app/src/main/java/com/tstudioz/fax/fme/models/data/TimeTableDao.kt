@@ -1,49 +1,47 @@
 package com.tstudioz.fax.fme.models.data
 
-import com.tstudioz.fax.fme.database.Predavanja
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Predavanja
+import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
-class TimeTableDao {
-    fun insertOrUpdateTimeTable( svaFreshPredavanja: MutableList<Predavanja> ){
-        val mainRealmConfig = RealmConfiguration.Builder()
-            .allowWritesOnUiThread(true)
-            .name("glavni.realm")
-            .schemaVersion(3)
-            .deleteRealmIfMigrationNeeded()
-            .build()
-        val realm = Realm.getInstance(mainRealmConfig)
+class TimeTableDao: KoinComponent {
+
+    private val dbManager: DatabaseManager by inject()
+
+    fun insertOrUpdateTimeTable(svaFreshPredavanja: MutableList<Predavanja> ){
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         try {
-            realm.executeTransaction { rlm ->
-                val svaPredavanja = rlm.where(Predavanja::class.java).findAll()
+            realm.writeBlocking {
+                val svaPredavanja = this.query<Predavanja>().find()
                 for (freshpred in svaFreshPredavanja) {
-                    if (!isPredavanjeInRealm(rlm, freshpred.id)) {
-                        rlm.copyToRealm(freshpred)
+                    if (!isPredavanjeInRealm(this, freshpred.id)) {
+                        this.copyToRealm(freshpred)
                     }
                 }
                 for (pred in svaPredavanja) {
                     if (!isPredavanjeInFresh(pred, svaFreshPredavanja)) {
-                        pred.deleteFromRealm()
+                        this.delete(pred)
                     }
                 }
             }
         } finally {
             realm.close()
         }
-    }fun insertTempTimeTable( svaFreshTempPredavanja: MutableList<Predavanja> ){
-        val mainRealmConfig = RealmConfiguration.Builder()
-            .allowWritesOnUiThread(true)
-            .name("temporary.realm")
-            .schemaVersion(12)
-            .deleteRealmIfMigrationNeeded()
-            .build()
-        val realm = Realm.getInstance(mainRealmConfig)
+    }
+
+    fun insertTempTimeTable( svaFreshTempPredavanja: MutableList<Predavanja> ){
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         try {
-            realm.executeTransaction { rlm ->
+            realm.writeBlocking {
                 for (freshpred in svaFreshTempPredavanja) {
-                    rlm.copyToRealm(freshpred)
+                    this.copyToRealm(freshpred)
                 }
             }
         } finally {
@@ -51,29 +49,22 @@ class TimeTableDao {
         }
     }
     fun deleteTempTimeTable(){
-        val tmpRealmConfig = RealmConfiguration.Builder()
-            .allowWritesOnUiThread(true)
-            .name("temporary.realm")
-            .schemaVersion(12)
-            .deleteRealmIfMigrationNeeded()
-            .build()
-        val tempRealm = Realm.getInstance(tmpRealmConfig)
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         try {
-            tempRealm.executeTransaction { rlm ->
-                val svaPredavanja = rlm.where(Predavanja::class.java).findAll()
+            realm.writeBlocking {
+                val svaPredavanja = this.query<Predavanja>().find()
                 for (pred in svaPredavanja) {
-                    pred.deleteFromRealm()
+                    this.delete(pred)
                 }
             }
         } finally {
-            tempRealm.close()
+            realm.close()
         }
     }
-    private fun isPredavanjeInRealm(realm: Realm, id: String?): Boolean {
-        val results = realm.where(Predavanja::class.java)
-            .equalTo("id", id)
-            .findAll()
+    private fun isPredavanjeInRealm(realm: MutableRealm, id: String?): Boolean {
+        val results = realm.query<Predavanja>("id = $0", id)
+            .find()
 
         return results.isNotEmpty()
     }

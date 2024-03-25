@@ -9,26 +9,20 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.LeanTask
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import java.util.UUID
-
-
-//Converted NoteActivity to kotlin, fixed return by adding a condition
-
-
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.LeanTask
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.query
+import org.koin.android.ext.android.inject
 
 class NoteActivity : AppCompatActivity() {
-    private var tRealm: Realm? = null
+
+    private val dbManager: DatabaseManager by inject()
+
     private var mTaskId: String? = null
     private var et: EditText? = null
-    private var realmTaskConfiguration: RealmConfiguration = RealmConfiguration.Builder()
-        .allowWritesOnUiThread(true)
-        .name("tasks.realm")
-        .deleteRealmIfMigrationNeeded()
-        .schemaVersion(1)
-        .build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,13 +37,13 @@ class NoteActivity : AppCompatActivity() {
             mTaskId = intent.extras?.getString("task_key")
         }
 
-        tRealm = Realm.getInstance(realmTaskConfiguration)
-        tRealm.use { tRealm ->
-            if (mTaskId != null) {
-                val leanTask = tRealm?.where(LeanTask::class.java)?.equalTo("id", mTaskId)?.findFirst()
-                et?.setText(leanTask?.taskTekst)
-            }
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
+
+        if (mTaskId != null) {
+            val leanTask: LeanTask? = realm.query<LeanTask>("id = $0", mTaskId).first()?.find()
+            et?.setText(leanTask?.taskTekst)
         }
+
         saveNoteListener()
     }
 
@@ -62,26 +56,29 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        val sRealm = Realm.getInstance(realmTaskConfiguration)
-        val stringBiljeska = et?.text.toString()
-        sRealm.use { sRlm ->
-            if (mTaskId != null && stringBiljeska.trim { it <= ' ' } != "") {
-                sRlm.executeTransaction { realm ->
-                    val leanTask = realm.where(LeanTask::class.java).equalTo("id", mTaskId).findFirst()
-                    leanTask?.taskTekst = stringBiljeska
-                    leanTask?.checked = false
+
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
+        val stringBiljeska = et?.text.toString().trim()
+
+        if (stringBiljeska.isEmpty()) {
+            return
+        }
+
+        realm.writeBlocking {
+            if (mTaskId != null) {
+                val leanTask = this.query<LeanTask>("id = $0", mTaskId).first().find()
+
+                leanTask?.let {
+                    it.taskTekst = stringBiljeska
+                    it.checked = false
+                    this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
                 }
-            } else if (mTaskId != null && stringBiljeska.trim { it <= ' ' } == "") {
-                sRlm.executeTransaction { realm ->
-                    val leanTask = realm.where(LeanTask::class.java).equalTo("id", mTaskId).findFirst()
-                    leanTask?.deleteFromRealm()
+            } else {
+                val leanTask = LeanTask().apply {
+                    taskTekst = stringBiljeska
+                    checked = false
                 }
-            } else if (stringBiljeska.trim { it <= ' ' } != "") {
-                sRlm.executeTransaction { realm ->
-                    val leanTask = realm.createObject(LeanTask::class.java, UUID.randomUUID().toString())
-                    leanTask?.taskTekst = stringBiljeska
-                    leanTask?.checked = false
-                }
+                this.copyToRealm(leanTask, updatePolicy = UpdatePolicy.ALL)
             }
         }
     }

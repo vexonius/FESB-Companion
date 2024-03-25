@@ -8,20 +8,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.view.adapters.PredavanjaRaspAdapterTable.PredavanjaRaspViewHolderTable
-import com.tstudioz.fax.fme.database.Predavanja
-import io.realm.RealmChangeListener
-import io.realm.RealmResults
+import io.realm.kotlin.query.RealmResults
 
-/**
- * Created by amarthus on 25-Mar-17.
- */
-class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanja>) : RecyclerView.Adapter<PredavanjaRaspViewHolderTable>(),  RealmChangeListener<RealmResults<Predavanja>> {
+class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanja>) : RecyclerView.Adapter<PredavanjaRaspViewHolderTable>() {
+
     private var dialog: BottomSheetDialog? = null
-
-    init {
-        mPredavanja.addChangeListener(this)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PredavanjaRaspViewHolderTable {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.table_row_item, parent, false)
@@ -133,7 +126,4 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
         dialog?.show()
     }
 
-    override fun onChange(t: RealmResults<Predavanja>) {
-        notifyDataSetChanged()
-    }
 }
