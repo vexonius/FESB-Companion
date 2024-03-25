@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
 import com.tstudioz.fax.fme.models.data.User
@@ -30,7 +31,7 @@ import org.koin.android.ext.android.inject
 @OptIn(InternalCoroutinesApi::class)
 class PrisutnostFragment : Fragment() {
 
-    private val dbManager: DatabaseManager by inject()
+    private val dbManager: DatabaseManagerInterface by inject()
 
     private var snack: Snackbar? = null
     private var semAdapter: DolasciAdapter? = null

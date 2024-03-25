@@ -6,10 +6,10 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.tstudioz.fax.fme.database.DatabaseManager
-import com.tstudioz.fax.fme.models.data.Repository
+import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.models.data.UserRepositoryInterface
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.core.KoinComponent
@@ -18,8 +18,8 @@ import org.koin.core.inject
 @InternalCoroutinesApi
 class LoginViewModel(application: Application) : AndroidViewModel(application), KoinComponent {
 
-    private val dbManager: DatabaseManager by inject()
-    private val repository: Repository by inject()
+    private val dbManager: DatabaseManagerInterface by inject()
+    private val repository: UserRepositoryInterface by inject()
 
     private val sharedPref = application.getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)
     private var _loggedIn = MutableLiveData<Boolean>()

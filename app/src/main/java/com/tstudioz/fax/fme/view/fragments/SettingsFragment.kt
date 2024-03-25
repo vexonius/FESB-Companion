@@ -25,6 +25,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.view.activities.LoginActivity
 import io.realm.kotlin.Realm
@@ -40,7 +41,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var mySPrefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
 
-    private val dbManager: DatabaseManager by inject()
+    private val dbManager: DatabaseManagerInterface by inject()
 
     /*private val modeChangeListener = object : Preference.OnPreferenceChangeListener {
         override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {

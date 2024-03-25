@@ -2,17 +2,14 @@ package com.tstudioz.fax.fme.models.services
 
 import com.tstudioz.fax.fme.models.Result
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.models.interfaces.UserInterface
+import com.tstudioz.fax.fme.models.interfaces.UserServiceInterface
 import kotlinx.coroutines.flow.Flow
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.koin.java.KoinJavaComponent.inject
 
 
-class UserService : UserInterface {
-
-    private val client: OkHttpClient by inject(OkHttpClient::class.java)
+class UserService(private val client: OkHttpClient) : UserServiceInterface {
 
     override suspend fun loginUser(user: User): Result.LoginResult {
         val requestBody = FormBody.Builder()
