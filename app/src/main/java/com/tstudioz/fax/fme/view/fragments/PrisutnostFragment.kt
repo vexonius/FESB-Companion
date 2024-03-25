@@ -34,9 +34,6 @@ class PrisutnostFragment : Fragment() {
 
     private val dbManager: DatabaseManager by inject()
 
-
-    private val dbManager: DatabaseManager by inject()
-
     private var snack: Snackbar? = null
     private var semAdapter: DolasciAdapter? = null
     private var realm: Realm? = null
