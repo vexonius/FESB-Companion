@@ -89,10 +89,7 @@ class PrisutnostFragment : Fragment() {
     private fun showRecyclerview(sem: Int) {
         if (realm == null || realm?.isClosed() == true){
             realm = Realm.open(dbManager.getDefaultConfiguration()) }
-        if (realm == null || realm?.isClosed() == true){
-            realm = Realm.open(dbManager.getDefaultConfiguration()) }
         val dolasciSem: RealmResults<Dolazak>? =
-            realm?.query<Dolazak>("semestar = $0", sem)?.find()
             realm?.query<Dolazak>("semestar = $0", sem)?.find()
         try {
             if (!dolasciSem.isNullOrEmpty()){
