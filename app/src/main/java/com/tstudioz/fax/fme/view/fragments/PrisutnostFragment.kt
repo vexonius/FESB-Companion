@@ -15,6 +15,8 @@ import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.databinding.PrisutnostTabBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
@@ -29,6 +31,9 @@ import org.koin.android.ext.android.inject
 
 @OptIn(InternalCoroutinesApi::class)
 class PrisutnostFragment : Fragment() {
+
+    private val dbManager: DatabaseManager by inject()
+
 
     private val dbManager: DatabaseManager by inject()
 
@@ -84,7 +89,10 @@ class PrisutnostFragment : Fragment() {
     private fun showRecyclerview(sem: Int) {
         if (realm == null || realm?.isClosed() == true){
             realm = Realm.open(dbManager.getDefaultConfiguration()) }
+        if (realm == null || realm?.isClosed() == true){
+            realm = Realm.open(dbManager.getDefaultConfiguration()) }
         val dolasciSem: RealmResults<Dolazak>? =
+            realm?.query<Dolazak>("semestar = $0", sem)?.find()
             realm?.query<Dolazak>("semestar = $0", sem)?.find()
         try {
             if (!dolasciSem.isNullOrEmpty()){

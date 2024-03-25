@@ -30,6 +30,8 @@ import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.models.Korisnik
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
@@ -37,6 +39,10 @@ import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.exceptions.RealmException
+import io.realm.kotlin.ext.query
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.exceptions.RealmException
@@ -55,6 +61,8 @@ import java.util.Locale
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
+
+    private val dbManager: DatabaseManager by inject()
 
     private val dbManager: DatabaseManager by inject()
 
@@ -133,11 +141,13 @@ class MainActivity : AppCompatActivity() {
     private fun checkUser() {
         var korisnik: Korisnik? = null
         realmLog = Realm.open(dbManager.getDefaultConfiguration())
+        realmLog = Realm.open(dbManager.getDefaultConfiguration())
         assert(shPref != null)
         editor = shPref?.edit()
 
         if (realmLog != null) {
             try {
+                korisnik = realmLog?.query<Korisnik>()?.find()?.first()
                 korisnik = realmLog?.query<Korisnik>()?.find()?.first()
             }
             catch (ex: Exception) { ex.printStackTrace() }
@@ -251,7 +261,9 @@ class MainActivity : AppCompatActivity() {
         editor?.apply()
 
         realmLog = Realm.open(dbManager.getDefaultConfiguration())
+        realmLog = Realm.open(dbManager.getDefaultConfiguration())
         try {
+            realmLog?.writeBlocking { this.deleteAll() }
             realmLog?.writeBlocking { this.deleteAll() }
         } catch (ex: RealmException) {
             Log.e("MainActivity", ex.toString())
