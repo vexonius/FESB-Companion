@@ -10,14 +10,19 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.view.adapters.PredavanjaRaspAdapterTable.PredavanjaRaspViewHolderTable
-import io.realm.kotlin.query.RealmResults
 
-class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanja>) : RecyclerView.Adapter<PredavanjaRaspViewHolderTable>() {
+class PredavanjaRaspAdapterTable(private var mPredavanja: List<Predavanja>) :
+    RecyclerView.Adapter<PredavanjaRaspViewHolderTable>() {
 
     private var dialog: BottomSheetDialog? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PredavanjaRaspViewHolderTable {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.table_row_item, parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): PredavanjaRaspViewHolderTable {
+        val view = LayoutInflater
+            .from(parent.context)
+            .inflate(R.layout.table_row_item, parent, false)
         return PredavanjaRaspViewHolderTable(view)
     }
 
@@ -26,19 +31,24 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
 
         val predavanja = mPredavanja[position]
 
-        if (predavanja?.predmetPredavanja != null && predavanja.predmetPredavanja?.isEmpty()==false && predavanja.predmetPredavanja?.contains(" ")==true) {
-            for (str in predavanja.predmetPredavanja!!.split(" ").toTypedArray())
-                compactImePredavanja.append(str[0])
-
+        if (predavanja.predmetPredavanja != null
+            && predavanja.predmetPredavanja?.isEmpty() == false
+            && predavanja.predmetPredavanja?.contains(" ") == true
+        ) {
+            val predmetPredavanja = predavanja.predmetPredavanja?.split(" ")?.toTypedArray()
+            if (predmetPredavanja != null) {
+                for (str in predmetPredavanja)
+                    compactImePredavanja.append(str[0])
+            }
             holder.tablename.text = compactImePredavanja.toString()
         } else {
-            holder.tablename.text = predavanja?.predmetPredavanja ?: ""
+            holder.tablename.text = predavanja.predmetPredavanja ?: ""
         }
         holder.tablename.text = compactImePredavanja.toString()
-        holder.tabletype.text = predavanja?.rasponVremena ?: ""
-        holder.tablemjesto.text = predavanja?.dvorana ?: ""
+        holder.tabletype.text = predavanja.rasponVremena ?: ""
+        holder.tablemjesto.text = predavanja.dvorana ?: ""
 
-        when (predavanja?.predavanjeIme) {
+        when (predavanja.predavanjeIme) {
             "Predavanje" -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
             "Auditorne vježbe" -> holder.tableboja.setBackgroundResource(R.color.green_nice)
             "Kolokvij" -> holder.tableboja.setBackgroundResource(R.color.purple_nice)
@@ -53,7 +63,8 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
         return mPredavanja.size
     }
 
-    inner class PredavanjaRaspViewHolderTable(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class PredavanjaRaspViewHolderTable(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
         var tablename: TextView
         var tabletype: TextView
         var tablemjesto: TextView
@@ -91,24 +102,24 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
         infoGrupa = views.findViewById<View>(R.id.text_ispod4) as TextView
         infoLokacija = views.findViewById<View>(R.id.text_ispod5) as TextView
 
-        var imePredavanja = predavanja?.predavanjeIme
+        var imePredavanja = predavanja.predavanjeIme
         if (!imePredavanja.isNullOrEmpty()) {
             imePredavanja = imePredavanja.substring(0, imePredavanja.length)
         }
-        var imeGrupe = predavanja?.grupa
+        var imeGrupe = predavanja.grupa
         imeGrupe = if (!imeGrupe.isNullOrEmpty()) {
             imeGrupe.substring(0, imeGrupe.length - 1)
-        }else{
-            "Jedna grupe"
+        } else {
+            "Jedna grupa"
         }
-        infoKolegij.text = predavanja?.predmetPredavanja
+        infoKolegij.text = predavanja.predmetPredavanja
         infoPredavanje.text = imePredavanja
-        infoProf.text = predavanja?.profesor
-        infoVrijeme.text = predavanja?.rasponVremena
+        infoProf.text = predavanja.profesor
+        infoVrijeme.text = predavanja.rasponVremena
         infoGrupa.text = imeGrupe
-        infoLokacija.text = predavanja?.dvorana
+        infoLokacija.text = predavanja.dvorana
 
-        when (predavanja?.predavanjeIme) {
+        when (predavanja.predavanjeIme) {
             "Predavanje" -> infoKolegij.setBackgroundResource(R.color.blue_nice)
             "Auditorne vježbe" -> infoKolegij.setBackgroundResource(R.color.green_nice)
             "Kolokvij" -> infoKolegij.setBackgroundResource(R.color.purple_nice)

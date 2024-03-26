@@ -10,16 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog
-import com.tstudioz.fax.fme.Application.FESBCompanion
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.databinding.TimetableTabBinding
 import com.tstudioz.fax.fme.models.data.User
@@ -27,7 +23,6 @@ import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.adapters.PredavanjaRaspAdapterTable
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -40,17 +35,18 @@ import java.util.Locale
 class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     private val dbManager: DatabaseManagerInterface by inject()
+
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by inject()
     private val shPref: SharedPreferences by inject()
 
-    private var rlm: Realm? = null
     var realm: Realm? = null
     private var snack: Snackbar? = null
-    private var adapteriTemp:MutableList<PredavanjaRaspAdapterTable?> = mutableListOf()
-    private val numberOfPredavanjaPerDay :MutableList<Int> = mutableListOf()
+    private var adapteriTemp: MutableList<PredavanjaRaspAdapterTable?> = mutableListOf()
+    private val numberOfPredavanjaPerDay: MutableList<Int> = mutableListOf()
     private var bold: Typeface? = null
     private var binding: TimetableTabBinding? = null
+
     @OptIn(InternalCoroutinesApi::class)
 
     override fun onCreateView(
@@ -62,12 +58,12 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         binding = TimetableTabBinding.inflate(inflater, container, false)
 
         requireActivity().runOnUiThread {
-            showDay("Ponedjeljak",false)
-            showDay("Utorak", false)
-            showDay("Srijeda",false)
+            showDay("ponedjeljak", false)
+            showDay("utorak", false)
+            showDay("srijeda", false)
             showDay("četvrtak", false)
-            showDay("Petak", false)
-            showDay("Subota", false)
+            showDay("petak", false)
+            showDay("subota", false)
         }
         val min = Calendar.getInstance()
         val now = Calendar.getInstance()
@@ -76,7 +72,8 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         min.add(Calendar.YEAR, -1)
         val builder: BottomSheetPickerDialog.Builder = DatePickerDialog.Builder(
             this@TimeTableFragment,
-            now[Calendar.YEAR], now[Calendar.MONTH], now[Calendar.DAY_OF_MONTH])
+            now[Calendar.YEAR], now[Calendar.MONTH], now[Calendar.DAY_OF_MONTH]
+        )
         val dateDialogBuilder = builder as DatePickerDialog.Builder
         dateDialogBuilder.setMaxDate(max)
             .setMinDate(min)
@@ -105,7 +102,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         kal[Calendar.YEAR] = year
         kal[Calendar.MONTH] = monthOfYear
         kal[Calendar.DAY_OF_MONTH] = dayOfMonth
-        kal.add(Calendar.DAY_OF_MONTH,-1)
+        kal.add(Calendar.DAY_OF_MONTH, -1)
 
         val sday: DateFormat = SimpleDateFormat("dd", Locale.getDefault())
         val smonth: DateFormat = SimpleDateFormat("MM", Locale.getDefault())
@@ -125,46 +122,55 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val sYear = syear.format(kal.time)
 
         mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear)
-        val textdisp ="Raspored za $mDay.$mMonth - $sDay.$sMonth"
+        val textdisp = "Raspored za $mDay.$mMonth - $sDay.$sMonth"
         binding?.odaberiDan?.text = textdisp
     }
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     fun mojRaspored(
         cal: Calendar, mMonth: String, mDay: String,
-        mYear: String, sMonth: String, sDay: String, sYear: String) {
-        requireActivity().runOnUiThread {
-            binding?.linearParent?.visibility = View.INVISIBLE
-            binding?.rasporedProgress?.visibility = View.VISIBLE
-            adapteriTemp.clear()
-            showDay("Ponedjeljak", true)
-            showDay("Utorak", true)
-            showDay("Srijeda", true)
-            showDay("četvrtak", true)
-            showDay("Petak", true)
-            showDay("Subota", true)
-        }
-        rlm = Realm.open(dbManager.getDefaultConfiguration())
+        mYear: String, sMonth: String, sDay: String, sYear: String
+    ) {
+
         val user = shPref.getString("username", "")?.let { User(it, "") }
         val mindate = "$mMonth%2F$mDay%2F$mYear"
         val maxdate = "$sMonth%2F$sDay%2F$sYear"
 
-        mainViewModel.fetchUserTimetableTemp(User(user?.username ?: "",""), mindate, maxdate)
+        mainViewModel.fetchUserTimetableTemp(User(user?.username ?: "", ""), mindate, maxdate)
+
+        binding?.linearParent?.visibility = View.INVISIBLE
+        binding?.rasporedProgress?.visibility = View.VISIBLE
+        adapteriTemp.clear()
+        numberOfPredavanjaPerDay.clear()
 
         mainViewModel.tableGot.observe(viewLifecycleOwner) { tableGot ->
-            if (tableGot) {
-                activity?.runOnUiThread {
+            if (tableGot.equals("fetched", true)) {
+                requireActivity().runOnUiThread {
+                    showDay("ponedjeljak", true)
+                    showDay("utorak", true)
+                    showDay("srijeda", true)
+                    showDay("četvrtak", true)
+                    showDay("petak", true)
+                    showDay("subota", true)
                     updateTemporaryWeek(cal)
                 }
-            } else {
+            } else if (tableGot.contains("error", true)) {
                 activity?.runOnUiThread { showSnackError() }
             }
         }
     }
+
     private fun setSetDates(calendar: Calendar) {
         val format: DateFormat = SimpleDateFormat("d", Locale.getDefault())
 
-        val daysOfWeek = listOf(Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY)
+        val daysOfWeek = listOf(
+            Calendar.MONDAY,
+            Calendar.TUESDAY,
+            Calendar.WEDNESDAY,
+            Calendar.THURSDAY,
+            Calendar.FRIDAY,
+            Calendar.SATURDAY
+        )
 
         for (dayOfWeek in daysOfWeek) {
             calendar.set(Calendar.DAY_OF_WEEK, dayOfWeek)
@@ -191,41 +197,48 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         binding?.mSub?.typeface = bold
     }
 
+    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private fun showDay(day: String, isTemp: Boolean) {
-        realm =
-            if (!isTemp) {
-            Realm.open(dbManager.getDefaultConfiguration())
+        val rezulatiDay = if (!isTemp) {
+            realm = Realm.open(dbManager.getDefaultConfiguration())
+            realm?.query<Predavanja>("detaljnoVrijeme TEXT $0", "$day*")?.find()?.toList()
         } else {
-            Realm.open(dbManager.getDefaultConfiguration())
+            mainViewModel.tempPredavanja.value?.filter {
+                it.detaljnoVrijeme?.contains(
+                    day,
+                    true
+                ) == true
+            }
         }
-        val rezulatiDay = realm?.query<Predavanja>("detaljnoVrijeme TEXT $0", "$day*")?.find()
+
         val adapter = rezulatiDay?.let { PredavanjaRaspAdapterTable(it) }
-        if (adapter != null && isTemp){
+        if (adapter != null && isTemp) {
             adapteriTemp.add(adapter)
             numberOfPredavanjaPerDay.add(adapter.itemCount)
         }
-        val bindDay = when (day){
-            "Ponedjeljak" -> binding?.recyclerPon
-            "Utorak" -> binding?.recyclerUto
-            "Srijeda" -> binding?.recyclerSri
+        val bindDay = when (day.lowercase(Locale.ROOT)) {
+            "ponedjeljak" -> binding?.recyclerPon
+            "utorak" -> binding?.recyclerUto
+            "srijeda" -> binding?.recyclerSri
             "četvrtak" -> binding?.recyclerCet
-            "Petak" -> binding?.recyclerPet
-            "Subota" -> binding?.recyclerSub //needs testing to show that sub properly shows
+            "petak" -> binding?.recyclerPet
+            "subota" -> binding?.recyclerSub
             else -> binding?.recyclerPet
         }
-        if (rezulatiDay?.isEmpty() == true && day == "Subota") {
-            binding?.linearSub?.visibility = View.GONE
-            binding?.linearParent?.weightSum = 5f
-        } else if (day == "Subota"){
-            binding?.linearSub?.visibility = View.VISIBLE
-            binding?.linearParent?.weightSum = 6f
-            bindDay?.layoutManager = LinearLayoutManager(activity)
-            if (!isTemp){
-                bindDay?.setHasFixedSize(true)
+        if (day.equals("subota", ignoreCase = true)) {
+            if (rezulatiDay?.isEmpty() == true) {
+                binding?.linearSub?.visibility = View.GONE
+                binding?.linearParent?.weightSum = 5f
+            } else {
+                binding?.linearSub?.visibility = View.VISIBLE
+                binding?.linearParent?.weightSum = 6f
+                bindDay?.layoutManager = LinearLayoutManager(activity)
+                if (!isTemp) {
+                    bindDay?.setHasFixedSize(true)
+                }
+                bindDay?.adapter = adapter
             }
-            bindDay?.adapter = adapter
-        }
-        if (day != "Subota" ){
+        } else {
             bindDay?.layoutManager = LinearLayoutManager(activity)
             bindDay?.setHasFixedSize(true)
             bindDay?.adapter = adapter
@@ -233,12 +246,12 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 
     private fun updateTemporaryWeek(cal: Calendar) {
-        for (adapter in this.adapteriTemp){
+        for (adapter in this.adapteriTemp) {
             adapter?.notifyDataSetChanged()
             adapter?.notifyItemChanged(0)
         }
         setSetDates(cal)
-        if (numberOfPredavanjaPerDay[5] != 0) {
+        if (numberOfPredavanjaPerDay.isNotEmpty() && numberOfPredavanjaPerDay[5] != 0) {
             binding?.linearParent?.weightSum = 6f
             binding?.linearSub?.visibility = View.VISIBLE
             binding?.linearParent?.invalidate()
@@ -250,6 +263,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         binding?.rasporedProgress?.visibility = View.INVISIBLE
         binding?.linearParent?.visibility = View.VISIBLE
     }
+
     private fun checkNetwork() {
         if (context?.let { NetworkUtils.isNetworkAvailable(it) } == true) {
             binding?.odaberiDan?.visibility = View.VISIBLE
@@ -295,9 +309,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (rlm != null) {
-            rlm?.close()
-        }
         if (realm != null) {
             realm?.close()
         }
