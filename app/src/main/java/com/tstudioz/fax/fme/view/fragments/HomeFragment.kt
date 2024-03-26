@@ -45,8 +45,10 @@ import java.util.Locale
 
 @OptIn(InternalCoroutinesApi::class)
 class HomeFragment : Fragment() {
+class HomeFragment : Fragment() {
 
     private val dbManager: DatabaseManagerInterface by inject()
+    private val shPref: SharedPreferences by inject()
     private val shPref: SharedPreferences by inject()
 
     private var binding: HomeTabBinding? = null
@@ -151,6 +153,7 @@ class HomeFragment : Fragment() {
     }
 
     fun showList() {
+        mrealm = Realm.open(dbManager.getDefaultConfiguration())
         mrealm = Realm.open(dbManager.getDefaultConfiguration())
         val rezultati = date?.let {
             mrealm?.query<Predavanja>("detaljnoVrijeme CONTAINS $0", it)?.find()

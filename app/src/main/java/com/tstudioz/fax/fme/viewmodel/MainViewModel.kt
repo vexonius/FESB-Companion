@@ -23,6 +23,10 @@ class MainViewModel(
     private val userRepository: UserRepositoryInterface,
     private val timeTableRepository: TimeTableRepositoryInterface
 ) : ViewModel() {
+class MainViewModel(
+    private val userRepository: UserRepositoryInterface,
+    private val timeTableRepository: TimeTableRepositoryInterface
+) : ViewModel() {
 
     val tableGot: MutableLiveData<String> = MutableLiveData()
 
@@ -42,6 +46,14 @@ class MainViewModel(
                 is UserRepositoryResult.LoginResult.Failure -> {
 
                 }
+        viewModelScope.launch(context = Dispatchers.IO) {
+            when (val result = userRepository.attemptLogin(user.username, user.password)) {
+                is UserRepositoryResult.LoginResult.Success -> {
+
+                }
+                is UserRepositoryResult.LoginResult.Failure -> {
+
+                }
             }
         }
     }
@@ -50,6 +62,7 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try{
                 println("started Fetching Timetable for user")
+                val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 val svaFreshPredavanja = mutableListOf<Predavanja>()
                 list.forEach { println(it.name) }
@@ -87,6 +100,7 @@ class MainViewModel(
                 val tempList = mutableListOf<Predavanja>()
                 println("started Fetching Timetable for user")
                 val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
+                val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 list.forEach { println(it.name) }
                 for (l in list) {
                     val predavanja = Predavanja()
@@ -117,6 +131,7 @@ class MainViewModel(
     }
 
     private suspend fun insertOrUpdateTimeTable(classes: List<Predavanja>) {
+        timeTableRepository.insertTimeTable(classes)
         timeTableRepository.insertTimeTable(classes)
     }
 
