@@ -20,7 +20,7 @@ class TimetableService(private val client: OkHttpClient) : TimetableServiceInter
         val value = response.body?.string()
         
         if (!response.isSuccessful || value.isNullOrEmpty()) {
-            return NetworkServiceResult.TimeTableResult.Failure(Throwable("Failed to fetch weather"))
+            return NetworkServiceResult.TimeTableResult.Failure(Throwable("Failed to fetch schedule"))
         }
 
         return NetworkServiceResult.TimeTableResult.Success(value)
