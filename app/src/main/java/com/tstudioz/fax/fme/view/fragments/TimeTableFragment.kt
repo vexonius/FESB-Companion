@@ -39,7 +39,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by inject()
     private val shPref: SharedPreferences by inject()
-    private val shPref: SharedPreferences by inject()
 
     var realm: Realm? = null
     private var snack: Snackbar? = null
