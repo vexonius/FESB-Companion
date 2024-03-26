@@ -15,19 +15,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
-import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.LeanTask
-import com.tstudioz.fax.fme.database.models.Predavanja
-import com.tstudioz.fax.fme.databinding.HomeTabBinding
-import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.view.activities.IndexActivity
-import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.LeanTask
 import com.tstudioz.fax.fme.database.models.Predavanja
@@ -39,18 +30,11 @@ import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.json.JSONException
-import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.IOException
@@ -67,7 +51,6 @@ class HomeFragment : Fragment() {
 
     private var binding: HomeTabBinding? = null
     private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
-    private val homeViewModel: HomeViewModel by viewModel()
     private val homeViewModel: HomeViewModel by viewModel()
     private var mrealm: Realm? = null
     private var date: String? = null
@@ -183,8 +166,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadNotes() {
-        val taskRealm = Realm.open(dbManager.getDefaultConfiguration())
-        val tasks = taskRealm.query<LeanTask>().find()
         val taskRealm = Realm.open(dbManager.getDefaultConfiguration())
         val tasks = taskRealm.query<LeanTask>().find()
         val dodajNovi = LeanTask()

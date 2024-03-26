@@ -109,7 +109,7 @@ class MainViewModel(
     }
 
     private suspend fun insertOrUpdateTimeTable(classes: List<Predavanja>) {
-        repository.insertTimeTable(classes)
+        timeTableRepository.insertTimeTable(classes)
     }
 
 }

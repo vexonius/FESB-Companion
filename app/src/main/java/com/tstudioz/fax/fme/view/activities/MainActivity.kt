@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
             finally {
                 if (korisnik != null) {
                     editor?.putString("username", korisnik.username)
-                    editor?.putString("password", korisnik.lozinka)
+                    editor?.putString("password", korisnik.password)
                     editor?.commit()
                     mojRaspored()
                 } else { invalidCreds() }
