@@ -5,6 +5,6 @@ import io.realm.kotlin.types.RealmObject
 open class Korisnik : RealmObject {
 
     var username: String? = null
-    var lozinka: String? = null
+    var password: String? = null
 
 }

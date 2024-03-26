@@ -42,6 +42,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private val dbManager: DatabaseManagerInterface by inject()
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by inject()
+    private val shPref: SharedPreferences by inject()
 
     private var rlm: Realm? = null
     var realm: Realm? = null
@@ -51,7 +52,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var bold: Typeface? = null
     private var binding: TimetableTabBinding? = null
     @OptIn(InternalCoroutinesApi::class)
-    private var shPref: SharedPreferences? =  FESBCompanion.instance?.sP
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -145,11 +145,11 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             showDay("Subota", true)
         }
         rlm = Realm.open(dbManager.getDefaultConfiguration())
-        val user = shPref?.getString("username", "")?.let { User(it, "", "") }
+        val user = shPref.getString("username", "")?.let { User(it, "") }
         val mindate = "$mMonth%2F$mDay%2F$mYear"
         val maxdate = "$sMonth%2F$sDay%2F$sYear"
 
-        mainViewModel.fetchUserTimetableTemp(User(user?.username.toString(),"",""), mindate, maxdate)
+        mainViewModel.fetchUserTimetableTemp(User(user?.username ?: "",""), mindate, maxdate)
 
         mainViewModel.tableGot.observe(viewLifecycleOwner) { tableGot ->
             if (tableGot) {

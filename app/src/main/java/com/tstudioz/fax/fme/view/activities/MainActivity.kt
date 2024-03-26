@@ -30,6 +30,7 @@ import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
+import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
@@ -55,6 +56,8 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     private val dbManager: DatabaseManagerInterface by inject()
+    private val shPref: SharedPreferences by inject()
+
 
     var date: String? = null
 
@@ -62,8 +65,7 @@ class MainActivity : AppCompatActivity() {
     private var client: OkHttpClient? = null
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
-    private var shPref: SharedPreferences? =  instance?.sP
-    private val homeFragment = HomeFragment(shPref)
+    private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
     private val prisutnostFragment = PrisutnostFragment()
     private var editor: SharedPreferences.Editor? = null
@@ -84,7 +86,6 @@ class MainActivity : AppCompatActivity() {
         isThereAction()
 
         setTableGotListener()
-        checkUser()
         checkVersion()
         shouldShowGDPRDialog()
     }
@@ -115,7 +116,7 @@ class MainActivity : AppCompatActivity() {
                     homeFragment.showList()
                     if (supportFragmentManager.findFragmentById(R.id.frame) is HomeFragment){
                         val text: TextView = findViewById(R.id.TimeRaspGot)
-                        text.text = shPref?.getString("timeGotcurrentrasp", "")
+                        text.text = shPref.getString("timeGotcurrentrasp", "")
                         text.visibility = View.VISIBLE
                     }
                 }
@@ -142,7 +143,7 @@ class MainActivity : AppCompatActivity() {
             finally {
                 if (korisnik != null) {
                     editor?.putString("username", korisnik.username)
-                    editor?.putString("password", korisnik.lozinka)
+                    editor?.putString("password", korisnik.password)
                     editor?.commit()
                     mojRaspored()
                 } else { invalidCreds() }
@@ -223,7 +224,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun mojRaspored(){
-        val user = shPref?.getString("username", "")?.let { User(it, "", "") }
+        val user = shPref.getString("username", "")?.let { User(it, "") }
 
         val calendar = Calendar.getInstance()
 
@@ -238,13 +239,13 @@ class MainActivity : AppCompatActivity() {
         val enddate = df.format(calendar.time)
 
         if (user != null) { mainViewModel.fetchUserTimetable(user, startdate, enddate) }
-        editor = shPref?.edit()
+        editor = shPref.edit()
         editor?.putString("timeGotcurrentrasp", dateandtime)
         editor?.commit()
     }
 
     private fun invalidCreds() {
-        editor = shPref?.edit()
+        editor = shPref.edit()
         editor?.putBoolean("logged_in", false)
         editor?.apply()
 
@@ -292,12 +293,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkVersion() {
-        val staraVerzija = shPref?.getInt("version_number", 14)
+        val staraVerzija = shPref.getInt("version_number", 14)
         val trenutnaVerzija: Int = BuildConfig.VERSION_CODE
 
         if ((staraVerzija != null) && (staraVerzija < trenutnaVerzija)) {
             showChangelog()
-            editor = shPref?.edit()
+            editor = shPref.edit()
             editor?.putInt("version_number", trenutnaVerzija)
             editor?.commit()
         }
@@ -317,10 +318,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun shouldShowGDPRDialog() {
-        val bool = shPref?.getBoolean("GDPR_agreed", false)
+        val bool = shPref.getBoolean("GDPR_agreed", false)
         if (bool==false) {
             showGDPRCompliance()
-            editor = shPref?.edit()
+            editor = shPref.edit()
             editor?.putBoolean("GDPR_agreed", true)
             editor?.commit()
         }

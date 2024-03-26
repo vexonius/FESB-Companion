@@ -1,20 +1,18 @@
-package com.tstudioz.fax.fme.models.services
+package com.tstudioz.fax.fme.feature.login.services
 
-import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.models.interfaces.UserServiceInterface
 import kotlinx.coroutines.flow.Flow
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-
 class UserService(private val client: OkHttpClient) : UserServiceInterface {
 
-    override suspend fun loginUser(user: User): Result.LoginResult {
+    override suspend fun loginUser(username: String, password: String): NetworkServiceResult.LoginResult {
         val requestBody = FormBody.Builder()
-                .add("Username", user.username)
-                .add("Password", user.password)
+                .add("Username", username)
+                .add("Password", password)
                 .add("IsRememberMeChecked", "true")
                 .build()
 
@@ -26,12 +24,12 @@ class UserService(private val client: OkHttpClient) : UserServiceInterface {
         val response = client.newCall(request).execute()
 
         return if (response.request.url.toString() == "https://korisnik.fesb.unist.hr/") {
-            Result.LoginResult.Success(User(user.username, user.password, user.username+"fesb.hr"))}
+            NetworkServiceResult.LoginResult.Success(User(username, password))}
         else {
-            Result.LoginResult.Failure(Throwable("Doslo je do pogreske prilikom prijave"))}
+            NetworkServiceResult.LoginResult.Failure(Throwable("Doslo je do pogreske prilikom prijave"))}
     }
 
-    override fun logoutUser(): Flow<Result.LogoutResult> {
+    override fun logoutUser(): Flow<NetworkServiceResult.LogoutResult> {
         TODO("Not yet implemented")
     }
 

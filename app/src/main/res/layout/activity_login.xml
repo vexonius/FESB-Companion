@@ -101,18 +101,6 @@
 
             </FrameLayout>
 
-            <TextView
-                android:id="@+id/login_pomoc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/framebutton"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="15dp"
-                android:clickable="true"
-                android:text="Pomoć"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="11dp" />
         </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro2
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.view.fragments.WelcomeSlideFragment
 
 class Welcome : AppIntro2() {
@@ -30,7 +31,7 @@ class Welcome : AppIntro2() {
     private fun onWelcomeFinish() {
         val sharedPref = getSharedPreferences("PRIVATE_PREFS", MODE_PRIVATE)
         val editor = sharedPref.edit()
-        editor.putBoolean("first_open", false)
+        editor.putBoolean(SPKey.FIRST_TIME.toString(), false)
         editor.apply()
     }
 }

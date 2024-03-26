@@ -1,15 +1,14 @@
 package com.tstudioz.fax.fme.models.services
 
-import com.tstudioz.fax.fme.models.Result
+import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.koin.java.KoinJavaComponent
 
 class WeatherNetworkService(private val client: OkHttpClient) : WeatherNetworkInterface {
 
-    override suspend fun fetchWeatherDetails(url: String): Result.WeatherResult {
+    override suspend fun fetchWeatherDetails(url: String): NetworkServiceResult.WeatherResult {
         val request: Request = Request.Builder()
             .url(url).header("Accept", "application/xml")
             .header("User-Agent", "FesbCompanion/1.0")
@@ -19,13 +18,13 @@ class WeatherNetworkService(private val client: OkHttpClient) : WeatherNetworkIn
         val value = response.body?.string()
 
         if (!response.isSuccessful || value.isNullOrEmpty()) {
-            return Result.WeatherResult.Failure(Throwable("Failed to fetch weather"))
+            return NetworkServiceResult.WeatherResult.Failure(Throwable("Failed to fetch weather"))
         }
 
-        return Result.WeatherResult.Success(value)
+        return NetworkServiceResult.WeatherResult.Success(value)
     }
 
-    override suspend fun getWeekWeatherDetails() : Result.WeatherResult {
+    override suspend fun getWeekWeatherDetails() : NetworkServiceResult.WeatherResult {
         TODO("Not yet implemented")
     }
 }
