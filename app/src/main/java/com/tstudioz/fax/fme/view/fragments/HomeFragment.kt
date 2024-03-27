@@ -33,6 +33,7 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.koin.android.ext.android.inject
@@ -50,7 +51,8 @@ class HomeFragment : Fragment() {
     private val shPref: SharedPreferences by inject()
 
     private var binding: HomeTabBinding? = null
-    private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
+    private val forecastUrl =
+        "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
     private var mrealm: Realm? = null
     private var date: String? = null
@@ -58,8 +60,8 @@ class HomeFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): CoordinatorLayout?
-    {
+        savedInstanceState: Bundle?
+    ): CoordinatorLayout? {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = HomeTabBinding.inflate(inflater, container, false)
 
@@ -95,17 +97,17 @@ class HomeFragment : Fragment() {
     private fun start() {
         try {
             if (NetworkUtils.isNetworkAvailable(requireContext())) {
-            lifecycleScope.launch { homeViewModel.getForecast(forecastUrl) }
-            homeViewModel.forecastGot.observe(viewLifecycleOwner) { forecastGot ->
-                if (forecastGot) {
-                    activity?.runOnUiThread { updateDisplay() }
-                } else {
-                    alertUserAboutError()
+                lifecycleScope.launch { homeViewModel.getForecast(forecastUrl) }
+                homeViewModel.forecastGot.observe(viewLifecycleOwner) { forecastGot ->
+                    if (forecastGot) {
+                        activity?.runOnUiThread { updateDisplay() }
+                    } else {
+                        alertUserAboutError()
+                    }
                 }
+            } else {
+                showSnacOffline()
             }
-        } else {
-            showSnacOffline()
-        }
         } catch (e: IOException) {
             e.printStackTrace()
         } catch (e: JSONException) {
@@ -119,7 +121,13 @@ class HomeFragment : Fragment() {
         val pHumidity = current?.humidity.toString() + " %"
         val pWind = current?.wind.toString() + " km/h"
         val pPrecip = current?.precipChance.toString() + " mm"
-        val pSummary = getString(resources.getIdentifier(current?.summary , "string", requireContext().packageName))
+        val pSummary = getString(
+            resources.getIdentifier(
+                current?.summary,
+                "string",
+                requireContext().packageName
+            )
+        )
         binding?.temperaturaVrijednost?.text = pTemperatura
         binding?.vlaznostVrijednost?.text = pHumidity
         binding?.oborineVrijednost?.text = pPrecip
@@ -127,7 +135,11 @@ class HomeFragment : Fragment() {
         binding?.opis?.text = pSummary
         binding?.shimmerWeather?.visibility = View.GONE
         binding?.cardHome?.visibility = View.VISIBLE
-        val drawable = ResourcesCompat.getDrawable(resources, resources.getIdentifier(current?.icon, "drawable", requireContext().packageName),null)
+        val drawable = ResourcesCompat.getDrawable(
+            resources,
+            resources.getIdentifier(current?.icon, "drawable", requireContext().packageName),
+            null
+        )
 
         binding?.vrijemeImage?.setImageDrawable(drawable)
     }
@@ -139,13 +151,13 @@ class HomeFragment : Fragment() {
             date?.let {
                 mrealm?.query<Predavanja>("detaljnoVrijeme LIKE $0", it)?.find()
             }
-            date?.let {
-                mrealm?.query<Predavanja>("detaljnoVrijeme LIKE $0", it)?.find()
-            }
-        if (rezultati !=null && rezultati.isEmpty()) {
+        date?.let {
+            mrealm?.query<Predavanja>("detaljnoVrijeme LIKE $0", it)?.find()
+        }
+        if (rezultati != null && rezultati.isEmpty()) {
             binding?.rv?.visibility = View.INVISIBLE
             binding?.nemaPredavanja?.visibility = View.VISIBLE
-        } else if (rezultati !=null){
+        } else if (rezultati != null) {
             binding?.nemaPredavanja?.visibility = View.GONE
             binding?.rv?.visibility = View.VISIBLE
             val adapter = HomePredavanjaAdapter(rezultati)
@@ -160,7 +172,8 @@ class HomeFragment : Fragment() {
             ?.setBackgroundDrawable(
                 ColorDrawable(
                     ContextCompat.getColor(requireContext(), R.color.dark_cyan)
-                ))
+                )
+            )
         requireActivity().window.statusBarColor =
             ContextCompat.getColor(requireContext(), R.color.darker_cyan)
     }
@@ -172,8 +185,7 @@ class HomeFragment : Fragment() {
         dodajNovi.id = "ACTION_ADD"
         dodajNovi.taskTekst = "Dodaj novi podsjetnik"
         taskRealm.writeBlocking { this.copyToRealm(dodajNovi, updatePolicy = UpdatePolicy.ALL) }
-        taskRealm.writeBlocking { this.copyToRealm(dodajNovi, updatePolicy = UpdatePolicy.ALL) }
-        val noteAdapter = tasks?.let { NoteAdapter(it) }
+        val noteAdapter = NoteAdapter(tasks)
         binding?.recyclerTask?.layoutManager = LinearLayoutManager(activity)
         binding?.recyclerTask?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
         binding?.recyclerTask?.adapter = noteAdapter
@@ -183,15 +195,22 @@ class HomeFragment : Fragment() {
         binding?.iksicaAd?.setOnClickListener {
             val appPackageName = "com.tstud.iksica"
             try {
-                val intent = requireActivity().packageManager.getLaunchIntentForPackage(appPackageName)
-                if (intent != null) { startActivity(intent) }
+                val intent =
+                    requireActivity().packageManager.getLaunchIntentForPackage(appPackageName)
+                if (intent != null) {
+                    startActivity(intent)
+                }
             } catch (anfe: Exception) {
                 try {
                     startActivity(
-                        Intent(Intent.ACTION_VIEW,Uri.parse("market://details?id=$appPackageName")))
+                        Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName"))
+                    )
                 } catch (ex: ActivityNotFoundException) {
                     startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName"))
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+                        )
                     )
                 }
             }
@@ -208,7 +227,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun showSnacOffline() {
-        snack = Snackbar.make(requireActivity().findViewById(R.id.coordinatorLayout), "Niste povezani", Snackbar.LENGTH_LONG)
+        snack = Snackbar.make(
+            requireActivity().findViewById(R.id.coordinatorLayout),
+            "Niste povezani",
+            Snackbar.LENGTH_LONG
+        )
         val vjuz = snack?.view
         vjuz?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
         snack?.show()
@@ -230,7 +253,8 @@ class HomeFragment : Fragment() {
             ?.setBackgroundDrawable(
                 ColorDrawable(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
             )
-        requireActivity().window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
+        requireActivity().window.statusBarColor =
+            ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
         if (mrealm != null) {
             mrealm?.close()
         }

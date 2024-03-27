@@ -11,14 +11,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.LeanTask
 import com.tstudioz.fax.fme.view.activities.NoteActivity
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter.NoteViewHolder
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmResults
+import okhttp3.internal.notifyAll
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -93,6 +93,7 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
             itemView.setOnLongClickListener(this)
             mRealm = Realm.open(dbManager.getDefaultConfiguration())
             point.setOnClickListener { view ->
+                val leanTask = mRealm.query<LeanTask>("id = $0",  mTasks[adapterPosition].id).first().find()
                 when (itemViewType) {
                     ADD_NEW -> {
                         val newIntent = Intent(view.context, NoteActivity::class.java)
@@ -104,16 +105,26 @@ class NoteAdapter(private val mTasks: RealmResults<LeanTask>) :
                         view.context.startActivity(newIntent)
                     }
 
-                    NOTE -> if (mTasks[adapterPosition]?.checked == true) {
+                    NOTE -> if (leanTask?.checked == true) {
                         taskText.paintFlags = 0
                         point.setImageResource(R.drawable.circle_white)
                         mRealm.writeBlocking {
-                            mTasks[adapterPosition]?.checked = false
+                            findLatest(mTasks[adapterPosition]).let {
+                                if (it != null) {
+                                    it.checked = false
+                                }
+                            }
                         }
                     } else {
                         point.setImageResource(R.drawable.circle_checked)
                         taskText.paintFlags = taskText.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                        mRealm.writeBlocking { mTasks[adapterPosition]?.checked = true }
+                        mRealm.writeBlocking {
+                            findLatest(mTasks[adapterPosition]).let {
+                                if (it != null) {
+                                    it.checked = true
+                                }
+                            }
+                        }
                     }
                 }
             }
