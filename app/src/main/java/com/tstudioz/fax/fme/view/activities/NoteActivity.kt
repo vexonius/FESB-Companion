@@ -9,11 +9,9 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.LeanTask
+import com.tstudioz.fax.fme.database.models.Note
 import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import org.koin.android.ext.android.inject
@@ -35,21 +33,21 @@ class NoteActivity : AppCompatActivity() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
         if (intent.extras?.getInt("mode") == 1) {
-            mTaskId = intent.extras?.getString("task_key")
+            mTaskId = intent.extras?.getString("note_key")
         }
 
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         if (mTaskId != null) {
-            val leanTask: LeanTask? = realm.query<LeanTask>("id = $0", mTaskId).first()?.find()
-            et?.setText(leanTask?.taskTekst)
+            val note: Note? = realm.query<Note>("id = $0", mTaskId).first()?.find()
+            et?.setText(note?.noteTekst)
         }
 
         saveNoteListener()
     }
 
     private fun saveNoteListener() {
-        val button : Button =  findViewById(R.id.saveButton)
+        val button: Button = findViewById(R.id.saveButton)
         button.setOnClickListener {
             finish()
         }
@@ -61,25 +59,29 @@ class NoteActivity : AppCompatActivity() {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
         val stringBiljeska = et?.text.toString().trim()
 
-        if (stringBiljeska.isEmpty()) {
-            return
-        }
-
         realm.writeBlocking {
-            if (mTaskId != null) {
-                val leanTask = this.query<LeanTask>("id = $0", mTaskId).first().find()
+            if (mTaskId != null && stringBiljeska.isNotEmpty()) {
+                val note = this.query<Note>("id = $0", mTaskId).first().find()
 
-                leanTask?.let {
-                    it.taskTekst = stringBiljeska
+                note?.let {
+                    it.noteTekst = stringBiljeska
                     it.checked = false
                     this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
                 }
-            } else {
-                val leanTask = LeanTask().apply {
-                    taskTekst = stringBiljeska
+            } else if (mTaskId != null && stringBiljeska.isEmpty()) {
+                findLatest(realm.query<Note>("id = $0", mTaskId).find().first()).let {
+                    if (it != null) {
+                        delete(it)
+                    }
+                }
+            } else if (stringBiljeska.isNotEmpty()) {
+                val note = Note().apply {
+                    noteTekst = stringBiljeska
                     checked = false
                 }
-                this.copyToRealm(leanTask, updatePolicy = UpdatePolicy.ALL)
+                this.copyToRealm(note, updatePolicy = UpdatePolicy.ALL)
+            } else {
+                // Do nothing
             }
         }
     }
@@ -93,14 +95,16 @@ class NoteActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.delete -> {
-                //et?.setText("22")
+                et?.setText("")
                 finish()
                 true
             }
+
             R.id.saveButton -> {
                 finish()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

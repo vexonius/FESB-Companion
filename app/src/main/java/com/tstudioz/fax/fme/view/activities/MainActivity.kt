@@ -281,7 +281,7 @@ class MainActivity : AppCompatActivity() {
         if (intent.action == "podsjetnik") {
             val newIntent = Intent(this@MainActivity, NoteActivity::class.java)
             newIntent.putExtra("mode", 2)
-            newIntent.putExtra("task_key", "")
+            newIntent.putExtra("note_key", "")
             startActivity(newIntent)
         } else {
             when (intent.action) {
