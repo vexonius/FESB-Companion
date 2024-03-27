@@ -23,10 +23,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
-import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
@@ -82,6 +80,7 @@ class MainActivity : AppCompatActivity() {
         getDate()
         setFragmentTabListener()
         testBottomBar()
+        checkUser()
 
         isThereAction()
 
@@ -97,8 +96,9 @@ class MainActivity : AppCompatActivity() {
             setDefaultScreen()
         }
     }
-    private fun onBack(){
-        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
+
+    private fun onBack() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }
@@ -109,19 +109,18 @@ class MainActivity : AppCompatActivity() {
         beginFragTransaction(R.id.tab_home)
     }
 
-    private fun setTableGotListener(){
+    private fun setTableGotListener() {
         mainViewModel.tableGotPerm.observe(this) { tableGot ->
-            if (tableGot){
+            if (tableGot) {
                 runOnUiThread {
                     homeFragment.showList()
-                    if (supportFragmentManager.findFragmentById(R.id.frame) is HomeFragment){
+                    if (supportFragmentManager.findFragmentById(R.id.frame) is HomeFragment) {
                         val text: TextView = findViewById(R.id.TimeRaspGot)
                         text.text = shPref.getString("timeGotcurrentrasp", "")
                         text.visibility = View.VISIBLE
                     }
                 }
-            }
-            else{
+            } else {
                 runOnUiThread {
                     homeFragment.showList()
                 }
@@ -135,26 +134,27 @@ class MainActivity : AppCompatActivity() {
         assert(shPref != null)
         editor = shPref?.edit()
 
-        if (realmLog != null) {
-            try {
-                korisnik = realmLog?.query<Korisnik>()?.find()?.first()
-            }
-            catch (ex: Exception) { ex.printStackTrace() }
-            finally {
-                if (korisnik != null) {
-                    editor?.putString("username", korisnik.username)
-                    editor?.putString("password", korisnik.password)
-                    editor?.commit()
-                    mojRaspored()
-                } else { invalidCreds() }
-                realmLog?.close()
-            }
-        } else {
+
+        try {
+            korisnik = realmLog?.query<Korisnik>()?.find()?.first()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
             editor?.putBoolean("logged_in", false)
             editor?.commit()
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+        } finally {
+            if (korisnik != null) {
+                editor?.putString("username", korisnik.username)
+                editor?.putString("password", korisnik.password)
+                editor?.commit()
+                mojRaspored()
+            } else {
+                invalidCreds()
+            }
+           // realmLog?.close()
         }
+
     }
 
     @SuppressLint("RestrictedApi")
@@ -168,9 +168,27 @@ class MainActivity : AppCompatActivity() {
     private fun testBottomBar() {
         val bar = binding?.bottomBar
 
-        bar?.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.attend), "Prisutnost", R.id.tab_prisutnost))
-        bar?.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.command_line), "Home", R.id.tab_home))
-        bar?.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.cal), "Raspored", R.id.tab_raspored))
+        bar?.addTab(
+            bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.attend),
+                "Prisutnost",
+                R.id.tab_prisutnost
+            )
+        )
+        bar?.addTab(
+            bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.command_line),
+                "Home",
+                R.id.tab_home
+            )
+        )
+        bar?.addTab(
+            bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.cal),
+                "Raspored",
+                R.id.tab_raspored
+            )
+        )
         bar?.selectTabById(R.id.tab_home, true)
     }
 
@@ -179,6 +197,7 @@ class MainActivity : AppCompatActivity() {
             override fun onTabSelected(lastIndex: Int, lastTab: Tab?, newIndex: Int, newTab: Tab) {
                 beginFragTransaction(newTab.id)
             }
+
             override fun onTabReselected(index: Int, tab: Tab) {}
         })
     }
@@ -187,14 +206,16 @@ class MainActivity : AppCompatActivity() {
         val ft = supportFragmentManager.beginTransaction()
         ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
         when (pos) {
-            R.id.tab_prisutnost-> {
+            R.id.tab_prisutnost -> {
                 supportActionBar?.title = "Prisutnost"
                 ft.replace(R.id.frame, prisutnostFragment)
             }
+
             R.id.tab_home -> {
                 supportActionBar?.title = "FESB Companion"
                 ft.replace(R.id.frame, homeFragment)
             }
+
             R.id.tab_raspored -> {
                 supportActionBar?.title = "Raspored"
                 ft.replace(R.id.frame, timeTableFragment)
@@ -223,7 +244,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun mojRaspored(){
+    private fun mojRaspored() {
         val user = shPref.getString("username", "")?.let { User(it, "") }
 
         val calendar = Calendar.getInstance()
@@ -232,13 +253,15 @@ class MainActivity : AppCompatActivity() {
         val dateandtime = dfandTime.format(calendar.time)
 
         calendar[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
-        val df: DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df: DateFormat = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault())
         val startdate = df.format(calendar.time)
 
         calendar.add(Calendar.DAY_OF_WEEK, Calendar.SATURDAY - Calendar.MONDAY)
         val enddate = df.format(calendar.time)
 
-        if (user != null) { mainViewModel.fetchUserTimetable(user, startdate, enddate) }
+        if (user != null) {
+            mainViewModel.fetchUserTimetable(user, startdate, enddate)
+        }
         editor = shPref.edit()
         editor?.putString("timeGotcurrentrasp", dateandtime)
         editor?.commit()
@@ -305,7 +328,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showChangelog() {
-        val view = LayoutInflater.from(this).inflate(R.layout.licence_view, null) as NestedScrollView
+        val view =
+            LayoutInflater.from(this).inflate(R.layout.licence_view, null) as NestedScrollView
         val wv = view.findViewById<View>(R.id.webvju) as WebView
 
         wv.loadUrl("file:///android_asset/changelog.html")
@@ -319,7 +343,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun shouldShowGDPRDialog() {
         val bool = shPref.getBoolean("GDPR_agreed", false)
-        if (bool==false) {
+        if (bool == false) {
             showGDPRCompliance()
             editor = shPref.edit()
             editor?.putBoolean("GDPR_agreed", true)
@@ -345,7 +369,8 @@ class MainActivity : AppCompatActivity() {
             try {
                 val builder = CustomTabsIntent.Builder()
                 val customTabsIntent =
-                    builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)).build()
+                    builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+                        .build()
                 customTabsIntent.launchUrl(
                     view.context, Uri.parse(
                         "http://tstud" + ".io/privacy"
@@ -353,7 +378,9 @@ class MainActivity : AppCompatActivity() {
                 )
             } catch (ex: Exception) {
                 Toast.makeText(
-                    view.context, "Ažurirajte Chrome preglednik za pregled " + "web stranice", Toast.LENGTH_SHORT
+                    view.context,
+                    "Ažurirajte Chrome preglednik za pregled " + "web stranice",
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         }
