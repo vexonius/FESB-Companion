@@ -26,10 +26,9 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: RealmResults<Predavanj
 
         val predavanja = mPredavanja[position]
 
-        if (predavanja?.predmetPredavanja != null && predavanja.predmetPredavanja?.isEmpty()==false && predavanja.predmetPredavanja?.contains(" ")==true) {
+        if (!predavanja?.predmetPredavanja.isNullOrEmpty()) {
             for (str in predavanja.predmetPredavanja!!.split(" ").toTypedArray())
                 compactImePredavanja.append(str[0])
-
             holder.tablename.text = compactImePredavanja.toString()
         } else {
             holder.tablename.text = predavanja?.predmetPredavanja ?: ""
