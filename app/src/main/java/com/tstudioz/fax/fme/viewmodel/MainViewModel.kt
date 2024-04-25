@@ -106,7 +106,7 @@ class MainViewModel(
                 tableGot.postValue("fetched")
                 delay(100)
                 tableGot.postValue("fetchedold")
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
                 tableGot.postValue("error")
             }
