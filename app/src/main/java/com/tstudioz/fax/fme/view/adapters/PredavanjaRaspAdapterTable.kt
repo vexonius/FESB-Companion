@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
@@ -31,32 +32,10 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: List<Predavanja>) :
 
         val predavanja = mPredavanja[position]
 
-        if (predavanja.predmetPredavanja != null
-            && predavanja.predmetPredavanja?.isEmpty() == false
-            && predavanja.predmetPredavanja?.contains(" ") == true
-        ) {
-            val predmetPredavanja = predavanja.predmetPredavanja?.split(" ")?.toTypedArray()
-            if (predmetPredavanja != null) {
-                for (str in predmetPredavanja)
-                    compactImePredavanja.append(str[0])
-            }
-            holder.tablename.text = compactImePredavanja.toString()
-        } else {
-            holder.tablename.text = predavanja.predmetPredavanja ?: ""
-        }
-        holder.tablename.text = compactImePredavanja.toString()
-        holder.tabletype.text = predavanja.rasponVremena ?: ""
-        holder.tablemjesto.text = predavanja.dvorana ?: ""
-
-        when (predavanja.predavanjeIme) {
-            "Predavanje" -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
-            "Auditorne vježbe" -> holder.tableboja.setBackgroundResource(R.color.green_nice)
-            "Kolokvij" -> holder.tableboja.setBackgroundResource(R.color.purple_nice)
-            "Laboratorijske vježbe" -> holder.tableboja.setBackgroundResource(R.color.red_nice)
-            "Konstrukcijske vježbe" -> holder.tableboja.setBackgroundResource(R.color.grey_nice)
-            "Seminar" -> holder.tableboja.setBackgroundResource(R.color.blue_nice)
-            "Ispit" -> holder.tableboja.setBackgroundResource(R.color.purple_dark)
-        }
+        holder.tablename.text = predavanja.getCompactTitle
+        holder.tabletype.text = predavanja.getTimeRange
+        holder.tablemjesto.text = predavanja.getHall
+        holder.tableboja.setBackgroundResource(predavanja.getBoja())
     }
 
     override fun getItemCount(): Int {
@@ -110,7 +89,7 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: List<Predavanja>) :
         imeGrupe = if (!imeGrupe.isNullOrEmpty()) {
             imeGrupe.substring(0, imeGrupe.length - 1)
         } else {
-            "Jedna grupa"
+            getString(context, R.string.default_group)
         }
         infoKolegij.text = predavanja.predmetPredavanja
         infoPredavanje.text = imePredavanja
@@ -119,15 +98,7 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: List<Predavanja>) :
         infoGrupa.text = imeGrupe
         infoLokacija.text = predavanja.dvorana
 
-        when (predavanja.predavanjeIme) {
-            "Predavanje" -> infoKolegij.setBackgroundResource(R.color.blue_nice)
-            "Auditorne vježbe" -> infoKolegij.setBackgroundResource(R.color.green_nice)
-            "Kolokvij" -> infoKolegij.setBackgroundResource(R.color.purple_nice)
-            "Laboratorijske vježbe" -> infoKolegij.setBackgroundResource(R.color.red_nice)
-            "Konstrukcijske vježbe" -> infoKolegij.setBackgroundResource(R.color.grey_nice)
-            "Seminar" -> infoKolegij.setBackgroundResource(R.color.blue_nice)
-            "Ispit" -> infoKolegij.setBackgroundResource(R.color.purple_dark)
-        }
+        infoKolegij.setBackgroundResource(predavanja.getBoja())
 
         dialog = BottomSheetDialog(context).apply {
             setCancelable(true)

@@ -47,8 +47,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var bold: Typeface? = null
     private var binding: TimetableTabBinding? = null
 
-    @OptIn(InternalCoroutinesApi::class)
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,12 +56,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         binding = TimetableTabBinding.inflate(inflater, container, false)
 
         requireActivity().runOnUiThread {
-            showDay("ponedjeljak", false)
-            showDay("utorak", false)
-            showDay("srijeda", false)
-            showDay("četvrtak", false)
-            showDay("petak", false)
-            showDay("subota", false)
+            showDays(false)
         }
         val min = Calendar.getInstance()
         val now = Calendar.getInstance()
@@ -122,7 +115,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val sYear = syear.format(kal.time)
 
         mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear)
-        val textdisp = "Raspored za $mDay.$mMonth - $sDay.$sMonth"
+        val textdisp = getString(R.string.Raspored_za) + "$mDay.$mMonth - $sDay.$sMonth"
         binding?.odaberiDan?.text = textdisp
     }
 
@@ -146,12 +139,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         mainViewModel.tableGot.observe(viewLifecycleOwner) { tableGot ->
             if (tableGot.equals("fetched", true)) {
                 requireActivity().runOnUiThread {
-                    showDay("ponedjeljak", true)
-                    showDay("utorak", true)
-                    showDay("srijeda", true)
-                    showDay("četvrtak", true)
-                    showDay("petak", true)
-                    showDay("subota", true)
+                    showDays(true)
                     updateTemporaryWeek(cal)
                 }
             } else if (tableGot.contains("error", true)) {
@@ -195,6 +183,15 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         binding?.mCet?.typeface = bold
         binding?.mPet?.typeface = bold
         binding?.mSub?.typeface = bold
+    }
+
+    private fun showDays(isTemp:Boolean){
+        showDay("ponedjeljak", isTemp)
+        showDay("utorak", isTemp)
+        showDay("srijeda", isTemp)
+        showDay("četvrtak", isTemp)
+        showDay("petak", isTemp)
+        showDay("subota", isTemp)
     }
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)

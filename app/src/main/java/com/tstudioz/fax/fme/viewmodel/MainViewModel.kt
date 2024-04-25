@@ -25,13 +25,10 @@ class MainViewModel(
 ) : ViewModel() {
 
     val tableGot: MutableLiveData<String> = MutableLiveData()
-
     var tableGotPerm = MutableLiveData<Boolean>()
-    val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
-
+    private val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
     private val _tempPredavanja: MutableLiveData<List<Predavanja>> = MutableLiveData(mutableListOf())
     val tempPredavanja : LiveData<List<Predavanja>> = _tempPredavanja
-
 
     private fun loginUser(user: User) {
         viewModelScope.launch(context = Dispatchers.IO) {

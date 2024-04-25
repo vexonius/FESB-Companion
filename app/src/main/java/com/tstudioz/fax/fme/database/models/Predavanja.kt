@@ -17,27 +17,53 @@ open class Predavanja : RealmObject {
     var brojSati: String? = null
     var grupa: String? = null
     var grupaShort: String? = null
+
     @FullText
     var detaljnoVrijeme: String? = null
     var dvorana: String? = null
     var boja: String? = null
 
+
+    fun getBoja(): Int {
+        return when (predavanjeIme) {
+            "Predavanje" -> R.color.blue_nice
+            "Auditorne vježbe" -> R.color.green_nice
+            "Kolokvij" -> R.color.purple_nice
+            "Laboratorijske vježbe" -> R.color.red_nice
+            "Konstrukcijske vježbe" -> R.color.grey_nice
+            "Seminar" -> R.color.blue_nice
+            "Ispit" -> R.color.purple_dark
+            else -> {
+                R.color.blue_nice
+            }
+        }
+    }
+
+
+    val getCompactTitle: String
+        get() {
+            val compactImePredavanja = StringBuilder()
+            if (predmetPredavanja != null
+                && predmetPredavanja?.isEmpty() == false
+                && predmetPredavanja?.contains(" ") == true
+            ) {
+                val predmetPredavanja = predmetPredavanja?.split(" ")?.toTypedArray()
+                if (predmetPredavanja != null) {
+                    for (str in predmetPredavanja)
+                        compactImePredavanja.append(str[0])
+                }
+                return compactImePredavanja.toString()
+            }
+            return predmetPredavanja ?: ""
+        }
+
     fun setPredavanjeVrsta(predavanjeVrsta: String?) {
         predavanjeIme = predavanjeVrsta
     }
 
-    fun setBoja(boja: String?): Int {
-        var bojaId = R.color.blue_nice
-  
-        when (boja) {
-            "predavanje" -> bojaId = R.color.blue_nice
-            "Auditorne" -> bojaId = R.color.green_nice
-            "Kolokviji" -> bojaId = R.color.purple_nice
-            "Laboratorijske vježbe" -> bojaId = R.color.red_nice
-            "Konstrukcijske vježbe" -> bojaId = R.color.grey_nice
-            "Ispiti" -> bojaId = R.color.purple_dark
-        }
+    val getTimeRange: String
+        get() = rasponVremena ?: ""
 
-        return bojaId
-    }
+    val getHall: String
+        get() = dvorana ?: ""
 }

@@ -45,4 +45,7 @@
     <string name="home">Home</string>
     <string name="raspored">Raspored</string>
 
+    <string name="default_group">Jedna grupa</string>
+    <string name="Raspored_za">Raspored za </string>
+
 </resources>
