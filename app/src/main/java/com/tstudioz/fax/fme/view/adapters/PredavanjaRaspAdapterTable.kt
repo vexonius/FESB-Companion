@@ -32,10 +32,12 @@ class PredavanjaRaspAdapterTable(private var mPredavanja: List<Predavanja>) :
 
         val predavanja = mPredavanja[position]
 
+
         holder.tablename.text = predavanja.getCompactTitle
         holder.tabletype.text = predavanja.getTimeRange
         holder.tablemjesto.text = predavanja.getHall
         holder.tableboja.setBackgroundResource(predavanja.getBoja())
+
     }
 
     override fun getItemCount(): Int {

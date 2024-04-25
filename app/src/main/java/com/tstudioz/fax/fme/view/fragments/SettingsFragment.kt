@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.view.fragments
 
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -14,7 +13,6 @@ import android.webkit.CookieManager
 import android.webkit.CookieSyncManager
 import android.webkit.WebView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
@@ -26,89 +24,55 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
+import com.tstudioz.fax.fme.feature.login.view.LoginViewModel
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.models.util.SPKey
 import io.realm.kotlin.Realm
+import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
 
+@OptIn(InternalCoroutinesApi::class)
 class SettingsFragment : PreferenceFragmentCompat() {
-    private var rlmLog: Realm? = null
-    private val alertDialog: AlertDialog? = null
+    private var realm: Realm? = null
     private var btmDialog: BottomSheetDialog? = null
     private var korisnik: String? = null
-    private var mySPrefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
-
     private val dbManager: DatabaseManagerInterface by inject()
+    private val loginViewModel: LoginViewModel by viewModel<LoginViewModel>()
+    private val sharedPreferences: SharedPreferences by inject()
 
-    /*private val modeChangeListener = object : Preference.OnPreferenceChangeListener {
-        override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
-            rlmLog = Realm.getDefaultInstance()
-            newValue as? Boolean
 
-            Log.i("newValue", newValue.toString())
-            updateTheme(AppCompatDelegate.MODE_NIGHT_NO)
-            when (newValue) {
-                true -> {
-                    updateTheme(R.style.AppTheme)
-                }
-                false -> {
-                    //updateTheme(R.style.AppTheme_Custom)
-                }
-                else -> {
-                    if (BuildCompat.isAtLeastQ()) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                    } else {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
-                    }
-                }
-            }
-            return true
-        }
-    }
-    private fun updateTheme(nightMode: Int): Boolean {
-        editor = mySPrefs?.edit()
-        editor?.putString("Theme_mode", nightMode.toString())
-        editor?.apply()
-        if(editor !=null)
-            editor?.commit()
-        requireActivity().setTheme(nightMode)
-        requireActivity().recreate()
-        return true
-    }*/
+    @OptIn(InternalCoroutinesApi::class)
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.app_prefrences)
-        mySPrefs = requireActivity().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE)
-
-
-
-        //val preference = findPreference<Preference>("amoled_theme")
-        //preference?.onPreferenceChangeListener = modeChangeListener
 
         val prefLogOut = findPreference("logout") as Preference?
         try {
-            korisnik = mySPrefs?.getString("username", "")
+            korisnik = sharedPreferences.getString("username", "")
         } catch (e: Exception) {
-            e.message?.let { Log.e("settings exp", it )}
+            e.message?.let { Log.e("settings exp", it) }
         }
         prefLogOut?.summary = "Prijavljeni ste kao $korisnik"
         prefLogOut?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            userLogOut()
+            deleteRealmAndShpref()
             deleteWebViewCookies()
             goToLoginScreen()
             true
         }
         val weatherUnits = findPreference<Preference>("units") as CheckBoxPreference?
         weatherUnits?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            editor = mySPrefs?.edit()
-            if (weatherUnits != null && weatherUnits.isChecked) {
-                editor?.putString("weather_units", "&units=ca")
-                editor?.apply()
-            } else {
-                editor?.putString("weather_units", "&units=us")
-                editor?.apply()
-            }
-            if(editor !=null)
-                editor?.commit()
+            editor = sharedPreferences.edit()
+            val units =
+                if (weatherUnits?.isChecked == true) { //ovo ne radi nista, ne primjeni se na weather fragment
+                    "&units=us"
+                } else {
+                    "&units=ca"
+                }
+            editor?.putString("weather_units", units)
+            editor?.apply()
+            editor?.commit()
             true
         }
         val prefFeedback = findPreference("feedback") as Preference?
@@ -174,17 +138,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun userLogOut() {
-        editor = mySPrefs?.edit()
-        editor?.putBoolean("logged_in", false)
-        editor?.apply()
-
-        rlmLog = Realm.open(dbManager.getDefaultConfiguration())
+    private fun deleteRealmAndShpref() {
+        sharedPreferences[SPKey.LOGGED_IN] = false
+        realm = Realm.open(dbManager.getDefaultConfiguration())
 
         try {
-            rlmLog?.writeBlocking { this.deleteAll() }
+            realm?.writeBlocking { this.deleteAll() }
         } finally {
-            rlmLog?.close()
+            realm?.close()
         }
     }
 
@@ -206,6 +167,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun goToLoginScreen() {
         val nazadNaLogin = Intent(activity, LoginActivity::class.java)
         startActivity(nazadNaLogin)
+        activity?.finish()
     }
 
     private val buildVersion: String
@@ -239,10 +201,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun mvpDialog() {
-        val view = LayoutInflater.from(activity).inflate(R.layout.licence_view, null) as NestedScrollView
+        val view =
+            LayoutInflater.from(activity).inflate(R.layout.licence_view, null) as NestedScrollView
         val wv = view.findViewById<View>(R.id.webvju) as WebView
         wv.loadUrl("file:///android_asset/mvp.html")
-        btmDialog = activity?.let { BottomSheetDialog(it)}
+        btmDialog = activity?.let { BottomSheetDialog(it) }
         btmDialog?.setCancelable(true)
         btmDialog?.setContentView(view)
         btmDialog?.setCanceledOnTouchOutside(true)
@@ -251,7 +214,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun sendFeedMail(title: String, body: String?) {
         val version = buildVersion
-        activity?.let { ShareCompat.IntentBuilder.from(it)}
+        activity?.let { ShareCompat.IntentBuilder.from(it) }
             ?.setType("message/rfc822")
             ?.addEmailTo("info@tstud.io")
             ?.setSubject("$title v$version")

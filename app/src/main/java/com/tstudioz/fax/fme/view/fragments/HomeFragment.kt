@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.LeanTask
+import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.databinding.HomeTabBinding
 import com.tstudioz.fax.fme.random.NetworkUtils
@@ -32,6 +32,8 @@ import com.tstudioz.fax.fme.viewmodel.HomeViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.json.JSONException
@@ -50,7 +52,8 @@ class HomeFragment : Fragment() {
     private val shPref: SharedPreferences by inject()
 
     private var binding: HomeTabBinding? = null
-    private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
+    private val forecastUrl =
+        "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
     private var mrealm: Realm? = null
     private var date: String? = null
@@ -148,12 +151,14 @@ class HomeFragment : Fragment() {
         } catch (e: Exception) {
             alertUserAboutError()
         }
+
     }
 
     fun showList() {
         mrealm = Realm.open(dbManager.getDefaultConfiguration())
         val rezultati = date?.let {
             mrealm?.query<Predavanja>("detaljnoVrijeme CONTAINS $0", it)?.find()
+
         }
         if (rezultati != null && rezultati.isEmpty()) {
             binding?.rv?.visibility = View.INVISIBLE
@@ -180,16 +185,23 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadNotes() {
-        val taskRealm = Realm.open(dbManager.getDefaultConfiguration())
-        val tasks = taskRealm.query<LeanTask>().find()
-        val dodajNovi = LeanTask()
-        dodajNovi.id = "ACTION_ADD"
-        dodajNovi.taskTekst = "Dodaj novi podsjetnik"
-        taskRealm.writeBlocking { this.copyToRealm(dodajNovi, updatePolicy = UpdatePolicy.ALL) }
-        val noteAdapter = NoteAdapter(tasks)
-        binding?.recyclerTask?.layoutManager = LinearLayoutManager(activity)
-        binding?.recyclerTask?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
-        binding?.recyclerTask?.adapter = noteAdapter
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
+        val notes = realm.query<Note>().find()
+        val addNew = Note()
+        addNew.id = "ACTION_ADD"
+        addNew.noteTekst = "Dodaj novi podsjetnik"
+        realm.writeBlocking { this.copyToRealm(addNew, updatePolicy = UpdatePolicy.ALL) }
+        binding?.recyclerNote?.layoutManager = LinearLayoutManager(activity)
+        binding?.recyclerNote?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
+
+        CoroutineScope(Dispatchers.Default).launch {
+            notes.asFlow().collect { changes ->
+                activity?.runOnUiThread {
+                    val noteAdapter = NoteAdapter(changes.list)
+                    binding?.recyclerNote?.adapter = noteAdapter
+                }
+            }
+        }
     }
 
     private fun loadIksicaAd() {
@@ -197,8 +209,11 @@ class HomeFragment : Fragment() {
             val appPackageName = "com.tstud.iksica"
             try {
                 val intent =
-                    requireActivity().packageManager.getLaunchIntentForPackage(appPackageName)            // needs fixing
-                startActivity(intent!!)
+                    requireActivity().packageManager.getLaunchIntentForPackage(appPackageName)
+                if (intent != null) {
+                    startActivity(intent)
+                }
+
             } catch (anfe: Exception) {
                 try {
                     startActivity(
