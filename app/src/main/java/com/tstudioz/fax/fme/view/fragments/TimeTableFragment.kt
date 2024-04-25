@@ -115,7 +115,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val sYear = syear.format(kal.time)
 
         mojRaspored(kal, mMonth, mDay, mYear, sMonth, sDay, sYear)
-        val textdisp = getString(R.string.Raspored_za) + "$mDay.$mMonth - $sDay.$sMonth"
+        val textdisp = getString(R.string.Raspored_za) + " $mDay.$mMonth - $sDay.$sMonth"
         binding?.odaberiDan?.text = textdisp
     }
 
