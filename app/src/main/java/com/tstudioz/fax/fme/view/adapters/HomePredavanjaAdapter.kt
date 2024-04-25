@@ -28,30 +28,16 @@ class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanj
 
     override fun onBindViewHolder(holder: HomePredavanjaViewHolder, position: Int) {
         val predavanja = mPredavanjaDanas[position]
-        holder.name.text = predavanja?.predmetPredavanja
+        holder.name.text = predavanja.predmetPredavanja
         holder.name.typeface = regulartf
-        holder.type.text = predavanja?.rasponVremena
-        var imePredavanja = predavanja?.predavanjeIme
+        holder.type.text = predavanja.rasponVremena
+        var imePredavanja = predavanja.predavanjeIme
         if (!imePredavanja.isNullOrEmpty()) imePredavanja =
             imePredavanja.substring(0, imePredavanja.length)
         holder.vrstaPredavanja.text = imePredavanja
-        holder.mjesto.text = predavanja?.dvorana
-        when (predavanja?.predavanjeIme) {
-            "Predavanje" -> holder.boja.setBackgroundResource(R.color.blue_nice)
-            "Auditorne vježbe" -> holder.boja.setBackgroundResource(R.color.green_nice)
-            "Kolokvij" -> holder.boja.setBackgroundResource(R.color.purple_nice)
-            "Laboratorijske vježbe" -> holder.boja.setBackgroundResource(R.color.red_nice)
-            "Konstrukcijske vježbe" -> holder.boja.setBackgroundResource(R.color.grey_nice)
-            "Seminar" -> holder.boja.setBackgroundResource(R.color.blue_nice)
-            "Ispit" -> holder.boja.setBackgroundResource(R.color.purple_dark)
-            "Predavanja," -> holder.boja.setBackgroundResource(R.color.blue_nice)
-            "Auditorne vježbe," -> holder.boja.setBackgroundResource(R.color.green_nice)
-            "Kolokviji," -> holder.boja.setBackgroundResource(R.color.purple_nice)
-            "Laboratorijske vježbe," -> holder.boja.setBackgroundResource(R.color.red_nice)
-            "Konstrukcijske vježbe," -> holder.boja.setBackgroundResource(R.color.grey_nice)
-            "Seminar," -> holder.boja.setBackgroundResource(R.color.blue_nice)
-            "Ispiti," -> holder.boja.setBackgroundResource(R.color.purple_dark)
-        }
+        holder.mjesto.text = predavanja.dvorana
+
+        holder.boja.setBackgroundResource(predavanja.getBoja())
     }
 
     override fun getItemCount(): Int {

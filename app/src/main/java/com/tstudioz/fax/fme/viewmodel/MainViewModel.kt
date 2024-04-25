@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,12 +9,11 @@ import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
-import com.tstudioz.fax.fme.models.data.AttendanceRepository
-import com.tstudioz.fax.fme.models.data.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -24,10 +24,11 @@ class MainViewModel(
     private val timeTableRepository: TimeTableRepositoryInterface
 ) : ViewModel() {
 
-    val tableGot: MutableLiveData<Boolean> = MutableLiveData()
-
+    val tableGot: MutableLiveData<String> = MutableLiveData()
     var tableGotPerm = MutableLiveData<Boolean>()
-    val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
+    private val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
+    private val _tempPredavanja: MutableLiveData<List<Predavanja>> = MutableLiveData(mutableListOf())
+    val tempPredavanja : LiveData<List<Predavanja>> = _tempPredavanja
 
     private fun loginUser(user: User) {
         viewModelScope.launch(context = Dispatchers.IO) {
@@ -80,7 +81,7 @@ class MainViewModel(
     fun fetchUserTimetableTemp(user: User, startDate: String, endDate: String){
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                val svaFreshPredavanja = mutableListOf<Predavanja>()
+                val tempList = mutableListOf<Predavanja>()
                 println("started Fetching Timetable for user")
                 val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 list.forEach { println(it.name) }
@@ -97,13 +98,17 @@ class MainViewModel(
                     predavanja.detaljnoVrijeme = l.detailDateWithDayName
                     predavanja.profesor = l.professor
 
-                    svaFreshPredavanja.add(predavanja)
+                    tempList.add(predavanja)
                 }
                 // Removed saving temp classes to db as it should be retained in viewmodel only
-                tableGot.postValue(true)
+
+                _tempPredavanja.postValue(tempList)
+                tableGot.postValue("fetched")
+                delay(100)
+                tableGot.postValue("fetchedold")
             } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
-                tableGot.postValue(false)
+                tableGot.postValue("error")
             }
         }
     }

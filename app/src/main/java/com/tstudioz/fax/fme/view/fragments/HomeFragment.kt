@@ -90,7 +90,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setLastRaspGot() {
-        binding?.TimeRaspGot?.text = shPref?.getString("timeGotcurrentrasp", "") ?: ""
+        binding?.TimeRaspGot?.text = shPref.getString("timeGotcurrentrasp", "") ?: ""
         binding?.TimeRaspGot?.visibility = View.VISIBLE
     }
 
@@ -117,43 +117,48 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateDisplay() {
-        val current = homeViewModel.mForecast?.current
-        val pTemperatura = current?.temperature.toString() + "°"
-        val pHumidity = current?.humidity.toString() + " %"
-        val pWind = current?.wind.toString() + " km/h"
-        val pPrecip = current?.precipChance.toString() + " mm"
-        val pSummary = getString(
-            resources.getIdentifier(
-                current?.summary,
-                "string",
-                requireContext().packageName
+        try {
+            val current = homeViewModel.mForecast?.current
+            val pTemperatura = current?.temperature.toString() + "°"
+            val pHumidity = current?.humidity.toString() + " %"
+            val pWind = current?.wind.toString() + " km/h"
+            val pPrecip = current?.precipChance.toString() + " mm"
+            val pSummary = try {
+                getString(
+                    resources.getIdentifier(
+                        current?.summary,
+                        "string",
+                        requireContext().packageName
+                    )
+                )
+            } catch (e: Exception) {
+                null
+            } ?: current?.summary
+            binding?.temperaturaVrijednost?.text = pTemperatura
+            binding?.vlaznostVrijednost?.text = pHumidity
+            binding?.oborineVrijednost?.text = pPrecip
+            binding?.trenutniVjetar?.text = pWind
+            binding?.opis?.text = pSummary
+            binding?.shimmerWeather?.visibility = View.GONE
+            binding?.cardHome?.visibility = View.VISIBLE
+            val drawable = ResourcesCompat.getDrawable(
+                resources,
+                resources.getIdentifier(current?.icon, "drawable", requireContext().packageName),
+                null
             )
-        )
-        binding?.temperaturaVrijednost?.text = pTemperatura
-        binding?.vlaznostVrijednost?.text = pHumidity
-        binding?.oborineVrijednost?.text = pPrecip
-        binding?.trenutniVjetar?.text = pWind
-        binding?.opis?.text = pSummary
-        binding?.shimmerWeather?.visibility = View.GONE
-        binding?.cardHome?.visibility = View.VISIBLE
-        val drawable = ResourcesCompat.getDrawable(
-            resources,
-            resources.getIdentifier(current?.icon, "drawable", requireContext().packageName),
-            null
-        )
 
-        binding?.vrijemeImage?.setImageDrawable(drawable)
+            binding?.vrijemeImage?.setImageDrawable(drawable)
+        } catch (e: Exception) {
+            alertUserAboutError()
+        }
+
     }
 
     fun showList() {
         mrealm = Realm.open(dbManager.getDefaultConfiguration())
-        mrealm = Realm.open(dbManager.getDefaultConfiguration())
-        val rezultati =
-            date?.let {
-                mrealm?.query<Predavanja>("detaljnoVrijeme LIKE $0", it)?.find()
-            }
-        date?.let {
-            mrealm?.query<Predavanja>("detaljnoVrijeme LIKE $0", it)?.find()
+        val rezultati = date?.let {
+            mrealm?.query<Predavanja>("detaljnoVrijeme CONTAINS $0", it)?.find()
+
         }
         if (rezultati != null && rezultati.isEmpty()) {
             binding?.rv?.visibility = View.INVISIBLE
@@ -200,7 +205,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadIksicaAd() {
-        binding?.iksicaAd?.setOnClickListener {
+        /*binding?.iksicaAd?.setOnClickListener {
             val appPackageName = "com.tstud.iksica"
             try {
                 val intent =
@@ -208,6 +213,7 @@ class HomeFragment : Fragment() {
                 if (intent != null) {
                     startActivity(intent)
                 }
+
             } catch (anfe: Exception) {
                 try {
                     startActivity(
@@ -222,7 +228,7 @@ class HomeFragment : Fragment() {
                     )
                 }
             }
-        }
+        }*/
     }
 
     private fun loadMenzaView() {
