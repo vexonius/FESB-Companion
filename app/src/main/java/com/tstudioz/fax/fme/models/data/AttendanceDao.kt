@@ -11,7 +11,7 @@ class AttendanceDao(private val dbManager: DatabaseManagerInterface) : Attendanc
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         realm.write {
-            this.deleteAll()
+            delete(Dolazak::class)
             attendance.forEach {
                 this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
             }

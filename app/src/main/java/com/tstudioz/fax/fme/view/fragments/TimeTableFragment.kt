@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -55,9 +56,6 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
         binding = TimetableTabBinding.inflate(inflater, container, false)
 
-        requireActivity().runOnUiThread {
-            showDays(false)
-        }
         val min = Calendar.getInstance()
         val now = Calendar.getInstance()
         val max = Calendar.getInstance()
@@ -74,12 +72,15 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             .setThemeDark(true)
             .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
             .setHeaderColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-        checkNetwork()
         binding?.odaberiDan?.setOnClickListener {
             builder.build().show(requireFragmentManager(), ContentValues.TAG)
         }
         setSetDates(now)
         boldOut()
+        requireActivity().runOnUiThread {
+            showDays(false)
+        }
+        checkNetwork()
 
         return binding?.root
     }
@@ -185,31 +186,30 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         binding?.mSub?.typeface = bold
     }
 
-    private fun showDays(isTemp:Boolean){
-        showDay("ponedjeljak", isTemp)
-        showDay("utorak", isTemp)
-        showDay("srijeda", isTemp)
-        showDay("četvrtak", isTemp)
-        showDay("petak", isTemp)
-        showDay("subota", isTemp)
+    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    private fun showDays(isTemp: Boolean) {
+        val predavanja = if (!isTemp) {
+            mainViewModel.permPredavanja.value
+        } else {
+            mainViewModel.tempPredavanja.value
+        }
+        if (predavanja != null) {
+            showDay("ponedjeljak", isTemp, predavanja)
+            showDay("utorak", isTemp, predavanja)
+            showDay("srijeda", isTemp, predavanja)
+            showDay("četvrtak", isTemp, predavanja)
+            showDay("petak", isTemp, predavanja)
+            showDay("subota", isTemp, predavanja)
+        }
     }
 
-    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-    private fun showDay(day: String, isTemp: Boolean) {
-        val rezulatiDay = if (!isTemp) {
-            realm = Realm.open(dbManager.getDefaultConfiguration())
-            realm?.query<Predavanja>("detaljnoVrijeme TEXT $0", "$day*")?.find()?.toList()
-        } else {
-            mainViewModel.tempPredavanja.value?.filter {
-                it.detaljnoVrijeme?.contains(
-                    day,
-                    true
-                ) == true
-            }
+    private fun showDay(day: String, isTemp: Boolean, predavanja: List<Predavanja>) {
+        val rezulatiDay: List<Predavanja> = predavanja.filter {
+            it.detaljnoVrijeme?.contains(day, true) == true
         }
 
-        val adapter = rezulatiDay?.let { PredavanjaRaspAdapterTable(it) }
-        if (adapter != null && isTemp) {
+        val adapter = PredavanjaRaspAdapterTable(rezulatiDay)
+        if (isTemp) {
             adapteriTemp.add(adapter)
             numberOfPredavanjaPerDay.add(adapter.itemCount)
         }
@@ -223,16 +223,14 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             else -> binding?.recyclerPet
         }
         if (day.equals("subota", ignoreCase = true)) {
-            if (rezulatiDay?.isEmpty() == true) {
+            if (rezulatiDay.isEmpty()) {
                 binding?.linearSub?.visibility = View.GONE
                 binding?.linearParent?.weightSum = 5f
             } else {
                 binding?.linearSub?.visibility = View.VISIBLE
                 binding?.linearParent?.weightSum = 6f
                 bindDay?.layoutManager = LinearLayoutManager(activity)
-                if (!isTemp) {
-                    bindDay?.setHasFixedSize(true)
-                }
+                if (!isTemp) { bindDay?.setHasFixedSize(true) }
                 bindDay?.adapter = adapter
             }
         } else {
@@ -273,9 +271,9 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private fun showSnacOffline() {
         snack = Snackbar.make(
             requireActivity().findViewById(R.id.coordinatorLayout), """
-     Niste povezani.
-     Prikazuje se raspored ovog tjedna.
-     """.trimIndent(), Snackbar.LENGTH_INDEFINITE
+             Niste povezani.
+             Prikazuje se raspored ovog tjedna.
+             """.trimIndent(), Snackbar.LENGTH_INDEFINITE
         )
         val vjuz = snack?.view
         vjuz?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))

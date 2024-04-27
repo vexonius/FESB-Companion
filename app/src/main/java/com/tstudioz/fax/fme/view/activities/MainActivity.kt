@@ -30,6 +30,8 @@ import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
@@ -38,6 +40,7 @@ import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.exceptions.RealmException
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.types.TypedRealmObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
@@ -131,16 +134,14 @@ class MainActivity : AppCompatActivity() {
     private fun checkUser() {
         var korisnik: Korisnik? = null
         realmLog = Realm.open(dbManager.getDefaultConfiguration())
-        assert(shPref != null)
-        editor = shPref?.edit()
-
+        editor = shPref.edit()
 
         try {
             korisnik = realmLog?.query<Korisnik>()?.find()?.first()
         } catch (ex: Exception) {
             ex.printStackTrace()
-            editor?.putBoolean("logged_in", false)
-            editor?.commit()
+            shPref[SPKey.LOGGED_IN] = false
+            val logged_in = shPref.getBoolean(SPKey.LOGGED_IN.name, true)
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this@MainActivity, LoginActivity::class.java))
         } finally {
@@ -152,9 +153,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 invalidCreds()
             }
-           // realmLog?.close()
+            realmLog?.close()
         }
-
     }
 
     @SuppressLint("RestrictedApi")
@@ -246,14 +246,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun mojRaspored() {
         val user = shPref.getString("username", "")?.let { User(it, "") }
+        val dfandTime: DateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
+        val df: DateFormat = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault())
 
         val calendar = Calendar.getInstance()
 
-        val dfandTime: DateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
         val dateandtime = dfandTime.format(calendar.time)
 
         calendar[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
-        val df: DateFormat = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault())
         val startdate = df.format(calendar.time)
 
         calendar.add(Calendar.DAY_OF_WEEK, Calendar.SATURDAY - Calendar.MONDAY)

@@ -6,10 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.models.Predavanja
-import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
 import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.models.data.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -26,49 +26,39 @@ class MainViewModel(
 
     val tableGot: MutableLiveData<String> = MutableLiveData()
     var tableGotPerm = MutableLiveData<Boolean>()
-    private val svaFreshPredavanjaLive = MutableLiveData(mutableListOf<Predavanja>())
-    private val _tempPredavanja: MutableLiveData<List<Predavanja>> = MutableLiveData(mutableListOf())
-    val tempPredavanja : LiveData<List<Predavanja>> = _tempPredavanja
+    private val _permPredavanja: MutableLiveData<List<Predavanja>> = MutableLiveData(listOf())
+    val permPredavanja: LiveData<List<Predavanja>> = _permPredavanja
+    private val _tempPredavanja: MutableLiveData<List<Predavanja>> = MutableLiveData(listOf())
+    val tempPredavanja: LiveData<List<Predavanja>> = _tempPredavanja
 
-    private fun loginUser(user: User) {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            when (val result = userRepository.attemptLogin(user.username, user.password)) {
-                is UserRepositoryResult.LoginResult.Success -> {
-
-                }
-                is UserRepositoryResult.LoginResult.Failure -> {
-
-                }
-            }
-        }
-    }
-
-    fun fetchUserTimetable(user: User, startDate: String, endDate: String){
+    fun fetchUserTimetable(user: User, startDate: String, endDate: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            try{
+            try {
                 println("started Fetching Timetable for user")
                 val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 val svaFreshPredavanja = mutableListOf<Predavanja>()
                 list.forEach { println(it.name) }
-                    for (l in list) {
-                        val predavanja = Predavanja()
-                        predavanja.objectId = l.id
-                        predavanja.id = l.id.toString()
-                        predavanja.predavanjeIme = l.eventType.type
-                        predavanja.predmetPredavanja = l.name
-                        predavanja.rasponVremena = l.timeSpan
-                        predavanja.grupa = l.group
-                        predavanja.grupaShort = l.group
-                        predavanja.dvorana = l.room
-                        predavanja.detaljnoVrijeme = l.detailDateWithDayName
-                        predavanja.profesor = l.professor
-                        val str = "${predavanja.id}${predavanja.predavanjeIme}${predavanja.predmetPredavanja}${predavanja.rasponVremena}${predavanja.grupa}${predavanja.dvorana}${predavanja.detaljnoVrijeme}${predavanja.profesor}"
-                        val id = UUID.nameUUIDFromBytes(str.toByteArray())
-                        predavanja.id = id.toString()
+                for (l in list) {
+                    val predavanja = Predavanja()
+                    predavanja.objectId = l.id
+                    predavanja.id = l.id.toString()
+                    predavanja.predavanjeIme = l.eventType.type
+                    predavanja.predmetPredavanja = l.name
+                    predavanja.rasponVremena = l.timeSpan
+                    predavanja.grupa = l.group
+                    predavanja.grupaShort = l.group
+                    predavanja.dvorana = l.room
+                    predavanja.detaljnoVrijeme = l.detailDateWithDayName
+                    predavanja.profesor = l.professor
+                    val str = "${predavanja.id}${predavanja.predavanjeIme}${predavanja.predmetPredavanja}" +
+                            "${predavanja.rasponVremena}${predavanja.grupa}${predavanja.dvorana}${predavanja.detaljnoVrijeme}${predavanja.profesor}"
+                    val id = UUID.nameUUIDFromBytes(str.toByteArray())
+                    predavanja.id = id.toString()
 
-                        svaFreshPredavanja.add(predavanja)
-                    }
-                svaFreshPredavanjaLive.postValue(svaFreshPredavanja)
+                    svaFreshPredavanja.add(predavanja)
+                }
+                _permPredavanja.postValue(svaFreshPredavanja.toList())
+                Log.d("MainViewModel", permPredavanja.value.toString())
                 insertOrUpdateTimeTable(svaFreshPredavanja)
                 tableGotPerm.postValue(true)
             } catch (e: Exception) {
@@ -78,9 +68,9 @@ class MainViewModel(
         }
     }
 
-    fun fetchUserTimetableTemp(user: User, startDate: String, endDate: String){
+    fun fetchUserTimetableTemp(user: User, startDate: String, endDate: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            try{
+            try {
                 val tempList = mutableListOf<Predavanja>()
                 println("started Fetching Timetable for user")
                 val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)

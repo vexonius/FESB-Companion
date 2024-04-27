@@ -33,10 +33,10 @@ class LoginViewModel(
     var password = MutableLiveData("")
 
     fun tryUserLogin() {
-        val username = username.value!!
-        val password = password.value!!
+        val username = username.value
+        val password = password.value
 
-        if (username.isEmpty() || password.isEmpty()) {
+        if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
             errorMessage.postValue("Niste unijeli korisničke podatke")
             return
         }
