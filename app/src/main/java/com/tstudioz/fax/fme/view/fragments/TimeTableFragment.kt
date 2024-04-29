@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.HomeCompose
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.databinding.TimetableTabBinding
@@ -28,12 +30,13 @@ import io.realm.kotlin.ext.query
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
+class TimeTableFragment : Fragment()/*, DatePickerDialog.OnDateSetListener*/ {
 
     private val dbManager: DatabaseManagerInterface by inject()
 
@@ -48,6 +51,7 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var bold: Typeface? = null
     private var binding: TimetableTabBinding? = null
 
+    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,8 +59,18 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         setHasOptionsMenu(true)
 
         binding = TimetableTabBinding.inflate(inflater, container, false)
+        val composeView = binding?.composeView!!
 
-        val min = Calendar.getInstance()
+        mainViewModel.lessons.observe(viewLifecycleOwner) {it ->
+            it.forEach(::println)
+            if (it.isNotEmpty()){
+                composeView.setContent {
+                    HomeCompose()
+                }
+            }
+        }
+
+        /*val min = Calendar.getInstance()
         val now = Calendar.getInstance()
         val max = Calendar.getInstance()
         max.add(Calendar.YEAR, 10)
@@ -80,12 +94,12 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         requireActivity().runOnUiThread {
             showDays(false)
         }
-        checkNetwork()
+        checkNetwork()*/
 
         return binding?.root
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
+    /*override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.refresMe).isVisible = true
         super.onPrepareOptionsMenu(menu)
     }
@@ -188,10 +202,12 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private fun showDays(isTemp: Boolean) {
+        val mainViewModelTest: MainViewModel by viewModel()
+
         val predavanja = if (!isTemp) {
-            mainViewModel.permPredavanja.value
+            mainViewModelTest.permPredavanja.value
         } else {
-            mainViewModel.tempPredavanja.value
+            mainViewModelTest.tempPredavanja.value
         }
         if (predavanja != null) {
             showDay("ponedjeljak", isTemp, predavanja)
@@ -307,5 +323,5 @@ class TimeTableFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         if (realm != null) {
             realm?.close()
         }
-    }
+    }*/
 }

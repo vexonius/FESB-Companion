@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
     private val prisutnostFragment = PrisutnostFragment()
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
-    private val mainViewModel: MainViewModel by viewModel()
+    private val mainViewModel: MainViewModel by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

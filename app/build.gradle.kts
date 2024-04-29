@@ -10,7 +10,7 @@ android {
     defaultConfig {
         multiDexEnabled = true
         applicationId = "com.tstudioz.fax.fme"
-        minSdk = 21
+        minSdk = 26
         targetSdk = 34
         versionCode = 21
         versionName = "2.3.0 build #2307"
@@ -42,11 +42,17 @@ android {
     }
     buildFeatures {
         buildConfig = true
+        compose=true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.9"
     }
 }
 
 dependencies {
 
+    implementation("androidx.compose.material3:material3-android:1.2.1")
     val koinVersion = "2.1.4"
     implementation("org.koin:koin-android:$koinVersion")
     implementation("org.koin:koin-android-scope:$koinVersion")
@@ -89,6 +95,27 @@ dependencies {
 
     implementation("io.realm.kotlin:library-base:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+    // Android Studio Preview support
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // UI Tests
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    //compose livedata state
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.6")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    //EncryptedSharedPreferences
+    implementation("androidx.security:security-crypto:1.0.0")
+
+    //pull to refresh compose
+    implementation("androidx.compose.material:material:1.6.6")
+
+    implementation("androidx.compose.ui:ui-android:1.6.6")
 }
 
 configurations.all {
