@@ -1,7 +1,5 @@
 package com.tstudioz.fax.fme.compose
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -44,12 +42,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.viewmodel.MainViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.java.KoinJavaComponent
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -76,9 +80,11 @@ data class PositionedEvent(
     val colSpan: Int = 1,
     val colTotal: Int = 1,
 )
+
 val EventTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 val EventTimeFormatter2: DateTimeFormatter = DateTimeFormatter.ofPattern("HH")
 
+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
 fun BasicEvent(
     positionedEvent: PositionedEvent,
@@ -110,8 +116,8 @@ fun BasicEvent(
             )
             .padding(4.dp)
             .clickable { ////refactor this, homeviewmodel inited too many times
-                /*val homeViewModel: HomeViewModel by KoinJavaComponent.inject(HomeViewModel::class.java)
-                homeViewModel.showDay(event)*/
+                val mainViewModel: MainViewModel by KoinJavaComponent.inject(MainViewModel::class.java)
+                mainViewModel.showDay(event)
             }
     ) {
         var eventName by remember { mutableStateOf(event.name) }
@@ -140,18 +146,17 @@ fun BasicEvent(
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 
         Text(
             text = "${event.start.format(EventTimeFormatter)} - ${
-                event.end.format(
-                    if(event.end.minute == 0){EventTimeFormatter2} else {EventTimeFormatter}
-                )
-            }",
+                event.end.format(EventTimeFormatter)}",
             style = MaterialTheme.typography.bodySmall,
-            maxLines = 1,
-            overflow = TextOverflow.Clip,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
         )
 
     }
@@ -165,7 +170,8 @@ private class EventDataModifier(
 
 private fun Modifier.eventData(positionedEvent: PositionedEvent) =
     this.then(EventDataModifier(positionedEvent))
-private val DayFormatter = DateTimeFormatter.ofPattern("EE, d.M.")
+
+private val DayFormatter = DateTimeFormatter.ofPattern("E d.M.")
 
 @Composable
 fun BasicDayHeader(
@@ -173,8 +179,7 @@ fun BasicDayHeader(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = day.format(DayFormatter)
-            .replaceFirstChar { day.format(DayFormatter)[0].uppercase() },
+        text = day.format(DayFormatter).replaceFirstChar { day.format(DayFormatter)[0].uppercase() },
         textAlign = TextAlign.Center,
         modifier = modifier
             .fillMaxWidth()
@@ -231,7 +236,7 @@ fun BasicSidebarLabel(
         text = time.format(HourFormatter),
         modifier = modifier
             .fillMaxHeight()
-            .padding(4.dp),
+            .padding(vertical = 0.dp, horizontal = 4.dp),
         color = MaterialTheme.colorScheme.onSurface,
     )
 
@@ -490,7 +495,7 @@ fun BasicSchedule(
     val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes / 60
-    val dividerColor = if (isSystemInDarkTheme()) Color.LightGray else Color.DarkGray
+    val dividerColor =  Color.DarkGray
     val positionedEvents =
         remember(events) { arrangeEvents(splitEvents(events.sortedBy(Event::start))).filter { it.end > minTime && it.start < maxTime } }
     Layout(
@@ -521,8 +526,8 @@ fun BasicSchedule(
                 repeat(numDays - 1) {
                     drawLine(
                         dividerColor,
-                        start = Offset((it + 1) * dayWidth.toPx()-3, 0f),
-                        end = Offset((it + 1) * dayWidth.toPx()-3, size.height),
+                        start = Offset((it + 1) * dayWidth.toPx() - 3, 0f),
+                        end = Offset((it + 1) * dayWidth.toPx() - 3, size.height),
                         strokeWidth = 1.dp.toPx()
                     )
                 }
@@ -563,7 +568,6 @@ fun BasicSchedule(
     }
 }
 
-/*
 @Preview(showBackground = true)
 @Composable
 fun EventPreview(
@@ -589,6 +593,8 @@ private val sampleEvents = listOf(
         color = Color(0xFFAFBBF2),
         start = LocalDateTime.parse("2021-05-18T09:00:00"),
         end = LocalDateTime.parse("2021-05-18T11:00:00"),
+        fullName = "Google I/O Keynote",
+        id = "keynote",
         description = "Tune in to find out about how we're furthering our mission to organize the world’s information and make it universally accessible and useful.",
     ),
     Event(
@@ -597,6 +603,8 @@ private val sampleEvents = listOf(
         color = Color(0xFFAFBBF2),
         start = LocalDateTime.parse("2021-05-18T09:00:00"),
         end = LocalDateTime.parse("2021-05-18T10:00:00"),
+        fullName = "Developer Keynote",
+        id = "dev-keynote",
         description = "Learn about the latest updates to our developer products and platforms from Google Developers.",
     ),
     Event(
@@ -605,6 +613,8 @@ private val sampleEvents = listOf(
         color = Color(0xFF1B998B),
         start = LocalDateTime.parse("2021-05-18T10:00:00"),
         end = LocalDateTime.parse("2021-05-18T11:00:00"),
+        fullName = "What's new in Android",
+        id = "android",
         description = "In this Keynote, Chet Haase, Dan Sandler, and Romain Guy discuss the latest Android features and enhancements for developers.",
     ),
     Event(
@@ -613,6 +623,8 @@ private val sampleEvents = listOf(
         color = Color(0xFF6DD3CE),
         start = LocalDateTime.parse("2021-05-18T11:00:00"),
         end = LocalDateTime.parse("2021-05-18T11:45:00"),
+        fullName = "What's new in Android",
+        id = "android",
         description = "Learn about the latest design improvements to help you build personal dynamic experiences with Material Design.",
     ),
     Event(
@@ -621,6 +633,8 @@ private val sampleEvents = listOf(
         color = Color(0xFFF4BFDB),
         start = LocalDateTime.parse("2021-05-18T10:00:00"),
         end = LocalDateTime.parse("2021-05-18T11:00:00"),
+        fullName = "What's new in Android",
+        id = "android",
         description = "Learn about the latest and greatest in ML from Google. We’ll cover what’s available to developers when it comes to creating, understanding, and deploying models for a variety of different applications.",
     ),
     Event(
@@ -629,6 +643,8 @@ private val sampleEvents = listOf(
         color = Color(0xFFF4BFDB),
         start = LocalDateTime.parse("2021-05-18T10:30:00"),
         end = LocalDateTime.parse("2021-05-18T11:30:00"),
+        fullName = "What's new in Android",
+        id = "android",
         description = "Learn about the latest and greatest in ML from Google. We’ll cover what’s available to developers when it comes to creating, understanding, and deploying models for a variety of different applications.",
     ),
     Event(
@@ -637,6 +653,8 @@ private val sampleEvents = listOf(
         color = Color(0xFF1B998B),
         start = LocalDateTime.parse("2021-05-20T12:00:00"),
         end = LocalDateTime.parse("2021-05-20T13:00:00"),
+        fullName = "What's new in Android",
+        id = "android",
         description = "This Workshop will take you through the basics of building your first app with Jetpack Compose, Android's new modern UI toolkit that simplifies and accelerates UI development on Android.",
     ),
 )
@@ -648,4 +666,4 @@ class EventsProvider : PreviewParameterProvider<Event> {
 @Composable
 fun SchedulePreview() {
     Schedule(sampleEvents)
-}*/
+}

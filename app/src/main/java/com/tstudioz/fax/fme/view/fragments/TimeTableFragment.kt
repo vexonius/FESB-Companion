@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.philliphsu.bottomsheetpickers.BottomSheetPickerDialog
 import com.philliphsu.bottomsheetpickers.date.DatePickerDialog
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.compose.HomeCompose
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Predavanja
@@ -65,7 +66,7 @@ class TimeTableFragment : Fragment()/*, DatePickerDialog.OnDateSetListener*/ {
             it.forEach(::println)
             if (it.isNotEmpty()){
                 composeView.setContent {
-                    HomeCompose()
+                    AppTheme{ HomeCompose() }
                 }
             }
         }
