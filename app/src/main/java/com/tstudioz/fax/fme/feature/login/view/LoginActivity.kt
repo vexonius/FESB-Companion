@@ -81,7 +81,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun observeInputFields() {
         binding.loginInput.doOnTextChanged { text, start, before, count ->
-            loginViewModel.username.value = text.toString()
+            loginViewModel.email.value = text.toString()
         }
 
         binding.loginPass.doOnTextChanged { text, start, before, count ->
@@ -114,7 +114,7 @@ class LoginActivity : AppCompatActivity() {
             )
         )
         val params = snackBarView2?.layoutParams as FrameLayout.LayoutParams
-        params.gravity = Gravity.TOP
+        params.gravity = Gravity.BOTTOM
         params.topMargin = 100
         snackBarView2.layoutParams = params
 
