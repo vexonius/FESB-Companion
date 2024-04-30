@@ -1,15 +1,19 @@
 package com.tstudioz.fax.fme.compose
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -35,28 +39,27 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
+import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun HomeCompose(oneDay: Boolean = false) {
+fun HomeCompose() {
 
     val mainViewModel: MainViewModel by inject(MainViewModel::class.java)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val event = mainViewModel.showDayEvent.observeAsState().value
-
-
+    val shPref by inject(SharedPreferences::class.java)
 
     BottomSheetScaffold(
         sheetContent = {
@@ -64,19 +67,29 @@ fun HomeCompose(oneDay: Boolean = false) {
                 ModalBottomSheet(
                     sheetState = sheetState,
                     onDismissRequest = { mainViewModel.hideDay() },
-                    containerColor = MaterialTheme.colorScheme.surface,//event?.color ?: Color.Transparent,
+                    containerColor = event?.color ?: Color.Transparent,
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                     shape = RectangleShape
                 ) {
-                    /*mainViewModel.showDayEvent.observeAsState().value?.let {
+                    mainViewModel.showDayEvent.observeAsState().value?.let {
                         BottomInfoCompose(it)
-                    }*/
+                    }
+                }
+            }
+            if (mainViewModel.showWeekChooseMenu.observeAsState(initial = false).value) {
+                ModalBottomSheet(sheetState = sheetState,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    windowInsets = WindowInsets(0.dp),
+                    onDismissRequest = {
+                        mainViewModel.showWeekChooseMenu(false)
+                    })
+                {
                     Column(Modifier.padding(8.dp, 8.dp, 8.dp, 20.dp)) {
                         val currentMonth = remember { YearMonth.now() }
-                        val startMonth = remember { currentMonth.minusMonths(100) } // Adjust as needed
-                        val endMonth = remember { currentMonth.plusMonths(100) } // Adjust as needed
-                        val firstDayOfWeek = remember { firstDayOfWeekFromLocale() } // Available from the library
+                        val startMonth = remember { currentMonth.minusMonths(100) }
+                        val endMonth = remember { currentMonth.plusMonths(100) }
+                        val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
                         var selection by remember { mutableStateOf<CalendarDay?>(null) }
                         val state = rememberCalendarState(
                             startMonth = startMonth,
@@ -90,7 +103,7 @@ fun HomeCompose(oneDay: Boolean = false) {
                             currentMonth = state.firstVisibleMonth.yearMonth,
                             goToPrevious = {
                                 coroutineScope.launch {
-                                    state.scrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth) //could be animated
+                                    state.scrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
                                 }
                             },
                             goToNext = {
@@ -99,23 +112,49 @@ fun HomeCompose(oneDay: Boolean = false) {
                                 }
                             },
                         )
+                        Spacer(modifier = Modifier.padding(0.dp, 5.dp))
                         HorizontalCalendar(state = state, dayContent = { day ->
-                            Day(day, isSelected = selection == day) { clicked ->
+                            Day(day, isSelected = selection == day, mainViewModel = mainViewModel) { clicked ->
                                 selection = if (clicked == selection) {
                                     null
                                 } else {
                                     clicked
                                 }
-                                val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
 
-                                val start = clicked.date.dayOfWeek.value
-                                val startDate = clicked.date.minusDays((start - 1).toLong())
-                                val endDate = clicked.date.plusDays(7 - start.toLong())
-                                mainViewModel.fetchUserTimetable(
-                                    User("sjurko00", ""), dateFormatter.format(startDate), dateFormatter.format(endDate)
-                                )
                             }
                         })
+                        Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth().padding(0.dp, 5.dp)) {
+                            Button(onClick = {
+                                coroutineScope.launch{
+                                    sheetState.hide()
+                                    delay(300)
+                                    mainViewModel.showWeekChooseMenu(false)
+                                }
+                            }) {
+                                Text(text = "Odustani")
+                            }
+                            Button(onClick = {
+                                val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
+
+                                if (selection != null) {
+                                    val start = selection!!.date.dayOfWeek.value
+                                    val startDate = selection!!.date.minusDays((start - 1).toLong())
+                                    val endDate = selection!!.date.plusDays(7 - start.toLong())
+                                    mainViewModel.fetchUserTimetable(
+                                        User(shPref.getString("username", "") ?: "", ""),
+                                        dateFormatter.format(startDate),
+                                        dateFormatter.format(endDate)
+                                    )
+                                    coroutineScope.launch{
+                                        sheetState.hide()
+                                        delay(300)
+                                        mainViewModel.showWeekChooseMenu(false)
+                                    }
+                                }
+                            }) {
+                                Text(text = "Odaberi")
+                            }
+                        }
                     }
                 }
             }
@@ -147,7 +186,8 @@ fun HomeCompose(oneDay: Boolean = false) {
 fun Day(
     day: CalendarDay,
     isSelected: Boolean = false,
-    onClick: (CalendarDay) -> Unit = {},
+    mainViewModel: MainViewModel,
+    onClick: (CalendarDay, ) -> Unit = {},
 ) {
     val selectedItemColor = MaterialTheme.colorScheme.secondary
     val inActiveTextColor = Color.Gray
@@ -156,11 +196,11 @@ fun Day(
         DayPosition.InDate, DayPosition.OutDate -> inActiveTextColor
     }
     val colors = mutableListOf(MaterialTheme.colorScheme.background)
+    val inPeriods = mutableListOf<TimeTableInfo>()
 
-    val mainViewModel: MainViewModel by inject(MainViewModel::class.java)
-    val dayEpoch = LocalDateTime.of(day.date, LocalTime.of(12, 0)).toEpochSecond(ZoneOffset.UTC).times(1000)
+
     mainViewModel.periods.value?.forEach {
-        if (it.StartDate < dayEpoch && it.EndDate + 86400000 > dayEpoch) {
+        if ((it.StartDate?.compareTo(day.date) ?: 1) <= 0 && (it.EndDate?.compareTo(day.date) ?: -1) >= 0) {
             when (it.ColorCode) {
                 "White" -> colors.add(Color.White)
                 "Blue" -> colors.add(Color(0xff0060ff))
@@ -171,8 +211,10 @@ fun Day(
                 "Green" -> colors.add(Color(0xff0b9700))
                 else -> {}
             }
+            inPeriods.add(it)
         }
     }
+
     val orderList = listOf(
         Color(0xffff6600).value,
         Color(0xff0060ff).value,
@@ -190,8 +232,8 @@ fun Day(
 
     Column(
         modifier = Modifier
-            .aspectRatio(1f)  // This is important for square sizing!
-            .padding(0.dp)
+            .aspectRatio(1f)
+            .padding(0.dp, 2.dp)
             .border(
                 width = if (isSelected) 1.dp else 1.dp,
                 color = if (isSelected) selectedItemColor else color.first(),
@@ -199,14 +241,12 @@ fun Day(
             .background(color = color.first())
             .clickable { onClick(day) },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = day.date.dayOfMonth.toString(),
             color = textColor,
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(end = 4.dp, top = 2.dp)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }
 }

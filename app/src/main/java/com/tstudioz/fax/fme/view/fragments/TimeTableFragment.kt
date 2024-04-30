@@ -100,11 +100,14 @@ class TimeTableFragment : Fragment()/*, DatePickerDialog.OnDateSetListener*/ {
         return binding?.root
     }
 
-    /*override fun onPrepareOptionsMenu(menu: Menu) {
+    override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.refresMe).isVisible = true
+        menu.findItem(R.id.choosesched).setVisible(true)
         super.onPrepareOptionsMenu(menu)
     }
 
+
+/*
     override fun onDateSet(dialog: DatePickerDialog, year: Int, monthOfYear: Int, dayOfMonth: Int) {
         val kal = Calendar.getInstance()
 

@@ -43,11 +43,13 @@ class MainViewModel(
     private val _lessons = MutableLiveData<List<Event>>().apply { value = emptyList() }
     private val _periods = MutableLiveData<List<TimeTableInfo>>().apply { value = emptyList() }
     private val _shownWeek = MutableLiveData<LocalDate>().apply { value = LocalDate.now()}
+    private val _showWeekChooseMenu = MutableLiveData<Boolean>().apply { value = false }
     val showDay: LiveData<Boolean> = _showDay
     val showDayEvent: LiveData<Event> = _showDayEvent
     val lessons: LiveData<List<Event>> = _lessons
     val periods: LiveData<List<TimeTableInfo>> = _periods
     val shownWeek: LiveData<LocalDate> = _shownWeek
+    val showWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
 
     fun fetchUserTimetable(user: User, startDate: String, endDate: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -203,6 +205,10 @@ class MainViewModel(
                 tableGot.postValue("error")
             }
         }
+    }
+
+    fun showWeekChooseMenu(value:Boolean = true) {
+        _showWeekChooseMenu.postValue(value)
     }
 
     fun showDay(event: Event) {

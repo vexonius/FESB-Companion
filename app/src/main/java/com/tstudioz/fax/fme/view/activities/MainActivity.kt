@@ -239,6 +239,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 showSnacOffline()
             }
+            R.id.choosesched -> {mainViewModel.showWeekChooseMenu()}
         }
         return super.onOptionsItemSelected(item)
     }

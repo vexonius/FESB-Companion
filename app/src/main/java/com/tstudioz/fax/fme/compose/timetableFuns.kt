@@ -82,7 +82,6 @@ data class PositionedEvent(
 )
 
 val EventTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-val EventTimeFormatter2: DateTimeFormatter = DateTimeFormatter.ofPattern("HH")
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
@@ -120,24 +119,14 @@ fun BasicEvent(
                 mainViewModel.showDay(event)
             }
     ) {
-        var eventName by remember { mutableStateOf(event.name) }
-        val eventShortName = event.shortName
-        LaunchedEffect(event) {
-            eventName = event.name
-        }
         Text(
-            text = eventName,
+            text = event.shortName,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Clip,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
-            onTextLayout = { textLayoutResult ->
-                if (textLayoutResult.hasVisualOverflow) {
-                    eventName = eventShortName
-                }
-            },
         )
 
         if (event.description != null) {

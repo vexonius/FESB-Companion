@@ -3,10 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/choosesched"
+        android:icon="@drawable/calendar_lines_pen_svgrepo_com"
+        android:title="@string/pretraga"
+        app:showAsAction="always"
+        android:visible="false"/>
+
+    <item
         android:id="@+id/refresMe"
         android:icon="@drawable/refresh"
         android:title="@string/osvje_i"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/settings"
