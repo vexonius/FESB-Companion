@@ -1,6 +1,8 @@
 package com.tstudioz.fax.fme.models.util
 
 import android.util.Log
+import com.google.gson.JsonObject
+import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.models.data.EventRecurring
 import com.tstudioz.fax.fme.models.data.TimetableEvent
 import com.tstudioz.fax.fme.models.data.TimetableItem
@@ -8,6 +10,7 @@ import com.tstudioz.fax.fme.weather.Current
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import org.mongodb.kbson.ExperimentalKBsonSerializerApi
 import java.util.*
 
 
@@ -44,6 +47,29 @@ suspend fun parseTimetable(body: String): List<TimetableItem> {
 
             items.add(TimetableItem(id, startdate, enddate, starth, startmin, endh, endmin, name, type, group, room, timespan, studycode, isItRecurring, repetsType, detailTime, professor, classDruration, repeatsUntil))
         }
+    }
+
+    return items
+}
+
+
+
+suspend fun parseTimetableInfo(body: String): List<TimeTableInfo> {
+    val items = mutableListOf<TimeTableInfo>()
+    val jsons = body.split("[", "]")[1].split("{","},{","}")
+    for (jsn in jsons) {
+        if (jsn.isEmpty()) continue
+        items.add(TimeTableInfo(
+            jsn.split("Id\":\"")[1].split("\",")[0].toInt(),
+            jsn.split("Name\":\"")[1].split("\"")[0],
+            jsn.split("StartDate\":\"\\/Date(")[1].split(")")[0].toLong(),
+            jsn.split("EndDate\":\"\\/Date(")[1].split(")")[0].toLong(),
+            jsn.split("StartDateText\":\"")[1].split("\"")[0],
+            jsn.split("EndDateText\":\"")[1].split("\"")[0],
+            jsn.split("Category\":\"")[1].split("\"")[0],
+            jsn.split("ColorCode\":\"")[1].split("\"")[0],
+            jsn.split("IsWorking\":")[1].split(",")[0].toBoolean()
+        ))
     }
 
     return items

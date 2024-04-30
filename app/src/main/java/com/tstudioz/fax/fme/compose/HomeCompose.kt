@@ -1,23 +1,52 @@
 package com.tstudioz.fax.fme.compose
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import com.kizitonwose.calendar.compose.HorizontalCalendar
+import com.kizitonwose.calendar.compose.rememberCalendarState
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import com.kizitonwose.calendar.core.nextMonth
+import com.kizitonwose.calendar.core.previousMonth
+import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.YearMonth
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
@@ -27,87 +56,69 @@ fun HomeCompose(oneDay: Boolean = false) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val event = mainViewModel.showDayEvent.observeAsState().value
 
+
+
     BottomSheetScaffold(
         sheetContent = {
             if (mainViewModel.showDay.observeAsState(initial = false).value) {
                 ModalBottomSheet(
                     sheetState = sheetState,
                     onDismissRequest = { mainViewModel.hideDay() },
-                    containerColor = event?.color ?: Color.Transparent,
+                    containerColor = MaterialTheme.colorScheme.surface,//event?.color ?: Color.Transparent,
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                     shape = RectangleShape
                 ) {
-                    mainViewModel.showDayEvent.observeAsState().value?.let {
+                    /*mainViewModel.showDayEvent.observeAsState().value?.let {
                         BottomInfoCompose(it)
-                    }
-                }
-            }
-            /*if (homeViewModel.showStudyChooseMenu.observeAsState().value == true) {
-                val map = homeViewModel.classesMap.observeAsState().value?.toList()
-                ModalBottomSheet(
-                    sheetState = sheetStateStudy,
-                    onDismissRequest = {
-                        homeViewModel.showStudyChooseMenu.postValue(false)
-                    }) {
-                    LazyColumn(contentPadding = PaddingValues(8.dp)) {
-                        items(map?.size ?: 0) {
-                            map?.get(it)?.let { it1 ->
-                                ListItem(
-                                    headlineContent = { Text(it1.first) },
-                                    modifier = Modifier.clickable {
-                                        sharedPreferences.edit().putString("studij", it1.first)
-                                            .apply()
-                                        homeViewModel.getData(studij = it1.first, force = true)
-                                        homeViewModel.showStudyChooseMenu.postValue(false)
-                                    },
-                                )
-                                HorizontalDivider()
-                            }
-                        }
-                        item {
-                            Spacer(modifier = Modifier.height(60.dp))
-                        }
-                    }
-                }
-            }
-            if (homeViewModel.showWeekChooseMenu.observeAsState().value == true) {
-                val map = homeViewModel.weeks.observeAsState().value?.toList()
-                ModalBottomSheet(
-                    sheetState = sheetStateWeek,
-                    onDismissRequest = {
-                        homeViewModel.showWeekChooseMenu.postValue(
-                            false
+                    }*/
+                    Column(Modifier.padding(8.dp, 8.dp, 8.dp, 20.dp)) {
+                        val currentMonth = remember { YearMonth.now() }
+                        val startMonth = remember { currentMonth.minusMonths(100) } // Adjust as needed
+                        val endMonth = remember { currentMonth.plusMonths(100) } // Adjust as needed
+                        val firstDayOfWeek = remember { firstDayOfWeekFromLocale() } // Available from the library
+                        var selection by remember { mutableStateOf<CalendarDay?>(null) }
+                        val state = rememberCalendarState(
+                            startMonth = startMonth,
+                            endMonth = endMonth,
+                            firstVisibleMonth = currentMonth,
+                            firstDayOfWeek = firstDayOfWeek
                         )
-                    }
-                ) {
-                    map?.forEach{ (t, u) ->
-                        u["text"]?.jsonPrimitive?.content?.let {
-                            ListItem(headlineContent = {
-                                Text(
-                                    text = it,
-                                    Modifier
-                                        .clickable {
-                                            val week = u["datefrom"]?.jsonPrimitive?.content ?: ""
-                                            val year = week.split("-")[0].toInt()
-                                            val month = week.split("-")[1].toInt()
-                                            val day = week.split("-")[2].toInt()
-                                            homeViewModel.setSelectedWeek(
-                                                LocalDate.of(year, month, day)
-                                            )
-                                            homeViewModel.getData(tjedan = t, force = true)
-                                            homeViewModel.showWeekChooseMenu.postValue(false)
-                                        },
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            })
-                            HorizontalDivider()
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(60.dp))
+                        val coroutineScope = rememberCoroutineScope()
+                        SimpleCalendarTitle(
+                            modifier = Modifier.fillMaxWidth(),
+                            currentMonth = state.firstVisibleMonth.yearMonth,
+                            goToPrevious = {
+                                coroutineScope.launch {
+                                    state.scrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth) //could be animated
+                                }
+                            },
+                            goToNext = {
+                                coroutineScope.launch {
+                                    state.scrollToMonth(state.firstVisibleMonth.yearMonth.nextMonth)
+                                }
+                            },
+                        )
+                        HorizontalCalendar(state = state, dayContent = { day ->
+                            Day(day, isSelected = selection == day) { clicked ->
+                                selection = if (clicked == selection) {
+                                    null
+                                } else {
+                                    clicked
+                                }
+                                val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
 
+                                val start = clicked.date.dayOfWeek.value
+                                val startDate = clicked.date.minusDays((start - 1).toLong())
+                                val endDate = clicked.date.plusDays(7 - start.toLong())
+                                mainViewModel.fetchUserTimetable(
+                                    User("sjurko00", ""), dateFormatter.format(startDate), dateFormatter.format(endDate)
+                                )
+                            }
+                        })
+                    }
                 }
-            }*/
+            }
         },
         sheetPeekHeight = 0.dp,
     ) {
@@ -116,25 +127,86 @@ fun HomeCompose(oneDay: Boolean = false) {
                 val mapped = mainViewModel.lessons.observeAsState(emptyList()).value.onEach {
                     it.color = colorResource(id = it.colorId)
                 }
-                if (!oneDay) {
+                val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
 
-                    Schedule(
-                        events = mapped,
-                        minTime = LocalTime.of(8, 0),
-                        maxTime = LocalTime.of(20, 0),
-                    )
-                } else {
-                    Schedule(
-                        events = mapped.filter {
-                            it.start.toLocalDate() == LocalDate.now()
-                        },
-                        minTime = LocalTime.of(8, 0),
-                        maxTime = LocalTime.of(20, 0),
-                    )
-                }
+                Schedule(
+                    events = mapped,
+                    minTime = LocalTime.of(8, 0),
+                    maxTime = LocalTime.of(20, 0),
+                    minDate = mainViewModel.shownWeek.value ?: LocalDate.now(),
+                    maxDate = (mainViewModel.shownWeek.value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
+                )
             }
         }
+    }
+}
 
+
+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+@Composable
+fun Day(
+    day: CalendarDay,
+    isSelected: Boolean = false,
+    onClick: (CalendarDay) -> Unit = {},
+) {
+    val selectedItemColor = MaterialTheme.colorScheme.secondary
+    val inActiveTextColor = Color.Gray
+    val textColor = when (day.position) {
+        DayPosition.MonthDate -> Color.Unspecified
+        DayPosition.InDate, DayPosition.OutDate -> inActiveTextColor
+    }
+    val colors = mutableListOf(MaterialTheme.colorScheme.background)
+
+    val mainViewModel: MainViewModel by inject(MainViewModel::class.java)
+    val dayEpoch = LocalDateTime.of(day.date, LocalTime.of(12, 0)).toEpochSecond(ZoneOffset.UTC).times(1000)
+    mainViewModel.periods.value?.forEach {
+        if (it.StartDate < dayEpoch && it.EndDate + 86400000 > dayEpoch) {
+            when (it.ColorCode) {
+                "White" -> colors.add(Color.White)
+                "Blue" -> colors.add(Color(0xff0060ff))
+                "Yellow" -> colors.add(Color(0xffe5c700))
+                "Orange" -> colors.add(Color(0xffff6600))
+                "Purple" -> colors.add(Color(0xffa200ff))
+                "Red" -> colors.add(Color(0xffff0000))
+                "Green" -> colors.add(Color(0xff0b9700))
+                else -> {}
+            }
+        }
+    }
+    val orderList = listOf(
+        Color(0xffff6600).value,
+        Color(0xff0060ff).value,
+        Color(0xffe5c700).value,
+        Color(0xffff0000).value,
+        Color(0xffa200ff).value,
+        Color(0xff0b9700).value,
+        MaterialTheme.colorScheme.background.value,
+        Color.White.value,
+    )
+
+    val color = colors.sortedBy {
+        orderList.indexOf<ULong>(it.value)
     }
 
+    Column(
+        modifier = Modifier
+            .aspectRatio(1f)  // This is important for square sizing!
+            .padding(0.dp)
+            .border(
+                width = if (isSelected) 1.dp else 1.dp,
+                color = if (isSelected) selectedItemColor else color.first(),
+            )
+            .background(color = color.first())
+            .clickable { onClick(day) },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Text(
+            text = day.date.dayOfMonth.toString(),
+            color = textColor,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(end = 4.dp, top = 2.dp)
+        )
+    }
 }

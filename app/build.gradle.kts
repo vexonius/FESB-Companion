@@ -116,6 +116,9 @@ dependencies {
     implementation("androidx.compose.material:material:1.6.6")
 
     implementation("androidx.compose.ui:ui-android:1.6.6")
+
+    //choose calendar
+    implementation("com.kizitonwose.calendar:compose:2.5.0")
 }
 
 configurations.all {

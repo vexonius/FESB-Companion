@@ -26,4 +26,21 @@ class TimetableService(private val client: OkHttpClient) : TimetableServiceInter
         return NetworkServiceResult.TimeTableResult.Success(value)
     }
 
+    override suspend fun fetchTimeTableInfo(startDate: String, endDate: String): NetworkServiceResult.TimeTableResult {
+        val requestUrl = "https://raspored.fesb.unist.hr/raspored/periodi-u-mjesecu-json?FromDate=$startDate&ToDate=$endDate"
+
+        val request = Request.Builder()
+            .url(requestUrl)
+            .build()
+
+        val response: Response = client.newCall(request).execute()
+        val value = response.body?.string()
+
+        if (!response.isSuccessful || value.isNullOrEmpty()) {
+            return NetworkServiceResult.TimeTableResult.Failure(Throwable("Failed to fetch schedule"))
+        }
+
+        return NetworkServiceResult.TimeTableResult.Success(value)
+    }
+
 }

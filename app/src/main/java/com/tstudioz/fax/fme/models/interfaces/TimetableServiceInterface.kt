@@ -10,4 +10,10 @@ interface TimetableServiceInterface {
         endDate: String
     ): NetworkServiceResult.TimeTableResult
 
+    suspend fun fetchTimeTableInfo(
+        startDate: String,
+        endDate: String
+    ): NetworkServiceResult.TimeTableResult
+
+
 }

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Predavanja
+import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.data.TimetableItem
@@ -33,12 +34,20 @@ class MainViewModel(
     val tableGot: MutableLiveData<String> = MutableLiveData()
     var tableGotPerm = MutableLiveData<Boolean>()
 
+    init {
+        fetchTimetableInfo()
+    }
+
     private val _showDay = MutableLiveData<Boolean>().apply { value = false }
     private val _showDayEvent = MutableLiveData<Event>()
     private val _lessons = MutableLiveData<List<Event>>().apply { value = emptyList() }
+    private val _periods = MutableLiveData<List<TimeTableInfo>>().apply { value = emptyList() }
+    private val _shownWeek = MutableLiveData<LocalDate>().apply { value = LocalDate.now()}
     val showDay: LiveData<Boolean> = _showDay
     val showDayEvent: LiveData<Event> = _showDayEvent
     val lessons: LiveData<List<Event>> = _lessons
+    val periods: LiveData<List<TimeTableInfo>> = _periods
+    val shownWeek: LiveData<LocalDate> = _shownWeek
 
     fun fetchUserTimetable(user: User, startDate: String, endDate: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -47,12 +56,28 @@ class MainViewModel(
                 val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 val svaFreshPredavanja = timetableToPredavanje(list)
                 val events = timetableToEvent(list)
+                _shownWeek.postValue(LocalDate.of(
+                    startDate.split("-")[2].toInt(),
+                    startDate.split("-")[0].toInt(),
+                    startDate.split("-")[1].toInt())
+                )
                 _lessons.postValue(events)
                 insertOrUpdateTimeTable(svaFreshPredavanja)
                 tableGotPerm.postValue(true)
             } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
                 tableGotPerm.postValue(false)
+            }
+        }
+    }
+
+    fun fetchTimetableInfo(startDate: String ="2023-1-1", endDate: String = "2025-1-1" ){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                println("started Fetching TimetableInfo")
+                _periods.postValue(timeTableRepository.fetchTimeTableInfo(startDate, endDate))
+            } catch (e: Exception) {
+                Log.e("Error timetableinfo", e.toString())
             }
         }
     }
@@ -83,7 +108,7 @@ class MainViewModel(
 
     private fun timetableToEvent(timetable: List<TimetableItem>): List<Event> {
         val events = mutableListOf<Event>()
-        events.add(
+        /*events.add(
             Event(
                 id = "0",
                 name = "Ponedjeljak",
@@ -107,7 +132,7 @@ class MainViewModel(
                 week = "a",
                 description = "C502"
             )
-        )
+        )*/
         for (l in timetable) {
             val event = Event(
                 id = l.id.toString(),
