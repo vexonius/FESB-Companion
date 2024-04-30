@@ -52,6 +52,9 @@
     <string name="login_error_empty_credentials">Niste unijeli korisničke podatke</string>
     <string name="login_error_invalid_credentials">Uneseni podaci su netočni</string>
     <string name="login_error_generic">Uneseni podaci su netočni</string>
+    <string name="login_email_or_username">FESB email ili korisničko ime</string>
+    <string name="login_password">Lozinka</string>
+    <string name="login_action_submit">Prijava</string>
 
 
 </resources>

@@ -81,7 +81,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun observeInputFields() {
         binding.loginInput.doOnTextChanged { text, start, before, count ->
-            loginViewModel.email.value = text.toString()
+            loginViewModel.username.value = text.toString()
         }
 
         binding.loginPass.doOnTextChanged { text, start, before, count ->

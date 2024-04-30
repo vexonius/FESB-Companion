@@ -22,7 +22,7 @@ class LoginViewModel(
     private val sharedPreferences: SharedPreferences
 ) : AndroidViewModel(application) {
 
-    var email = MutableLiveData("")
+    var username = MutableLiveData("")
     var password = MutableLiveData("")
 
     var firstTimeInApp = MutableLiveData(false)
@@ -39,19 +39,20 @@ class LoginViewModel(
     }
 
     fun tryUserLogin() {
-        val email = email.value!!
+        var username = username.value!!
         val password = password.value!!
 
-        if (email.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty()) {
             errorMessage.setValue(application.getString(R.string.login_error_empty_credentials))
             return
-        } else if (!isEmailValid(email)) {
-            errorMessage.setValue(application.getString(R.string.login_error_email))
-            return
+        } else if (isEmailValid(username)) {
+            // If user inputted email, get only username,
+            // else continue
+            username = username.substringBefore("@")
         }
 
         viewModelScope.launch(Dispatchers.IO + handler) {
-            when (repository.attemptLogin(email, password)) {
+            when (repository.attemptLogin(username, password)) {
                 is UserRepositoryResult.LoginResult.Success -> {
                     loggedIn.postValue(true)
                 }
