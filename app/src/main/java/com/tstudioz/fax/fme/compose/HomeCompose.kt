@@ -90,7 +90,14 @@ fun HomeCompose() {
                         val startMonth = remember { currentMonth.minusMonths(100) }
                         val endMonth = remember { currentMonth.plusMonths(100) }
                         val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
-                        var selection by remember { mutableStateOf<CalendarDay?>(null) }
+                        var selection by remember {
+                            mutableStateOf<CalendarDay?>(
+                                CalendarDay(
+                                    LocalDate.now(),
+                                    DayPosition.MonthDate
+                                )
+                            )
+                        }
                         val state = rememberCalendarState(
                             startMonth = startMonth,
                             endMonth = endMonth,
@@ -123,9 +130,14 @@ fun HomeCompose() {
 
                             }
                         })
-                        Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth().padding(0.dp, 5.dp)) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(0.dp, 5.dp)
+                        ) {
                             Button(onClick = {
-                                coroutineScope.launch{
+                                coroutineScope.launch {
                                     sheetState.hide()
                                     delay(300)
                                     mainViewModel.showWeekChooseMenu(false)
@@ -145,7 +157,7 @@ fun HomeCompose() {
                                         dateFormatter.format(startDate),
                                         dateFormatter.format(endDate)
                                     )
-                                    coroutineScope.launch{
+                                    coroutineScope.launch {
                                         sheetState.hide()
                                         delay(300)
                                         mainViewModel.showWeekChooseMenu(false)
@@ -162,20 +174,24 @@ fun HomeCompose() {
         sheetPeekHeight = 0.dp,
     ) {
         Column {
-            if (mainViewModel.lessons.observeAsState().value?.isNotEmpty() == true) {
-                val mapped = mainViewModel.lessons.observeAsState(emptyList()).value.onEach {
-                    it.color = colorResource(id = it.colorId)
-                }
-                val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
-
-                Schedule(
-                    events = mapped,
-                    minTime = LocalTime.of(8, 0),
-                    maxTime = LocalTime.of(20, 0),
-                    minDate = mainViewModel.shownWeek.value ?: LocalDate.now(),
-                    maxDate = (mainViewModel.shownWeek.value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
-                )
+            val mapped = mainViewModel.lessons.observeAsState(emptyList()).value.onEach {
+                it.color = colorResource(id = it.colorId)
             }
+            val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
+            val eventBefore8AM = mapped.any { it.start.toLocalTime().isBefore(LocalTime.of(8, 0)) }
+            val eventAfter8PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(20, 0)) }
+            val eventAfter9PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(21, 0)) }
+
+            Schedule(
+                events = mapped,
+                minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
+                maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
+                else if (eventAfter8PM) LocalTime.of(21,0)
+                else LocalTime.of(20, 0),
+                minDate = mainViewModel.shownWeek.value ?: LocalDate.now(),
+                maxDate = (mainViewModel.shownWeek.value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
+            )
+
         }
     }
 }
@@ -187,7 +203,7 @@ fun Day(
     day: CalendarDay,
     isSelected: Boolean = false,
     mainViewModel: MainViewModel,
-    onClick: (CalendarDay, ) -> Unit = {},
+    onClick: (CalendarDay) -> Unit = {},
 ) {
     val selectedItemColor = MaterialTheme.colorScheme.secondary
     val inActiveTextColor = Color.Gray
@@ -200,7 +216,9 @@ fun Day(
 
 
     mainViewModel.periods.value?.forEach {
-        if ((it.StartDate?.compareTo(day.date) ?: 1) <= 0 && (it.EndDate?.compareTo(day.date) ?: -1) >= 0) {
+        if ((it.StartDate?.compareTo(day.date) ?: 1) <= 0 &&
+            (it.EndDate?.compareTo(day.date) ?: -1) >= 0
+        ) {
             when (it.ColorCode) {
                 "White" -> colors.add(Color.White)
                 "Blue" -> colors.add(Color(0xff0060ff))
@@ -225,20 +243,19 @@ fun Day(
         MaterialTheme.colorScheme.background.value,
         Color.White.value,
     )
-
-    val color = colors.sortedBy {
+    val colorOrdered = colors.sortedBy {
         orderList.indexOf<ULong>(it.value)
     }
 
     Column(
         modifier = Modifier
             .aspectRatio(1f)
-            .padding(0.dp, 2.dp)
+            .padding(0.dp, 3.dp)
             .border(
                 width = if (isSelected) 1.dp else 1.dp,
-                color = if (isSelected) selectedItemColor else color.first(),
+                color = if (isSelected) selectedItemColor else colorOrdered.first(),
             )
-            .background(color = color.first())
+            .background(color = colorOrdered.first())
             .clickable { onClick(day) },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

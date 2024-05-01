@@ -141,7 +141,6 @@ class MainActivity : AppCompatActivity() {
         } catch (ex: Exception) {
             ex.printStackTrace()
             shPref[SPKey.LOGGED_IN] = false
-            val logged_in = shPref.getBoolean(SPKey.LOGGED_IN.name, true)
             Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this@MainActivity, LoginActivity::class.java))
         } finally {

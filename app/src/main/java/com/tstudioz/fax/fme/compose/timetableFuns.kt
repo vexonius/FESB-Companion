@@ -3,7 +3,6 @@ package com.tstudioz.fax.fme.compose
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -22,10 +21,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -114,7 +111,7 @@ fun BasicEvent(
                 )
             )
             .padding(4.dp)
-            .clickable { ////refactor this, homeviewmodel inited too many times
+            .clickable { //refactor this, homeviewmodel inited too many times
                 val mainViewModel: MainViewModel by KoinJavaComponent.inject(MainViewModel::class.java)
                 mainViewModel.showDay(event)
             }
@@ -141,8 +138,7 @@ fun BasicEvent(
         }
 
         Text(
-            text = "${event.start.format(EventTimeFormatter)} - ${
-                event.end.format(EventTimeFormatter)}",
+            text = "${event.start.format(EventTimeFormatter)} - ${event.end.format(EventTimeFormatter)}",
             style = MaterialTheme.typography.bodySmall,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
@@ -389,7 +385,7 @@ fun Schedule(
     minTime: LocalTime = LocalTime.MIN,
     maxTime: LocalTime = LocalTime.MAX,
     daySize: ScheduleSize = ScheduleSize.Adaptive(64.dp),//FixedSize(64.dp),
-    hourSize: ScheduleSize = ScheduleSize.FixedSize(64.dp),
+    hourSize: ScheduleSize = ScheduleSize.Adaptive(44.dp),
 ) {
     val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
@@ -484,7 +480,7 @@ fun BasicSchedule(
     val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes / 60
-    val dividerColor =  Color.DarkGray
+    val dividerColor = Color.DarkGray
     val positionedEvents =
         remember(events) { arrangeEvents(splitEvents(events.sortedBy(Event::start))).filter { it.end > minTime && it.start < maxTime } }
     Layout(
@@ -647,12 +643,162 @@ private val sampleEvents = listOf(
         description = "This Workshop will take you through the basics of building your first app with Jetpack Compose, Android's new modern UI toolkit that simplifies and accelerates UI development on Android.",
     ),
 )
+private val sampleEvents2 = listOf(
+    Event(
+        id = "0",
+        name = "Ponedjeljak",
+        fullName = "Ponedjeljak",
+        shortName = "P",
+        color = Color.Blue,
+        colorId = 2131099687,
+        teacher = "matko",
+        type="Pred",
+        groups = "nemaa",
+        classroom = "C502",
+        classroomShort = "C502",
+        start = LocalDateTime.parse("2024-05-02T10:15"),
+        end = LocalDateTime.parse("2024-05-02T11:00"),
+        description = "C502"
+    ),
+    Event(
+        id = "532059",
+        name = "Kriptografija i mrežna sigurnost",
+        fullName = "Kriptografija i mrežna sigurnost",
+        shortName = "KIMS",
+        color = Color.Blue,
+        colorId = 2131099687,
+        teacher = "Čagalj Mario",
+        type = "Predavanje",
+        groups = "",
+        classroom = "C501",
+        classroomShort = "C501",
+        start = LocalDateTime.parse("2024-04-29T10:15"),
+        end = LocalDateTime.parse("2024-04-29T12:00"),
+        description = "C501"
+    ),
+    Event(
+        id = "534198",
+        name = "Metode optimizacije",
+        fullName = "Metode optimizacije",
+        shortName = "MO",
+        color = Color.Blue,
+        colorId = 2131100480,
+        teacher = "Bašić Martina",
+        type = "Laboratorijske vježbe",
+        groups = "Grupa 1,",
+        classroom = "B420",
+        classroomShort = "B420",
+        start = LocalDateTime.parse("2024-04-29T18:30"),
+        end = LocalDateTime.parse("2024-04-29T20:00"),
+        description = "B420"
+    ),
+    Event(
+        id = "532144",
+        name = "Podržano strojno učenje",
+        fullName = "Podržano strojno učenje",
+        shortName = "PSU",
+        color = Color.Blue,
+        colorId = 2131099687,
+        teacher = "Vasilj Josip",
+        type = "Predavanje",
+        groups = "",
+        classroom = "A243",
+        classroomShort = "A243",
+        start = LocalDateTime.parse("2024-04-30T08:15"),
+        end = LocalDateTime.parse("2024-04-30T10:00"),
+        description = "A243"
+    ),
+    Event(
+        id = "532084",
+        name = "Metode optimizacije",
+        fullName = "Metode optimizacije",
+        shortName = "MO",
+        color = Color.Blue,
+        colorId = 2131099687,
+        teacher = "Marasović Jadranka",
+        type = "Predavanje",
+        groups = "",
+        classroom = "C502",
+        classroomShort = "C502",
+        start = LocalDateTime.parse("2024-04-30T10:15"),
+        end = LocalDateTime.parse("2024-04-30T12:00"),
+        description = "C502"
+    ),
+    Event(
+        id = "532120",
+        name = "IP komunikacije",
+        fullName = "IP komunikacije",
+        shortName = "IK",
+        color = Color.Blue,
+        colorId = 2131099687,
+        teacher = "Russo Mladen",
+        type = "Predavanje",
+        groups = "",
+        classroom = "A105",
+        classroomShort = "A105",
+        start = LocalDateTime.parse("2024-04-30T12:15"),
+        end = LocalDateTime.parse("2024-04-30T14:00"),
+        description = "A105"
+    ),
+    Event(
+        id = "538989",
+        name = "Podržano strojno učenje",
+        fullName = "Podržano strojno učenje",
+        shortName = "PSU",
+        color = Color.Blue,
+        colorId = 2131100480,
+        teacher = "Vasilj Josip",
+        type = "Laboratorijske vježbe",
+        groups = "Grupa 1,",
+        classroom = "A507",
+        classroomShort = "A507",
+        start = LocalDateTime.parse("2024-05-02T10:00"),
+        end = LocalDateTime.parse("2024-05-02T12:15"),
+        description = "A507"
+    ),
+    Event(
+        id = "535595",
+        name = "Jezici i prevoditelji",
+        fullName = "Jezici i prevoditelji",
+        shortName = "JIP",
+        color = Color.Blue,
+        colorId = 2131100480,
+        teacher = "Sikora Marjan",
+        type = "Laboratorijske vježbe",
+        groups = "Grupa 1,",
+        classroom = "B526",
+        classroomShort = "B526",
+        start = LocalDateTime.parse("2024-05-02T08:30"),
+        end = LocalDateTime.parse("2024-05-02T10:00"),
+        description = "B526"
+    ),
+    Event(
+        id = "535336",
+        name = "IP komunikacije",
+        fullName = "IP komunikacije",
+        shortName = "IK",
+        color = Color.Blue,
+        colorId = 2131100480,
+        teacher = "Meter Davor",
+        type = "Laboratorijske vježbe",
+        groups = "Grupa 1,",
+        classroom = "B526",
+        classroomShort = "B526",
+        start = LocalDateTime.parse("2024-05-03T08:00"),
+        end = LocalDateTime.parse("2024-05-03T09:30"),
+        description = "B526"
+    ),
+)
 
 class EventsProvider : PreviewParameterProvider<Event> {
     override val values = sampleEvents.asSequence()
 }
+
 @Preview(showBackground = true)
 @Composable
 fun SchedulePreview() {
-    Schedule(sampleEvents)
+    Schedule(
+        minTime = LocalTime.of(8, 0),
+        maxTime = LocalTime.of(20, 0),
+        events = sampleEvents2)
 }

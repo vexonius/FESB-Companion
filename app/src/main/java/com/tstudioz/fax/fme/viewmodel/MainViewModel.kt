@@ -42,7 +42,7 @@ class MainViewModel(
     private val _showDayEvent = MutableLiveData<Event>()
     private val _lessons = MutableLiveData<List<Event>>().apply { value = emptyList() }
     private val _periods = MutableLiveData<List<TimeTableInfo>>().apply { value = emptyList() }
-    private val _shownWeek = MutableLiveData<LocalDate>().apply { value = LocalDate.now()}
+    private val _shownWeek = MutableLiveData<LocalDate>().apply { value = LocalDate.now() }
     private val _showWeekChooseMenu = MutableLiveData<Boolean>().apply { value = false }
     val showDay: LiveData<Boolean> = _showDay
     val showDayEvent: LiveData<Event> = _showDayEvent
@@ -58,10 +58,12 @@ class MainViewModel(
                 val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 val svaFreshPredavanja = timetableToPredavanje(list)
                 val events = timetableToEvent(list)
-                _shownWeek.postValue(LocalDate.of(
-                    startDate.split("-")[2].toInt(),
-                    startDate.split("-")[0].toInt(),
-                    startDate.split("-")[1].toInt())
+                _shownWeek.postValue(
+                    LocalDate.of(
+                        startDate.split("-")[2].toInt(),
+                        startDate.split("-")[0].toInt(),
+                        startDate.split("-")[1].toInt()
+                    )
                 )
                 _lessons.postValue(events)
                 insertOrUpdateTimeTable(svaFreshPredavanja)
@@ -73,7 +75,10 @@ class MainViewModel(
         }
     }
 
-    fun fetchTimetableInfo(startDate: String ="2023-1-1", endDate: String = "2025-1-1" ){
+    fun fetchTimetableInfo(
+        startDate: String = (LocalDate.now().year - 1).toString() + "-8-1",
+        endDate: String = (LocalDate.now().year + 1).toString() + "-8-1"
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 println("started Fetching TimetableInfo")
@@ -125,11 +130,36 @@ class MainViewModel(
                 classroomShort = "C502",
                 start = LocalDateTime.of(
                     LocalDate.of(2024, 5 ,2),
-                    LocalTime.of(10, 15)
+                    LocalTime.of(7, 15)
                 ),
                 end = LocalDateTime.of(
                     LocalDate.of(2024, 5 ,2),
-                    LocalTime.of(11, 0)
+                    LocalTime.of(8, 0)
+                ),
+                week = "a",
+                description = "C502"
+            )
+        )
+        events.add(
+            Event(
+                id = "0",
+                name = "Ponedjeljak",
+                fullName = "Ponedjeljak",
+                shortName = "P",
+                colorId = R.color.blue_nice,
+                color = Color.White,
+                teacher = "matko",
+                type = "Pred",
+                groups = "nemaa",
+                classroom = "C502",
+                classroomShort = "C502",
+                start = LocalDateTime.of(
+                    LocalDate.of(2024, 5 ,2),
+                    LocalTime.of(20, 15)
+                ),
+                end = LocalDateTime.of(
+                    LocalDate.of(2024, 5 ,2),
+                    LocalTime.of(21, 1)
                 ),
                 week = "a",
                 description = "C502"
@@ -207,7 +237,7 @@ class MainViewModel(
         }
     }
 
-    fun showWeekChooseMenu(value:Boolean = true) {
+    fun showWeekChooseMenu(value: Boolean = true) {
         _showWeekChooseMenu.postValue(value)
     }
 
