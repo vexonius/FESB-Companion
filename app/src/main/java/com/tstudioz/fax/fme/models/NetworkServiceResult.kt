@@ -20,6 +20,11 @@ sealed class NetworkServiceResult {
         class Failure(throwable: Throwable) : TimeTableResult()
     }
 
+    sealed class IksicaResult: NetworkServiceResult(){
+        data class Success(val data: String) : IksicaResult()
+        class Failure(throwable: Throwable) : IksicaResult()
+    }
+
     sealed class PrisutnostResult: NetworkServiceResult(){
         class Success(val pris: MutableList<Dolazak>) : PrisutnostResult()
         class Failure(throwable: Throwable) : PrisutnostResult()

@@ -1,6 +1,8 @@
 package com.tstudioz.fax.fme.models.util
 
 import android.util.Log
+import com.tstudioz.fax.fme.database.models.Receipt
+import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.models.data.EventRecurring
 import com.tstudioz.fax.fme.models.data.TimetableEvent
@@ -9,9 +11,10 @@ import com.tstudioz.fax.fme.weather.Current
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneOffset
-import java.util.TimeZone
 
 
 suspend fun parseTimetable(body: String): List<TimetableItem> {
@@ -176,3 +179,58 @@ fun parseWeatherDetails(data: String): Current {
     current.setTemperature(currently.getDouble("air_temperature"))
     return current
 }
+
+fun parseRacuni(doc: String): List<Receipt> {
+    val racuni = mutableListOf<Receipt>()
+    val table = Jsoup.parse(doc).select("table")
+    val rows = table.select("tr")
+    for (row in rows) {
+        val cols = row.select("td")
+        if (cols.size >= 6) {
+            racuni.add(
+                Receipt(
+                    cols[0].text(),
+                    LocalDate.of(
+                        cols[1].text().split(".")[2].toInt(),
+                        cols[1].text().split(".")[1].toInt(),
+                        cols[1].text().split(".")[0].toInt()
+                    ),
+                    cols[1].text(),
+                    cols[2].text(),
+                    cols[3].text(),
+                    cols[4].text(),
+                    cols[5].text(),
+                    cols[6].select("a").attr("href")
+                )
+            )
+        }
+    }
+    return racuni.sortedByDescending {
+        LocalTime.of(
+            it.vrijeme.split(":")[0].toInt(),
+            it.vrijeme.split(":")[1].toInt()
+        )
+    }.sortedByDescending { it.datum }
+}
+
+fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {
+    val detaljiRacuna = mutableListOf<ReceiptItem>()
+    val table = Jsoup.parse(doc).select(".table-responsive").first()
+    val rows = table?.select("tbody")?.select("tr")
+    if (rows != null) {
+        for (row in rows) {
+            val cols = row.select("td")
+            detaljiRacuna.add(
+                ReceiptItem(
+                    cols[0].text(),
+                    cols[1].text(),
+                    cols[2].text(),
+                    cols[3].text(),
+                    cols[4].text()
+                )
+            )
+        }
+    }
+    return detaljiRacuna
+}
+

@@ -29,6 +29,7 @@ import com.tstudioz.fax.fme.view.activities.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
+import com.tstudioz.fax.fme.viewmodel.IksicaViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -55,6 +56,7 @@ class HomeFragment : Fragment() {
     private val forecastUrl =
         "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
+    private val iksicaViewModel: IksicaViewModel by inject()
     private var mrealm: Realm? = null
     private var date: String? = null
     private var snack: Snackbar? = null

@@ -34,6 +34,7 @@ import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
+import com.tstudioz.fax.fme.view.fragments.IksicaFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
@@ -188,6 +189,13 @@ class MainActivity : AppCompatActivity() {
                 R.id.tab_raspored
             )
         )
+        bar?.addTab(
+            bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.cal),
+                "Iksica",
+                R.id.tab_iksica
+            )
+        )
         bar?.selectTabById(R.id.tab_home, true)
     }
 
@@ -218,6 +226,11 @@ class MainActivity : AppCompatActivity() {
             R.id.tab_raspored -> {
                 supportActionBar?.title = "Raspored"
                 ft.replace(R.id.frame, timeTableFragment)
+            }
+
+            R.id.tab_iksica -> {
+                supportActionBar?.title = "Iksica"
+                ft.replace(R.id.frame, IksicaFragment())
             }
         }
         ft.addToBackStack(null)
