@@ -34,8 +34,7 @@ suspend fun parseTimetable(body: String): List<TimetableItem> {
             val endmin = e.attr("data-endsmin").toInt() ?: -1
             val type = parseEventType(e.selectFirst("span.groupCategory"))
             val name = e.selectFirst("span.name.normal")?.text()
-                ?: e.selectFirst("div.popup > div.eventContent > div.header > div > span.title")?.text()
-                ?: ""
+                ?: e.selectFirst("div.popup > div.eventContent > div.header > div > span.title")?.text() ?: ""
             val timespan = e.selectFirst("div.timespan")?.text() ?: ""
             val group = e.select("span.group.normal").first()?.text() ?: ""
             val studycode = e.selectFirst("span.studyCode")?.text() ?: ""
@@ -95,14 +94,10 @@ suspend fun parseTimetableInfo(body: String): List<TimeTableInfo> {
                 jsn.split("ColorCode\":\"")[1].split("\"")[0],
                 jsn.split("IsWorking\":")[1].split(",")[0].toBoolean(),
                 LocalDateTime.ofEpochSecond(
-                    jsn.split("StartDate\":\"\\/Date(")[1].split(")")[0].toLong().div(1000),
-                    0,
-                    ZoneOffset.UTC
+                    jsn.split("StartDate\":\"\\/Date(")[1].split(")")[0].toLong().div(1000), 0, ZoneOffset.UTC
                 ).toLocalDate().plusDays(1),
                 LocalDateTime.ofEpochSecond(
-                    jsn.split("EndDate\":\"\\/Date(")[1].split(")")[0].toLong().div(1000),
-                    0,
-                    ZoneOffset.UTC
+                    jsn.split("EndDate\":\"\\/Date(")[1].split(")")[0].toLong().div(1000), 0, ZoneOffset.UTC
                 ).toLocalDate().plusDays(1)
             )
         )
@@ -207,8 +202,7 @@ fun parseRacuni(doc: String): List<Receipt> {
     }
     return racuni.sortedByDescending {
         LocalTime.of(
-            it.vrijeme.split(":")[0].toInt(),
-            it.vrijeme.split(":")[1].toInt()
+            it.vrijeme.split(":")[0].toInt(), it.vrijeme.split(":")[1].toInt()
         )
     }.sortedByDescending { it.datum }
 }
@@ -217,18 +211,23 @@ fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {
     val detaljiRacuna = mutableListOf<ReceiptItem>()
     val table = Jsoup.parse(doc).select(".table-responsive").first()
     val rows = table?.select("tbody")?.select("tr")
-    if (rows != null) {
-        for (row in rows) {
-            val cols = row.select("td")
-            detaljiRacuna.add(
-                ReceiptItem(
-                    cols[0].text(),
-                    cols[1].text(),
-                    cols[2].text(),
-                    cols[3].text(),
-                    cols[4].text()
-                )
-            )
+    rows?.forEach { row ->
+        val cols = row.select("td")
+        val item = ReceiptItem(
+            cols[0].text(),
+            cols[1].text(),
+            cols[2].text(),
+            cols[3].text(),
+            cols[4].text()
+        )
+        if (!detaljiRacuna.any { it.nazivArtikla == item.nazivArtikla && it.cijenaJednogArtikla == item.cijenaJednogArtikla }) {
+            detaljiRacuna.add(item)
+        } else {
+            val index = detaljiRacuna.indexOf(
+                detaljiRacuna.first {
+                    it.nazivArtikla == item.nazivArtikla && it.cijenaJednogArtikla == item.cijenaJednogArtikla
+                })
+            detaljiRacuna[index].kolicina = (detaljiRacuna[index].kolicina.toInt() + item.kolicina.toInt()).toString()
         }
     }
     return detaljiRacuna

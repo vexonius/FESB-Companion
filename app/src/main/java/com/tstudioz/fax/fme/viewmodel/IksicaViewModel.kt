@@ -27,6 +27,9 @@ class IksicaViewModel(
     private val _itemToShow = MutableLiveData<Receipt>()
     val itemToShow: LiveData<Receipt> = _itemToShow
 
+    private var _loadingTxt = MutableLiveData<String>()
+    val loadingTxt: LiveData<String> = _loadingTxt
+
     fun toggleShowItem(value: Boolean) {
         _showItem.postValue(value)
     }
@@ -39,9 +42,13 @@ class IksicaViewModel(
     fun login(email: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                _loadingTxt.postValue("Getting AuthState...")
                 repository.getAuthState()
+                _loadingTxt.postValue("Logging in...")
                 repository.login(email, password)
+                _loadingTxt.postValue("Getting ASP.NET Session...")
                 repository.getAspNetSessionSAML()
+                _loadingTxt.postValue("Parsing Data...")
                 _receipts.postValue(repository.getRacuni())
             } catch (e: Exception) {
                 e.printStackTrace()

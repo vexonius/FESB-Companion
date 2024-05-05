@@ -35,13 +35,10 @@ class IksicaFragment : Fragment() {
             (shPref.getString("username", "") ?: "") + "@fesb.hr",
             shPref.getString("password", "") ?: ""
         ) // Unsafe call on a nullable receiver of type "IksicaViewModel?
-
-        iksicaViewModel.receipts.observe(viewLifecycleOwner) {
-            it.forEach(::println)
-            composeView.setContent {
-                AppTheme { IksicaCompose() }
-            }
+        composeView.setContent {
+            AppTheme { IksicaCompose() }
         }
+
         setHasOptionsMenu(true)
 
         return binding?.root
