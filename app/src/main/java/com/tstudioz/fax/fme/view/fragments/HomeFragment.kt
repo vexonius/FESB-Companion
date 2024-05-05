@@ -29,11 +29,13 @@ import com.tstudioz.fax.fme.view.activities.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
+import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.json.JSONException
@@ -55,7 +57,8 @@ class HomeFragment : Fragment() {
     private val forecastUrl =
         "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
-    private var mrealm: Realm? = null
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val mainViewModel: MainViewModel by inject()
     private var date: String? = null
     private var snack: Snackbar? = null
 
@@ -154,22 +157,20 @@ class HomeFragment : Fragment() {
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun showList() {
-        mrealm = Realm.open(dbManager.getDefaultConfiguration())
-        val rezultati = date?.let {
-            mrealm?.query<Predavanja>("detaljnoVrijeme CONTAINS $0", it)?.find()
-
-        }
-        if (rezultati != null && rezultati.isEmpty()) {
-            binding?.rv?.visibility = View.INVISIBLE
-            binding?.nemaPredavanja?.visibility = View.VISIBLE
-        } else if (rezultati != null) {
-            binding?.nemaPredavanja?.visibility = View.GONE
-            binding?.rv?.visibility = View.VISIBLE
-            val adapter = HomePredavanjaAdapter(rezultati)
-            binding?.rv?.adapter = adapter
-            binding?.rv?.layoutManager = LinearLayoutManager(activity)
-            binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
+        mainViewModel.lessons.observe(viewLifecycleOwner){ lessons ->
+            if (lessons != null && lessons.isEmpty()) {
+                binding?.rv?.visibility = View.INVISIBLE
+                binding?.nemaPredavanja?.visibility = View.VISIBLE
+            } else if (lessons != null) {
+                binding?.nemaPredavanja?.visibility = View.GONE
+                binding?.rv?.visibility = View.VISIBLE
+                val adapter = HomePredavanjaAdapter(lessons)
+                binding?.rv?.adapter = adapter
+                binding?.rv?.layoutManager = LinearLayoutManager(activity)
+                binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
+            }
         }
     }
 
@@ -269,9 +270,6 @@ class HomeFragment : Fragment() {
             )
         requireActivity().window.statusBarColor =
             ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
-        if (mrealm != null) {
-            mrealm?.close()
-        }
         super.onStop()
     }
 

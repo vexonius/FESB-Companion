@@ -1,6 +1,7 @@
-package com.tstudioz.fax.fme.models.data
+package com.tstudioz.fax.fme.database.models
 
 data class TimetableItem(val id: Int,
+
                          val startDate: String = "",
                          val endDate: String = "",
                          val startHour: Int = 0,
@@ -8,13 +9,19 @@ data class TimetableItem(val id: Int,
                          val endHour: Int = 0,
                          val endMin: Int = 0,
                          val name: String = "",
+
+
                          val eventType: TimetableEvent = TimetableEvent.GENERIC,
+
                          val group: String = "",
                          val room: String = "",
                          val timeSpan: String = "",
+
                          val studyCode: String = "",
+
                          val recurring: Boolean = false,
                          val recurringType: EventRecurring = EventRecurring.UNDEFINED,
+
                          val detailDateWithDayName: String = "",
                          val professor: String = "",
                          val classDuration: Int = 0,

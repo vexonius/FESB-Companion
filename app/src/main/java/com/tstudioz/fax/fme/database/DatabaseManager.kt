@@ -16,7 +16,8 @@ class DatabaseManager: DatabaseManagerInterface {
                 Meni::class,
                 Racun::class,
                 Kolegij::class,
-                KolegijTjedan::class))
+                KolegijTjedan::class,
+                EventRealm::class))
             .name("default.realm")
             .schemaVersion(1)
             .encryptionKey("nekikljuckojicemopromjenitiubuducnostialisadjetujernedamisebolje".toByteArray())

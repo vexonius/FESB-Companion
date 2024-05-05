@@ -7,18 +7,26 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.database.DatabaseManager
+import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.database.models.EventRealm
 import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.models.data.TimetableItem
+import com.tstudioz.fax.fme.database.models.TimetableItem
+import com.tstudioz.fax.fme.database.models.fromRealmObject
 import com.tstudioz.fax.fme.models.data.User
+import io.realm.kotlin.Realm
+import io.realm.kotlin.ext.query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.java.KoinJavaComponent.inject
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -33,10 +41,9 @@ class MainViewModel(
 
     val tableGot: MutableLiveData<String> = MutableLiveData()
     var tableGotPerm = MutableLiveData<Boolean>()
+    private val dbManager: DatabaseManagerInterface by inject(DatabaseManager::class.java)
 
-    init {
-        fetchTimetableInfo()
-    }
+
 
     private val _showDay = MutableLiveData<Boolean>().apply { value = false }
     private val _showDayEvent = MutableLiveData<Event>()
@@ -51,13 +58,16 @@ class MainViewModel(
     val shownWeek: LiveData<LocalDate> = _shownWeek
     val showWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
 
+    init {
+        fetchTimetableInfo()
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
+        _lessons.postValue(realm.query<EventRealm>().find().map{ fromRealmObject(it) })
+    }
     fun fetchUserTimetable(user: User, startDate: String, endDate: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 println("started Fetching Timetable for user")
-                val list = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
-                val svaFreshPredavanja = timetableToPredavanje(list)
-                val events = timetableToEvent(list)
+                val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(
                     LocalDate.of(
                         startDate.split("-")[2].toInt(),
@@ -66,7 +76,7 @@ class MainViewModel(
                     )
                 )
                 _lessons.postValue(events)
-                insertOrUpdateTimeTable(svaFreshPredavanja)
+                insertOrUpdateTimeTable(events)
                 tableGotPerm.postValue(true)
             } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
@@ -75,7 +85,7 @@ class MainViewModel(
         }
     }
 
-    fun fetchTimetableInfo(
+    private fun fetchTimetableInfo(
         startDate: String = (LocalDate.now().year - 1).toString() + "-8-1",
         endDate: String = (LocalDate.now().year + 1).toString() + "-8-1"
     ) {
@@ -113,115 +123,6 @@ class MainViewModel(
         return predavanja
     }
 
-    private fun timetableToEvent(timetable: List<TimetableItem>): List<Event> {
-        val events = mutableListOf<Event>()
-        /*events.add(
-            Event(
-                id = "0",
-                name = "Ponedjeljak",
-                fullName = "Ponedjeljak",
-                shortName = "P",
-                colorId = R.color.blue_nice,
-                color = Color.White,
-                teacher = "matko",
-                type = "Pred",
-                groups = "nemaa",
-                classroom = "C502",
-                classroomShort = "C502",
-                start = LocalDateTime.of(
-                    LocalDate.of(2024, 5 ,2),
-                    LocalTime.of(7, 15)
-                ),
-                end = LocalDateTime.of(
-                    LocalDate.of(2024, 5 ,2),
-                    LocalTime.of(8, 0)
-                ),
-                week = "a",
-                description = "C502"
-            )
-        )
-        events.add(
-            Event(
-                id = "0",
-                name = "Ponedjeljak",
-                fullName = "Ponedjeljak",
-                shortName = "P",
-                colorId = R.color.blue_nice,
-                color = Color.White,
-                teacher = "matko",
-                type = "Pred",
-                groups = "nemaa",
-                classroom = "C502",
-                classroomShort = "C502",
-                start = LocalDateTime.of(
-                    LocalDate.of(2024, 5 ,2),
-                    LocalTime.of(20, 15)
-                ),
-                end = LocalDateTime.of(
-                    LocalDate.of(2024, 5 ,2),
-                    LocalTime.of(21, 1)
-                ),
-                week = "a",
-                description = "C502"
-            )
-        )*/
-        for (l in timetable) {
-            val event = Event(
-                id = l.id.toString(),
-                name = l.name,
-                fullName = l.name,
-                shortName = l.name.split(" ").toTypedArray().let {
-                    val title = StringBuilder()
-                    for (part in it)
-                        title.append(part[0].uppercase())
-                    title.toString()
-                } ?: "",
-                colorId = getBoja(l.eventType.type),
-                color = Color.White,
-                teacher = l.professor,
-                type = l.eventType.type,
-                groups = l.group,
-                classroom = l.room,
-                classroomShort = l.room,
-                start = LocalDateTime.of(
-                    LocalDate.of(
-                        l.startDate.split("-")[0].toInt(),
-                        l.startDate.split("-")[1].toInt(),
-                        l.startDate.split("-")[2].toInt()
-                    ),
-                    LocalTime.of(l.startHour, l.startMin)
-                ),
-                end = LocalDateTime.of(
-                    LocalDate.of(
-                        l.endDate.split("-")[0].toInt(),
-                        l.endDate.split("-")[1].toInt(),
-                        l.endDate.split("-")[2].toInt()
-                    ),
-                    LocalTime.of(l.endHour, l.endMin)
-                ),
-                week = "",
-                description = l.room
-            )
-            events.add(event)
-        }
-        return events
-    }
-
-    private fun getBoja(predavanjeIme: String): Int {
-        return when (predavanjeIme) {
-            "Predavanje" -> R.color.blue_nice
-            "Auditorne vježbe" -> R.color.green_nice
-            "Kolokvij" -> R.color.purple_nice
-            "Laboratorijske vježbe" -> R.color.red_nice
-            "Konstrukcijske vježbe" -> R.color.grey_nice
-            "Seminar" -> R.color.blue_nice
-            "Ispit" -> R.color.purple_dark
-            else -> {
-                R.color.blue_nice
-            }
-        }
-    }
-
     fun fetchUserTimetableTemp(user: User, startDate: String, endDate: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -250,7 +151,7 @@ class MainViewModel(
         _showDay.postValue(false)
     }
 
-    private suspend fun insertOrUpdateTimeTable(classes: List<Predavanja>) {
+    private suspend fun insertOrUpdateTimeTable(classes: List<Event>) {
         timeTableRepository.insertTimeTable(classes)
     }
 
