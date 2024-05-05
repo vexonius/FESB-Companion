@@ -32,7 +32,6 @@ class TimeTableFragment : Fragment() {
         mainViewModel.loadPermEvents()
 
         mainViewModel.lessonsToShow.observe(viewLifecycleOwner) {
-            it.forEach(::println)
             composeView.setContent {
                 AppTheme { HomeCompose() }
             }
