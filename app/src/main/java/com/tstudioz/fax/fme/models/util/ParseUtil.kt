@@ -2,7 +2,6 @@ package com.tstudioz.fax.fme.models.util
 
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.EventOfType
 import com.tstudioz.fax.fme.database.models.Recurring
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.weather.Current
@@ -30,7 +29,7 @@ suspend fun parseTimetable(body: String): List<Event> {
             val endDateSplit = enddate.split("-")
             val endh = e.attr("data-endshour").toInt()
             val endmin = e.attr("data-endsmin").toInt()
-            val type = parseEventType(e.selectFirst("span.groupCategory"))
+            val type = editType(e.selectFirst("span.groupCategory")?.text()?.split(",")?.get(0) ?: "")
             val name = e.selectFirst("span.name.normal")?.text()
                 ?: e.selectFirst("div.popup > div.eventContent > div.header > div > span.title")?.text()
                 ?: ""
@@ -54,7 +53,7 @@ suspend fun parseTimetable(body: String): List<Event> {
                     eventType = type,
                     groups = group,
                     classroom = room,
-                    colorId = getBoja(name),
+                    colorId = getBoja(type),
                     start = LocalDateTime.of(
                         startDateSplit[0].toInt(),
                         startDateSplit[1].toInt(),
@@ -82,13 +81,27 @@ suspend fun parseTimetable(body: String): List<Event> {
     return events
 }
 
-private fun getBoja(predavanjeIme: String): Int {
-    return when (predavanjeIme) {
+private fun editType(type: String): String {
+    return when (type) {
+        "Predavanja" -> "Predavanje"
+        "Auditorne vježbe" -> "Auditorna vježba"
+        "Kolokviji" -> "Kolokvij"
+        "Laboratorijske vježbe" -> "Laboratorijska vježba"
+        "Konstrukcijske vježbe" -> "Konstrukcijska vježba"
+        "Seminar," -> "Seminar"
+        "Ispit" -> "Ispit"
+        else -> type
+    }
+}
+
+
+private fun getBoja(type: String): Int {
+    return when (type) {
         "Predavanje" -> R.color.blue_nice
-        "Auditorne vježbe" -> R.color.green_nice
+        "Auditorna vježba" -> R.color.green_nice
         "Kolokvij" -> R.color.purple_nice
-        "Laboratorijske vježbe" -> R.color.red_nice
-        "Konstrukcijske vježbe" -> R.color.grey_nice
+        "Laboratorijska vježba" -> R.color.red_nice
+        "Konstrukcijska vježba" -> R.color.grey_nice
         "Seminar" -> R.color.blue_nice
         "Ispit" -> R.color.purple_dark
         else -> {
@@ -104,7 +117,7 @@ suspend fun makeAcronym(name: String): String {
         val nameSplit = name.split(" ").toTypedArray()
         for (str in nameSplit)
             acronym.append(str[0])
-        return acronym.toString()
+        return acronym.toString().uppercase()
     }
     return name
 }
@@ -151,22 +164,6 @@ private fun parseNumbersFromString(element: Element?): Recurring {
         element.hasClass("everyTwoWeeks") -> Recurring.EVERY_TWO_WEEKS
         element.hasClass("monthly") -> Recurring.MONTHLY
         else -> Recurring.UNDEFINED
-    }
-}
-
-private fun parseEventType(element: Element?): EventOfType { // fixxxxxxxxxxxxxx
-    if (element == null) return EventOfType.GENERIC
-
-    return when (element.text()) {
-        "Predavanja," -> EventOfType.PREDAVANJA
-        "Auditorne vježbe," -> EventOfType.AUDITORNE_VJEZBE
-        "Kolokviji," -> EventOfType.KOLOKVIJ
-        "Laboratorijske vježbe," -> EventOfType.LABARATORIJSKE_VJEZBE
-        "Konstrukcijske vježbe," -> EventOfType.KONSTRUKCIJSKE_VJEZBE
-        "Seminar," -> EventOfType.SEMINAR
-        "Ispiti," -> EventOfType.ISPIT
-        "Terenska nastava," -> EventOfType.TERENSKA_NASTAVA
-        else -> EventOfType.GENERIC
     }
 }
 

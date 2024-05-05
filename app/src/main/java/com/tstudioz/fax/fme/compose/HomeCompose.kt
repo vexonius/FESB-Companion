@@ -50,7 +50,6 @@ import org.koin.java.KoinJavaComponent.inject
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
@@ -66,7 +65,7 @@ fun HomeCompose() {
             if (mainViewModel.showDay.observeAsState(initial = false).value) {
                 ModalBottomSheet(
                     sheetState = sheetState,
-                    onDismissRequest = { mainViewModel.hideDay() },
+                    onDismissRequest = { mainViewModel.hideEvent() },
                     containerColor = event?.color ?: Color.Transparent,
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
@@ -146,16 +145,15 @@ fun HomeCompose() {
                                 Text(text = "Odustani")
                             }
                             Button(onClick = {
-                                val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
-
                                 if (selection != null) {
                                     val start = selection!!.date.dayOfWeek.value
                                     val startDate = selection!!.date.minusDays((start - 1).toLong())
                                     val endDate = selection!!.date.plusDays(7 - start.toLong())
                                     mainViewModel.fetchUserTimetable(
                                         User(shPref.getString("username", "") ?: "", ""),
-                                        dateFormatter.format(startDate),
-                                        dateFormatter.format(endDate)
+                                        startDate,
+                                        endDate,
+                                        startDate
                                     )
                                     coroutineScope.launch {
                                         sheetState.hide()
@@ -174,7 +172,7 @@ fun HomeCompose() {
         sheetPeekHeight = 0.dp,
     ) {
         Column {
-            val mapped = mainViewModel.lessons.observeAsState(emptyList()).value.onEach {
+            val mapped = mainViewModel.lessonsToShow.observeAsState(emptyList()).value.onEach {
                 it.color = colorResource(id = it.colorId)
             }
             val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
@@ -190,6 +188,9 @@ fun HomeCompose() {
                 else LocalTime.of(20, 0),
                 minDate = mainViewModel.shownWeek.value ?: LocalDate.now(),
                 maxDate = (mainViewModel.shownWeek.value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
+                onClick = { event ->
+                    mainViewModel.showEvent(event)
+                }
             )
 
         }

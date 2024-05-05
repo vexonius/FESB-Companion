@@ -1,10 +1,8 @@
 package com.tstudioz.fax.fme.view.fragments
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,10 +19,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Note
-import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.databinding.HomeTabBinding
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.activities.IndexActivity
+import com.tstudioz.fax.fme.view.activities.MainActivity
 import com.tstudioz.fax.fme.view.activities.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter
@@ -44,6 +42,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 
@@ -57,6 +56,7 @@ class HomeFragment : Fragment() {
     private val forecastUrl =
         "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by inject()
     private var date: String? = null
@@ -84,7 +84,7 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         setCyanStatusBarColor()
-        showList()
+        (activity as MainActivity?)?.mojRaspored()
     }
 
     private fun getDate() {
@@ -159,14 +159,16 @@ class HomeFragment : Fragment() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun showList() {
-        mainViewModel.lessons.observe(viewLifecycleOwner){ lessons ->
-            if (lessons != null && lessons.isEmpty()) {
+        mainViewModel.lessonsPerm.observe(viewLifecycleOwner) { lessons ->
+            val filteredLessons = lessons.filter { it.start.toLocalDate() == LocalDate.now() }
+            binding?.TimeRaspGot?.text = shPref.getString("timeGotcurrentrasp", "") ?: ""
+            if (filteredLessons.isEmpty()) {
                 binding?.rv?.visibility = View.INVISIBLE
                 binding?.nemaPredavanja?.visibility = View.VISIBLE
-            } else if (lessons != null) {
+            } else {
                 binding?.nemaPredavanja?.visibility = View.GONE
                 binding?.rv?.visibility = View.VISIBLE
-                val adapter = HomePredavanjaAdapter(lessons)
+                val adapter = HomePredavanjaAdapter(filteredLessons)
                 binding?.rv?.adapter = adapter
                 binding?.rv?.layoutManager = LinearLayoutManager(activity)
                 binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }

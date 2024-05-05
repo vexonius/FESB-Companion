@@ -29,7 +29,9 @@ class TimeTableFragment : Fragment() {
         binding = TimetableTabBinding.inflate(inflater, container, false)
         val composeView = binding?.composeView!!
 
-        mainViewModel.lessons.observe(viewLifecycleOwner) {
+        mainViewModel.loadPermEvents()
+
+        mainViewModel.lessonsToShow.observe(viewLifecycleOwner) {
             it.forEach(::println)
             composeView.setContent {
                 AppTheme { HomeCompose() }

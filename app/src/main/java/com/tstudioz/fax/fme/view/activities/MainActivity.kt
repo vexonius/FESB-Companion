@@ -40,18 +40,15 @@ import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.exceptions.RealmException
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.types.TypedRealmObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
@@ -80,14 +77,12 @@ class MainActivity : AppCompatActivity() {
 
         onBack()
         setUpToolbar()
-        getDate()
         setFragmentTabListener()
         testBottomBar()
         checkUser()
 
         isThereAction()
 
-        setTableGotListener()
         checkVersion()
         shouldShowGDPRDialog()
     }
@@ -112,39 +107,18 @@ class MainActivity : AppCompatActivity() {
         beginFragTransaction(R.id.tab_home)
     }
 
-    private fun setTableGotListener() {
-        mainViewModel.tableGotPerm.observe(this) { tableGot ->
-            if (tableGot) {
-                runOnUiThread {
-                    homeFragment.showList()
-                    if (supportFragmentManager.findFragmentById(R.id.frame) is HomeFragment) {
-                        val text: TextView = findViewById(R.id.TimeRaspGot)
-                        text.text = shPref.getString("timeGotcurrentrasp", "")
-                        text.visibility = View.VISIBLE
-                    }
-                }
-            } else {
-                runOnUiThread {
-                    homeFragment.showList()
-                }
-            }
-        }
-    }
-
     private fun checkUser() {
         var korisnik: Korisnik? = null
         realmLog = Realm.open(dbManager.getDefaultConfiguration())
-        editor = shPref.edit()
 
         try {
             korisnik = realmLog?.query<Korisnik>()?.find()?.first()
         } catch (ex: Exception) {
             ex.printStackTrace()
-            shPref[SPKey.LOGGED_IN] = false
-            Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+            invalidCreds()
         } finally {
             if (korisnik != null) {
+                editor = shPref.edit()
                 editor?.putString("username", korisnik.username)
                 editor?.putString("password", korisnik.password)
                 editor?.commit()
@@ -197,7 +171,11 @@ class MainActivity : AppCompatActivity() {
                 beginFragTransaction(newTab.id)
             }
 
-            override fun onTabReselected(index: Int, tab: Tab) {}
+            override fun onTabReselected(index: Int, tab: Tab) {
+                if (tab.id == R.id.tab_raspored) {
+                    mainViewModel.showWeekChooseMenu()
+                }
+            }
         })
     }
 
@@ -238,39 +216,41 @@ class MainActivity : AppCompatActivity() {
             } else {
                 showSnacOffline()
             }
-            R.id.choosesched -> {mainViewModel.showWeekChooseMenu()}
+
+            R.id.choosesched -> {
+                mainViewModel.showWeekChooseMenu()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
 
-    private fun mojRaspored() {
-        val user = shPref.getString("username", "")?.let { User(it, "") }
-        val dfandTime: DateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
-        val df: DateFormat = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault())
+    fun mojRaspored() {
+        if (NetworkUtils.isNetworkAvailable(this)) {
+            val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
+            editor = shPref.edit()
+            editor?.putString("timeGotcurrentrasp", LocalDateTime.now().format(dateTimeFormatter))
+            editor?.commit()
 
-        val calendar = Calendar.getInstance()
+            val user = shPref.getString("username", "")?.let { User(it, "") }
 
-        val dateandtime = dfandTime.format(calendar.time)
+            val now = LocalDate.now().plusDays(1)
+            val start = now.dayOfWeek.value
+            val startDate = now.plusDays((1 - start).toLong())
+            val endDate = now.plusDays(7 - start.toLong())
 
-        calendar[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
-        val startdate = df.format(calendar.time)
-
-        calendar.add(Calendar.DAY_OF_WEEK, Calendar.SATURDAY - Calendar.MONDAY)
-        val enddate = df.format(calendar.time)
-
-        if (user != null) {
-            mainViewModel.fetchUserTimetable(user, startdate, enddate)
+            if (user != null) {
+                mainViewModel.fetchUserTimetableCurrentWeekAndSave(user, startDate, endDate, startDate)
+            }
+        } else {
+            showSnacOffline()
         }
-        editor = shPref.edit()
-        editor?.putString("timeGotcurrentrasp", dateandtime)
-        editor?.commit()
+
     }
 
     private fun invalidCreds() {
-        editor = shPref.edit()
-        editor?.putBoolean("logged_in", false)
-        editor?.apply()
+        shPref[SPKey.LOGGED_IN] = false
+        Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
 
         realmLog = Realm.open(dbManager.getDefaultConfiguration())
         try {
@@ -281,11 +261,7 @@ class MainActivity : AppCompatActivity() {
             realmLog?.close()
         }
         startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-    }
-
-    private fun getDate() {
-        val df: DateFormat = SimpleDateFormat("d.M.yyyy.", Locale.getDefault())
-        date = df.format(Calendar.getInstance().time)
+        finish()
     }
 
     private fun showSnacOffline() {

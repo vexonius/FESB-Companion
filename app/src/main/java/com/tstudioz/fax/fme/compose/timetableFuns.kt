@@ -45,11 +45,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.EventOfType
-import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.java.KoinJavaComponent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -86,6 +83,7 @@ val EventTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 fun BasicEvent(
     positionedEvent: PositionedEvent,
     modifier: Modifier = Modifier,
+    onClick : (Event) -> Unit = {}
 ) {
     val event = positionedEvent.event
     val topRadius =
@@ -111,11 +109,8 @@ fun BasicEvent(
                     bottomStart = bottomRadius,
                 )
             )
-            .padding(4.dp)
-            .clickable { //refactor this, homeviewmodel inited way too many times
-                val mainViewModel: MainViewModel by KoinJavaComponent.inject(MainViewModel::class.java)
-                mainViewModel.showDay(event)
-            }
+            .padding(2.dp)
+            .clickable { onClick(positionedEvent.event) }
     ) {
         Text(
             text = event.shortName,
@@ -129,7 +124,7 @@ fun BasicEvent(
 
         if (event.description != null) {
             Text(
-                text = event.description,
+                text = event.classroom,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -374,9 +369,11 @@ sealed class ScheduleSize {
 fun Schedule(
     events: List<Event>,
     modifier: Modifier = Modifier,
+    onClick: (Event) -> Unit = { },
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
         BasicEvent(
-            positionedEvent = it
+            positionedEvent = it,
+            onClick = onClick
         )
     },
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
@@ -468,7 +465,8 @@ fun BasicSchedule(
     modifier: Modifier = Modifier,
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
         BasicEvent(
-            positionedEvent = it
+            positionedEvent = it,
+            onClick = { }
         )
     },
     minDate: LocalDate = events.minByOrNull(Event::start)?.start?.toLocalDate() ?: LocalDate.now(),
@@ -568,7 +566,8 @@ fun EventPreview(
             event.start.toLocalTime(),
             event.end.toLocalTime()
         ),
-        modifier = Modifier.sizeIn(maxHeight = 64.dp)
+        modifier = Modifier.sizeIn(maxHeight = 64.dp),
+        onClick = { }
     )
 }
 
@@ -645,7 +644,7 @@ private val sampleEvents2 = listOf(
         color = Color.Blue,
         colorId = 2131099687,
         professor = "matko",
-        eventType= EventOfType.AUDITORNE_VJEZBE,
+        eventType= "Auditorne vježbe",
         groups = "nemaa",
         classroom = "C502",
         start = LocalDateTime.parse("2024-05-02T10:15"),
@@ -659,7 +658,7 @@ private val sampleEvents2 = listOf(
         color = Color.Blue,
         colorId = 2131099687,
         professor = "Čagalj Mario",
-        eventType = EventOfType.PREDAVANJA,
+        eventType = "Predavanje",
         groups = "",
         classroom = "C501",
         start = LocalDateTime.parse("2024-04-29T10:15"),
@@ -673,7 +672,7 @@ private val sampleEvents2 = listOf(
         color = Color.Blue,
         colorId = 2131100480,
         professor = "Bašić Martina",
-        eventType = EventOfType.LABARATORIJSKE_VJEZBE,
+        eventType = "Laboratorijske vježbe",
         groups = "Grupa 1,",
         classroom = "B420",
         start = LocalDateTime.parse("2024-04-29T18:30"),
@@ -687,7 +686,7 @@ private val sampleEvents2 = listOf(
         color = Color.Blue,
         colorId = 2131099687,
         professor = "Vasilj Josip",
-        eventType = EventOfType.PREDAVANJA,
+        eventType = "Predavanje",
         groups = "",
         classroom = "A243",
         start = LocalDateTime.parse("2024-04-30T08:15"),
@@ -701,7 +700,7 @@ private val sampleEvents2 = listOf(
         color = Color.Blue,
         colorId = 2131099687,
         professor = "Marasović Jadranka",
-        eventType = EventOfType.PREDAVANJA,
+        eventType = "Predavanje",
         groups = "",
         classroom = "C502",
         start = LocalDateTime.parse("2024-04-30T10:15"),
@@ -715,7 +714,7 @@ private val sampleEvents2 = listOf(
         color = Color.Blue,
         colorId = 2131099687,
         professor = "Russo Mladen",
-        eventType = EventOfType.PREDAVANJA,
+        eventType = "Predavanje",
         groups = "",
         classroom = "A105",
         start = LocalDateTime.parse("2024-04-30T12:15"),
@@ -729,7 +728,7 @@ private val sampleEvents2 = listOf(
         color = Color.Blue,
         colorId = 2131100480,
         professor = "Vasilj Josip",
-        eventType = EventOfType.LABARATORIJSKE_VJEZBE,
+        eventType = "Laboratorijske vježbe",
         groups = "Grupa 1,",
         classroom = "A507",
         start = LocalDateTime.parse("2024-05-02T10:00"),
@@ -743,7 +742,7 @@ private val sampleEvents2 = listOf(
         color = Color.Blue,
         colorId = 2131100480,
         professor = "Sikora Marjan",
-        eventType = EventOfType.LABARATORIJSKE_VJEZBE,
+        eventType = "Laboratorijske vježbe",
         groups = "Grupa 1,",
         classroom = "B526",
         start = LocalDateTime.parse("2024-05-02T08:30"),
@@ -757,7 +756,7 @@ private val sampleEvents2 = listOf(
         color = Color.Blue,
         colorId = 2131100480,
         professor = "Meter Davor",
-        eventType = EventOfType.LABARATORIJSKE_VJEZBE,
+        eventType = "Laboratorijske vježbe",
         groups = "Grupa 1,",
         classroom = "B526",
         start = LocalDateTime.parse("2024-05-03T08:00"),

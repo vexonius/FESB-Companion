@@ -13,7 +13,7 @@ data class Event(
     var color: Color = Color.Blue,
     val colorId : Int = 0,
     val professor: String = "",
-    val eventType: EventOfType = EventOfType.GENERIC,
+    val eventType: String = "",
     val groups: String = "",
     val classroom: String = "",
     val start: LocalDateTime,
@@ -24,19 +24,6 @@ data class Event(
     val recurringUntil: String = "",
     val studyCode: String = "",
     )
-
-enum class EventOfType(val type: String) {
-
-    PREDAVANJA("Predavanje"),
-    AUDITORNE_VJEZBE("Auditorne vježbe"),
-    LABARATORIJSKE_VJEZBE("Laboratorijske vježbe"),
-    KONSTRUKCIJSKE_VJEZBE("Konstrukcijske vježbe"),
-    KOLOKVIJ("Kolokvij"),
-    SEMINAR("Seminar"),
-    ISPIT("Ispit"),
-    GENERIC(""),
-    TERENSKA_NASTAVA("Terenska nastava")
-}
 
 enum class Recurring {
     ONCE, WEEKLY, EVERY_TWO_WEEKS, MONTHLY, UNDEFINED
@@ -49,7 +36,7 @@ fun toRealmObject(event: Event): EventRealm {
         shortName = event.shortName
         colorId = event.colorId
         professor = event.professor
-        eventType = event.eventType.type
+        eventType = event.eventType
         groups = event.groups
         classroom = event.classroom
         start = event.start.toString()
@@ -69,7 +56,7 @@ fun fromRealmObject(eventRealm: EventRealm): Event {
         shortName = eventRealm.shortName ?: "",
         colorId = eventRealm.colorId ?: 0,
         professor = eventRealm.professor ?: "",
-        eventType = EventOfType.valueOf(eventRealm.eventType ?: ""),
+        eventType = eventRealm.eventType ?: "",
         groups = eventRealm.groups ?: "",
         classroom = eventRealm.classroom ?: "",
         start = LocalDateTime.parse(eventRealm.start),

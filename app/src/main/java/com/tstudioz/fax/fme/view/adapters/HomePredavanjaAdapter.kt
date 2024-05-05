@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter.HomePredavanjaViewHolder
 import io.realm.kotlin.query.RealmResults
 
@@ -32,7 +31,7 @@ class HomePredavanjaAdapter(private val mPredavanjaDanas: List<Event>) :
         holder.name.text = predavanja.name
         holder.name.typeface = regulartf
         holder.type.text = predavanja.start.toLocalTime().toString() + " - " + predavanja.end.toLocalTime().toString()
-        holder.vrstaPredavanja.text = predavanja.eventType.type
+        holder.vrstaPredavanja.text = predavanja.eventType
         holder.mjesto.text = predavanja.classroom
 
         holder.boja.setBackgroundResource(predavanja.colorId)
