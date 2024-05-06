@@ -56,7 +56,7 @@ class MainViewModel(
 
     init {
         fetchTimetableInfo()
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
+        val realm = Realm.open(dbManager.getDefaultConfiguration()) // coroutine add here, can be done in background
         _lessonsPerm.postValue(realm.query<EventRealm>().find().map { fromRealmObject(it) })
     }
 
@@ -91,7 +91,7 @@ class MainViewModel(
                 editor?.putString("shownWeek", shownWeekMonday.toString())
                 editor?.apply()
                 _lessonsPerm.postValue(events)
-                insertOrUpdateTimeTable(events)
+                timeTableRepository.insertTimeTable(events)
             } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
             }
@@ -127,10 +127,6 @@ class MainViewModel(
 
     fun hideEvent() {
         _showEvent.postValue(false)
-    }
-
-    private suspend fun insertOrUpdateTimeTable(classes: List<Event>) {
-        timeTableRepository.insertTimeTable(classes)
     }
 
 }

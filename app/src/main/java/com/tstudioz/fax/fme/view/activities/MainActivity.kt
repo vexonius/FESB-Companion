@@ -229,7 +229,7 @@ class MainActivity : AppCompatActivity() {
         if (NetworkUtils.isNetworkAvailable(this)) {
             val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
             editor = shPref.edit()
-            editor?.putString("timeGotcurrentrasp", LocalDateTime.now().format(dateTimeFormatter))
+            editor?.putString("timeGotcurrentrasp", LocalDateTime.now().format(dateTimeFormatter)) // prebacit da se doda samo ako je uspjesno
             editor?.commit()
 
             val user = shPref.getString("username", "")?.let { User(it, "") }
@@ -377,6 +377,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     public override fun onResume() {
+        mojRaspored()
         super.onResume()
     }
 }

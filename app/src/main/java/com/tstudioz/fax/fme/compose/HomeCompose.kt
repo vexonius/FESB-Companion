@@ -221,7 +221,7 @@ fun Day(
             (it.EndDate?.compareTo(day.date) ?: -1) >= 0
         ) {
             when (it.ColorCode) {
-                "White" -> colors.add(Color.White)
+                "White" -> colors.add(Color.White) // move from here
                 "Blue" -> colors.add(Color(0xff0060ff))
                 "Yellow" -> colors.add(Color(0xffe5c700))
                 "Orange" -> colors.add(Color(0xffff6600))

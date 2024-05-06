@@ -123,7 +123,7 @@ suspend fun makeAcronym(name: String): String {
 }
 
 
-suspend fun parseTimetableInfo(body: String): List<TimeTableInfo> {
+suspend fun parseTimetableInfo(body: String): List<TimeTableInfo> { // refactor with retrofit
     val items = mutableListOf<TimeTableInfo>()
     val jsons = body.split("[", "]")[1].split("{", "},{", "}")
     for (jsn in jsons) {
