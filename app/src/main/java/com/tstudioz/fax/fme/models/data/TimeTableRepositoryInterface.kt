@@ -12,4 +12,7 @@ interface TimeTableRepositoryInterface {
 
     suspend fun insertTimeTable(classes: List<Event>)
 
-}
+    suspend fun loadFromDb(): List<Event>
+
+
+    }

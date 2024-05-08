@@ -14,6 +14,9 @@ import com.tstudioz.fax.fme.database.models.fromRealmObject
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
+import com.tstudioz.fax.fme.models.util.SPKey
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +24,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
@@ -39,11 +44,8 @@ class MainViewModel(
     private val _shownWeek = MutableLiveData<LocalDate>().apply {
         val now = LocalDate.now().plusDays(1)
         val start = now.dayOfWeek.value
-        value = (sharedPreferences.getString("shownWeek", "").let {
-            if (it != "") {
-                LocalDate.parse(it)
-            } else null
-        } ?: now.plusDays((1 - start).toLong()))
+        value = (sharedPreferences[SPKey.SHOWN_WEEK,""].let {
+            if (it != "") { LocalDate.parse(it) } else null } ?: now.plusDays((1 - start).toLong()))
     }
     private val _showWeekChooseMenu = MutableLiveData<Boolean>().apply { value = false }
     val showDay: LiveData<Boolean> = _showEvent
@@ -56,8 +58,9 @@ class MainViewModel(
 
     init {
         fetchTimetableInfo()
-        val realm = Realm.open(dbManager.getDefaultConfiguration()) // coroutine add here, can be done in background
-        _lessonsPerm.postValue(realm.query<EventRealm>().find().map { fromRealmObject(it) })
+        viewModelScope.launch(Dispatchers.IO) {
+            _lessonsPerm.postValue(timeTableRepository.loadFromDb())
+        }
     }
 
     fun fetchUserTimetable(user: User, startDate: LocalDate, endDate: LocalDate, shownWeekMonday: LocalDate) {
@@ -66,9 +69,7 @@ class MainViewModel(
                 println("started Fetching Timetable for user")
                 val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(shownWeekMonday)
-                val editor = sharedPreferences.edit()
-                editor?.putString("shownWeek", shownWeekMonday.toString())
-                editor?.apply()
+                sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
                 _lessonsToShow.postValue(events)
             } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
@@ -87,9 +88,9 @@ class MainViewModel(
                 println("started Fetching Timetable for user")
                 val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(shownWeekMonday)
-                val editor = sharedPreferences.edit()
-                editor?.putString("shownWeek", shownWeekMonday.toString())
-                editor?.apply()
+                sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
+                sharedPreferences[SPKey.TIMEGOTPERMRASP] =
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                 _lessonsPerm.postValue(events)
                 timeTableRepository.insertTimeTable(events)
             } catch (e: Exception) {

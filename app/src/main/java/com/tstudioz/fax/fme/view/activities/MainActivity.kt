@@ -227,11 +227,6 @@ class MainActivity : AppCompatActivity() {
 
     fun mojRaspored() {
         if (NetworkUtils.isNetworkAvailable(this)) {
-            val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
-            editor = shPref.edit()
-            editor?.putString("timeGotcurrentrasp", LocalDateTime.now().format(dateTimeFormatter)) // prebacit da se doda samo ako je uspjesno
-            editor?.commit()
-
             val user = shPref.getString("username", "")?.let { User(it, "") }
 
             val now = LocalDate.now().plusDays(1)

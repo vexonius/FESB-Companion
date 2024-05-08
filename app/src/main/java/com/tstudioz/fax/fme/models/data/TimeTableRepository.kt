@@ -38,6 +38,10 @@ class TimeTableRepository(
         timeTableDao.insert(classes)
     }
 
+    override suspend fun loadFromDb(): List<Event> {
+        return timeTableDao.loadFromDb()
+    }
+
     companion object {
         private val TAG = this.javaClass.canonicalName
     }

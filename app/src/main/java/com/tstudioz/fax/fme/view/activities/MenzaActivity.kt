@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.view.activities
 
-import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
@@ -10,19 +9,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.Dolazak
-import com.tstudioz.fax.fme.view.adapters.MeniesAdapter
 import com.tstudioz.fax.fme.database.models.Meni
 import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding
 import com.tstudioz.fax.fme.random.NetworkUtils
+import com.tstudioz.fax.fme.view.adapters.MeniesAdapter
 import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -32,7 +26,6 @@ import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import java.io.IOException
 
-@OptIn(InternalCoroutinesApi::class)
 class MenzaActivity : AppCompatActivity() {
 
     private val okHttpClient: OkHttpClient by inject()

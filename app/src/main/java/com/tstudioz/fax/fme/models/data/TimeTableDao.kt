@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.models.data
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.EventRealm
+import com.tstudioz.fax.fme.database.models.fromRealmObject
 import com.tstudioz.fax.fme.database.models.toRealmObject
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -20,6 +21,11 @@ class TimeTableDao(private val dbManager: DatabaseManagerInterface) : TimeTableD
                 this.copyToRealm(toRealmObject(it) , updatePolicy = UpdatePolicy.ALL)
             }
         }
+    }
+
+    override suspend fun loadFromDb(): List<Event> {
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
+        return realm.query<EventRealm>().find().map { fromRealmObject(it) }
     }
 
 }

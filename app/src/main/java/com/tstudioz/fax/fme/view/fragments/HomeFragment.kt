@@ -17,9 +17,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.databinding.HomeTabBinding
+import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.activities.IndexActivity
 import com.tstudioz.fax.fme.view.activities.MainActivity
@@ -93,7 +95,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setLastRaspGot() {
-        binding?.TimeRaspGot?.text = shPref.getString("timeGotcurrentrasp", "") ?: ""
+        binding?.TimeRaspGot?.text = shPref[SPKey.TIMEGOTPERMRASP, ""]
         binding?.TimeRaspGot?.visibility = View.VISIBLE
     }
 
@@ -161,7 +163,7 @@ class HomeFragment : Fragment() {
     fun showList() {
         mainViewModel.lessonsPerm.observe(viewLifecycleOwner) { lessons ->
             val filteredLessons = lessons.filter { it.start.toLocalDate() == LocalDate.now() }
-            binding?.TimeRaspGot?.text = shPref.getString("timeGotcurrentrasp", "") ?: ""
+            binding?.TimeRaspGot?.text = shPref[SPKey.TIMEGOTPERMRASP, ""]
             if (filteredLessons.isEmpty()) {
                 binding?.rv?.visibility = View.INVISIBLE
                 binding?.nemaPredavanja?.visibility = View.VISIBLE

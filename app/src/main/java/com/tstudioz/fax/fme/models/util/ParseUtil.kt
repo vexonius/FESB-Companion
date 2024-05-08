@@ -1,5 +1,9 @@
 package com.tstudioz.fax.fme.models.util
 
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Recurring
@@ -8,6 +12,8 @@ import com.tstudioz.fax.fme.weather.Current
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import java.lang.reflect.Type
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -123,37 +129,45 @@ suspend fun makeAcronym(name: String): String {
 }
 
 
-suspend fun parseTimetableInfo(body: String): List<TimeTableInfo> { // refactor with retrofit
-    val items = mutableListOf<TimeTableInfo>()
-    val jsons = body.split("[", "]")[1].split("{", "},{", "}")
-    for (jsn in jsons) {
-        if (jsn.isEmpty()) continue
-        items.add(
-            TimeTableInfo(
-                jsn.split("Id\":\"")[1].split("\",")[0].toInt(),
-                jsn.split("Name\":\"")[1].split("\"")[0],
-                jsn.split("StartDate\":\"\\/Date(")[1].split(")")[0].toLong(),
-                jsn.split("EndDate\":\"\\/Date(")[1].split(")")[0].toLong(),
-                jsn.split("StartDateText\":\"")[1].split("\"")[0],
-                jsn.split("EndDateText\":\"")[1].split("\"")[0],
-                jsn.split("Category\":\"")[1].split("\"")[0],
-                jsn.split("ColorCode\":\"")[1].split("\"")[0],
-                jsn.split("IsWorking\":")[1].split(",")[0].toBoolean(),
-                LocalDateTime.ofEpochSecond(
-                    jsn.split("StartDate\":\"\\/Date(")[1].split(")")[0].toLong().div(1000),
-                    0,
-                    ZoneOffset.UTC
-                ).toLocalDate().plusDays(1),
-                LocalDateTime.ofEpochSecond(
-                    jsn.split("EndDate\":\"\\/Date(")[1].split(")")[0].toLong().div(1000),
-                    0,
-                    ZoneOffset.UTC
-                ).toLocalDate().plusDays(1)
-            )
-        )
-    }
+suspend fun parseTimetableInfo(json: String): List<TimeTableInfo> {
+    val gson = GsonBuilder()
+        .registerTypeAdapter(Long::class.java, ColorDeserializer())
+        .registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
+        .create()
+    return gson.fromJson(json, Array<TimeTableInfo>::class.java).toList()
+}
 
-    return items
+class LocalDateDeserializer : JsonDeserializer<LocalDate> {
+    override fun deserialize(
+        json: JsonElement?,
+        typeOfT: Type?,
+        context: JsonDeserializationContext?
+    ): LocalDate? {
+        val dateString = json?.asString?.split("/Date(")?.get(1)?.split(")")?.get(0)
+        return dateString?.toLong()?.div(1000)?.let {
+            LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC).toLocalDate().plusDays(1)
+        }
+    }
+}
+
+class ColorDeserializer : JsonDeserializer<Long> {
+    override fun deserialize(
+        json: JsonElement?,
+        typeOfT: Type?,
+        context: JsonDeserializationContext?
+    ): Long {
+        print(json?.asString?.split('"'))
+        return when (json?.asString) {
+            "White" -> 0xFFFFFFFF
+            "Blue" -> 0xff0060ff
+            "Yellow" -> 0xffe5c700
+            "Orange" -> 0xffff6600
+            "Purple" -> 0xffa200ff
+            "Red" -> 0xffff0000
+            "Green" -> 0xff0b9700
+            else -> 0xFF191C1D
+        }
+    }
 }
 
 

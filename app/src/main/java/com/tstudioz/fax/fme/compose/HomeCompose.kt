@@ -184,7 +184,7 @@ fun HomeCompose() {
                 events = mapped,
                 minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
                 maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
-                else if (eventAfter8PM) LocalTime.of(21,0)
+                else if (eventAfter8PM) LocalTime.of(21, 0)
                 else LocalTime.of(20, 0),
                 minDate = mainViewModel.shownWeek.value ?: LocalDate.now(),
                 maxDate = (mainViewModel.shownWeek.value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
@@ -198,6 +198,16 @@ fun HomeCompose() {
 }
 
 
+val orderList = listOf(
+    0xffff6600,
+    0xff0060ff,
+    0xffe5c700,
+    0xffff0000,
+    0xffa200ff,
+    0xff0b9700,
+    0xFF191C1D,
+    0xFFFFFFFF,
+)
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
 fun Day(
@@ -212,41 +222,17 @@ fun Day(
         DayPosition.MonthDate -> Color.Unspecified
         DayPosition.InDate, DayPosition.OutDate -> inActiveTextColor
     }
-    val colors = mutableListOf(MaterialTheme.colorScheme.background)
+    val colors = mutableListOf(0xFF191C1D)
     val inPeriods = mutableListOf<TimeTableInfo>()
 
-
-    mainViewModel.periods.value?.forEach {
-        if ((it.StartDate?.compareTo(day.date) ?: 1) <= 0 &&
-            (it.EndDate?.compareTo(day.date) ?: -1) >= 0
-        ) {
-            when (it.ColorCode) {
-                "White" -> colors.add(Color.White) // move from here
-                "Blue" -> colors.add(Color(0xff0060ff))
-                "Yellow" -> colors.add(Color(0xffe5c700))
-                "Orange" -> colors.add(Color(0xffff6600))
-                "Purple" -> colors.add(Color(0xffa200ff))
-                "Red" -> colors.add(Color(0xffff0000))
-                "Green" -> colors.add(Color(0xff0b9700))
-                else -> {}
-            }
-            inPeriods.add(it)
-        }
+    mainViewModel.periods.value?.filter {
+        (it.StartDate?.compareTo(day.date) ?: 1) <= 0 &&
+                (it.EndDate?.compareTo(day.date) ?: -1) >= 0
+    }?.forEach {
+        colors.add(it.ColorCode)
+        inPeriods.add(it)
     }
-
-    val orderList = listOf(
-        Color(0xffff6600).value,
-        Color(0xff0060ff).value,
-        Color(0xffe5c700).value,
-        Color(0xffff0000).value,
-        Color(0xffa200ff).value,
-        Color(0xff0b9700).value,
-        MaterialTheme.colorScheme.background.value,
-        Color.White.value,
-    )
-    val colorOrdered = colors.sortedBy {
-        orderList.indexOf<ULong>(it.value)
-    }
+    val colorOrdered = colors.sortedBy { orderList.indexOf<Long>(it) }
 
     Column(
         modifier = Modifier
@@ -254,9 +240,9 @@ fun Day(
             .padding(0.dp, 3.dp)
             .border(
                 width = if (isSelected) 1.dp else 1.dp,
-                color = if (isSelected) selectedItemColor else colorOrdered.first(),
+                color = if (isSelected) selectedItemColor else Color(colorOrdered.first()),
             )
-            .background(color = colorOrdered.first())
+            .background(color = Color(colorOrdered.first()))
             .clickable { onClick(day) },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
