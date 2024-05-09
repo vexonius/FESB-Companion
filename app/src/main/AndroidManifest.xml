@@ -4,13 +4,15 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <application
         android:name=".Application.FESBCompanion"
         android:allowBackup="true"
+        android:forceDarkAllowed="false"
         android:icon="@drawable/icon"
         android:label="FESB Companion"
         android:roundIcon="@drawable/icon"
@@ -18,21 +20,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true"
-        tools:replace="label"
-        android:forceDarkAllowed="false">
+        tools:replace="label">
 
-    <meta-data
+        <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5944203368510130~8955475006"/>
+            android:value="ca-app-pub-5944203368510130~8955475006" />
 
         <activity
             android:name=".feature.login.view.LoginActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Simple"
-            android:exported="true">
+            android:theme="@style/AppTheme.Simple">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -47,10 +48,14 @@
             android:label=""
             android:parentActivityName=".view.activities.MainActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".view.activities.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".feature.merlin.view.MerlinActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
@@ -69,8 +74,7 @@
         <activity
             android:name=".view.activities.IndexActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

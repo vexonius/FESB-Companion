@@ -29,6 +29,7 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
+import com.tstudioz.fax.fme.feature.merlin.view.MerlinActivity
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
@@ -212,7 +213,8 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
             R.id.refresMe -> if (NetworkUtils.isNetworkAvailable(this)) {
-                mojRaspored()
+                startActivity(Intent(this@MainActivity, MerlinActivity::class.java))
+            //mojRaspored()
             } else {
                 showSnacOffline()
             }

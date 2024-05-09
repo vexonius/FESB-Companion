@@ -131,6 +131,7 @@ allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_17.toString()
+            freeCompilerArgs = listOf("-Xdebug") // so it does not optimise out vars 'courses' was optimised out
         }
     }
 }
