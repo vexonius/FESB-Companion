@@ -24,6 +24,10 @@ class MerlinRepository(
         return merlinService.runSegmented( email, password)
     }
 
+    override suspend fun getCourseDetails(courseID: Int): MerlinNetworkServiceResult.MerlinNetworkResult {
+        return merlinService.getCourseDetails(courseID)
+    }
+
     companion object {
         private val TAG = this.javaClass.canonicalName
     }

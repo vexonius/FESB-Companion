@@ -18,6 +18,6 @@ interface MerlinServiceInterface {
 
     suspend fun getEnrolledCourses() : MerlinNetworkServiceResult.MerlinNetworkResult
 
-    suspend fun getCourseDetails(courseID: Int)
+    suspend fun getCourseDetails(courseID: Int): MerlinNetworkServiceResult.MerlinNetworkResult
 }
 

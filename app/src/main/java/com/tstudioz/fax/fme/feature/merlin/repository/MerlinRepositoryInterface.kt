@@ -6,4 +6,5 @@ import com.tstudioz.fax.fme.feature.merlin.services.MerlinNetworkServiceResult
 interface MerlinRepositoryInterface {
 
     suspend fun login(email: String, password: String): MerlinNetworkServiceResult.MerlinNetworkResult
+    suspend fun getCourseDetails(courseID: Int): MerlinNetworkServiceResult.MerlinNetworkResult
 }

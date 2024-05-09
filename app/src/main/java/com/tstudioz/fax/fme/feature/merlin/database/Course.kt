@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.database
+package com.tstudioz.fax.fme.feature.merlin.database
 
 data class Course(
     val id: Int,

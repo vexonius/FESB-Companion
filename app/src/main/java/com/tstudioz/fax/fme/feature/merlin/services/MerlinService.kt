@@ -1,17 +1,15 @@
 package com.tstudioz.fax.fme.feature.merlin.services
 
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.tstudioz.fax.fme.database.models.TimeTableInfo
-import com.tstudioz.fax.fme.feature.database.Course
-import com.tstudioz.fax.fme.models.util.ColorDeserializer
-import com.tstudioz.fax.fme.models.util.LocalDateDeserializer
+import com.tstudioz.fax.fme.feature.merlin.database.Course
+import com.tstudioz.fax.fme.feature.merlin.database.CourseDetails
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.jsoup.Jsoup
-import java.time.LocalDate
 
 class MerlinService(private val client: OkHttpClient) : MerlinServiceInterface {
 
@@ -25,7 +23,8 @@ class MerlinService(private val client: OkHttpClient) : MerlinServiceInterface {
         getSimpleAuthToken()
         return getEnrolledCourses()
     }
-    override suspend fun getAuthState() : MerlinNetworkServiceResult.MerlinNetworkResult {
+
+    override suspend fun getAuthState(): MerlinNetworkServiceResult.MerlinNetworkResult {
         val request = Request.Builder()
             .url("https://moodle.srce.hr/2023-2024/auth/simplesaml/index.php?sp=default-sp&edugain=0")
             .build()
@@ -41,7 +40,7 @@ class MerlinService(private val client: OkHttpClient) : MerlinServiceInterface {
         }
     }
 
-    override suspend fun login(email: String, password: String) : MerlinNetworkServiceResult.MerlinNetworkResult{
+    override suspend fun login(email: String, password: String): MerlinNetworkServiceResult.MerlinNetworkResult {
         val formBody1 = FormBody.Builder()
             .add("username", email)
             .add("password", password)
@@ -64,7 +63,7 @@ class MerlinService(private val client: OkHttpClient) : MerlinServiceInterface {
         }
     }
 
-    override suspend fun getSimpleAuthToken() : MerlinNetworkServiceResult.MerlinNetworkResult{
+    override suspend fun getSimpleAuthToken(): MerlinNetworkServiceResult.MerlinNetworkResult {
         val formBody = FormBody.Builder()
             .add("SAMLResponse", SAMLResponse)
             .add("Submit", "")
@@ -91,7 +90,7 @@ class MerlinService(private val client: OkHttpClient) : MerlinServiceInterface {
         }
     }
 
-    override suspend fun getEnrolledCourses() : MerlinNetworkServiceResult.MerlinNetworkResult{
+    override suspend fun getEnrolledCourses(): MerlinNetworkServiceResult.MerlinNetworkResult {
         val request = Request.Builder()
             .url("https://moodle.srce.hr/2023-2024/lib/ajax/service.php?sesskey=${sesskey}&info=core_course_get_enrolled_courses_by_timeline_classification")
             .post("[{\"index\":0,\"methodname\":\"core_course_get_enrolled_courses_by_timeline_classification\",\"args\":{\"offset\":0,\"limit\":0,\"classification\":\"all\",\"sort\":\"ul.timeaccess desc\",\"customfieldname\":\"\",\"customfieldvalue\":\"\"}}]".toRequestBody())
@@ -106,13 +105,6 @@ class MerlinService(private val client: OkHttpClient) : MerlinServiceInterface {
             .create()
         val courses = gson.fromJson(json, Array<Course>::class.java).toList()
 
-
-
-        val ids = doc.toString().split("\"id\":").forEachIndexed() { index, it ->
-            if (index != 0)
-                getCourseDetails(it.split(',')[0].toInt())
-        }
-
         return if (response.isSuccessful) {
             MerlinNetworkServiceResult.MerlinNetworkResult.Success(courses)
         } else {
@@ -120,7 +112,7 @@ class MerlinService(private val client: OkHttpClient) : MerlinServiceInterface {
         }
     }
 
-    override suspend fun getCourseDetails(courseID: Int) {
+    override suspend fun getCourseDetails(courseID: Int): MerlinNetworkServiceResult.MerlinNetworkResult {
         val request = Request.Builder()
             .url("https://moodle.srce.hr/2023-2024/lib/ajax/service.php?sesskey=${sesskey}&info=core_courseformat_get_state\n")
             .post("[{\"index\":0,\"methodname\":\"core_courseformat_get_state\",\"args\":{\"courseid\":${courseID}}}]".toRequestBody())
@@ -128,12 +120,22 @@ class MerlinService(private val client: OkHttpClient) : MerlinServiceInterface {
             .build()
 
         val response = client.newCall(request).execute()
-        val doc = Jsoup.parse(response.body?.string() ?: "")
+        val string = (response.body?.string() ?: "")
+            .replace("\\\"", "\"")
+            .replace("\"{", "{")
+            .replace("}\"", "}")
+            .replace("\\\\", "\\").replace("\\/", "/")
+        val doc = Jsoup.parse(string)
+        val json = kotlinx.serialization.json.Json.parseToJsonElement(doc.select("body").text())
+        val cm = json.jsonArray[0].jsonObject["data"]?.jsonObject?.get("cm")?.toString()
+        val gson = GsonBuilder()
+            .create()
+        val courses = gson.fromJson(cm.toString(), Array<CourseDetails>::class.java).toList()
 
-        if (response.isSuccessful) {
-            println("Success getEnrolledCourses")
+        return if (response.isSuccessful) {
+            MerlinNetworkServiceResult.MerlinNetworkResult.Success(courses)
         } else {
-            println("Failure getEnrolledCourses")
+            MerlinNetworkServiceResult.MerlinNetworkResult.Failure("Failure merlin getCourseDetails")
         }
     }
 }

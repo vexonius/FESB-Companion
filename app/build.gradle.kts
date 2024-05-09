@@ -119,6 +119,9 @@ dependencies {
 
     //choose calendar
     implementation("com.kizitonwose.calendar:compose:2.5.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
 }
 
 configurations.all {
