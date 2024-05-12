@@ -1,183 +1,93 @@
 package com.tstudioz.fax.fme.models.util
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.Recurring
-import com.tstudioz.fax.fme.database.models.TimeTableInfo
+import android.util.Log
+import com.tstudioz.fax.fme.models.data.EventRecurring
+import com.tstudioz.fax.fme.models.data.TimetableEvent
+import com.tstudioz.fax.fme.models.data.TimetableItem
 import com.tstudioz.fax.fme.weather.Current
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import java.lang.reflect.Type
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.util.*
 
 
-suspend fun parseTimetable(body: String): List<Event> {
-    val events = ArrayList<Event>()
+suspend fun parseTimetable(body: String): List<TimetableItem> {
+    val items = ArrayList<TimetableItem>()
 
     val doc = Jsoup.parse(body)
     val elements = doc.select("div.event")
 
-    elements.let {
+    elements?.let {
         for (e in elements) {
-            val id = e.attr("data-id").toInt()
-            val startdate = e.attr("data-startsdate").toString()
-            val startDateSplit = startdate.split("-")
-            val starth = e.attr("data-startshour").toInt()
-            val startmin = e.attr("data-startsmin").toInt()
-            val enddate = e.attr("data-endsdate").toString()
-            val endDateSplit = enddate.split("-")
-            val endh = e.attr("data-endshour").toInt()
-            val endmin = e.attr("data-endsmin").toInt()
-            val type = editType(e.selectFirst("span.groupCategory")?.text()?.split(",")?.get(0) ?: "")
-            val name = e.selectFirst("span.name.normal")?.text()
-                ?: e.selectFirst("div.popup > div.eventContent > div.header > div > span.title")?.text()
-                ?: ""
-            val group = e.select("span.group.normal").first()?.text() ?: ""
-            val studycode = e.selectFirst("span.studyCode")?.text() ?: ""
-            val room = e.selectFirst("div.eventContent > div.eventInfo > span.resource")?.text() ?: ""
-            val detailTime = e.selectFirst("div.detailItem.datetime")?.text() ?: ""
-            val professor = e.selectFirst("div.detailItem.user")?.text() ?: ""
-            val repetsType = parseNumbersFromString(e.selectFirst("div.recurring > span.type > span"))
-            val isItRecurring = !(repetsType == Recurring.ONCE || repetsType == Recurring.UNDEFINED)
+            val id = e?.attr("data-id")?.toInt() ?: -1
+            val startdate = e?.attr("data-startsdate")?.toString() ?: ""
+            val starth = e?.attr("data-startshour")?.toInt() ?: -1
+            val startmin = e?.attr("data-startsmin")?.toInt() ?: -1
+            val enddate = e?.attr("data-endsdate")?.toString() ?: ""
+            val endh = e?.attr("data-endshour")?.toInt() ?: -1
+            val endmin = e?.attr("data-endsmin")?.toInt() ?: -1
+            val type = parseEventType(e?.selectFirst("span.groupCategory"))
+            val name = e?.selectFirst("span.name.normal")?.text()
+                    ?: e?.selectFirst("div.popup > div.eventContent > div.header > div > span.title")?.text()
+                    ?: ""
+            val timespan = e?.selectFirst("div.timespan")?.text() ?: ""
+            val group = e?.select("span.group.normal")?.first()?.text() ?: ""
+            val studycode = e?.selectFirst("span.studyCode")?.text() ?: ""
+            val room = e?.selectFirst("div.eventContent > div.eventInfo > span.resource")?.text() ?: ""
+            val detailTime = e?.selectFirst("div.detailItem.datetime")?.text() ?: ""
+            val professor = e?.selectFirst("div.detailItem.user")?.text() ?: ""
+            val repetsType = parseNumbersFromString(e?.selectFirst("div.recurring > span.type > span"))
+            val isItRecurring = !(repetsType== EventRecurring.ONCE || repetsType== EventRecurring.UNDEFINED)
+            val classDruration = parseClassDuration(e?.selectFirst("div.detailItem.datetime > span"))
 
-            val repeatsUntil = e.selectFirst("span.repeat")?.text() ?: ""
+            val repeatsUntil = e?.selectFirst("span.repeat")?.text() ?: ""
 
-
-            events.add(
-                Event(
-                    id = id.toString(),
-                    name = name,
-                    shortName = makeAcronym(name),
-                    professor = professor,
-                    eventType = type,
-                    groups = group,
-                    classroom = room,
-                    colorId = getBoja(type),
-                    start = LocalDateTime.of(
-                        startDateSplit[0].toInt(),
-                        startDateSplit[1].toInt(),
-                        startDateSplit[2].toInt(),
-                        starth,
-                        startmin
-                    ),
-                    end = LocalDateTime.of(
-                        endDateSplit[0].toInt(),
-                        endDateSplit[1].toInt(),
-                        endDateSplit[2].toInt(),
-                        endh,
-                        endmin
-                    ),
-                    description = detailTime,
-                    recurring = isItRecurring,
-                    recurringType = repetsType,
-                    recurringUntil = repeatsUntil,
-                    studyCode = studycode
-                )
-            )
+            items.add(TimetableItem(id, startdate, enddate, starth, startmin, endh, endmin, name, type, group, room, timespan, studycode, isItRecurring, repetsType, detailTime, professor, classDruration, repeatsUntil))
         }
     }
 
-    return events
+    return items
 }
 
-private fun editType(type: String): String {
-    return when (type) {
-        "Predavanja" -> "Predavanje"
-        "Auditorne vježbe" -> "Auditorna vježba"
-        "Kolokviji" -> "Kolokvij"
-        "Laboratorijske vježbe" -> "Laboratorijska vježba"
-        "Konstrukcijske vježbe" -> "Konstrukcijska vježba"
-        "Seminar," -> "Seminar"
-        "Ispit" -> "Ispit"
-        else -> type
-    }
-}
+private fun parseClassDuration(element: Element?): Int {
+    if (element==null) return -1
 
-
-private fun getBoja(type: String): Int {
-    return when (type) {
-        "Predavanje" -> R.color.blue_nice
-        "Auditorna vježba" -> R.color.green_nice
-        "Kolokvij" -> R.color.purple_nice
-        "Laboratorijska vježba" -> R.color.red_nice
-        "Konstrukcijska vježba" -> R.color.grey_nice
-        "Seminar" -> R.color.blue_nice
-        "Ispit" -> R.color.purple_dark
-        else -> {
-            R.color.blue_nice
+    var duration = -1
+    try {
+        val pattern = "\\d+".toRegex()
+        val num = pattern.find(element.text())
+        num?.value?.let {
+            duration = it.toInt()
         }
+    } catch (e: Exception){
+        e.message?.let { Log.e("Parsing util", it) }
     }
+    return duration
 }
 
-suspend fun makeAcronym(name: String): String {
-    val acronym = StringBuilder()
-    if (name.isNotEmpty() && name.contains(" ")
-    ) {
-        val nameSplit = name.split(" ").toTypedArray()
-        for (str in nameSplit)
-            acronym.append(str[0])
-        return acronym.toString().uppercase()
-    }
-    return name
-}
-
-
-suspend fun parseTimetableInfo(json: String): List<TimeTableInfo> {
-    val gson = GsonBuilder()
-        .registerTypeAdapter(Long::class.java, ColorDeserializer())
-        .registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
-        .create()
-    return gson.fromJson(json, Array<TimeTableInfo>::class.java).toList()
-}
-
-class LocalDateDeserializer : JsonDeserializer<LocalDate> {
-    override fun deserialize(
-        json: JsonElement?,
-        typeOfT: Type?,
-        context: JsonDeserializationContext?
-    ): LocalDate? {
-        val dateString = json?.asString?.split("/Date(")?.get(1)?.split(")")?.get(0)
-        return dateString?.toLong()?.div(1000)?.let {
-            LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC).toLocalDate().plusDays(1)
-        }
-    }
-}
-
-class ColorDeserializer : JsonDeserializer<Long> {
-    override fun deserialize(
-        json: JsonElement?,
-        typeOfT: Type?,
-        context: JsonDeserializationContext?
-    ): Long {
-        print(json?.asString?.split('"'))
-        return when (json?.asString) {
-            "White" -> 0xFFFFFFFF
-            "Blue" -> 0xff0060ff
-            "Yellow" -> 0xffe5c700
-            "Orange" -> 0xffff6600
-            "Purple" -> 0xffa200ff
-            "Red" -> 0xffff0000
-            "Green" -> 0xff0b9700
-            else -> 0xFF191C1D
-        }
-    }
-}
-
-
-private fun parseNumbersFromString(element: Element?): Recurring {
+private fun parseNumbersFromString(element: Element?): EventRecurring {
     return when {
-        element == null -> Recurring.ONCE
-        element.hasClass("weekly") -> Recurring.WEEKLY
-        element.hasClass("everyTwoWeeks") -> Recurring.EVERY_TWO_WEEKS
-        element.hasClass("monthly") -> Recurring.MONTHLY
-        else -> Recurring.UNDEFINED
+        element == null -> EventRecurring.ONCE
+        element.hasClass("weekly") -> EventRecurring.WEEKLY
+        element.hasClass("everyTwoWeeks") -> EventRecurring.EVERY_TWO_WEEKS
+        element.hasClass("monthly") -> EventRecurring.MONTHLY
+        else -> EventRecurring.UNDEFINED
+    }
+}
+
+private fun parseEventType(element: Element?): TimetableEvent {
+    if (element == null) return TimetableEvent.GENERIC
+
+    return when (element.text()) {
+        "Predavanja," -> TimetableEvent.PREDAVANJA
+        "Auditorne vježbe," -> TimetableEvent.AUDITORNE_VJEZBE
+        "Kolokviji," -> TimetableEvent.KOLOKVIJ
+        "Laboratorijske vježbe," -> TimetableEvent.LABARATORIJSKE_VJEZBE
+        "Konstrukcijske vježbe," -> TimetableEvent.KONSTRUKCIJSKE_VJEZBE
+        "Seminar," -> TimetableEvent.SEMINAR
+        "Ispiti," -> TimetableEvent.ISPIT
+        "Terenska nastava," -> TimetableEvent.TERENSKA_NASTAVA
+        else -> TimetableEvent.GENERIC
     }
 }
 
@@ -186,17 +96,14 @@ fun parseWeatherDetails(data: String): Current {
 
     val currently0 = forecastjson.getJSONObject("properties")
     val currentlyArray = currently0.getJSONArray("timeseries")
-    val currently =
-        currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("instant").getJSONObject("details")
+    val currently = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("instant").getJSONObject("details")
     val currentlyNextOneHours = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("next_1_hours")
     val currentlyNextOneHoursSummary = currentlyNextOneHours.getJSONObject("summary")
     val currentlyNextOneHoursDetails = currentlyNextOneHours.getJSONObject("details")
     val unparsedsummary = currentlyNextOneHoursSummary.getString("symbol_code")
-    val summarycode: String? = if (unparsedsummary.contains("_")) {
-        unparsedsummary.substring(0, unparsedsummary.indexOf('_'))
-    } else {
-        unparsedsummary
-    }
+    val summarycode: String? = if (unparsedsummary.contains("_"))
+    { unparsedsummary.substring(0, unparsedsummary.indexOf('_'))
+    } else { unparsedsummary }
 
     val current = Current()
     current.humidity = currently.getDouble("relative_humidity")

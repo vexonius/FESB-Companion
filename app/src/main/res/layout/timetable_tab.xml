@@ -8,9 +8,278 @@
     android:background="@color/colorPrimaryDark"
     android:orientation="vertical">
 
-    <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/compose_view"
+    <LinearLayout
+        android:id="@+id/linear_parent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.compose.ui.platform.ComposeView>
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="6">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mPon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="2dp"
+                android:singleLine="true"
+                android:text="PON"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/pon_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="1"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="11dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerPon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/mUto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="2dp"
+                android:text="UTO"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/uto_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="2"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="11dp" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerUto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mSri"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="2dp"
+                android:text="SRI"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/sri_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="3"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="11dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSri"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mCet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="2dp"
+                android:text="ČET"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/cet_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="4"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="11dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerCet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mPet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="2dp"
+                android:text="PET"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/pet_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="5"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="11dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerPet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearSub"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mSub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="2dp"
+                android:text="SUB"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/sub_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="6"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="11dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSub"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+        </LinearLayout>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/raspored_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:indeterminate="true"
+        android:progressTint="@color/colorAccent"
+        android:visibility="invisible"
+        ads:layout_constraintBottom_toBottomOf="@+id/linear_parent"
+        ads:layout_constraintEnd_toEndOf="parent"
+        ads:layout_constraintStart_toStartOf="parent"
+        ads:layout_constraintTop_toTopOf="parent" />
+
+
+    <Button
+        android:id="@+id/odaberiDan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/button_blue"
+        android:paddingLeft="20dp"
+        android:paddingTop="15dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="15dp"
+        android:text="Odaberi tjedan"
+        android:textColor="@color/white"
+        android:visibility="visible"
+        ads:layout_constraintBottom_toBottomOf="@+id/linear_parent"
+        ads:layout_constraintEnd_toEndOf="parent"
+        ads:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

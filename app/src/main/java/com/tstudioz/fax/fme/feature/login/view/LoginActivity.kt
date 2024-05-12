@@ -75,7 +75,6 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.loggedIn.observe(this) { loggedIn ->
             if (loggedIn) {
                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                finish()
             }
         }
     }

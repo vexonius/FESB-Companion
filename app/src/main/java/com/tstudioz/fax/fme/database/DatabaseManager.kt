@@ -9,10 +9,14 @@ class DatabaseManager: DatabaseManagerInterface {
         return RealmConfiguration.Builder(
             setOf(
                 Korisnik::class,
+                Predavanja::class,
                 Note::class,
                 Dolazak::class,
+                Materijal::class,
                 Meni::class,
-                EventRealm::class))
+                Racun::class,
+                Kolegij::class,
+                KolegijTjedan::class))
             .name("default.realm")
             .schemaVersion(1)
             .encryptionKey("nekikljuckojicemopromjenitiubuducnostialisadjetujernedamisebolje".toByteArray())

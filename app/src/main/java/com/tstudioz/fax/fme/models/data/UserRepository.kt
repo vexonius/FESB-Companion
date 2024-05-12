@@ -2,7 +2,8 @@ package com.tstudioz.fax.fme.models.data
 
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
-import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.database.models.Predavanja
+import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
@@ -11,7 +12,6 @@ import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
 import com.tstudioz.fax.fme.models.util.parseTimetable
 import com.tstudioz.fax.fme.models.util.parseWeatherDetails
 import com.tstudioz.fax.fme.weather.Current
-import java.time.LocalDate
 
 
 class UserRepository(
@@ -32,7 +32,7 @@ class UserRepository(
         }
     }
 
-    override suspend fun fetchTimetable(user: String, startDate: LocalDate, endDate: LocalDate): List<Event> {
+    override suspend fun fetchTimetable(user: String, startDate: String, endDate: String): List<TimetableItem> {
         return when(val result = timetableService.fetchTimeTable(user, startDate, endDate)){
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetable(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
@@ -42,7 +42,7 @@ class UserRepository(
         }
     }
 
-    override suspend fun insertTimeTable(classes: List<Event>) {
+    override suspend fun insertTimeTable(classes: List<Predavanja>) {
         timeTableDao.insert(classes)
     }
 
