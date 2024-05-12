@@ -46,7 +46,7 @@ val module = module {
     single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single { androidContext().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE) }
-    viewModel { MainViewModel(get(), get()) }
+    single { MainViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
     viewModel { AttendanceViewModel(get()) }
 }
