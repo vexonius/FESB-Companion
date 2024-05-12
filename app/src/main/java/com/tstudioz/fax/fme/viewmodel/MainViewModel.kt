@@ -66,7 +66,7 @@ class MainViewModel(
     fun fetchUserTimetable(user: User, startDate: LocalDate, endDate: LocalDate, shownWeekMonday: LocalDate) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                println("started Fetching Timetable for user")
+                println("started fetching timetable for user")
                 val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(shownWeekMonday)
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
