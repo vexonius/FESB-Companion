@@ -39,7 +39,7 @@ class LoginViewModel(
     }
 
     fun tryUserLogin() {
-        val username = username.value
+        var username = username.value
         val password = password.value
 
         if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
