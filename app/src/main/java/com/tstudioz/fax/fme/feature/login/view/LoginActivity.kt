@@ -115,7 +115,7 @@ class LoginActivity : AppCompatActivity() {
             )
         )
         val params = snackBarView2?.layoutParams as FrameLayout.LayoutParams
-        params.gravity = Gravity.TOP
+        params.gravity = Gravity.BOTTOM
         params.topMargin = 100
         snackBarView2.layoutParams = params
 
