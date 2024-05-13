@@ -8,6 +8,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Recurring
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
+import com.tstudioz.fax.fme.database.models.TimetableType
 import com.tstudioz.fax.fme.weather.Current
 import org.json.JSONObject
 import org.jsoup.Jsoup
@@ -87,29 +88,28 @@ suspend fun parseTimetable(body: String): List<Event> {
     return events
 }
 
-private fun editType(type: String): String {
+private fun editType(type: String): TimetableType {
     return when (type) {
-        "Predavanja" -> "Predavanje"
-        "Auditorne vježbe" -> "Auditorna vježba"
-        "Kolokviji" -> "Kolokvij"
-        "Laboratorijske vježbe" -> "Laboratorijska vježba"
-        "Konstrukcijske vježbe" -> "Konstrukcijska vježba"
-        "Seminar," -> "Seminar"
-        "Ispit" -> "Ispit"
-        else -> type
+        "Predavanja" -> TimetableType.PREDAVANJE
+        "Auditorne vježbe" -> TimetableType.AUDITORNA_VJEZBA
+        "Kolokviji" -> TimetableType.KOLOKVIJ
+        "Laboratorijske vježbe" -> TimetableType.LABORATORIJSKA_VJEZBA
+        "Konstrukcijske vježbe" -> TimetableType.KONSTRUKCIJSKA_VJEZBA
+        "Seminari" -> TimetableType.SEMINAR
+        "Ispiti" -> TimetableType.ISPIT
+        else -> TimetableType.OTHER
     }
 }
 
-
-private fun getBoja(type: String): Int {
+private fun getBoja(type: TimetableType): Int {
     return when (type) {
-        "Predavanje" -> R.color.blue_nice
-        "Auditorna vježba" -> R.color.green_nice
-        "Kolokvij" -> R.color.purple_nice
-        "Laboratorijska vježba" -> R.color.red_nice
-        "Konstrukcijska vježba" -> R.color.grey_nice
-        "Seminar" -> R.color.blue_nice
-        "Ispit" -> R.color.purple_dark
+        TimetableType.PREDAVANJE -> R.color.blue_nice
+        TimetableType.AUDITORNA_VJEZBA -> R.color.green_nice
+        TimetableType.KOLOKVIJ -> R.color.purple_nice
+        TimetableType.LABORATORIJSKA_VJEZBA -> R.color.red_nice
+        TimetableType.KONSTRUKCIJSKA_VJEZBA -> R.color.grey_nice
+        TimetableType.SEMINAR -> R.color.blue_nice
+        TimetableType.ISPIT -> R.color.purple_dark
         else -> {
             R.color.blue_nice
         }
@@ -156,9 +156,8 @@ class ColorDeserializer : JsonDeserializer<Long> {
         typeOfT: Type?,
         context: JsonDeserializationContext?
     ): Long {
-        print(json?.asString?.split('"'))
         return when (json?.asString) {
-            "White" -> 0xFFFFFFFF
+            "White" -> 0xFF191C1D
             "Blue" -> 0xff0060ff
             "Yellow" -> 0xffe5c700
             "Orange" -> 0xffff6600

@@ -11,7 +11,7 @@ class UserDao(private val dbManager: DatabaseManagerInterface): UserDaoInterface
     override suspend fun insert(user: Korisnik) {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
-        realm.writeBlocking { copyToRealm(user) }
+        realm.write { copyToRealm(user) }
 
         Log.d("UserDao", "User inserted: ${user.username}")
         realm.close()

@@ -40,7 +40,6 @@ import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
-import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -145,15 +144,14 @@ fun HomeCompose() {
                                 Text(text = "Odustani")
                             }
                             Button(onClick = {
-                                if (selection != null) {
-                                    val start = selection!!.date.dayOfWeek.value
-                                    val startDate = selection!!.date.minusDays((start - 1).toLong())
-                                    val endDate = selection!!.date.plusDays(7 - start.toLong())
+                                selection?.let {
+                                    val start = it.date.dayOfWeek.value
+                                    val startDate = it.date.minusDays((start - 1).toLong())
+                                    val endDate = it.date.plusDays(7 - start.toLong())
                                     mainViewModel.fetchUserTimetable(
-                                        User(shPref.getString("username", "") ?: "", ""),
-                                        startDate,
-                                        endDate,
-                                        startDate
+                                        startDate = startDate,
+                                        endDate = endDate,
+                                        shownWeekMonday = startDate
                                     )
                                     coroutineScope.launch {
                                         sheetState.hide()
@@ -197,17 +195,17 @@ fun HomeCompose() {
     }
 }
 
-
-val orderList = listOf(
-    0xffff6600,
-    0xff0060ff,
-    0xffe5c700,
-    0xffff0000,
-    0xffa200ff,
-    0xff0b9700,
-    0xFF191C1D,
-    0xFFFFFFFF,
+val orderOfPeriodImportance = listOf(
+    "Narančasta",
+    "Plava",
+    "Yellow",
+    "Crvena",
+    "Ljubičasta",
+    "Zelena",
+    "Siva",
+    "Bijela",
 )
+
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
 fun Day(
@@ -222,17 +220,16 @@ fun Day(
         DayPosition.MonthDate -> Color.Unspecified
         DayPosition.InDate, DayPosition.OutDate -> inActiveTextColor
     }
-    val colors = mutableListOf(0xFF191C1D)
     val inPeriods = mutableListOf<TimeTableInfo>()
 
     mainViewModel.periods.value?.filter {
         (it.StartDate?.compareTo(day.date) ?: 1) <= 0 &&
                 (it.EndDate?.compareTo(day.date) ?: -1) >= 0
     }?.forEach {
-        colors.add(it.ColorCode)
         inPeriods.add(it)
     }
-    val colorOrdered = colors.sortedBy { orderList.indexOf<Long>(it) }
+    val periodsOrdered = inPeriods.sortedBy { orderOfPeriodImportance.indexOf(it.Category) }
+    val dayColor = periodsOrdered.firstOrNull()?.ColorCode?.let { Color(it) }
 
     Column(
         modifier = Modifier
@@ -240,9 +237,9 @@ fun Day(
             .padding(0.dp, 3.dp)
             .border(
                 width = if (isSelected) 1.dp else 1.dp,
-                color = if (isSelected) selectedItemColor else Color(colorOrdered.first()),
+                color = if (isSelected) selectedItemColor else (dayColor ?: MaterialTheme.colorScheme.background),
             )
-            .background(color = Color(colorOrdered.first()))
+            .background(color = (dayColor ?: MaterialTheme.colorScheme.background))
             .clickable { onClick(day) },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

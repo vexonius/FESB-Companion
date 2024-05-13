@@ -16,6 +16,4 @@ interface TimetableServiceInterface {
         endDate: String
     ): NetworkServiceResult.TimeTableResult
 
-
-
 }

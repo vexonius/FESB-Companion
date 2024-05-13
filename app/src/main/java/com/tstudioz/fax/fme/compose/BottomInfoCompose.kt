@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.database.models.TimetableType
 import java.time.LocalDateTime
 
 @Preview
@@ -29,7 +30,7 @@ fun BottomInfoCompose(
         name = "Event",
         start = LocalDateTime.now(),
         end = LocalDateTime.now(),
-        eventType = "Predavanje",
+        eventType = TimetableType.OTHER,
         description = "Description",
         color = Color.Blue,
         shortName = "E",
@@ -51,7 +52,7 @@ fun BottomInfoCompose(
             Text(text = event.name, fontSize = 24.sp, modifier = Modifier.padding(15.dp))
         }
         BottomElement(
-            text = event.eventType,
+            text = event.eventType.type,
             modifierText = Modifier.padding(10.dp, 10.dp, 0.dp, 5.dp),
             modifierRow = Modifier.padding(15.dp, 15.dp, 0.dp, 10.dp),
             icon = R.drawable.classroom

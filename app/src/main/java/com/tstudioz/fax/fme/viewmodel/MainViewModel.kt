@@ -8,17 +8,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.EventRealm
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
-import com.tstudioz.fax.fme.database.models.fromRealmObject
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
-import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -44,8 +40,11 @@ class MainViewModel(
     private val _shownWeek = MutableLiveData<LocalDate>().apply {
         val now = LocalDate.now().plusDays(1)
         val start = now.dayOfWeek.value
-        value = (sharedPreferences[SPKey.SHOWN_WEEK,""].let {
-            if (it != "") { LocalDate.parse(it) } else null } ?: now.plusDays((1 - start).toLong()))
+        value = (sharedPreferences[SPKey.SHOWN_WEEK, ""].let {
+            if (it != "") {
+                LocalDate.parse(it)
+            } else null
+        } ?: now.plusDays((1 - start).toLong()))
     }
     private val _showWeekChooseMenu = MutableLiveData<Boolean>().apply { value = false }
     val showDay: LiveData<Boolean> = _showEvent
@@ -63,7 +62,13 @@ class MainViewModel(
         }
     }
 
-    fun fetchUserTimetable(user: User, startDate: LocalDate, endDate: LocalDate, shownWeekMonday: LocalDate) {
+    fun fetchUserTimetable(
+        user: User = User(sharedPreferences.getString("username", "") ?: "", ""),
+        startDate: LocalDate,
+        endDate: LocalDate,
+        shownWeekMonday: LocalDate
+    ) {
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 println("started fetching timetable for user")

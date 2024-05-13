@@ -31,7 +31,7 @@ class HomePredavanjaAdapter(private val mPredavanjaDanas: List<Event>) :
         holder.name.text = predavanja.name
         holder.name.typeface = regulartf
         holder.type.text = predavanja.start.toLocalTime().toString() + " - " + predavanja.end.toLocalTime().toString()
-        holder.vrstaPredavanja.text = predavanja.eventType
+        holder.vrstaPredavanja.text = predavanja.eventType.type
         holder.mjesto.text = predavanja.classroom
 
         holder.boja.setBackgroundResource(predavanja.colorId)

@@ -13,7 +13,7 @@ data class Event(
     var color: Color = Color.Blue,
     val colorId : Int = 0,
     val professor: String = "",
-    val eventType: String = "",
+    val eventType: TimetableType = TimetableType.OTHER,
     val groups: String = "",
     val classroom: String = "",
     val start: LocalDateTime,
@@ -36,7 +36,7 @@ fun toRealmObject(event: Event): EventRealm {
         shortName = event.shortName
         colorId = event.colorId
         professor = event.professor
-        eventType = event.eventType
+        eventType = event.eventType.name
         groups = event.groups
         classroom = event.classroom
         start = event.start.toString()
@@ -56,7 +56,7 @@ fun fromRealmObject(eventRealm: EventRealm): Event {
         shortName = eventRealm.shortName ?: "",
         colorId = eventRealm.colorId ?: 0,
         professor = eventRealm.professor ?: "",
-        eventType = eventRealm.eventType ?: "",
+        eventType = eventRealm.eventType?.let { TimetableType.valueOf(it) } ?: TimetableType.OTHER,
         groups = eventRealm.groups ?: "",
         classroom = eventRealm.classroom ?: "",
         start = LocalDateTime.parse(eventRealm.start),
@@ -87,4 +87,15 @@ open class EventRealm : RealmObject {
     var recurringType: String? = null
     var recurringUntil: String? = null
     var studyCode: String? = null
+}
+
+enum class TimetableType(val type: String) {
+    PREDAVANJE("Predavanje"),
+    AUDITORNA_VJEZBA("Auditorna vježba"),
+    KOLOKVIJ("Kolokvij"),
+    LABORATORIJSKA_VJEZBA("Laboratorijska vježba"),
+    KONSTRUKCIJSKA_VJEZBA("Konstrukcijska vježba"),
+    SEMINAR("Seminar"),
+    ISPIT("Ispit"),
+    OTHER("Other")
 }
