@@ -88,6 +88,7 @@ fun HomeCompose() {
                         val startMonth = remember { currentMonth.minusMonths(100) }
                         val endMonth = remember { currentMonth.plusMonths(100) }
                         val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
+                        val periods = mainViewModel.periods.value
                         var selection by remember {
                             mutableStateOf<CalendarDay?>(
                                 CalendarDay(
@@ -119,7 +120,7 @@ fun HomeCompose() {
                         )
                         Spacer(modifier = Modifier.padding(0.dp, 5.dp))
                         HorizontalCalendar(state = state, dayContent = { day ->
-                            Day(day, isSelected = selection == day, mainViewModel = mainViewModel) { clicked ->
+                            Day(day, isSelected = selection == day, periods = periods ?: emptyList()) { clicked ->
                                 selection = if (clicked == selection) {
                                     null
                                 } else {
@@ -211,7 +212,7 @@ val orderOfPeriodImportance = listOf(
 fun Day(
     day: CalendarDay,
     isSelected: Boolean = false,
-    mainViewModel: MainViewModel,
+    periods: List<TimeTableInfo>,
     onClick: (CalendarDay) -> Unit = {},
 ) {
     val selectedItemColor = MaterialTheme.colorScheme.secondary
@@ -222,10 +223,10 @@ fun Day(
     }
     val inPeriods = mutableListOf<TimeTableInfo>()
 
-    mainViewModel.periods.value?.filter {
+    periods.filter {
         (it.startDate?.compareTo(day.date) ?: 1) <= 0 &&
                 (it.endDate?.compareTo(day.date) ?: -1) >= 0
-    }?.forEach {
+    }.forEach {
         inPeriods.add(it)
     }
     val periodsOrdered = inPeriods.sortedBy { orderOfPeriodImportance.indexOf(it.category) }
