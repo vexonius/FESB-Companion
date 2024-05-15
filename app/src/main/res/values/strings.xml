@@ -30,24 +30,19 @@
     <string name="check_attend">Provjeri dolaske na predavanja</string>
     <string name="attend_quick">Prisutnost</string>
 
-
-    /*Kljucevi za admob*/
-    <string name="native_home">ca-app-pub-5944203368510130/8815874204</string>
-    <string name="native_left">ca-app-pub-5944203368510130/6801293807</string>
-    <string name="interstitial_note">ca-app-pub-5944203368510130/2813576206</string>
     <string name="delete">Izbriši bilješku</string>
     <string name="terms">Uvjeti korištenja</string>
     <string name="terms_desc">Sukladno s GDPR zakonom ovim pristankom prihvaćate uvjete korištenja ove aplikacije.</string>
-    <string name="postavke">Postavke</string>
-    <string name="osvje_i">Osvježi</string>
-    <string name="ljetni_semestar">LJETNI SEMESTAR</string>
-    <string name="zimski_semestar">ZIMSKI SEMESTAR</string>
+    <string name="settings">Postavke</string>
+    <string name="refresh">Osvježi</string>
+    <string name="summer_semester">LJETNI SEMESTAR</string>
+    <string name="winter_semester">ZIMSKI SEMESTAR</string>
     <string name="home">Home</string>
-    <string name="raspored">Raspored</string>
-    <string name="pretraga">Promjena tjedna</string>
+    <string name="timetable_Title">Raspored</string>
+    <string name="change_week">Promjena tjedna</string>
 
     <string name="default_group">Jedna grupa</string>
-    <string name="Raspored_za">Raspored za</string>
+    <string name="timetable_for">Raspored za</string>
 
     <string name="login_error_email">Potrebno je unijeti FESB email</string>
     <string name="login_error_empty_credentials">Niste unijeli korisničke podatke</string>

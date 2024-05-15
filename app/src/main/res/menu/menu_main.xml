@@ -5,21 +5,21 @@
     <item
         android:id="@+id/choosesched"
         android:icon="@drawable/calendar_lines_pen_svgrepo_com"
-        android:title="@string/pretraga"
+        android:title="@string/change_week"
         app:showAsAction="always"
         android:visible="false"/>
 
     <item
         android:id="@+id/refresMe"
         android:icon="@drawable/refresh"
-        android:title="@string/osvje_i"
+        android:title="@string/refresh"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/settings"
         android:enabled="true"
         android:icon="@drawable/settings_icon"
-        android:title="@string/postavke"
+        android:title="@string/settings"
         android:visible="true"
         app:showAsAction="ifRoom"/>
 
