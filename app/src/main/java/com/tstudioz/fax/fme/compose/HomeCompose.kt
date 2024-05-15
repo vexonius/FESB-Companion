@@ -223,13 +223,13 @@ fun Day(
     val inPeriods = mutableListOf<TimeTableInfo>()
 
     mainViewModel.periods.value?.filter {
-        (it.StartDate?.compareTo(day.date) ?: 1) <= 0 &&
-                (it.EndDate?.compareTo(day.date) ?: -1) >= 0
+        (it.startDate?.compareTo(day.date) ?: 1) <= 0 &&
+                (it.endDate?.compareTo(day.date) ?: -1) >= 0
     }?.forEach {
         inPeriods.add(it)
     }
-    val periodsOrdered = inPeriods.sortedBy { orderOfPeriodImportance.indexOf(it.Category) }
-    val dayColor = periodsOrdered.firstOrNull()?.ColorCode?.let { Color(it) }
+    val periodsOrdered = inPeriods.sortedBy { orderOfPeriodImportance.indexOf(it.category) }
+    val dayColor = periodsOrdered.firstOrNull()?.colorCode?.let { Color(it) }
 
     Column(
         modifier = Modifier

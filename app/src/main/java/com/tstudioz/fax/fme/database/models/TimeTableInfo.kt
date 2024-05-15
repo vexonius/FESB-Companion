@@ -1,16 +1,25 @@
 package com.tstudioz.fax.fme.database.models
 
-import androidx.compose.ui.graphics.Color
+import com.google.gson.annotations.SerializedName
 import java.time.LocalDate
 
 data class TimeTableInfo (
-    var Id: Int = 0,
-    var Name: String = "",
-    var StartDate: LocalDate? = null,
-    var EndDate: LocalDate?= null,
-    var StartDateText: String = "",
-    var EndDateText: String = "",
-    var Category: String = "",
-    var ColorCode: Long = 0xFF191C1D,
-    var IsWorking: Boolean = false,
+    @SerializedName("Id")
+    var id: Int = 0,
+    @SerializedName("Name")
+    var name: String = "",
+    @SerializedName("StartDate")
+    var startDate: LocalDate? = null,
+    @SerializedName("EndDate")
+    var endDate: LocalDate?= null,
+    @SerializedName("StartDateText")
+    var startDateText: String = "",
+    @SerializedName("EndDateText")
+    var endDateText: String = "",
+    @SerializedName("Category")
+    var category: String = "",
+    @SerializedName("ColorCode")
+    var colorCode: Long = 0xFF191C1D,
+    @SerializedName("IsWorking")
+    var isWorking: Boolean = false,
 )
