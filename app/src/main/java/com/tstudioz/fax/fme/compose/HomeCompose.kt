@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.compose
 
-import android.content.SharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,19 +44,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun HomeCompose() {
+fun HomeCompose(mainViewModel: MainViewModel) {
 
-    val mainViewModel: MainViewModel by inject(MainViewModel::class.java)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val event = mainViewModel.showDayEvent.observeAsState().value
-    val shPref by inject(SharedPreferences::class.java)
 
     BottomSheetScaffold(
         sheetContent = {
@@ -65,7 +60,7 @@ fun HomeCompose() {
                 ModalBottomSheet(
                     sheetState = sheetState,
                     onDismissRequest = { mainViewModel.hideEvent() },
-                    containerColor = event?.color ?: Color.Transparent,
+                    containerColor = mainViewModel.showDayEvent.observeAsState().value?.color ?: Color.Transparent,
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                     shape = RectangleShape
@@ -185,8 +180,9 @@ fun HomeCompose() {
                 maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
                 else if (eventAfter8PM) LocalTime.of(21, 0)
                 else LocalTime.of(20, 0),
-                minDate = mainViewModel.shownWeek.value ?: LocalDate.now(),
-                maxDate = (mainViewModel.shownWeek.value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
+                minDate = mainViewModel.shownWeek.observeAsState().value ?: LocalDate.now(),
+                maxDate = (mainViewModel.shownWeek.observeAsState().value
+                    ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
                 onClick = { event ->
                     mainViewModel.showEvent(event)
                 }
@@ -207,7 +203,6 @@ val orderOfPeriodImportance = listOf(
     "Bijela",
 )
 
-@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
 fun Day(
     day: CalendarDay,
@@ -216,21 +211,18 @@ fun Day(
     onClick: (CalendarDay) -> Unit = {},
 ) {
     val selectedItemColor = MaterialTheme.colorScheme.secondary
-    val inActiveTextColor = Color.Gray
+    val inActiveTextColor = Color.DarkGray
     val textColor = when (day.position) {
         DayPosition.MonthDate -> Color.Unspecified
         DayPosition.InDate, DayPosition.OutDate -> inActiveTextColor
     }
     val inPeriods = mutableListOf<TimeTableInfo>()
 
-    periods.filter {
-        (it.startDate?.compareTo(day.date) ?: 1) <= 0 &&
-                (it.endDate?.compareTo(day.date) ?: -1) >= 0
-    }.forEach {
-        inPeriods.add(it)
-    }
-    val periodsOrdered = inPeriods.sortedBy { orderOfPeriodImportance.indexOf(it.category) }
-    val dayColor = periodsOrdered.firstOrNull()?.colorCode?.let { Color(it) }
+    periods.filter { (it.startDate?.compareTo(day.date) ?: 1) <= 0 && (it.endDate?.compareTo(day.date) ?: -1) >= 0 }
+        .forEach {
+            inPeriods.add(it)
+        }
+    val dayColor = inPeriods.minByOrNull { orderOfPeriodImportance.indexOf(it.category) }?.colorCode?.let { Color(it) }
 
     Column(
         modifier = Modifier

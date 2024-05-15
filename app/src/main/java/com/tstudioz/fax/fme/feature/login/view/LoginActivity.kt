@@ -16,7 +16,7 @@ import com.tstudioz.fax.fme.databinding.ActivityLoginBinding
 import com.tstudioz.fax.fme.view.activities.MainActivity
 import com.tstudioz.fax.fme.view.activities.Welcome
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(InternalCoroutinesApi::class)
 class LoginActivity : AppCompatActivity() {

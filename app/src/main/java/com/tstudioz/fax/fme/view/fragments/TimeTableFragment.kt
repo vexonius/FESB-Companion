@@ -14,11 +14,13 @@ import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TimeTableFragment : Fragment() {
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-    private val mainViewModel: MainViewModel by inject()
+    private val mainViewModel: MainViewModel by activityViewModel()
     private var binding: TimetableTabBinding? = null
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
@@ -31,10 +33,9 @@ class TimeTableFragment : Fragment() {
 
         mainViewModel.loadPermEvents()
 
-        mainViewModel.lessonsToShow.observe(viewLifecycleOwner) {
-            composeView.setContent {
-                AppTheme { HomeCompose() }
-            }
+
+        composeView.setContent {
+            AppTheme { HomeCompose(mainViewModel) }
         }
         setHasOptionsMenu(true)
 

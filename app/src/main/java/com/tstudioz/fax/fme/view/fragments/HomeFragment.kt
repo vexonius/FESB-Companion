@@ -40,7 +40,8 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -60,7 +61,7 @@ class HomeFragment : Fragment() {
     private val homeViewModel: HomeViewModel by viewModel()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val mainViewModel: MainViewModel by inject()
+    private val mainViewModel: MainViewModel by activityViewModel()
     private var date: String? = null
     private var snack: Snackbar? = null
 
