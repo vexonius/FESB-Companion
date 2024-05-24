@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.models.data
+package com.tstudioz.fax.fme.feature.attendance.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Dolazak

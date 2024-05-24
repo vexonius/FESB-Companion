@@ -34,7 +34,7 @@ import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
-import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
@@ -48,9 +48,6 @@ import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
@@ -68,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     private var bottomSheet: BottomSheetDialog? = null
     private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
-    private val prisutnostFragment = PrisutnostFragment()
+    private val attendanceFragment = AttendanceFragment()
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     private val mainViewModel: MainViewModel by viewModel()
@@ -188,7 +185,7 @@ class MainActivity : AppCompatActivity() {
         when (pos) {
             R.id.tab_prisutnost -> {
                 supportActionBar?.title = "Prisutnost"
-                ft.replace(R.id.frame, prisutnostFragment)
+                ft.replace(R.id.frame, attendanceFragment)
             }
 
             R.id.tab_home -> {

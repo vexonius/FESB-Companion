@@ -3,9 +3,10 @@ package com.tstudioz.fax.fme.models.data
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
+import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
 import com.tstudioz.fax.fme.models.util.parseTimetable
@@ -20,7 +21,8 @@ class UserRepository(
     private val weatherNetworkService: WeatherNetworkInterface,
     private val attendanceService: AttendanceServiceInterface,
     private val timeTableDao: TimeTableDaoInterface,
-    private val attendanceDao: AttendanceDaoInterface) : UserRepositoryInterface {
+    private val attendanceDao: AttendanceDaoInterface
+) : UserRepositoryInterface {
 
     override suspend fun attemptLogin(user: User): User {
         return when (val result = service.loginUser(user.username, user.password)) {

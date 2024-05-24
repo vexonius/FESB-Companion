@@ -21,7 +21,7 @@ sealed class NetworkServiceResult {
     }
 
     sealed class PrisutnostResult: NetworkServiceResult(){
-        class Success(val pris: MutableList<Dolazak>) : PrisutnostResult()
+        class Success(val pris: MutableMap<String, MutableList<Dolazak>>) : PrisutnostResult()
         class Failure(throwable: Throwable) : PrisutnostResult()
     }
 

@@ -1,10 +1,9 @@
-package com.tstudioz.fax.fme.models.services
+package com.tstudioz.fax.fme.feature.attendance.services
 
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.User
-import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.FormBody
@@ -14,7 +13,6 @@ import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import org.koin.java.KoinJavaComponent
 import java.io.IOException
 import java.util.StringTokenizer
 import java.util.UUID
@@ -25,9 +23,7 @@ import kotlin.coroutines.suspendCoroutine
 class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInterface {
 
     override suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult {
-        var zimskaPris: MutableList<MutableList<Dolazak>> = mutableListOf()
-        var ljetnaPris: MutableList<MutableList<Dolazak>> = mutableListOf()
-        val prisutnost: MutableList<Dolazak> = mutableListOf()
+        val prisutnost: MutableMap<String, MutableList<Dolazak>> = mutableMapOf()
 
         val formData: FormBody = Builder()
             .add("Username", user.username)
@@ -57,28 +53,22 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
                         if (zimski != null && zimski.getElementsByClass("emptyList")
                                 .first() == null
                         ) {
-                            zimskaPredavanja?.let { zimskaPris = getDetailedPrisutnost(it, 1) }
+                            zimskaPredavanja?.let { prisutnost.putAll(getDetailedPrisutnost(it, 1)) }
                         }
                         if (litnji != null && litnji.getElementsByClass("emptyList")
                                 .first() == null
                         ) {
-                            litnjaPredavanja?.let { ljetnaPris = getDetailedPrisutnost(it, 2) }
+                            litnjaPredavanja?.let { prisutnost.putAll(getDetailedPrisutnost(it, 2)) }
                         }
                     } catch (ex: Exception) {
                         ex.message?.let { Log.d("Exception pris", it) }
                         ex.printStackTrace()
-                        return NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to parse timetable"))
+                        return NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to parse attendance"))
                     }
                 }
             }
         } else {
-            return NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to fetch timetable"))
-        }
-
-        for (pris in (zimskaPris + ljetnaPris)) {
-            for (p in pris) {
-                prisutnost.add(p)
-            }
+            return NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to fetch attendance"))
         }
 
         return NetworkServiceResult.PrisutnostResult.Success(prisutnost) //popravit ovo tako da vrati failure kada je failure
@@ -144,8 +134,8 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
     private suspend fun getDetailedPrisutnost(
         listaPredavanja: Element,
         sem: Int
-    ): MutableList<MutableList<Dolazak>> {
-        val pris: MutableList<MutableList<Dolazak>> = mutableListOf()
+    ): MutableMap<String, MutableList<Dolazak>> {
+        val pris: MutableMap<String, MutableList<Dolazak>> = mutableMapOf()
         val kolegiji = listaPredavanja.select("a")
         for (element in kolegiji) {
             val request: Request = Request.Builder()
@@ -158,7 +148,9 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
             val response = makeNetworkCall(request)
             if (response.isSuccessful) {
                 try {
-                    pris.add(parseAndToDatabase(element, response, sem))
+                    parseAndToDatabase(element, response, sem).let {
+                        pris[it.first().predmet ?:""] = it
+                    }
                 } catch (exception: Exception) {
                     exception.message?.let { Log.d("Exception prisutnost", it) }
                     exception.printStackTrace()

@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.models.interfaces
+package com.tstudioz.fax.fme.feature.attendance.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.User

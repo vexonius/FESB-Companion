@@ -1,8 +1,10 @@
-package com.tstudioz.fax.fme.models.data
+package com.tstudioz.fax.fme.feature.attendance.repository
 
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
+import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
+import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
+import com.tstudioz.fax.fme.models.data.User
 
 class AttendanceRepository(
     private val attendanceService: AttendanceServiceInterface,

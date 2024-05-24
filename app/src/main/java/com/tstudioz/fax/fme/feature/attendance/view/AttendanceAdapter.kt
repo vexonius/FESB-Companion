@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.view.adapters
+package com.tstudioz.fax.fme.feature.attendance.view
 
 import android.content.Context
 import android.graphics.Typeface
@@ -15,11 +15,11 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IValueFormatter
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.view.adapters.DolasciAdapter.DolazakViewHolder
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceAdapter.DolazakViewHolder
 import com.tstudioz.fax.fme.database.models.Dolazak
 import io.realm.kotlin.query.RealmResults
 
-class DolasciAdapter(private val context: Context, private val mDolazak: RealmResults<Dolazak>) : RecyclerView.Adapter<DolazakViewHolder?>() {
+class AttendanceAdapter(private val context: Context, private val mDolazak: RealmResults<Dolazak>) : RecyclerView.Adapter<DolazakViewHolder?>() {
     var regulartf: Typeface? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DolazakViewHolder {
