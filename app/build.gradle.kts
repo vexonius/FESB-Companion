@@ -32,6 +32,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs = listOf("-Xdebug") // da ne bi bilo optimised out vars
     }
 
     viewBinding {

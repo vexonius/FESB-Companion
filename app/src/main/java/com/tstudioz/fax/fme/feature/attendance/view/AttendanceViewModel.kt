@@ -28,15 +28,15 @@ class AttendanceViewModel(private val repository: AttendanceRepositoryInterface)
     private val shPref: SharedPreferences by inject(SharedPreferences::class.java)
 
     fun fetchAttendance() {
-        val user = User(
-            shPref.getString("username", "") ?: "",
-            shPref.getString("password", "") ?: ""
-        )
         viewModelScope.launch(context = Dispatchers.IO) {
-            when (val attendance = repository.fetchAttendance(user)) {
+            when (val attendance = repository.fetchAttendance(User(
+                shPref.getString("username", "") ?: "",
+                shPref.getString("password", "") ?: ""
+            ))) {
                 is NetworkServiceResult.PrisutnostResult.Success -> {
-                    repository.insertAttendance(attendance.pris.values.flatten())
-                    _attendanceList.postValue(attendance.pris)
+                    val data = attendance.data as Map<String, MutableList<Dolazak>>
+                    repository.insertAttendance((data).values.flatten())
+                    _attendanceList.postValue(data)
                     shouldShow.postValue(true)
                 }
 

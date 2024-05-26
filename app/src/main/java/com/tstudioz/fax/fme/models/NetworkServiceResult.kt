@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.models
 
-import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.models.data.User
 
 sealed class NetworkServiceResult {
@@ -21,7 +20,7 @@ sealed class NetworkServiceResult {
     }
 
     sealed class PrisutnostResult: NetworkServiceResult(){
-        class Success(val pris: MutableMap<String, MutableList<Dolazak>>) : PrisutnostResult()
+        class Success(val data: Any) : PrisutnostResult()
         class Failure(throwable: Throwable) : PrisutnostResult()
     }
 
