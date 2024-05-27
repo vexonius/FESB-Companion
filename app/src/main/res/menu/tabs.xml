@@ -11,5 +11,5 @@
     <item
         android:id="@+id/tab_raspored"
         android:icon="@drawable/cal"
-        android:title="@string/raspored" />
+        android:title="@string/timetable_Title" />
 </menu>

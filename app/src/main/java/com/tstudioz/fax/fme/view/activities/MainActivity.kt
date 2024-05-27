@@ -23,15 +23,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
-import com.tstudioz.fax.fme.Application.FESBCompanion.Companion.instance
 import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
@@ -46,11 +46,12 @@ import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
@@ -79,13 +80,12 @@ class MainActivity : AppCompatActivity() {
 
         onBack()
         setUpToolbar()
-        getDate()
         setFragmentTabListener()
         testBottomBar()
+        checkUser()
 
         isThereAction()
 
-        setTableGotListener()
         checkVersion()
         shouldShowGDPRDialog()
     }
@@ -97,8 +97,9 @@ class MainActivity : AppCompatActivity() {
             setDefaultScreen()
         }
     }
-    private fun onBack(){
-        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
+
+    private fun onBack() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }
@@ -109,51 +110,26 @@ class MainActivity : AppCompatActivity() {
         beginFragTransaction(R.id.tab_home)
     }
 
-    private fun setTableGotListener(){
-        mainViewModel.tableGotPerm.observe(this) { tableGot ->
-            if (tableGot){
-                runOnUiThread {
-                    homeFragment.showList()
-                    if (supportFragmentManager.findFragmentById(R.id.frame) is HomeFragment){
-                        val text: TextView = findViewById(R.id.TimeRaspGot)
-                        text.text = shPref.getString("timeGotcurrentrasp", "")
-                        text.visibility = View.VISIBLE
-                    }
-                }
-            }
-            else{
-                runOnUiThread {
-                    homeFragment.showList()
-                }
-            }
-        }
-    }
-
     private fun checkUser() {
         var korisnik: Korisnik? = null
         realmLog = Realm.open(dbManager.getDefaultConfiguration())
-        assert(shPref != null)
-        editor = shPref?.edit()
 
-        if (realmLog != null) {
-            try {
-                korisnik = realmLog?.query<Korisnik>()?.find()?.first()
+        try {
+            korisnik = realmLog?.query<Korisnik>()?.find()?.first()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            invalidCreds()
+        } finally {
+            if (korisnik != null) {
+                editor = shPref.edit()
+                editor?.putString("username", korisnik.username)
+                editor?.putString("password", korisnik.password)
+                editor?.commit()
+                mojRaspored()
+            } else {
+                invalidCreds()
             }
-            catch (ex: Exception) { ex.printStackTrace() }
-            finally {
-                if (korisnik != null) {
-                    editor?.putString("username", korisnik.username)
-                    editor?.putString("password", korisnik.password)
-                    editor?.commit()
-                    mojRaspored()
-                } else { invalidCreds() }
-                realmLog?.close()
-            }
-        } else {
-            editor?.putBoolean("logged_in", false)
-            editor?.commit()
-            Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+            realmLog?.close()
         }
     }
 
@@ -168,9 +144,27 @@ class MainActivity : AppCompatActivity() {
     private fun testBottomBar() {
         val bar = binding?.bottomBar
 
-        bar?.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.attend), "Prisutnost", R.id.tab_prisutnost))
-        bar?.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.command_line), "Home", R.id.tab_home))
-        bar?.addTab(bar.createTab(AppCompatResources.getDrawable(this, R.drawable.cal), "Raspored", R.id.tab_raspored))
+        bar?.addTab(
+            bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.attend),
+                "Prisutnost",
+                R.id.tab_prisutnost
+            )
+        )
+        bar?.addTab(
+            bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.command_line),
+                "Home",
+                R.id.tab_home
+            )
+        )
+        bar?.addTab(
+            bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.cal),
+                "Raspored",
+                R.id.tab_raspored
+            )
+        )
         bar?.selectTabById(R.id.tab_home, true)
     }
 
@@ -179,7 +173,12 @@ class MainActivity : AppCompatActivity() {
             override fun onTabSelected(lastIndex: Int, lastTab: Tab?, newIndex: Int, newTab: Tab) {
                 beginFragTransaction(newTab.id)
             }
-            override fun onTabReselected(index: Int, tab: Tab) {}
+
+            override fun onTabReselected(index: Int, tab: Tab) {
+                if (tab.id == R.id.tab_raspored) {
+                    mainViewModel.showWeekChooseMenu()
+                }
+            }
         })
     }
 
@@ -187,14 +186,16 @@ class MainActivity : AppCompatActivity() {
         val ft = supportFragmentManager.beginTransaction()
         ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
         when (pos) {
-            R.id.tab_prisutnost-> {
+            R.id.tab_prisutnost -> {
                 supportActionBar?.title = "Prisutnost"
                 ft.replace(R.id.frame, prisutnostFragment)
             }
+
             R.id.tab_home -> {
                 supportActionBar?.title = "FESB Companion"
                 ft.replace(R.id.frame, homeFragment)
             }
+
             R.id.tab_raspored -> {
                 supportActionBar?.title = "Raspored"
                 ft.replace(R.id.frame, timeTableFragment)
@@ -218,36 +219,36 @@ class MainActivity : AppCompatActivity() {
             } else {
                 showSnacOffline()
             }
+
+            R.id.choosesched -> {
+                mainViewModel.showWeekChooseMenu()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
 
-    private fun mojRaspored(){
-        val user = shPref.getString("username", "")?.let { User(it, "") }
+    fun mojRaspored() {
+        if (NetworkUtils.isNetworkAvailable(this)) {
+            val user = shPref.getString("username", "")?.let { User(it, "") }
 
-        val calendar = Calendar.getInstance()
+            val now = LocalDate.now().plusDays(1)
+            val start = now.dayOfWeek.value
+            val startDate = now.plusDays((1 - start).toLong())
+            val endDate = now.plusDays(7 - start.toLong())
 
-        val dfandTime: DateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
-        val dateandtime = dfandTime.format(calendar.time)
+            if (user != null) {
+                mainViewModel.fetchUserTimetableCurrentWeekAndSave(user, startDate, endDate, startDate)
+            }
+        } else {
+            showSnacOffline()
+        }
 
-        calendar[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
-        val df: DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val startdate = df.format(calendar.time)
-
-        calendar.add(Calendar.DAY_OF_WEEK, Calendar.SATURDAY - Calendar.MONDAY)
-        val enddate = df.format(calendar.time)
-
-        if (user != null) { mainViewModel.fetchUserTimetable(user, startdate, enddate) }
-        editor = shPref.edit()
-        editor?.putString("timeGotcurrentrasp", dateandtime)
-        editor?.commit()
     }
 
     private fun invalidCreds() {
-        editor = shPref.edit()
-        editor?.putBoolean("logged_in", false)
-        editor?.apply()
+        shPref[SPKey.LOGGED_IN] = false
+        Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
 
         realmLog = Realm.open(dbManager.getDefaultConfiguration())
         try {
@@ -258,11 +259,7 @@ class MainActivity : AppCompatActivity() {
             realmLog?.close()
         }
         startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-    }
-
-    private fun getDate() {
-        val df: DateFormat = SimpleDateFormat("d.M.yyyy.", Locale.getDefault())
-        date = df.format(Calendar.getInstance().time)
+        finish()
     }
 
     private fun showSnacOffline() {
@@ -281,7 +278,7 @@ class MainActivity : AppCompatActivity() {
         if (intent.action == "podsjetnik") {
             val newIntent = Intent(this@MainActivity, NoteActivity::class.java)
             newIntent.putExtra("mode", 2)
-            newIntent.putExtra("task_key", "")
+            newIntent.putExtra("note_key", "")
             startActivity(newIntent)
         } else {
             when (intent.action) {
@@ -305,7 +302,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showChangelog() {
-        val view = LayoutInflater.from(this).inflate(R.layout.licence_view, null) as NestedScrollView
+        val view =
+            LayoutInflater.from(this).inflate(R.layout.licence_view, null) as NestedScrollView
         val wv = view.findViewById<View>(R.id.webvju) as WebView
 
         wv.loadUrl("file:///android_asset/changelog.html")
@@ -319,7 +317,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun shouldShowGDPRDialog() {
         val bool = shPref.getBoolean("GDPR_agreed", false)
-        if (bool==false) {
+        if (bool == false) {
             showGDPRCompliance()
             editor = shPref.edit()
             editor?.putBoolean("GDPR_agreed", true)
@@ -345,7 +343,8 @@ class MainActivity : AppCompatActivity() {
             try {
                 val builder = CustomTabsIntent.Builder()
                 val customTabsIntent =
-                    builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)).build()
+                    builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+                        .build()
                 customTabsIntent.launchUrl(
                     view.context, Uri.parse(
                         "http://tstud" + ".io/privacy"
@@ -353,7 +352,9 @@ class MainActivity : AppCompatActivity() {
                 )
             } catch (ex: Exception) {
                 Toast.makeText(
-                    view.context, "Ažurirajte Chrome preglednik za pregled " + "web stranice", Toast.LENGTH_SHORT
+                    view.context,
+                    "Ažurirajte Chrome preglednik za pregled " + "web stranice",
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         }
@@ -374,6 +375,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     public override fun onResume() {
+        mojRaspored()
         super.onResume()
     }
 }

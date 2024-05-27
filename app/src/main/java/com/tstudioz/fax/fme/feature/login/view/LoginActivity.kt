@@ -16,7 +16,7 @@ import com.tstudioz.fax.fme.databinding.ActivityLoginBinding
 import com.tstudioz.fax.fme.view.activities.MainActivity
 import com.tstudioz.fax.fme.view.activities.Welcome
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(InternalCoroutinesApi::class)
 class LoginActivity : AppCompatActivity() {
@@ -75,6 +75,7 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.loggedIn.observe(this) { loggedIn ->
             if (loggedIn) {
                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                finish()
             }
         }
     }
@@ -114,7 +115,7 @@ class LoginActivity : AppCompatActivity() {
             )
         )
         val params = snackBarView2?.layoutParams as FrameLayout.LayoutParams
-        params.gravity = Gravity.TOP
+        params.gravity = Gravity.BOTTOM
         params.topMargin = 100
         snackBarView2.layoutParams = params
 

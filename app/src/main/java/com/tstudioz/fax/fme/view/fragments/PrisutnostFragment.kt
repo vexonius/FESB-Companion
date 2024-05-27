@@ -25,8 +25,8 @@ import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
-import org.koin.core.KoinComponent
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.component.KoinComponent
 
 @OptIn(InternalCoroutinesApi::class)
 class PrisutnostFragment : Fragment(), KoinComponent {
