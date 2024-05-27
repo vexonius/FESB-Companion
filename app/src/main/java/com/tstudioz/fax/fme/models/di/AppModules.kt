@@ -47,7 +47,7 @@ val module = module {
     single { androidContext().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
-    viewModel { AttendanceViewModel(get()) }
+    viewModel { AttendanceViewModel(get(), get()) }
 }
 
 fun provideOkHttpClient(context: Context) : OkHttpClient {

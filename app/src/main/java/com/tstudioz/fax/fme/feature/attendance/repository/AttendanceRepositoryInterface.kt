@@ -8,5 +8,6 @@ interface AttendanceRepositoryInterface {
 
     suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult
     suspend fun insertAttendance(attendance: List<Dolazak>)
+    suspend fun readAttendance(): List<List<Dolazak>>
 
 }

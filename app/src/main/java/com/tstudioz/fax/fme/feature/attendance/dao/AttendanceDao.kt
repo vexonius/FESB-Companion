@@ -18,4 +18,12 @@ class AttendanceDao(private val dbManager: DatabaseManagerInterface) : Attendanc
         }
     }
 
+    override suspend fun read(): List<List<Dolazak>> {
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
+        val result = realm.query(Dolazak::class).find()
+        val grouped = result.groupBy { it.predmet }.values.toList()
+
+        return grouped.sortedBy { it[0].predmet }.sortedBy { it[0].semestar }
+    }
+
 }

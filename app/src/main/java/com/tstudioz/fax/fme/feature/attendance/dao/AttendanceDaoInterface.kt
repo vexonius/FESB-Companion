@@ -6,4 +6,6 @@ interface AttendanceDaoInterface {
 
     suspend fun insert(attendance: List<Dolazak>)
 
+    suspend fun read(): List<List<Dolazak>>
+
 }

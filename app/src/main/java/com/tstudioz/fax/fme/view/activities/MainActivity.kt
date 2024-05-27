@@ -35,6 +35,7 @@ import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
@@ -46,6 +47,7 @@ import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 
@@ -55,9 +57,6 @@ class MainActivity : AppCompatActivity() {
 
     private val dbManager: DatabaseManagerInterface by inject()
     private val shPref: SharedPreferences by inject()
-
-
-    var date: String? = null
 
     private var realmLog: Realm? = null
     private var client: OkHttpClient? = null
@@ -122,7 +121,6 @@ class MainActivity : AppCompatActivity() {
                 editor?.putString("username", korisnik.username)
                 editor?.putString("password", korisnik.password)
                 editor?.commit()
-                mojRaspored()
             } else {
                 invalidCreds()
             }
@@ -208,18 +206,18 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.refresMe -> if (NetworkUtils.isNetworkAvailable(this)) {
-                mojRaspored()
-            } else {
-                showSnacOffline()
+            R.id.refresMe -> {
+                if (NetworkUtils.isNetworkAvailable(this)) {
+                    mojRaspored()
+                } else {
+                    showSnacOffline()
+                }
             }
-
-            R.id.choosesched -> {
-                mainViewModel.showWeekChooseMenu()
-            }
+            R.id.choosesched -> mainViewModel.showWeekChooseMenu()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -344,13 +342,13 @@ class MainActivity : AppCompatActivity() {
                         .build()
                 customTabsIntent.launchUrl(
                     view.context, Uri.parse(
-                        "http://tstud" + ".io/privacy"
+                        "http://tstud.io/privacy"
                     )
                 )
             } catch (ex: Exception) {
                 Toast.makeText(
                     view.context,
-                    "Ažurirajte Chrome preglednik za pregled " + "web stranice",
+                    "Ažurirajte Chrome preglednik za pregled web stranice",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -369,10 +367,5 @@ class MainActivity : AppCompatActivity() {
         if (client != null) {
             client?.dispatcher?.cancelAll()
         }
-    }
-
-    public override fun onResume() {
-        mojRaspored()
-        super.onResume()
     }
 }
