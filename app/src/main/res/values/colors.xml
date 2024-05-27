@@ -51,4 +51,10 @@
     <color name="welcome3">#3395ff</color>
     <color name="welcome4">#c873f4</color>
 
+
+    <color name="StudomatBlue">#0052a3</color>
+    <color name="StudomatBlueLite">#ACDDF8</color>
+    <color name="StudomatBlueLiteLite">#E9F7FF</color>
+    <color name="passGreen">#02b010</color>
+
 </resources>

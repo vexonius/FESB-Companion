@@ -50,7 +50,7 @@ import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun HomeCompose(mainViewModel: MainViewModel) {
+fun TimetableCompose(mainViewModel: MainViewModel) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 

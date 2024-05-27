@@ -8,14 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.HomeCompose
+import com.tstudioz.fax.fme.compose.TimetableCompose
 import com.tstudioz.fax.fme.databinding.TimetableTabBinding
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TimeTableFragment : Fragment() {
 
@@ -35,7 +33,7 @@ class TimeTableFragment : Fragment() {
 
 
         composeView.setContent {
-            AppTheme { HomeCompose(mainViewModel) }
+            AppTheme { TimetableCompose(mainViewModel) }
         }
         setHasOptionsMenu(true)
 

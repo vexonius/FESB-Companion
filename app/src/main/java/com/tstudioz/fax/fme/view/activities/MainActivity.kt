@@ -29,6 +29,7 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
+import com.tstudioz.fax.fme.feature.studomat.view.StudomatFragment
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
@@ -165,6 +166,13 @@ class MainActivity : AppCompatActivity() {
                 R.id.tab_raspored
             )
         )
+        bar?.addTab(
+                bar.createTab(
+                    AppCompatResources.getDrawable(this, R.drawable.cal),
+                    "Studomat",
+                    R.id.tab_studomat
+                )
+                )
         bar?.selectTabById(R.id.tab_home, true)
     }
 
@@ -199,6 +207,10 @@ class MainActivity : AppCompatActivity() {
             R.id.tab_raspored -> {
                 supportActionBar?.title = "Raspored"
                 ft.replace(R.id.frame, timeTableFragment)
+            }
+            R.id.tab_studomat -> {
+                supportActionBar?.title = "Studomat"
+                ft.replace(R.id.frame, StudomatFragment())
             }
         }
         ft.addToBackStack(null)

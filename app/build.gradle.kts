@@ -104,6 +104,8 @@ dependencies {
 
     val composeVersion = "1.6.7"
 
+    implementation("androidx.activity:activity-compose:1.9.0")
+
     //compose livedata state
     implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")

@@ -1,6 +1,9 @@
 package com.tstudioz.fax.fme.models.di
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
@@ -45,7 +48,7 @@ val module = module {
     single<TimeTableDaoInterface> { TimeTableDao(get()) }
     single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
-    single { androidContext().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE) }
+    single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
     viewModel { AttendanceViewModel(get()) }
@@ -57,4 +60,16 @@ fun provideOkHttpClient(context: Context) : OkHttpClient {
             .connectTimeout(30, TimeUnit.SECONDS)
             .cookieJar(PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context)))
             .build()
+}
+
+fun encryptedSharedPreferences(androidContext: Context): SharedPreferences {
+    val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+
+    return EncryptedSharedPreferences.create(
+        "PreferencesFilename",
+        masterKeyAlias,
+        androidContext,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
 }
