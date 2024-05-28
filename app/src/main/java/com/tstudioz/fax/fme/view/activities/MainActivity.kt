@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         )
         bar?.addTab(
                 bar.createTab(
-                    AppCompatResources.getDrawable(this, R.drawable.cal),
+                    AppCompatResources.getDrawable(this, R.drawable.vectorstudomat_final),
                     "Studomat",
                     R.id.tab_studomat
                 )

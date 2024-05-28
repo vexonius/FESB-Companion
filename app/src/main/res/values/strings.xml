@@ -39,6 +39,7 @@
     <string name="winter_semester">ZIMSKI SEMESTAR</string>
     <string name="home">Home</string>
     <string name="timetable_Title">Raspored</string>
+    <string name="studomat_Title">Raspored</string>
     <string name="change_week">Promjena tjedna</string>
 
     <string name="default_group">Jedna grupa</string>
