@@ -46,13 +46,6 @@ class StudomatRepository(private val studomatService: StudomatService) {
         }
     }
 
-    /*suspend fun getStudomatExamsReg(): Document {
-        return when (val result = networkService.getStudomatExamsReg()) {
-            is NetworkServiceResult.StudomatResult.Success -> result.data as Document
-            else -> throw Exception("Failure getting exams data")
-        }
-    }*/
-
     suspend fun getGodine(): NetworkServiceResult.StudomatResult<List<Pair<String, String>>> {
         return when (val result = studomatService.getUpisaneGodine()) {
             is NetworkServiceResult.StudomatResult.Success -> NetworkServiceResult.StudomatResult.Success(

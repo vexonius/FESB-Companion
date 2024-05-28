@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.login.di
+package com.tstudioz.fax.fme.feature.studomat.di
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -12,7 +12,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-@OptIn(InternalCoroutinesApi::class)
 val studomatModule = module {
     single{ StudomatService() }
     single { StudomatRepository(get()) }

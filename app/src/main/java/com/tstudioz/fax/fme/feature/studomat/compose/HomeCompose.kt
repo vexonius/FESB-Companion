@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.studomat.compose
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -37,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -78,23 +75,21 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(Modifier/*.background(colorResource(id = R.color.white))*/) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .width(64.dp)
-                                .height(64.dp),
-                            color = colorResource(id = R.color.StudomatBlue),
-                            trackColor = colorResource(id = R.color.StudomatBlueLite),
-                            strokeWidth = 4.dp,
-                            strokeCap = StrokeCap.Round
-                        )
-                    }
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .width(64.dp)
+                            .height(64.dp),
+                        color = colorResource(id = R.color.StudomatBlue),
+                        trackColor = colorResource(id = R.color.StudomatBlueLite),
+                        strokeWidth = 4.dp,
+                        strokeCap = StrokeCap.Round
+                    )
+
                 }
             }
 
             Box(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState())
                     .wrapContentHeight()
                     .padding(innerPadding),
             ) {
@@ -102,23 +97,25 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
                     PullRefreshIndicator(
                         isRefreshing, pullRefreshState, Modifier
                             .align(Alignment.TopCenter)
-                            .zIndex(2f)
+                            .zIndex(2f), scale = true
                     )
-                    Column(
-                        //horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .padding(16.dp, 10.dp, 16.dp, 0.dp)
+                    LazyColumn(
+                        modifier = Modifier.padding(16.dp, 10.dp, 16.dp, 0.dp)
                     ) {
-                        Dropdown(studomatViewModel)
-                        Row {
-                            Text(
-                                text = "Generirano: ${studomatViewModel.generated.value ?: ""}",
-                                Modifier.padding(8.dp, 4.dp)
-                            )
+                        item {
+                            Column(Modifier.zIndex(1f)) {
+                                Dropdown(studomatViewModel)
+                                Row {
+                                    Text(
+                                        text = "Generirano: ${studomatViewModel.generated.value ?: ""}",
+                                        Modifier.padding(8.dp, 4.dp)
+                                    )
+                                }
+                                studomatViewModel.polozeniKrozUpisani.value?.let { it1 -> ProgressBarCompose(it1) }
+                            }
                         }
-                        studomatViewModel.polozeniKrozUpisani.value?.let { it1 -> ProgressBarCompose(it1) }
-                        predmetList.forEach {
-                            PredmetCompose(predmet = it)
+                        items(predmetList.size) { item ->
+                            PredmetCompose(predmet = predmetList[item])
                         }
                     }
                 }
@@ -131,7 +128,6 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
 @Composable
 fun Dropdown(studomatViewModel: StudomatViewModel) {
     val godine = studomatViewModel.godine.observeAsState().value
-    val studomatBlue = colorResource(id = R.color.StudomatBlue)
 
     if (!godine.isNullOrEmpty()) {
         var expanded by remember { mutableStateOf(false) }
@@ -144,7 +140,6 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                //.background(color = Color.White)
         ) {
             TextField(
                 readOnly = true,
@@ -155,19 +150,7 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
                     ExposedDropdownMenuDefaults.TrailingIcon(
                         expanded = expanded
                     )
-                },/*
-                colors = ExposedDropdownMenuDefaults*//*.textFieldColors(
-                    focusedIndicatorColor = studomatBlue,
-                    focusedLabelColor = studomatBlue,
-                    unfocusedPlaceholderColor = studomatBlue,
-                    focusedContainerColor = colorResource(
-                        id = R.color.StudomatBlueLiteLite
-                    ),
-                    unfocusedContainerColor = colorResource(
-                        id = R.color.white
-                    ),
-                    unfocusedTextColor = studomatBlue,
-                )*//*,*/
+                },
                 modifier = Modifier
                     .menuAnchor()
                     .wrapContentWidth()
@@ -176,7 +159,6 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 Modifier
-                    //.background(color = Color.White)
                     .exposedDropdownSize()
             ) {
                 if (godine.isNotEmpty()) {

@@ -11,8 +11,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 class StudomatService {
-    private val builder = OkHttpClient.Builder()
-    private val client: OkHttpClient = builder.cookieJar(object : CookieJar {
+    private val client: OkHttpClient = OkHttpClient.Builder().cookieJar(object : CookieJar {
         private val cookieStore = HashMap<String, MutableList<Cookie>>()
 
         override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
@@ -153,34 +152,6 @@ class StudomatService {
         } else {
             lastTimeLoggedIn = 0L
             NetworkServiceResult.StudomatResult.Failure("Couldn't get Studomat data!")
-        }
-    }
-
-    fun getStudomatExamsReg(): NetworkServiceResult.StudomatResult<Document> {
-        val request6 = Request.Builder()
-            .url("https://www.isvu.hr/studomat/hr/ispit/ponudapredmetazaprijavuispita")
-            .build()
-        val response6 = client.newCall(request6).execute()
-
-        val doc2 = response6.body?.string()?.let { Jsoup.parse(it) } ?: Jsoup.parse("")
-
-        val addre =
-            doc2.select("a[href^=/studomat/hr/ispit/ponudarokovazaprijavuispita]").attr("href")
-                .toString()
-
-        val request7 = Request.Builder()
-            .url("https://www.isvu.hr$addre")
-            .get()
-            .build()
-
-        val response7 = client.newCall(request7).execute()
-        val doc7 = response7.body?.string()?.let { Jsoup.parse(it) } ?: Jsoup.parse("")
-
-        return if (doc7.toString() != "") {
-            NetworkServiceResult.StudomatResult.Success(doc7)
-        } else {
-            lastTimeLoggedIn = 0L
-            NetworkServiceResult.StudomatResult.Failure("Couldn't get Studomat exams registration data!")
         }
     }
 
