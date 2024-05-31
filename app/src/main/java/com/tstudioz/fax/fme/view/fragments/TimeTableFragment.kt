@@ -13,9 +13,7 @@ import com.tstudioz.fax.fme.databinding.TimetableTabBinding
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TimeTableFragment : Fragment() {
 
@@ -31,8 +29,7 @@ class TimeTableFragment : Fragment() {
         binding = TimetableTabBinding.inflate(inflater, container, false)
         val composeView = binding?.composeView!!
 
-        mainViewModel.loadPermEvents()
-
+        mainViewModel.showThisWeeksEvents()
 
         composeView.setContent {
             AppTheme { HomeCompose(mainViewModel) }
@@ -43,8 +40,8 @@ class TimeTableFragment : Fragment() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        menu.findItem(R.id.refresMe).isVisible = true
-        menu.findItem(R.id.choosesched).setVisible(true)
+        menu.findItem(R.id.refreshTimetable).isVisible = true
+        menu.findItem(R.id.chooseSchedule).setVisible(true)
         super.onPrepareOptionsMenu(menu)
     }
 }

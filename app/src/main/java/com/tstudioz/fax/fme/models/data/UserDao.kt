@@ -13,7 +13,6 @@ class UserDao(private val dbManager: DatabaseManagerInterface): UserDaoInterface
 
         realm.write { copyToRealm(user) }
 
-        Log.d("UserDao", "User inserted: ${user.username}")
         realm.close()
     }
 

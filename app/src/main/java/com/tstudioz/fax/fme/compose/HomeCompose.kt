@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
@@ -38,6 +39,7 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -137,7 +139,7 @@ fun HomeCompose(mainViewModel: MainViewModel) {
                                     mainViewModel.showWeekChooseMenu(false)
                                 }
                             }) {
-                                Text(text = "Odustani")
+                                Text(text = stringResource(id = R.string.cancelChoosingWeek))
                             }
                             Button(onClick = {
                                 selection?.let {
@@ -156,7 +158,7 @@ fun HomeCompose(mainViewModel: MainViewModel) {
                                     }
                                 }
                             }) {
-                                Text(text = "Odaberi")
+                                Text(text = stringResource(id = R.string.chooseChoosingWeek))
                             }
                         }
                     }

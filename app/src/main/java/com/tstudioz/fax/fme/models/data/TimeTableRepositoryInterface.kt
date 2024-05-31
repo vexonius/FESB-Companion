@@ -10,9 +10,9 @@ interface TimeTableRepositoryInterface {
 
     suspend fun fetchTimeTableInfo(startDate: String, endDate: String): List<TimeTableInfo>
 
-    suspend fun insertTimeTable(classes: List<Event>)
+    suspend fun insert(classes: List<Event>)
 
-    suspend fun loadFromDb(): List<Event>
+    suspend fun getCachedEvents(): List<Event>
 
 
     }

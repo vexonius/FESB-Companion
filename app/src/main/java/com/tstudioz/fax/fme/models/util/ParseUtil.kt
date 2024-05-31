@@ -4,7 +4,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
-import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Recurring
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
@@ -16,6 +15,7 @@ import org.jsoup.nodes.Element
 import java.lang.reflect.Type
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneOffset
 
 
@@ -29,11 +29,9 @@ suspend fun parseTimetable(body: String): List<Event> {
         for (e in elements) {
             val id = e.attr("data-id").toInt()
             val startdate = e.attr("data-startsdate").toString()
-            val startDateSplit = startdate.split("-")
             val starth = e.attr("data-startshour").toInt()
             val startmin = e.attr("data-startsmin").toInt()
             val enddate = e.attr("data-endsdate").toString()
-            val endDateSplit = enddate.split("-")
             val endh = e.attr("data-endshour").toInt()
             val endmin = e.attr("data-endsmin").toInt()
             val type = editType(e.selectFirst("span.groupCategory")?.text()?.split(",")?.get(0) ?: "")
@@ -50,7 +48,6 @@ suspend fun parseTimetable(body: String): List<Event> {
 
             val repeatsUntil = e.selectFirst("span.repeat")?.text() ?: ""
 
-
             events.add(
                 Event(
                     id = id.toString(),
@@ -60,20 +57,14 @@ suspend fun parseTimetable(body: String): List<Event> {
                     eventType = type,
                     groups = group,
                     classroom = room,
-                    colorId = getBoja(type),
+                    colorId = type.color,
                     start = LocalDateTime.of(
-                        startDateSplit[0].toInt(),
-                        startDateSplit[1].toInt(),
-                        startDateSplit[2].toInt(),
-                        starth,
-                        startmin
+                        LocalDate.parse(startdate),
+                        LocalTime.of(starth, startmin)
                     ),
                     end = LocalDateTime.of(
-                        endDateSplit[0].toInt(),
-                        endDateSplit[1].toInt(),
-                        endDateSplit[2].toInt(),
-                        endh,
-                        endmin
+                        LocalDate.parse(enddate),
+                        LocalTime.of(endh, endmin)
                     ),
                     description = detailTime,
                     recurring = isItRecurring,
@@ -101,21 +92,6 @@ private fun editType(type: String): TimetableType {
     }
 }
 
-private fun getBoja(type: TimetableType): Int {
-    return when (type) {
-        TimetableType.PREDAVANJE -> R.color.blue_nice
-        TimetableType.AUDITORNA_VJEZBA -> R.color.green_nice
-        TimetableType.KOLOKVIJ -> R.color.purple_nice
-        TimetableType.LABORATORIJSKA_VJEZBA -> R.color.red_nice
-        TimetableType.KONSTRUKCIJSKA_VJEZBA -> R.color.grey_nice
-        TimetableType.SEMINAR -> R.color.blue_nice
-        TimetableType.ISPIT -> R.color.purple_dark
-        else -> {
-            R.color.blue_nice
-        }
-    }
-}
-
 suspend fun makeAcronym(name: String): String {
     val acronym = StringBuilder()
     if (name.isNotEmpty() && name.contains(" ")
@@ -136,39 +112,6 @@ suspend fun parseTimetableInfo(json: String): List<TimeTableInfo> {
         .create()
     return gson.fromJson(json, Array<TimeTableInfo>::class.java).toList()
 }
-
-class LocalDateDeserializer : JsonDeserializer<LocalDate> {
-    override fun deserialize(
-        json: JsonElement?,
-        typeOfT: Type?,
-        context: JsonDeserializationContext?
-    ): LocalDate? {
-        val dateString = json?.asString?.split("/Date(")?.get(1)?.split(")")?.get(0)
-        return dateString?.toLong()?.div(1000)?.let {
-            LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC).toLocalDate().plusDays(1)
-        }
-    }
-}
-
-class ColorDeserializer : JsonDeserializer<Long> {
-    override fun deserialize(
-        json: JsonElement?,
-        typeOfT: Type?,
-        context: JsonDeserializationContext?
-    ): Long {
-        return when (json?.asString) {
-            "White" -> 0xFF191C1D
-            "Blue" -> 0xff0060ff
-            "Yellow" -> 0xffe5c700
-            "Orange" -> 0xffff6600
-            "Purple" -> 0xffa200ff
-            "Red" -> 0xffff0000
-            "Green" -> 0xff0b9700
-            else -> 0xFF191C1D
-        }
-    }
-}
-
 
 private fun parseNumbersFromString(element: Element?): Recurring {
     return when {

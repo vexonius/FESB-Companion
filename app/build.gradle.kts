@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("io.realm.kotlin") version "1.11.0"
+    id("io.realm.kotlin") version "1.16.0"
 }
 
 android {
@@ -52,7 +52,6 @@ android {
 
 dependencies {
 
-    implementation("androidx.compose.material3:material3-android:1.2.1")
     val koinVersion = "3.5.6"
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
@@ -102,6 +101,8 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation("androidx.compose.material3:material3-android:1.2.1")
+
     val composeVersion = "1.6.7"
 
     //compose livedata state
@@ -112,7 +113,6 @@ dependencies {
     implementation("androidx.security:security-crypto:1.0.0")
 
     //pull to refresh compose
-    implementation("androidx.compose.material:material:$composeVersion")
     implementation("androidx.compose.ui:ui-android:$composeVersion")
 
     //choose calendar

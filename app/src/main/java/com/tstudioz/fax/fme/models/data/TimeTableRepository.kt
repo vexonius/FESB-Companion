@@ -8,6 +8,7 @@ import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.util.parseTimetable
 import com.tstudioz.fax.fme.models.util.parseTimetableInfo
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class TimeTableRepository(
     private val timetableService: TimetableServiceInterface,
@@ -15,7 +16,14 @@ class TimeTableRepository(
 ) : TimeTableRepositoryInterface {
 
     override suspend fun fetchTimetable(user: String, startDate: LocalDate, endDate: LocalDate): List<Event> {
-        return when (val result = timetableService.fetchTimeTable(user, startDate, endDate)) {
+
+        val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
+        val requestUrl = "https://raspored.fesb.unist.hr/part/raspored/kalendar?" +
+                "DataType=User&DataId=$user" +
+                "&MinDate=${dateFormatter.format(startDate)}" +
+                "&MaxDate=${dateFormatter.format(endDate)}"
+
+        return when (val result = timetableService.fetchTimeTable(requestUrl)) {
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetable(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")
@@ -25,7 +33,10 @@ class TimeTableRepository(
     }
 
     override suspend fun fetchTimeTableInfo(startDate: String, endDate: String): List<TimeTableInfo> {
-        return when (val result = timetableService.fetchTimeTableInfo(startDate, endDate)) {
+
+        val requestUrl = "https://raspored.fesb.unist.hr/raspored/periodi-u-mjesecu-json?FromDate=$startDate&ToDate=$endDate"
+
+        return when (val result = timetableService.fetchTimeTable(requestUrl)) {
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetableInfo(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
                 Log.e(TAG, "TimetableInfo fetching error")
@@ -34,12 +45,12 @@ class TimeTableRepository(
         }
     }
 
-    override suspend fun insertTimeTable(classes: List<Event>) {
+    override suspend fun insert(classes: List<Event>) {
         timeTableDao.insert(classes)
     }
 
-    override suspend fun loadFromDb(): List<Event> {
-        return timeTableDao.loadFromDb()
+    override suspend fun getCachedEvents(): List<Event> {
+        return timeTableDao.getCachedEvents()
     }
 
     companion object {

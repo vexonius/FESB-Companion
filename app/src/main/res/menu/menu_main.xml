@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/choosesched"
+        android:id="@+id/chooseSchedule"
         android:icon="@drawable/calendar_lines_pen_svgrepo_com"
         android:title="@string/change_week"
         app:showAsAction="always"
         android:visible="false"/>
 
     <item
-        android:id="@+id/refresMe"
+        android:id="@+id/refreshTimetable"
         android:icon="@drawable/refresh"
         android:title="@string/refresh"
         app:showAsAction="ifRoom" />

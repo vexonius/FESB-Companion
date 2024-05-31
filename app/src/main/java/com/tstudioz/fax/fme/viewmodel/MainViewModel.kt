@@ -58,7 +58,7 @@ class MainViewModel(
     init {
         fetchTimetableInfo()
         viewModelScope.launch(Dispatchers.IO) {
-            _lessonsPerm.postValue(timeTableRepository.loadFromDb())
+            _lessonsPerm.postValue(timeTableRepository.getCachedEvents())
         }
     }
 
@@ -94,10 +94,10 @@ class MainViewModel(
                 val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(shownWeekMonday)
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
-                sharedPreferences[SPKey.TIMEGOTPERMRASP] =
+                sharedPreferences[SPKey.TIME_GOT_CURRENT_WEEK_TIMETABLE] =
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                 _lessonsPerm.postValue(events)
-                timeTableRepository.insertTimeTable(events)
+                timeTableRepository.insert(events)
             } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
             }
@@ -118,7 +118,7 @@ class MainViewModel(
         }
     }
 
-    fun loadPermEvents() {
+    fun showThisWeeksEvents() {
         _lessonsToShow.postValue(_lessonsPerm.value)
     }
 

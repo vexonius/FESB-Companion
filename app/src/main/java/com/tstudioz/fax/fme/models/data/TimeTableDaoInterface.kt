@@ -6,7 +6,7 @@ interface TimeTableDaoInterface {
 
     suspend fun insert(classes: List<Event> )
 
-    suspend fun loadFromDb(): List<Event>
+    suspend fun getCachedEvents(): List<Event>
 
 
     }

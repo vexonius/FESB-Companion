@@ -12,6 +12,7 @@ import com.tstudioz.fax.fme.models.util.parseTimetable
 import com.tstudioz.fax.fme.models.util.parseWeatherDetails
 import com.tstudioz.fax.fme.weather.Current
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 class UserRepository(
@@ -33,7 +34,12 @@ class UserRepository(
     }
 
     override suspend fun fetchTimetable(user: String, startDate: LocalDate, endDate: LocalDate): List<Event> {
-        return when(val result = timetableService.fetchTimeTable(user, startDate, endDate)){
+        val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
+        val requestUrl = "https://raspored.fesb.unist.hr/part/raspored/kalendar?" +
+                "DataType=User&DataId=$user" +
+                "&MinDate=${dateFormatter.format(startDate)}" +
+                "&MaxDate=${dateFormatter.format(endDate)}"
+        return when(val result = timetableService.fetchTimeTable(requestUrl)){
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetable(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")

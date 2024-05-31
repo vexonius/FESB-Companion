@@ -48,9 +48,6 @@ import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
@@ -214,14 +211,14 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.refresMe -> if (NetworkUtils.isNetworkAvailable(this)) {
+            R.id.chooseSchedule -> {
+                mainViewModel.showWeekChooseMenu()
+            }
+
+            R.id.refreshTimetable -> if (NetworkUtils.isNetworkAvailable(this)) {
                 mojRaspored()
             } else {
                 showSnacOffline()
-            }
-
-            R.id.choosesched -> {
-                mainViewModel.showWeekChooseMenu()
             }
         }
         return super.onOptionsItemSelected(item)

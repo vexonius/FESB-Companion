@@ -23,7 +23,7 @@ class TimeTableDao(private val dbManager: DatabaseManagerInterface) : TimeTableD
         }
     }
 
-    override suspend fun loadFromDb(): List<Event> {
+    override suspend fun getCachedEvents(): List<Event> {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
         return realm.query<EventRealm>().find().map { fromRealmObject(it) }
     }
