@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -40,6 +41,7 @@ import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,34 +52,43 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
 
-@OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeCompose(mainViewModel: MainViewModel) {
+fun HomeCompose(showDay: LiveData<Boolean>,
+                showDayEvent: LiveData<Event>,
+                shownWeekChooseMenu: LiveData<Boolean>,
+                lessonsToShow: LiveData<List<Event>>,
+                shownWeek: LiveData<LocalDate>,
+                periods:  LiveData<List<TimeTableInfo>>,
+                fetchUserTimetable: (LocalDate, LocalDate, LocalDate) -> Unit,
+                showEvent: (Event) -> Unit,
+                showWeekChooseMenu: (Boolean) -> Unit,
+                hideEvent: () -> Unit){
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     BottomSheetScaffold(
         sheetContent = {
-            if (mainViewModel.showDay.observeAsState(initial = false).value) {
+            if (showDay.observeAsState(initial = false).value) {
                 ModalBottomSheet(
                     sheetState = sheetState,
-                    onDismissRequest = { mainViewModel.hideEvent() },
-                    containerColor = mainViewModel.showDayEvent.observeAsState().value?.color ?: Color.Transparent,
+                    onDismissRequest = { hideEvent() },
+                    containerColor = showDayEvent.observeAsState().value?.color ?: Color.Transparent,
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                     shape = RectangleShape
                 ) {
-                    mainViewModel.showDayEvent.observeAsState().value?.let {
+                    showDayEvent.observeAsState().value?.let {
                         BottomInfoCompose(it)
                     }
                 }
             }
-            if (mainViewModel.showWeekChooseMenu.observeAsState(initial = false).value) {
+            if (shownWeekChooseMenu.observeAsState(initial = false).value) {
                 ModalBottomSheet(sheetState = sheetState,
                     containerColor = MaterialTheme.colorScheme.surface,
                     windowInsets = WindowInsets(0.dp),
                     onDismissRequest = {
-                        mainViewModel.showWeekChooseMenu(false)
+                        showWeekChooseMenu(false)
                     })
                 {
                     Column(Modifier.padding(8.dp, 8.dp, 8.dp, 20.dp)) {
@@ -85,7 +96,6 @@ fun HomeCompose(mainViewModel: MainViewModel) {
                         val startMonth = remember { currentMonth.minusMonths(100) }
                         val endMonth = remember { currentMonth.plusMonths(100) }
                         val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
-                        val periods = mainViewModel.periods.value
                         var selection by remember {
                             mutableStateOf<CalendarDay?>(
                                 CalendarDay(
@@ -117,13 +127,12 @@ fun HomeCompose(mainViewModel: MainViewModel) {
                         )
                         Spacer(modifier = Modifier.padding(0.dp, 5.dp))
                         HorizontalCalendar(state = state, dayContent = { day ->
-                            Day(day, isSelected = selection == day, periods = periods ?: emptyList()) { clicked ->
+                            Day(day, isSelected = selection == day, periods = periods.value ?: emptyList()) { clicked ->
                                 selection = if (clicked == selection) {
                                     null
                                 } else {
                                     clicked
                                 }
-
                             }
                         })
                         Row(
@@ -136,7 +145,7 @@ fun HomeCompose(mainViewModel: MainViewModel) {
                                 coroutineScope.launch {
                                     sheetState.hide()
                                     delay(300)
-                                    mainViewModel.showWeekChooseMenu(false)
+                                    showWeekChooseMenu(false)
                                 }
                             }) {
                                 Text(text = stringResource(id = R.string.cancelChoosingWeek))
@@ -146,15 +155,11 @@ fun HomeCompose(mainViewModel: MainViewModel) {
                                     val start = it.date.dayOfWeek.value
                                     val startDate = it.date.minusDays((start - 1).toLong())
                                     val endDate = it.date.plusDays(7 - start.toLong())
-                                    mainViewModel.fetchUserTimetable(
-                                        startDate = startDate,
-                                        endDate = endDate,
-                                        shownWeekMonday = startDate
-                                    )
+                                    fetchUserTimetable(startDate, endDate, startDate)
                                     coroutineScope.launch {
                                         sheetState.hide()
                                         delay(300)
-                                        mainViewModel.showWeekChooseMenu(false)
+                                        showWeekChooseMenu(false)
                                     }
                                 }
                             }) {
@@ -168,7 +173,7 @@ fun HomeCompose(mainViewModel: MainViewModel) {
         sheetPeekHeight = 0.dp,
     ) {
         Column {
-            val mapped = mainViewModel.lessonsToShow.observeAsState(emptyList()).value.onEach {
+            val mapped = lessonsToShow.observeAsState(emptyList()).value.onEach {
                 it.color = colorResource(id = it.colorId)
             }
             val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
@@ -182,11 +187,10 @@ fun HomeCompose(mainViewModel: MainViewModel) {
                 maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
                 else if (eventAfter8PM) LocalTime.of(21, 0)
                 else LocalTime.of(20, 0),
-                minDate = mainViewModel.shownWeek.observeAsState().value ?: LocalDate.now(),
-                maxDate = (mainViewModel.shownWeek.observeAsState().value
-                    ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
+                minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
+                maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
                 onClick = { event ->
-                    mainViewModel.showEvent(event)
+                    showEvent(event)
                 }
             )
 

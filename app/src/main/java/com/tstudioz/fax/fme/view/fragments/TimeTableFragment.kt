@@ -32,7 +32,32 @@ class TimeTableFragment : Fragment() {
         mainViewModel.showThisWeeksEvents()
 
         composeView.setContent {
-            AppTheme { HomeCompose(mainViewModel) }
+            AppTheme {
+                HomeCompose(
+                    showDay = mainViewModel.showDay,
+                    showDayEvent = mainViewModel.showDayEvent,
+                    shownWeekChooseMenu = mainViewModel.shownWeekChooseMenu,
+                    lessonsToShow = mainViewModel.lessonsToShow,
+                    shownWeek = mainViewModel.shownWeek,
+                    periods = mainViewModel.periods,
+                    fetchUserTimetable = { startDate, endDate, shownWeek ->
+                        mainViewModel.fetchUserTimetable(
+                            startDate = startDate,
+                            endDate = endDate,
+                            shownWeekMonday = shownWeek
+                        )
+                    },
+                    showEvent = { event ->
+                        mainViewModel.showEvent(event)
+                    },
+                    showWeekChooseMenu = { show ->
+                        mainViewModel.showWeekChooseMenu(show)
+                    },
+                    hideEvent = {
+                        mainViewModel.hideEvent()
+                    },
+                )
+            }
         }
         setHasOptionsMenu(true)
 

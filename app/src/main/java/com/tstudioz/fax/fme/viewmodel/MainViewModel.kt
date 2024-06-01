@@ -32,7 +32,7 @@ class MainViewModel(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    private val _showEvent = MutableLiveData<Boolean>().apply { value = false }
+    private val _showEvent = MutableLiveData<Boolean>(false)
     private val _showEventContent = MutableLiveData<Event>()
     private val _lessonsToShow = MutableLiveData<List<Event>>().apply { value = emptyList() }
     private val _lessonsPerm = MutableLiveData<List<Event>>().apply { value = emptyList() }
@@ -53,7 +53,7 @@ class MainViewModel(
     val lessonsPerm: LiveData<List<Event>> = _lessonsPerm
     val periods: LiveData<List<TimeTableInfo>> = _periods
     val shownWeek: LiveData<LocalDate> = _shownWeek
-    val showWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
+    val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
 
     init {
         fetchTimetableInfo()
