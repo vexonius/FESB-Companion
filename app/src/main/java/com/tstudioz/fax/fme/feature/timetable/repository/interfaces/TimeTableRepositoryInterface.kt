@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.models.data
+package com.tstudioz.fax.fme.feature.timetable.repository.interfaces
 
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo

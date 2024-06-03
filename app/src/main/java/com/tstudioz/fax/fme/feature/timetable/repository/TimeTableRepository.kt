@@ -1,12 +1,14 @@
-package com.tstudioz.fax.fme.models.data
+package com.tstudioz.fax.fme.feature.timetable.repository
 
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
-import com.tstudioz.fax.fme.models.util.parseTimetable
-import com.tstudioz.fax.fme.models.util.parseTimetableInfo
+import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
+import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
+import com.tstudioz.fax.fme.feature.timetable.parseTimetable
+import com.tstudioz.fax.fme.feature.timetable.parseTimetableInfo
+import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

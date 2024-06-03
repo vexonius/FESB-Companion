@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.models.interfaces
+package com.tstudioz.fax.fme.feature.timetable.services.interfaces
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 

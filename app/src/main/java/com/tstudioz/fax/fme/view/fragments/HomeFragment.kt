@@ -56,8 +56,7 @@ class HomeFragment : Fragment() {
     private val shPref: SharedPreferences by inject()
 
     private var binding: HomeTabBinding? = null
-    private val forecastUrl =
-        "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
+    private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
 
     @OptIn(ExperimentalCoroutinesApi::class)

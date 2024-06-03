@@ -10,7 +10,7 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
-import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set

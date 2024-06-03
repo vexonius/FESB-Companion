@@ -35,7 +35,7 @@ import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
-import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
+import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.exceptions.RealmException

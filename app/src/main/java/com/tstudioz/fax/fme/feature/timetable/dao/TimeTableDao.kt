@@ -1,10 +1,11 @@
-package com.tstudioz.fax.fme.models.data
+package com.tstudioz.fax.fme.feature.timetable.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.EventRealm
 import com.tstudioz.fax.fme.database.models.fromRealmObject
 import com.tstudioz.fax.fme.database.models.toRealmObject
+import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query

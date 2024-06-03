@@ -1,7 +1,7 @@
-package com.tstudioz.fax.fme.models.services
+package com.tstudioz.fax.fme.feature.timetable.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
+import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response

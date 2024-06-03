@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.view.fragments
+package com.tstudioz.fax.fme.feature.timetable.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
