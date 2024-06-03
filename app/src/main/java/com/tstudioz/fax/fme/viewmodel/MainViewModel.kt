@@ -94,7 +94,7 @@ class MainViewModel(
                 val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(shownWeekMonday)
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
-                sharedPreferences[SPKey.TIME_GOT_CURRENT_WEEK_TIMETABLE] =
+                sharedPreferences[SPKey.LAST_FETCHED] =
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                 _lessonsPerm.postValue(events)
                 timeTableRepository.insert(events)

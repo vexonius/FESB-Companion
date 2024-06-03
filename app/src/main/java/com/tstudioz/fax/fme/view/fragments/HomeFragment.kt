@@ -95,7 +95,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setLastRaspGot() {
-        binding?.TimeRaspGot?.text = shPref[SPKey.TIME_GOT_CURRENT_WEEK_TIMETABLE, ""]
+        binding?.TimeRaspGot?.text = shPref[SPKey.LAST_FETCHED, ""]
         binding?.TimeRaspGot?.visibility = View.VISIBLE
     }
 
@@ -163,7 +163,7 @@ class HomeFragment : Fragment() {
     fun showList() {
         mainViewModel.lessonsPerm.observe(viewLifecycleOwner) { lessons ->
             val filteredLessons = lessons.filter { it.start.toLocalDate() == LocalDate.now() }
-            binding?.TimeRaspGot?.text = shPref[SPKey.TIME_GOT_CURRENT_WEEK_TIMETABLE, ""]
+            binding?.TimeRaspGot?.text = shPref[SPKey.LAST_FETCHED, ""]
             if (filteredLessons.isEmpty()) {
                 binding?.rv?.visibility = View.INVISIBLE
                 binding?.nemaPredavanja?.visibility = View.VISIBLE

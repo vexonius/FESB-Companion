@@ -100,3 +100,4 @@ enum class TimetableType(val type: String, val color: Int) {
     ISPIT("Ispit", R.color.purple_dark),
     OTHER("Other", R.color.blue_nice)
 }
+

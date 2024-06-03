@@ -15,11 +15,7 @@ class LocalDateDeserializer : JsonDeserializer<LocalDate> {
         typeOfT: Type?,
         context: JsonDeserializationContext?
     ): LocalDate? {
-        val dateString = try {
-            (json?.asString ?: "").removePrefix("/Date(").removeSuffix(")/").toLong()
-        } catch (e: NumberFormatException) {
-            0
-        }
+        val dateString = json?.asString?.removePrefix("/Date(")?.removeSuffix(")/")?.toLong() ?: 0
         return dateString.div(1000).let {
             LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC).toLocalDate().plusDays(1)
         }
