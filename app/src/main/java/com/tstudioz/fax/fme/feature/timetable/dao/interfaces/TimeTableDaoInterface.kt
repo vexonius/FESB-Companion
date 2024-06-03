@@ -8,5 +8,4 @@ interface TimeTableDaoInterface {
 
     suspend fun getCachedEvents(): List<Event>
 
-
-    }
+}

@@ -7,4 +7,5 @@ interface TimetableServiceInterface {
     suspend fun fetchTimeTable(
         url: String
     ): NetworkServiceResult.TimeTableResult
+
 }

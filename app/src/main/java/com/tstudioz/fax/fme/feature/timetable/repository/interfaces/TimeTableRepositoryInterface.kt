@@ -14,5 +14,4 @@ interface TimeTableRepositoryInterface {
 
     suspend fun getCachedEvents(): List<Event>
 
-
-    }
+}

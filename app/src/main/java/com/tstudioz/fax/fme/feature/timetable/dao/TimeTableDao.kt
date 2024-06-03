@@ -19,7 +19,7 @@ class TimeTableDao(private val dbManager: DatabaseManagerInterface) : TimeTableD
             val oldClasses = this.query<EventRealm>().find()
             this.delete(oldClasses)
             classes.forEach {
-                this.copyToRealm(toRealmObject(it) , updatePolicy = UpdatePolicy.ALL)
+                this.copyToRealm(toRealmObject(it), updatePolicy = UpdatePolicy.ALL)
             }
         }
     }
