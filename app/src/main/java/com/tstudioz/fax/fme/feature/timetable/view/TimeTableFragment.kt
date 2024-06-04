@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.HomeCompose
 import com.tstudioz.fax.fme.databinding.TimetableTabBinding
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +32,7 @@ class TimeTableFragment : Fragment() {
 
         composeView.setContent {
             AppTheme {
-                HomeCompose(
+                TimetableCompose(
                     showDay = mainViewModel.showDay,
                     showDayEvent = mainViewModel.showDayEvent,
                     shownWeekChooseMenu = mainViewModel.shownWeekChooseMenu,

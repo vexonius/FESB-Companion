@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.compose
+package com.tstudioz.fax.fme.feature.timetable.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,11 +41,11 @@ import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.BottomInfoCompose
+import com.tstudioz.fax.fme.compose.Schedule
+import com.tstudioz.fax.fme.compose.SimpleCalendarTitle
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
-import com.tstudioz.fax.fme.viewmodel.MainViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -54,16 +54,16 @@ import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeCompose(showDay: LiveData<Boolean>,
-                showDayEvent: LiveData<Event>,
-                shownWeekChooseMenu: LiveData<Boolean>,
-                lessonsToShow: LiveData<List<Event>>,
-                shownWeek: LiveData<LocalDate>,
-                periods:  LiveData<List<TimeTableInfo>>,
-                fetchUserTimetable: (LocalDate, LocalDate, LocalDate) -> Unit,
-                showEvent: (Event) -> Unit,
-                showWeekChooseMenu: (Boolean) -> Unit,
-                hideEvent: () -> Unit){
+fun TimetableCompose(showDay: LiveData<Boolean>,
+                     showDayEvent: LiveData<Event>,
+                     shownWeekChooseMenu: LiveData<Boolean>,
+                     lessonsToShow: LiveData<List<Event>>,
+                     shownWeek: LiveData<LocalDate>,
+                     periods:  LiveData<List<TimeTableInfo>>,
+                     fetchUserTimetable: (LocalDate, LocalDate, LocalDate) -> Unit,
+                     showEvent: (Event) -> Unit,
+                     showWeekChooseMenu: (Boolean) -> Unit,
+                     hideEvent: () -> Unit){
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
