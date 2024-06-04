@@ -10,7 +10,6 @@ buildscript {
             name 'Google'
         }
         maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
-        //mavenCentral()
         google()
     }
     dependencies {

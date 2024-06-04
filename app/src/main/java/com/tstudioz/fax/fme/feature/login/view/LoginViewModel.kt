@@ -39,11 +39,11 @@ class LoginViewModel(
     }
 
     fun tryUserLogin() {
-        var username = username.value!!
-        val password = password.value!!
+        var username = username.value
+        val password = password.value
 
-        if (username.isEmpty() || password.isEmpty()) {
-            errorMessage.setValue(application.getString(R.string.login_error_empty_credentials))
+        if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
+            errorMessage.postValue(application.getString(R.string.login_error_empty_credentials))
             return
         } else if (isEmailValid(username)) {
             // If user inputted email, get only username,

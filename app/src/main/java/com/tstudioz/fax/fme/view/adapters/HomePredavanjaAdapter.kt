@@ -1,18 +1,20 @@
 package com.tstudioz.fax.fme.view.adapters
 
+import android.content.res.Resources
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.compose.ui.res.integerResource
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.models.Predavanja
+import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter.HomePredavanjaViewHolder
 import io.realm.kotlin.query.RealmResults
 
-class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanja>) :
+class HomePredavanjaAdapter(private val mPredavanjaDanas: List<Event>) :
     RecyclerView.Adapter<HomePredavanjaViewHolder>() {
     var boldtf: Typeface? = null
     var regulartf: Typeface? = null
@@ -28,16 +30,13 @@ class HomePredavanjaAdapter(private val mPredavanjaDanas: RealmResults<Predavanj
 
     override fun onBindViewHolder(holder: HomePredavanjaViewHolder, position: Int) {
         val predavanja = mPredavanjaDanas[position]
-        holder.name.text = predavanja.predmetPredavanja
+        holder.name.text = predavanja.name
         holder.name.typeface = regulartf
-        holder.type.text = predavanja.rasponVremena
-        var imePredavanja = predavanja.predavanjeIme
-        if (!imePredavanja.isNullOrEmpty()) imePredavanja =
-            imePredavanja.substring(0, imePredavanja.length)
-        holder.vrstaPredavanja.text = imePredavanja
-        holder.mjesto.text = predavanja.dvorana
+        holder.type.text = predavanja.start.toLocalTime().toString() + " - " + predavanja.end.toLocalTime().toString()
+        holder.vrstaPredavanja.text = predavanja.eventType.type
+        holder.mjesto.text = predavanja.classroom
 
-        holder.boja.setBackgroundResource(predavanja.getBoja())
+        holder.boja.setBackgroundResource(predavanja.colorId)
     }
 
     override fun getItemCount(): Int {

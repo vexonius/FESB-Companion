@@ -3,16 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/refresMe"
+        android:id="@+id/chooseSchedule"
+        android:icon="@drawable/calendar_lines_pen_svgrepo_com"
+        android:title="@string/change_week"
+        app:showAsAction="always"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/refreshTimetable"
         android:icon="@drawable/refresh"
-        android:title="@string/osvje_i"
-        app:showAsAction="always" />
+        android:title="@string/refresh"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/settings"
         android:enabled="true"
         android:icon="@drawable/settings_icon"
-        android:title="@string/postavke"
+        android:title="@string/settings"
         android:visible="true"
         app:showAsAction="ifRoom"/>
 
