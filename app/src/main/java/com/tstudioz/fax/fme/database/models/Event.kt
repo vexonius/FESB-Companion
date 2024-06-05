@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 
 
 data class Event(
-    val id : String,
+    val id: String,
     val name: String,
     val shortName: String,
     var color: Color = Color.Blue,
-    val colorId : Int = 0,
+    val colorId: Int = 0,
     val professor: String = "",
     val eventType: TimetableType = TimetableType.OTHER,
     val groups: String = "",
@@ -24,7 +24,7 @@ data class Event(
     val recurringType: Recurring = Recurring.UNDEFINED,
     val recurringUntil: String = "",
     val studyCode: String = "",
-    )
+)
 
 enum class Recurring {
     ONCE, WEEKLY, EVERY_TWO_WEEKS, MONTHLY, UNDEFINED
@@ -57,7 +57,13 @@ fun fromRealmObject(eventRealm: EventRealm): Event {
         shortName = eventRealm.shortName ?: "",
         colorId = eventRealm.colorId ?: 0,
         professor = eventRealm.professor ?: "",
-        eventType = eventRealm.eventType?.let { TimetableType.valueOf(it) } ?: TimetableType.OTHER,
+        eventType = eventRealm.eventType?.let {
+            try {
+                TimetableType.valueOf(it)
+            } catch (error: IllegalArgumentException) {
+                TimetableType.OTHER
+            }
+        } ?: TimetableType.OTHER,
         groups = eventRealm.groups ?: "",
         classroom = eventRealm.classroom ?: "",
         start = LocalDateTime.parse(eventRealm.start),

@@ -70,7 +70,7 @@ fun HomeCompose(mainViewModel: MainViewModel) {
                     }
                 }
             }
-            if (mainViewModel.showWeekChooseMenu.observeAsState(initial = false).value) {
+            if (mainViewModel.shownWeekChooseMenu.observeAsState(initial = false).value) {
                 ModalBottomSheet(sheetState = sheetState,
                     containerColor = MaterialTheme.colorScheme.surface,
                     windowInsets = WindowInsets(0.dp),

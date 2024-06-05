@@ -83,7 +83,7 @@ class AttendanceFragment : Fragment(), KoinComponent {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        menu.findItem(R.id.refresMe).isVisible = false
+        menu.findItem(R.id.refreshTimetable).isVisible = false
         super.onPrepareOptionsMenu(menu)
     }
 

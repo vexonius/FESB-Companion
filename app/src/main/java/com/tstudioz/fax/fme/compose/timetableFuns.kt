@@ -767,7 +767,7 @@ private val sampleEvents2 = listOf(
 )
 
 class EventsProvider : PreviewParameterProvider<Event> {
-    override val values = sampleEvents.asSequence()
+    override val values = sampleEvents2.asSequence()
 }
 
 @Preview(showBackground = true)

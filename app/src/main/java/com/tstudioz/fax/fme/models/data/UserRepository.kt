@@ -3,7 +3,6 @@ package com.tstudioz.fax.fme.models.data
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
