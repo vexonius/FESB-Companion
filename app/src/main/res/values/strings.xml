@@ -39,10 +39,11 @@
     <string name="winter_semester">ZIMSKI SEMESTAR</string>
     <string name="home">Home</string>
     <string name="timetable_Title">Raspored</string>
+    <string name="studomat_Title">Raspored</string>
     <string name="change_week">Promjena tjedna</string>
 
     <string name="default_group">Jedna grupa</string>
-    <string name="timetable_for">Raspored za</string>
+    <string name="Raspored_za">Raspored za</string>
 
     <string name="login_error_email">Potrebno je unijeti FESB email</string>
     <string name="login_error_empty_credentials">Niste unijeli korisničke podatke</string>
@@ -52,5 +53,12 @@
     <string name="login_password">Lozinka</string>
     <string name="login_action_submit">Prijava</string>
 
+    // Compose Strings
+
+    <string name="lastMonth">Prošli</string>
+    <string name="nextMonth">Sljedeći</string>
+
+    <string name="cancelChoosingWeek">Odustani</string>
+    <string name="chooseChoosingWeek">Odaberi</string>
 
 </resources>

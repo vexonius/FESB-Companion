@@ -36,7 +36,7 @@ import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
-import com.tstudioz.fax.fme.view.fragments.TimeTableFragment
+import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.exceptions.RealmException
@@ -206,18 +206,18 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.refresMe -> {
-                if (NetworkUtils.isNetworkAvailable(this)) {
-                    mojRaspored()
-                } else {
-                    showSnacOffline()
-                }
+            R.id.chooseSchedule -> {
+                mainViewModel.showWeekChooseMenu()
             }
-            R.id.choosesched -> mainViewModel.showWeekChooseMenu()
+
+            R.id.refreshTimetable -> if (NetworkUtils.isNetworkAvailable(this)) {
+                mojRaspored()
+            } else {
+                showSnacOffline()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

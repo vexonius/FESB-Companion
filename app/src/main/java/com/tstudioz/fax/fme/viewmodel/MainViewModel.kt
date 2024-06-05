@@ -10,7 +10,7 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
-import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
@@ -32,7 +32,7 @@ class MainViewModel(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    private val _showEvent = MutableLiveData<Boolean>().apply { value = false }
+    private val _showEvent = MutableLiveData<Boolean>(false)
     private val _showEventContent = MutableLiveData<Event>()
     private val _lessonsToShow = MutableLiveData<List<Event>>().apply { value = emptyList() }
     private val _lessonsPerm = MutableLiveData<List<Event>>().apply { value = emptyList() }
@@ -53,12 +53,12 @@ class MainViewModel(
     val lessonsPerm: LiveData<List<Event>> = _lessonsPerm
     val periods: LiveData<List<TimeTableInfo>> = _periods
     val shownWeek: LiveData<LocalDate> = _shownWeek
-    val showWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
+    val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
 
     init {
         fetchTimetableInfo()
         viewModelScope.launch(Dispatchers.IO) {
-            _lessonsPerm.postValue(timeTableRepository.loadFromDb())
+            _lessonsPerm.postValue(timeTableRepository.getCachedEvents())
         }
     }
 
@@ -94,10 +94,10 @@ class MainViewModel(
                 val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(shownWeekMonday)
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
-                sharedPreferences[SPKey.TIMEGOTPERMRASP] =
+                sharedPreferences[SPKey.LAST_FETCHED] =
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                 _lessonsPerm.postValue(events)
-                timeTableRepository.insertTimeTable(events)
+                timeTableRepository.insert(events)
             } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
             }
@@ -118,7 +118,7 @@ class MainViewModel(
         }
     }
 
-    fun loadPermEvents() {
+    fun showThisWeeksEvents() {
         _lessonsToShow.postValue(_lessonsPerm.value)
     }
 

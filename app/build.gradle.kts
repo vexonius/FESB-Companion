@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("io.realm.kotlin") version "1.11.0"
+    id("io.realm.kotlin") version "1.16.0"
 }
 
 android {
@@ -21,7 +21,6 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("debug")
         }
     }
     namespace = "com.tstudioz.fax.fme"
@@ -54,11 +53,9 @@ android {
 
 dependencies {
 
-    implementation("androidx.compose.material3:material3-android:1.2.1")
     val koinVersion = "3.5.6"
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
-
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
     implementation("com.facebook.shimmer:shimmer:0.5.0")
@@ -100,9 +97,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-    // UI Tests
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("androidx.compose.material3:material3-android:1.2.1")
 
     val composeVersion = "1.6.7"
 

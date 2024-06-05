@@ -18,13 +18,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun SimpleCalendarTitle(
@@ -39,41 +43,27 @@ fun SimpleCalendarTitle(
     ) {
         CalendarNavigationIcon(
             icon = painterResource(id = R.drawable.ic_chevron_left),
-            contentDescription = "Prošli",
+            contentDescription = stringResource(R.string.lastMonth),
             onClick = goToPrevious,
         )
         Text(
             modifier = Modifier
                 .weight(1f)
                 .testTag("MonthTitle"),
-            text = numToMonth(currentMonth.monthValue) + currentMonth.year.toString(),
+            text = currentMonth.month.getDisplayName(
+                TextStyle.FULL_STANDALONE,
+                Locale.getDefault()
+            ).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                    + " " + currentMonth.year.toString(),
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,
         )
         CalendarNavigationIcon(
             icon = painterResource(id = R.drawable.ic_chevron_right),
-            contentDescription = "Sljedeći",
+            contentDescription = stringResource(R.string.nextMonth),
             onClick = goToNext,
         )
-    }
-}
-
-fun numToMonth(num: Int): String {
-    return when (num) {
-        1 -> "Siječanj "
-        2 -> "Veljača "
-        3 -> "Ožujak "
-        4 -> "Travanj "
-        5 -> "Svibanj "
-        6 -> "Lipanj "
-        7 -> "Srpanj "
-        8 -> "Kolovoz "
-        9 -> "Rujan "
-        10 -> "Listopad "
-        11 -> "Studeni "
-        12 -> "Prosinac "
-        else -> "Nepoznato "
     }
 }
 

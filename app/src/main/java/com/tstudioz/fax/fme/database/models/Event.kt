@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.database.models
 
 import androidx.compose.ui.graphics.Color
+import com.tstudioz.fax.fme.R
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import java.time.LocalDateTime
@@ -89,13 +90,14 @@ open class EventRealm : RealmObject {
     var studyCode: String? = null
 }
 
-enum class TimetableType(val type: String) {
-    PREDAVANJE("Predavanje"),
-    AUDITORNA_VJEZBA("Auditorna vježba"),
-    KOLOKVIJ("Kolokvij"),
-    LABORATORIJSKA_VJEZBA("Laboratorijska vježba"),
-    KONSTRUKCIJSKA_VJEZBA("Konstrukcijska vježba"),
-    SEMINAR("Seminar"),
-    ISPIT("Ispit"),
-    OTHER("Other")
+enum class TimetableType(val type: String, val color: Int) {
+    PREDAVANJE("Predavanje", R.color.blue_nice),
+    AUDITORNA_VJEZBA("Auditorna vježba", R.color.green_nice),
+    KOLOKVIJ("Kolokvij", R.color.purple_nice),
+    LABORATORIJSKA_VJEZBA("Laboratorijska vježba", R.color.red_nice),
+    KONSTRUKCIJSKA_VJEZBA("Konstrukcijska vježba", R.color.grey_nice),
+    SEMINAR("Seminar", R.color.blue_nice),
+    ISPIT("Ispit", R.color.purple_dark),
+    OTHER("Other", R.color.blue_nice)
 }
+
