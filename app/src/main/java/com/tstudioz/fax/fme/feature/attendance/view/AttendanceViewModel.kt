@@ -36,7 +36,6 @@ class AttendanceViewModel(private val repository: AttendanceRepositoryInterface,
 
     fun fetchAttendance() {
         viewModelScope.launch(context = Dispatchers.IO) {
-            val start = System.currentTimeMillis()
             when (val attendance = repository.fetchAttendance(User(
                 shPref.getString("username", "") ?: "",
                 shPref.getString("password", "") ?: ""
@@ -53,9 +52,6 @@ class AttendanceViewModel(private val repository: AttendanceRepositoryInterface,
                     error.postValue(true)
                 }
             }
-            val end = System.currentTimeMillis()
-            println("Time: ${(end - start)}")
-            Log.d("Time", "Time: ${(end - start)}")
         }
     }
 }

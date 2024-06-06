@@ -10,6 +10,7 @@ import com.tstudioz.fax.fme.models.data.User
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 class AttendanceRepository(
@@ -18,23 +19,25 @@ class AttendanceRepository(
 ) : AttendanceRepositoryInterface {
 
     override suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult {
-        attendanceService.loginAttendance(user)
+        when (val result = attendanceService.loginAttendance(user)) {
+            is NetworkServiceResult.PrisutnostResult.Success -> {}
+
+            is NetworkServiceResult.PrisutnostResult.Failure -> {
+                return result
+            }
+        }
 
         when (val list = attendanceService.fetchAttendance(user)) {
             is NetworkServiceResult.PrisutnostResult.Success -> {
-                var isSuccessful = true
                 val attendanceList = mutableListOf<List<Dolazak>>()
-                val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+                val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                     println("Caught exception $throwable in CoroutineExceptionHandler")
-                    isSuccessful = false
                 }
-                parseAttendList(list.data as String).map {
+                val coroutines = parseAttendList(list.data as String).map {
                     CoroutineScope(Dispatchers.IO).launch(exceptionHandler) {
                         when (val kolegijData = attendanceService.getDetailedPrisutnost(it.first)) {
                             is NetworkServiceResult.PrisutnostResult.Success -> {
-                                val attendOneKolegij =
-                                    parseAttendance(it.first, kolegijData.data as String, it.second)
-                                attendanceList.add(attendOneKolegij)
+                                attendanceList.add(parseAttendance(it.first, kolegijData.data as String, it.second))
                             }
 
                             is NetworkServiceResult.PrisutnostResult.Failure -> {
@@ -42,9 +45,10 @@ class AttendanceRepository(
                             }
                         }
                     }
-                }.forEach { it.join() }
+                }
+                coroutines.joinAll()
 
-                return if (isSuccessful) {
+                return if (coroutines.any { it.isCancelled }) {
                     NetworkServiceResult.PrisutnostResult.Failure(
                         Throwable("Error while fetching attendance data")
                     )
@@ -61,8 +65,6 @@ class AttendanceRepository(
                 )
             }
         }
-
-
     }
 
     override suspend fun insertAttendance(attendance: List<Dolazak>) {

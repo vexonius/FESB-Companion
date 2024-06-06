@@ -18,9 +18,7 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
             .host("korisnik.fesb.unist.hr")
             .build()
 
-        val test = client.cookieJar.loadForRequest(url)
-
-        if (!test.any(){it.name == "Fesb.AuthCookie"}) {
+        if (!client.cookieJar.loadForRequest(url).any{it.name == "Fesb.AuthCookie"}) {
             val formData: FormBody = Builder()
                 .add("Username", user.username)
                 .add("Password", user.password)
