@@ -31,10 +31,11 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
 
             val response = client.newCall(rq).execute()
 
-            if (response.isSuccessful) {
-                return NetworkServiceResult.PrisutnostResult.Success("Successfully logged in")
+            return if (response.isSuccessful) {
+                NetworkServiceResult.PrisutnostResult.Success("Successfully logged in")
+            } else {
+                NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to login"))
             }
-            return NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to login"))
         }
         return NetworkServiceResult.PrisutnostResult.Success("Already logged in")
     }
@@ -44,10 +45,10 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
             .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
             .get()
             .build()
-        val response1 = client.newCall(request).execute()
+        val response = client.newCall(request).execute()
 
-        return if (response1.isSuccessful) {
-            NetworkServiceResult.PrisutnostResult.Success(response1.body?.string() ?: "")
+        return if (response.isSuccessful) {
+            NetworkServiceResult.PrisutnostResult.Success(response.body?.string() ?: "")
         } else {
             NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to fetch attendance"))
         }

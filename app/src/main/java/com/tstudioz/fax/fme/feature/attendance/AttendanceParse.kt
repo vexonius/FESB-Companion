@@ -36,11 +36,9 @@ fun parseAttendList(body: String): List<Pair<Element, Int>> {
     val attendanceUrls: MutableList<Pair<Element, Int>> = mutableListOf()
     try {
         attendanceUrls.addAll(
-            doc.select("div.semster.winter div.body.clearfix a")
-                .map { element -> Pair(element, 1) })
+            doc.select("div.semster.winter div.body.clearfix a").map { element -> Pair(element, 1) })
         attendanceUrls.addAll(
-            doc.select("div.semster.summer div.body.clearfix a")
-                .map { element -> Pair(element, 2) })
+            doc.select("div.semster.summer div.body.clearfix a").map { element -> Pair(element, 2) })
     } catch (ex: Exception) {
         ex.message?.let { Log.d("Exception pris", it) }
         ex.printStackTrace()

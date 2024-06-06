@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.feature.attendance.view
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,42 +13,48 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
-class AttendanceViewModel(private val repository: AttendanceRepositoryInterface, private val shPref: SharedPreferences) : ViewModel() {
+class AttendanceViewModel(
+    private val repository: AttendanceRepositoryInterface,
+    private val shPref: SharedPreferences
+) : ViewModel() {
 
-    var shouldShow = MutableLiveData(true)
-    var error = MutableLiveData(false)
-        private set
-    var attendanceList: MutableLiveData<List<List<Dolazak>>> = MutableLiveData(emptyList())
-        private set
+    private var _shouldShow = MutableLiveData(true)
+    val shouldShow: LiveData<Boolean> = _shouldShow
+
+    private var _error = MutableLiveData(false)
+    val error: LiveData<Boolean> = _error
+
+    private var _attendanceList: MutableLiveData<List<List<Dolazak>>> = MutableLiveData(emptyList())
+    val attendanceList: LiveData<List<List<Dolazak>>> = _attendanceList
 
     init {
-        viewModelScope.launch(context = Dispatchers.IO){
-            val att = repository.readAttendance()
-            attendanceList.postValue(att)
-            shouldShow.postValue(true)
+        viewModelScope.launch(context = Dispatchers.IO) {
+            _attendanceList.postValue(repository.readAttendance())
+            _shouldShow.postValue(true)
         }
     }
 
     fun fetchAttendance() {
         viewModelScope.launch(context = Dispatchers.IO) {
-            when (val attendance = repository.fetchAttendance(User(
-                shPref.getString("username", "") ?: "",
-                shPref.getString("password", "") ?: ""
-            ))) {
+            when (val attendance = repository.fetchAttendance(
+                User(
+                    shPref.getString("username", "") ?: "",
+                    shPref.getString("password", "") ?: ""
+                )
+            )) {
                 is NetworkServiceResult.PrisutnostResult.Success -> {
                     val data = attendance.data as List<List<Dolazak>>
                     repository.insertAttendance(data.flatten())
-                    attendanceList.postValue(data)
-                    shouldShow.postValue(true)
+                    _attendanceList.postValue(data)
+                    _shouldShow.postValue(true)
                 }
 
                 is NetworkServiceResult.PrisutnostResult.Failure -> {
-                    shouldShow.postValue(false)
-                    error.postValue(true)
+                    _shouldShow.postValue(false)
+                    _error.postValue(true)
                 }
             }
         }
