@@ -1,5 +1,5 @@
 package com.tstudioz.fax.fme.weather
 
-class Forecast {
+class Forecast1 {
     var current: Current? = null
 }

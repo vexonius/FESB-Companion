@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.view.fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
@@ -17,13 +18,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.databinding.HomeTabBinding
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.view.activities.IndexActivity
 import com.tstudioz.fax.fme.view.activities.MainActivity
 import com.tstudioz.fax.fme.view.activities.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
@@ -43,10 +43,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.Calendar
 import java.util.Locale
 
 @OptIn(InternalCoroutinesApi::class)
@@ -56,12 +53,12 @@ class HomeFragment : Fragment() {
     private val shPref: SharedPreferences by inject()
 
     private var binding: HomeTabBinding? = null
-    private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
+    private val forecastUrl =
+        "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by activityViewModel()
-    private var date: String? = null
     private var snack: Snackbar? = null
 
     override fun onCreateView(
@@ -73,13 +70,12 @@ class HomeFragment : Fragment() {
 
         setHasOptionsMenu(true)
         setCyanStatusBarColor()
-        getDate()
-        setLastRaspGot()
-        start()
+        setLastFetched()
+        fetchForcastAndRegisterListener()
         loadNotes()
         loadIksicaAd()
         loadMenzaView()
-        showList()
+        showEventList()
         return binding?.root
     }
 
@@ -89,78 +85,57 @@ class HomeFragment : Fragment() {
         (activity as MainActivity?)?.mojRaspored()
     }
 
-    private fun getDate() {
-        val df: DateFormat = SimpleDateFormat("d.M.yyyy.", Locale.getDefault())
-        date = df.format(Calendar.getInstance().time)
-    }
-
-    private fun setLastRaspGot() {
+    private fun setLastFetched() {
         binding?.TimeRaspGot?.text = shPref[SPKey.LAST_FETCHED, ""]
         binding?.TimeRaspGot?.visibility = View.VISIBLE
     }
 
     @Throws(IOException::class, JSONException::class)
-    private fun start() {
-        try {
-            if (NetworkUtils.isNetworkAvailable(requireContext())) {
+    private fun fetchForcastAndRegisterListener() {
+        if (NetworkUtils.isNetworkAvailable(requireContext())) {
+            try {
                 lifecycleScope.launch { homeViewModel.getForecast(forecastUrl) }
                 homeViewModel.forecastGot.observe(viewLifecycleOwner) { forecastGot ->
                     if (forecastGot) {
-                        activity?.runOnUiThread { updateDisplay() }
+                        activity?.runOnUiThread { updateWeatherDisplay() }
                     } else {
-                        alertUserAboutError()
+                        showSnac("Došlo je do pogreške pri dohvaćanju prognoze")
                     }
                 }
-            } else {
-                showSnacOffline()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } catch (e: JSONException) {
-            e.printStackTrace()
+        } else {
+            showSnac("Niste povezani")
         }
     }
 
-    private fun updateDisplay() {
+    @SuppressLint("DiscouragedApi")
+    private fun updateWeatherDisplay() {
         try {
-            val current = homeViewModel.mForecast?.current
-            val pTemperatura = current?.temperature.toString() + "°"
-            val pHumidity = current?.humidity.toString() + " %"
-            val pWind = current?.wind.toString() + " km/h"
-            val pPrecip = current?.precipChance.toString() + " mm"
-            val pSummary = try {
-                getString(
-                    resources.getIdentifier(
-                        current?.summary,
-                        "string",
-                        requireContext().packageName
-                    )
-                )
-            } catch (e: Exception) {
-                null
-            } ?: current?.summary
-            binding?.temperaturaVrijednost?.text = pTemperatura
-            binding?.vlaznostVrijednost?.text = pHumidity
-            binding?.oborineVrijednost?.text = pPrecip
-            binding?.trenutniVjetar?.text = pWind
-            binding?.opis?.text = pSummary
+            binding?.temperaturaVrijednost?.text = String.format(Locale.US, getString(R.string.weatherTemp), homeViewModel.temperature.value)
+            binding?.vlaznostVrijednost?.text = String.format(Locale.US, getString(R.string.weatherHumidity), homeViewModel.humidity.value)
+            binding?.oborineVrijednost?.text = String.format(Locale.US, getString(R.string.weatherPrecipChance), homeViewModel.precipChance.value)
+            binding?.trenutniVjetar?.text = String.format(Locale.US, getString(R.string.weatherWind), homeViewModel.wind.value)
+            binding?.opis?.text = homeViewModel.summary.value
             binding?.shimmerWeather?.visibility = View.GONE
             binding?.cardHome?.visibility = View.VISIBLE
-            val drawable = ResourcesCompat.getDrawable(
-                resources,
-                resources.getIdentifier(current?.icon, "drawable", requireContext().packageName),
-                null
+            binding?.vrijemeImage?.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    resources.getIdentifier(homeViewModel.icon.value, "drawable", requireContext().packageName),
+                    null
+                )
             )
-
-            binding?.vrijemeImage?.setImageDrawable(drawable)
         } catch (e: Exception) {
-            alertUserAboutError()
+            showSnac("Došlo je do pogreške pri dohvaćanju prognoze")
         }
-
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun showList() {
+    fun showEventList() {
         mainViewModel.lessonsPerm.observe(viewLifecycleOwner) { lessons ->
             val filteredLessons = lessons.filter { it.start.toLocalDate() == LocalDate.now() }
             binding?.TimeRaspGot?.text = shPref[SPKey.LAST_FETCHED, ""]
@@ -240,40 +215,18 @@ class HomeFragment : Fragment() {
         binding?.menzaRelative?.setOnClickListener {
             startActivity(Intent(activity, MenzaActivity::class.java))
         }
-        binding?.eindexRelative?.setOnClickListener {
-            startActivity(Intent(activity, IndexActivity::class.java))
-        }
     }
 
-    private fun showSnacOffline() {
-        snack = Snackbar.make(
-            requireActivity().findViewById(R.id.coordinatorLayout),
-            "Niste povezani",
-            Snackbar.LENGTH_LONG
-        )
-        val vjuz = snack?.view
-        vjuz?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
-        snack?.show()
-    }
-
-    private fun alertUserAboutError() {
-        snack = Snackbar.make(
-            requireActivity().findViewById(R.id.coordinatorLayout),
-            "Došlo je do pogreške pri dohvaćanju prognoze",
-            Snackbar.LENGTH_LONG
-        )
-        val vjuz = snack?.view
-        vjuz?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
+    private fun showSnac(text: String) {
+        snack = Snackbar.make(requireActivity().findViewById(R.id.coordinatorLayout), text, Snackbar.LENGTH_LONG)
+        snack?.view?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
         snack?.show()
     }
 
     override fun onStop() {
         (activity as AppCompatActivity?)?.supportActionBar
-            ?.setBackgroundDrawable(
-                ColorDrawable(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-            )
-        requireActivity().window.statusBarColor =
-            ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
+            ?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(requireContext(), R.color.colorPrimary)))
+        requireActivity().window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
         super.onStop()
     }
 

@@ -11,6 +11,8 @@ import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.models.util.parseWeatherDetails
 import com.tstudioz.fax.fme.weather.Current
+import com.tstudioz.fax.fme.weather.WeatherFeature
+import kotlinx.serialization.json.Json
 
 class UserRepository(
     private val userService: UserServiceInterface,
@@ -35,9 +37,15 @@ class UserRepository(
         }
     }
 
-    override suspend fun fetchWeatherDetails(url : String): Current? {
+    override suspend fun fetchWeatherDetails(url : String): WeatherFeature? {
         return when(val result = weatherNetworkService.fetchWeatherDetails(url)){
-            is NetworkServiceResult.WeatherResult.Success -> parseWeatherDetails(result.data)
+            is NetworkServiceResult.WeatherResult.Success -> {
+                val test = Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }
+                test.decodeFromString<WeatherFeature>(result.data)
+            }
             is NetworkServiceResult.WeatherResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")
                 //throw Exception("Timetable fetching error")

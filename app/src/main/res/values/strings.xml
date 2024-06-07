@@ -61,4 +61,8 @@
     <string name="cancelChoosingWeek">Odustani</string>
     <string name="chooseChoosingWeek">Odaberi</string>
 
+    <string name="weatherTemp">%1$.0f°</string>
+    <string name="weatherHumidity">%1$.1f%%</string>
+    <string name="weatherPrecipChance">%1$.1f mm</string>
+    <string name="weatherWind">%1$.1f km/h</string>
 </resources>
