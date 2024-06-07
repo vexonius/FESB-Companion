@@ -14,7 +14,7 @@ class DailyWeather : Fragment() {
     ): View? {
         //set the layout you want to display in First Fragment
         val view = inflater.inflate(
-            R.layout.daily,
+            R.layout.weather_daily,
             container, false
         )
         /*val bundle = this.requireArguments()

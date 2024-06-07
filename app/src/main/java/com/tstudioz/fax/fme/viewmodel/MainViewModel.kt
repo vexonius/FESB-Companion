@@ -97,6 +97,7 @@ class MainViewModel(
                 sharedPreferences[SPKey.LAST_FETCHED] =
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                 _lessonsPerm.postValue(events)
+                _lessonsToShow.postValue(events)
                 timeTableRepository.insert(events)
             } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())

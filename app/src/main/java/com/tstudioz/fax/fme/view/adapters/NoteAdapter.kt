@@ -30,7 +30,7 @@ class NoteAdapter(private val mNotes: RealmResults<Note>) :
         val view: View
         return if (viewType == ADD_NEW) {
             view = LayoutInflater.from(parent.context).inflate(
-                R.layout.add_note_item,
+                R.layout.note_add_item,
                 parent, false
             )
             NoteViewHolder(view)

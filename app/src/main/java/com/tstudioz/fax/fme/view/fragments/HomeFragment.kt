@@ -14,18 +14,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Note
-import com.tstudioz.fax.fme.databinding.HomeTabBinding
+import com.tstudioz.fax.fme.databinding.TabHomeBinding
+import com.tstudioz.fax.fme.feature.menza.view.MenzaActivity
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.activities.MainActivity
-import com.tstudioz.fax.fme.feature.menza.view.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
@@ -52,7 +51,7 @@ class HomeFragment : Fragment() {
     private val dbManager: DatabaseManagerInterface by inject()
     private val shPref: SharedPreferences by inject()
 
-    private var binding: HomeTabBinding? = null
+    private var binding: TabHomeBinding? = null
     private val forecastUrl =
         "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
@@ -66,7 +65,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): CoordinatorLayout? {
         super.onCreateView(inflater, container, savedInstanceState)
-        binding = HomeTabBinding.inflate(inflater, container, false)
+        binding = TabHomeBinding.inflate(inflater, container, false)
 
         setHasOptionsMenu(true)
         setCyanStatusBarColor()
@@ -93,19 +92,13 @@ class HomeFragment : Fragment() {
     @Throws(IOException::class, JSONException::class)
     private fun fetchForcastAndRegisterListener() {
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
-            try {
-                lifecycleScope.launch { homeViewModel.getForecast(forecastUrl) }
-                homeViewModel.forecastGot.observe(viewLifecycleOwner) { forecastGot ->
-                    if (forecastGot) {
-                        activity?.runOnUiThread { updateWeatherDisplay() }
-                    } else {
-                        showSnac("Došlo je do pogreške pri dohvaćanju prognoze")
-                    }
+            homeViewModel.getForecast(forecastUrl)
+            homeViewModel.forecastGot.observe(viewLifecycleOwner) { forecastGot ->
+                if (forecastGot) {
+                    activity?.runOnUiThread { updateWeatherDisplay() }
+                } else {
+                    showSnac("Došlo je do pogreške pri dohvaćanju prognoze")
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } catch (e: JSONException) {
-                e.printStackTrace()
             }
         } else {
             showSnac("Niste povezani")
@@ -115,10 +108,14 @@ class HomeFragment : Fragment() {
     @SuppressLint("DiscouragedApi")
     private fun updateWeatherDisplay() {
         try {
-            binding?.temperaturaVrijednost?.text = String.format(Locale.US, getString(R.string.weatherTemp), homeViewModel.temperature.value)
-            binding?.vlaznostVrijednost?.text = String.format(Locale.US, getString(R.string.weatherHumidity), homeViewModel.humidity.value)
-            binding?.oborineVrijednost?.text = String.format(Locale.US, getString(R.string.weatherPrecipChance), homeViewModel.precipChance.value)
-            binding?.trenutniVjetar?.text = String.format(Locale.US, getString(R.string.weatherWind), homeViewModel.wind.value)
+            binding?.temperaturaVrijednost?.text =
+                String.format(Locale.US, getString(R.string.weatherTemp), homeViewModel.temperature.value)
+            binding?.vlaznostVrijednost?.text =
+                String.format(Locale.US, getString(R.string.weatherHumidity), homeViewModel.humidity.value)
+            binding?.oborineVrijednost?.text =
+                String.format(Locale.US, getString(R.string.weatherPrecipChance), homeViewModel.precipChance.value)
+            binding?.trenutniVjetar?.text =
+                String.format(Locale.US, getString(R.string.weatherWind), homeViewModel.wind.value)
             binding?.opis?.text = homeViewModel.summary.value
             binding?.shimmerWeather?.visibility = View.GONE
             binding?.cardHome?.visibility = View.VISIBLE
