@@ -6,20 +6,25 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
+import com.tstudioz.fax.fme.feature.menza.service.MenzaServiceInterface
+import com.tstudioz.fax.fme.feature.menza.service.MenzaService
+import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
 import com.tstudioz.fax.fme.models.data.AttendanceDao
 import com.tstudioz.fax.fme.models.data.AttendanceDaoInterface
 import com.tstudioz.fax.fme.models.data.AttendanceRepository
 import com.tstudioz.fax.fme.models.data.AttendanceRepositoryInterface
+import com.tstudioz.fax.fme.feature.menza.dao.MenzaDao
+import com.tstudioz.fax.fme.feature.menza.dao.interfaces.MenzaDaoInterface
 import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
 import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
 import com.tstudioz.fax.fme.feature.timetable.repository.TimeTableRepository
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
-import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
+import com.tstudioz.fax.fme.feature.weather.WeatherNetworkInterface
 import com.tstudioz.fax.fme.models.services.AttendanceService
 import com.tstudioz.fax.fme.feature.timetable.services.TimetableService
-import com.tstudioz.fax.fme.models.services.WeatherNetworkService
+import com.tstudioz.fax.fme.feature.weather.WeatherNetworkService
 import com.tstudioz.fax.fme.viewmodel.AttendanceViewModel
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
@@ -42,11 +47,14 @@ val module = module {
     single<DatabaseManagerInterface> { DatabaseManager() }
     single<AttendanceDaoInterface> { AttendanceDao(get()) }
     single<TimeTableDaoInterface> { TimeTableDao(get()) }
+    single<MenzaDaoInterface> { MenzaDao(get()) }
+    single<MenzaServiceInterface> { MenzaService(get()) }
     single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single { androidContext().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
+    viewModel { MenzaViewModel(androidApplication(), get()) }
     viewModel { AttendanceViewModel(get()) }
 }
 

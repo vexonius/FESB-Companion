@@ -6,9 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
-import com.tstudioz.fax.fme.models.util.codeToDisplay
-import com.tstudioz.fax.fme.models.util.weatherSymbolKeys
-import com.tstudioz.fax.fme.weather.Forecast
+import com.tstudioz.fax.fme.feature.weather.codeToDisplay
+import com.tstudioz.fax.fme.feature.weather.weatherSymbolKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -21,41 +20,30 @@ class HomeViewModel(
     private val repository: UserRepositoryInterface
 ) : AndroidViewModel(application) {
 
-    /*var mForecast: Forecast? = Forecast()*/
-    private var _forecast = MutableLiveData<Forecast>()
-    val forecast: LiveData<Forecast> = _forecast
-
     private val _humidity = MutableLiveData<Double>()
-    val humidity: LiveData<Double> = _humidity
-
     private val _icon = MutableLiveData<String>()
-    val icon: LiveData<String> = _icon
-
     private val _precipChance = MutableLiveData<Double>()
-    val precipChance: LiveData<Double> = _precipChance
-
     private val _summary = MutableLiveData<String>()
-    val summary: LiveData<String> = _summary
-
     private val _wind = MutableLiveData<Double>()
-    val wind: LiveData<Double> = _wind
-
     private val _temperature = MutableLiveData<Double>()
-    val temperature: LiveData<Double> = _temperature
-
     private var _forecastGot = MutableLiveData<Boolean>()
-    val forecastGot: LiveData<Boolean>
-        get() = _forecastGot
+
+    val humidity: LiveData<Double> = _humidity
+    val icon: LiveData<String> = _icon
+    val precipChance: LiveData<Double> = _precipChance
+    val summary: LiveData<String> = _summary
+    val wind: LiveData<Double> = _wind
+    val temperature: LiveData<Double> = _temperature
+    val forecastGot: LiveData<Boolean> = _forecastGot
 
     fun getForecast(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val test = repository.fetchWeatherDetails(url)
-            if (test != null) {
-                val forecastInstantDetails = test.properties?.timeseries?.first()?.data?.instant?.details
-                val forecastNextOneHours = test.properties?.timeseries?.first()?.data?.next1Hours
+            val weather = repository.fetchWeatherDetails(url)
+            if (weather != null) {
+                val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
+                val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
                 val forecastNextOneHoursDetails = forecastNextOneHours?.details
-                val forecastNextOneHoursSummary = forecastNextOneHours?.summary
-                val unparsedSummary = forecastNextOneHoursSummary?.symbolCode
+                val unparsedSummary = forecastNextOneHours?.summary?.symbolCode
                 val weatherSymbol = weatherSymbolKeys[unparsedSummary]
                 val iconName = "_" + weatherSymbol?.first.toString() + weatherSymbol?.second
                 val summary = codeToDisplay[weatherSymbol?.first]?.replaceFirstChar {

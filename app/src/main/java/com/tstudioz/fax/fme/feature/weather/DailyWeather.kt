@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.weather
+package com.tstudioz.fax.fme.feature.weather
 
 import android.os.Bundle
 import android.view.LayoutInflater

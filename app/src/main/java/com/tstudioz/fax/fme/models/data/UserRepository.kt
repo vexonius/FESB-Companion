@@ -9,9 +9,9 @@ import com.tstudioz.fax.fme.feature.timetable.parseTimetable
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
-import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
-import com.tstudioz.fax.fme.models.util.parseWeatherDetails
-import com.tstudioz.fax.fme.weather.Current
+import com.tstudioz.fax.fme.feature.weather.WeatherNetworkInterface
+import com.tstudioz.fax.fme.feature.weather.WeatherFeature
+import kotlinx.serialization.json.Json
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -53,9 +53,15 @@ class UserRepository(
         timeTableDao.insert(classes)
     }
 
-    override suspend fun fetchWeatherDetails(url : String): Current? {
+    override suspend fun fetchWeatherDetails(url : String): WeatherFeature? {
         return when(val result = weatherNetworkService.fetchWeatherDetails(url)){
-            is NetworkServiceResult.WeatherResult.Success -> parseWeatherDetails(result.data)
+            is NetworkServiceResult.WeatherResult.Success -> {
+                val test = Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }
+                test.decodeFromString<WeatherFeature>(result.data)
+            }
             is NetworkServiceResult.WeatherResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")
                 //throw Exception("Timetable fetching error")
@@ -64,7 +70,9 @@ class UserRepository(
         }
     }
 
-    override suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult = attendanceService.fetchAttendance(user)
+    override suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult {
+        return attendanceService.fetchAttendance(user)
+    }
 
     override suspend fun insertAttendance(attendance: List<Dolazak>) {
         attendanceDao.insert(attendance)

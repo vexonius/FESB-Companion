@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.view.adapters
+package com.tstudioz.fax.fme.feature.menza.view
 
 import android.graphics.Typeface
 import android.view.LayoutInflater
@@ -8,21 +8,17 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Meni
-import com.tstudioz.fax.fme.view.adapters.MeniesAdapter.MeniViewHolder
-import io.realm.kotlin.query.RealmResults
+import com.tstudioz.fax.fme.feature.menza.view.MeniesAdapter.MeniViewHolder
 
-class MeniesAdapter(var mMenies: RealmResults<Meni>) : RecyclerView.Adapter<MeniViewHolder>() {
+class MeniesAdapter(private var mMenies: List<Meni>?) : RecyclerView.Adapter<MeniViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeniViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(
-            R.layout.meni_item, parent,
-            false
-        )
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.meni_item, parent, false)
         return MeniViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: MeniViewHolder, position: Int) {
-        val meni = mMenies[position]
+        val meni = mMenies?.get(position)
         holder.title.typeface = holder.regulartf
         holder.jelo1.typeface = holder.lighttf
         holder.jelo2.typeface = holder.lighttf
@@ -50,7 +46,7 @@ class MeniesAdapter(var mMenies: RealmResults<Meni>) : RecyclerView.Adapter<Meni
     }
 
     override fun getItemCount(): Int {
-        return mMenies.size
+        return mMenies?.size ?: 0
     }
 
     inner class MeniViewHolder(mView: View) : RecyclerView.ViewHolder(mView) {

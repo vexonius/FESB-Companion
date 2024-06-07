@@ -25,7 +25,7 @@ import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.activities.MainActivity
-import com.tstudioz.fax.fme.view.activities.MenzaActivity
+import com.tstudioz.fax.fme.feature.menza.view.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel

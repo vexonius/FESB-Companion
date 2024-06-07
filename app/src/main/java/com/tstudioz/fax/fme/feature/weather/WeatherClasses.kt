@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.weather
+package com.tstudioz.fax.fme.feature.weather
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

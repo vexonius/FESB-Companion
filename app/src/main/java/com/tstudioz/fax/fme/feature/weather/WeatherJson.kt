@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.models.util
+package com.tstudioz.fax.fme.feature.weather
 
 val weatherSymbolKeys = mapOf(
     "clearsky_day" to Pair(1, "d"),

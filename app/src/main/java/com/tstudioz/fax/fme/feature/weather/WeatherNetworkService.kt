@@ -1,7 +1,6 @@
-package com.tstudioz.fax.fme.models.services
+package com.tstudioz.fax.fme.feature.weather
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -22,9 +21,5 @@ class WeatherNetworkService(private val client: OkHttpClient) : WeatherNetworkIn
         }
 
         return NetworkServiceResult.WeatherResult.Success(value)
-    }
-
-    override suspend fun getWeekWeatherDetails() : NetworkServiceResult.WeatherResult {
-        TODO("Not yet implemented")
     }
 }
