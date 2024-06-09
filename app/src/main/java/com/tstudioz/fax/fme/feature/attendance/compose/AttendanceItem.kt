@@ -28,7 +28,7 @@ fun AttendanceItem(attendanceItem: Dolazak) {
     ListItem(
         headlineContent = {
             Text(
-                (attendanceItem.vrsta ?: "xxxxxxxxxx xxxxx").replaceFirstChar { it.uppercase() })
+                (attendanceItem.vrsta ?: "").replaceFirstChar { it.uppercase() })
         },
         supportingContent = {
             Column{
@@ -36,7 +36,7 @@ fun AttendanceItem(attendanceItem: Dolazak) {
                     progress = { percent }, modifier = Modifier.padding(top = 8.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(("Obavezno " + (attendanceItem.required ?: "x od x")), fontSize = 12.sp)
+                Text(("Obavezno " + (attendanceItem.required ?: "")), fontSize = 12.sp)
             }
         },
         trailingContent = {

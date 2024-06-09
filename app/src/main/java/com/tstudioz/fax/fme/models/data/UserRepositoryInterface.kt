@@ -12,7 +12,7 @@ interface UserRepositoryInterface {
     suspend fun fetchTimetable(user: String, startDate: LocalDate, endDate: LocalDate): List<Event>
     suspend fun insertTimeTable(classes: List<Event>)
     suspend fun fetchWeatherDetails(url : String): Current?
-    suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult
+    suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceFetchResult
     suspend fun insertAttendance(attendance: List<Dolazak>)
 
 }

@@ -39,6 +39,7 @@ class TimeTableFragment : Fragment() {
                     lessonsToShow = mainViewModel.lessonsToShow,
                     shownWeek = mainViewModel.shownWeek,
                     periods = mainViewModel.periods,
+                    monthData = mainViewModel.monthData,
                     fetchUserTimetable = { startDate, endDate, shownWeek ->
                         mainViewModel.fetchUserTimetable(
                             startDate = startDate,
@@ -52,10 +53,9 @@ class TimeTableFragment : Fragment() {
                     showWeekChooseMenu = { show ->
                         mainViewModel.showWeekChooseMenu(show)
                     },
-                    hideEvent = {
-                        mainViewModel.hideEvent()
-                    },
-                )
+                ) {
+                    mainViewModel.hideEvent()
+                }
             }
         }
         setHasOptionsMenu(true)

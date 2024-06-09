@@ -66,7 +66,7 @@ class UserRepository(
         }
     }
 
-    override suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult = attendanceService.fetchAttendance(user)
+    override suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceFetchResult = attendanceService.fetchAttendance(user)
 
     override suspend fun insertAttendance(attendance: List<Dolazak>) {
         attendanceDao.insert(attendance)

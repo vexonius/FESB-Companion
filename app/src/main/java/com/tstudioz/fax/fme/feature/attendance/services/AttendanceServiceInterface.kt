@@ -6,10 +6,10 @@ import org.jsoup.nodes.Element
 
 interface AttendanceServiceInterface {
 
-     suspend fun loginAttendance(user: User): NetworkServiceResult.PrisutnostResult
+     suspend fun loginAttendance(user: User): NetworkServiceResult.AttendanceFetchResult
 
-     suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult
+     suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceFetchResult
 
-     suspend fun getDetailedPrisutnost(element: Element): NetworkServiceResult.PrisutnostResult
+     suspend fun getDetailedPrisutnost(element: Element): NetworkServiceResult.AttendanceFetchResult
 
 }

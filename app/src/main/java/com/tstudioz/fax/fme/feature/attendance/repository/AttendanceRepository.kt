@@ -1,9 +1,8 @@
 package com.tstudioz.fax.fme.feature.attendance.repository
 
 import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.feature.attendance.ParseAttendance
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
-import com.tstudioz.fax.fme.feature.attendance.parseAttendList
-import com.tstudioz.fax.fme.feature.attendance.parseAttendance
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.User
@@ -18,29 +17,30 @@ class AttendanceRepository(
     private val attendanceDao: AttendanceDaoInterface
 ) : AttendanceRepositoryInterface {
 
-    override suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult {
+    override suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceParseResult {
         when (val result = attendanceService.loginAttendance(user)) {
-            is NetworkServiceResult.PrisutnostResult.Success -> {}
+            is NetworkServiceResult.AttendanceFetchResult.Success -> {}
 
-            is NetworkServiceResult.PrisutnostResult.Failure -> {
-                return result
+            is NetworkServiceResult.AttendanceFetchResult.Failure -> {
+                return NetworkServiceResult.AttendanceParseResult.Failure(Throwable("Error while logging in"))
             }
         }
 
         when (val list = attendanceService.fetchAttendance(user)) {
-            is NetworkServiceResult.PrisutnostResult.Success -> {
+            is NetworkServiceResult.AttendanceFetchResult.Success -> {
                 val attendanceList = mutableListOf<List<Dolazak>>()
                 val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                     println("Caught exception $throwable in CoroutineExceptionHandler")
                 }
-                val coroutines = parseAttendList(list.data as String).map {
+                val parseAtt = ParseAttendance()
+                val coroutines = parseAtt.parseAttendList(list.data as String).map {
                     CoroutineScope(Dispatchers.IO).launch(exceptionHandler) {
                         when (val kolegijData = attendanceService.getDetailedPrisutnost(it.first)) {
-                            is NetworkServiceResult.PrisutnostResult.Success -> {
-                                attendanceList.add(parseAttendance(it.first, kolegijData.data as String, it.second))
+                            is NetworkServiceResult.AttendanceFetchResult.Success -> {
+                                attendanceList.add(parseAtt.parseAttendance(it.first, kolegijData.data as String, it.second))
                             }
 
-                            is NetworkServiceResult.PrisutnostResult.Failure -> {
+                            is NetworkServiceResult.AttendanceFetchResult.Failure -> {
                                 throw Exception("Error while fetching attendance data")
                             }
                         }
@@ -49,18 +49,19 @@ class AttendanceRepository(
                 coroutines.joinAll()
 
                 return if (coroutines.any { it.isCancelled }) {
-                    NetworkServiceResult.PrisutnostResult.Failure(
+                    NetworkServiceResult.AttendanceParseResult.Failure(
                         Throwable("Error while fetching attendance data")
                     )
                 } else {
-                    NetworkServiceResult.PrisutnostResult.Success(
-                        attendanceList.sortedBy { it[0].predmet }.sortedBy { it[0].semestar }
+                    insertAttendance(attendanceList.flatten())
+                    NetworkServiceResult.AttendanceParseResult.Success(
+                        attendanceList.sortedBy { it.first().predmet }.sortedBy { it.first().semestar }
                     )
                 }
             }
 
-            is NetworkServiceResult.PrisutnostResult.Failure -> {
-                return NetworkServiceResult.PrisutnostResult.Failure(
+            is NetworkServiceResult.AttendanceFetchResult.Failure -> {
+                return NetworkServiceResult.AttendanceParseResult.Failure(
                     Throwable("Error while fetching attendance data")
                 )
             }

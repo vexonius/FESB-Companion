@@ -23,7 +23,7 @@ class AttendanceDao(private val dbManager: DatabaseManagerInterface) : Attendanc
         val result = realm.query(Dolazak::class).find()
         val grouped = result.groupBy { it.predmet }.values.toList()
 
-        return grouped.sortedBy { it[0].predmet }.sortedBy { it[0].semestar }
+        return grouped.sortedBy { it.first().predmet }.sortedBy { it.first().semestar }
     }
 
 }

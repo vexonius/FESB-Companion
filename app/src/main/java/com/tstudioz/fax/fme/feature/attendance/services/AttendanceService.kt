@@ -11,7 +11,7 @@ import org.jsoup.nodes.Element
 
 class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInterface {
 
-    override suspend fun loginAttendance(user: User): NetworkServiceResult.PrisutnostResult {
+    override suspend fun loginAttendance(user: User): NetworkServiceResult.AttendanceFetchResult {
 
         val url :HttpUrl = HttpUrl.Builder()
             .scheme("https")
@@ -32,15 +32,15 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
             val response = client.newCall(rq).execute()
 
             return if (response.isSuccessful) {
-                NetworkServiceResult.PrisutnostResult.Success("Successfully logged in")
+                NetworkServiceResult.AttendanceFetchResult.Success("Successfully logged in")
             } else {
-                NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to login"))
+                NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to login"))
             }
         }
-        return NetworkServiceResult.PrisutnostResult.Success("Already logged in")
+        return NetworkServiceResult.AttendanceFetchResult.Success("Already logged in")
     }
 
-    override suspend fun fetchAttendance(user: User): NetworkServiceResult.PrisutnostResult {
+    override suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceFetchResult {
         val request: Request = Request.Builder()
             .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
             .get()
@@ -48,22 +48,22 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
         val response = client.newCall(request).execute()
 
         return if (response.isSuccessful) {
-            NetworkServiceResult.PrisutnostResult.Success(response.body?.string() ?: "")
+            NetworkServiceResult.AttendanceFetchResult.Success(response.body?.string() ?: "")
         } else {
-            NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to fetch attendance"))
+            NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance"))
         }
 
     }
 
-    override suspend fun getDetailedPrisutnost(element: Element): NetworkServiceResult.PrisutnostResult {
+    override suspend fun getDetailedPrisutnost(element: Element): NetworkServiceResult.AttendanceFetchResult {
         val request: Request = Request.Builder()
             .url("https://raspored.fesb.unist.hr${element.attr("href")}")
             .get()
             .build()
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
-            return NetworkServiceResult.PrisutnostResult.Success(response.body?.string() ?: "")
+            return NetworkServiceResult.AttendanceFetchResult.Success(response.body?.string() ?: "")
         }
-        return NetworkServiceResult.PrisutnostResult.Failure(Throwable("Failed to fetch attendance details"))
+        return NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance details"))
     }
 }

@@ -30,29 +30,26 @@ class AttendanceViewModel(
     private var _attendanceList: MutableLiveData<List<List<Dolazak>>> = MutableLiveData(emptyList())
     val attendanceList: LiveData<List<List<Dolazak>>> = _attendanceList
 
+    var user: MutableLiveData<User> = MutableLiveData<User>()
+
     init {
         viewModelScope.launch(context = Dispatchers.IO) {
             _attendanceList.postValue(repository.readAttendance())
             _shouldShow.postValue(true)
         }
+        user.postValue(User(shPref.getString("username", "") ?: "", shPref.getString("password", "") ?: ""))
     }
 
     fun fetchAttendance() {
         viewModelScope.launch(context = Dispatchers.IO) {
-            when (val attendance = repository.fetchAttendance(
-                User(
-                    shPref.getString("username", "") ?: "",
-                    shPref.getString("password", "") ?: ""
-                )
-            )) {
-                is NetworkServiceResult.PrisutnostResult.Success -> {
-                    val data = attendance.data as List<List<Dolazak>>
-                    repository.insertAttendance(data.flatten())
+            when (val attendance = repository.fetchAttendance(user.value ?: User("", ""))) {
+                is NetworkServiceResult.AttendanceParseResult.Success -> {
+                    val data = attendance.data
                     _attendanceList.postValue(data)
                     _shouldShow.postValue(true)
                 }
 
-                is NetworkServiceResult.PrisutnostResult.Failure -> {
+                is NetworkServiceResult.AttendanceParseResult.Failure -> {
                     _shouldShow.postValue(false)
                     _error.postValue(true)
                 }

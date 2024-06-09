@@ -63,7 +63,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
-                android:text="@string/danasnja_predavanja"
+                android:text="@string/todaysEvents"
                 android:textColor="@color/shady_blue"
                 android:textSize="13sp" />
 
@@ -119,7 +119,7 @@
                         android:layout_below="@+id/smile"
                         android:layout_marginTop="15dp"
                         android:paddingBottom="10dp"
-                        android:text="@string/odmori_se"
+                        android:text="@string/getRest"
                         android:textAlignment="center"
                         android:textColor="#cacaca"
                         android:textSize="14dp" />
