@@ -288,7 +288,7 @@ class MainActivity : AppCompatActivity() {
         val staraVerzija = shPref.getInt("version_number", 14)
         val trenutnaVerzija: Int = BuildConfig.VERSION_CODE
 
-        if ((staraVerzija != null) && (staraVerzija < trenutnaVerzija)) {
+        if (staraVerzija < trenutnaVerzija) {
             showChangelog()
             editor = shPref.edit()
             editor?.putInt("version_number", trenutnaVerzija)
