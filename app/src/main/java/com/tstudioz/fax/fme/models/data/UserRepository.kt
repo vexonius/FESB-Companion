@@ -34,13 +34,15 @@ class UserRepository(
         }
     }
 
-    override suspend fun fetchTimetable(user: String, startDate: LocalDate, endDate: LocalDate): List<Event> {
-        val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
-        val requestUrl = "https://raspored.fesb.unist.hr/part/raspored/kalendar?" +
-                "DataType=User&DataId=$user" +
-                "&MinDate=${dateFormatter.format(startDate)}" +
-                "&MaxDate=${dateFormatter.format(endDate)}"
-        return when(val result = timetableService.fetchTimeTable(requestUrl)){
+    override suspend fun fetchTimetable(user: String, startDate: String, endDate: String): List<Event> {
+        val params: HashMap<String, String> = hashMapOf(
+            "DataType" to "User",
+            "DataId" to user,
+            "MinDate" to startDate,
+            "MaxDate" to endDate
+        )
+
+        return when(val result = timetableService.fetchTimeTable(params = params)){
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetable(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")

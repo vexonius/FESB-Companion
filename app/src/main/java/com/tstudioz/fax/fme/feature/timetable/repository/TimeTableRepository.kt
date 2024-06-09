@@ -3,29 +3,31 @@ package com.tstudioz.fax.fme.feature.timetable.repository
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
-import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
 import com.tstudioz.fax.fme.feature.timetable.parseTimetable
 import com.tstudioz.fax.fme.feature.timetable.parseTimetableInfo
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
+import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 class TimeTableRepository(
     private val timetableService: TimetableServiceInterface,
     private val timeTableDao: TimeTableDaoInterface
 ) : TimeTableRepositoryInterface {
 
-    override suspend fun fetchTimetable(user: String, startDate: LocalDate, endDate: LocalDate): List<Event> {
+    override suspend fun fetchTimetable(
+        user: String,
+        startDate: String,
+        endDate: String
+    ): List<Event> {
+        val params: HashMap<String, String> = hashMapOf(
+            "DataType" to "User",
+            "DataId" to user,
+            "MinDate" to startDate,
+            "MaxDate" to endDate
+        )
 
-        val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
-        val requestUrl = "https://raspored.fesb.unist.hr/part/raspored/kalendar?" +
-                "DataType=User&DataId=$user" +
-                "&MinDate=${dateFormatter.format(startDate)}" +
-                "&MaxDate=${dateFormatter.format(endDate)}"
-
-        return when (val result = timetableService.fetchTimeTable(requestUrl)) {
+        return when (val result = timetableService.fetchTimeTable(params = params)) {
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetable(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")
@@ -34,11 +36,13 @@ class TimeTableRepository(
         }
     }
 
-    override suspend fun fetchTimeTableInfo(startDate: String, endDate: String): List<TimeTableInfo> {
+    override suspend fun fetchTimeTableCalendar(startDate: String, endDate: String): List<TimeTableInfo> {
+        val params: HashMap<String, String> = hashMapOf(
+            "FromDate" to startDate,
+            "ToDate" to endDate
+        )
 
-        val requestUrl = "https://raspored.fesb.unist.hr/raspored/periodi-u-mjesecu-json?FromDate=$startDate&ToDate=$endDate"
-
-        return when (val result = timetableService.fetchTimeTable(requestUrl)) {
+        return when (val result = timetableService.fetchTimeTable(params = params)) {
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetableInfo(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
                 Log.e(TAG, "TimetableInfo fetching error")
