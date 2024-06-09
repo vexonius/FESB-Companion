@@ -42,7 +42,7 @@ class TimeTableRepository(
             "ToDate" to endDate
         )
 
-        return when (val result = timetableService.fetchTimeTable(params = params)) {
+        return when (val result = timetableService.fetchTimetableCalendar(params = params)) {
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetableInfo(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
                 Log.e(TAG, "TimetableInfo fetching error")

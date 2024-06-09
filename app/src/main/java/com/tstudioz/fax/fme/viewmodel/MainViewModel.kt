@@ -116,7 +116,8 @@ class MainViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _periods.postValue(timeTableRepository.fetchTimeTableCalendar(startDate, endDate))
+                val result = timeTableRepository.fetchTimeTableCalendar(startDate, endDate)
+                _periods.postValue(result)
             } catch (e: Exception) {
                 Log.e("Error timetableinfo", e.toString())
             }
