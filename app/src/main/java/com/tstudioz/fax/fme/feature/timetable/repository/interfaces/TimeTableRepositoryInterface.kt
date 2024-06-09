@@ -6,9 +6,9 @@ import java.time.LocalDate
 
 interface TimeTableRepositoryInterface {
 
-    suspend fun fetchTimetable(user: String, startDate: LocalDate, endDate: LocalDate): List<Event>
+    suspend fun fetchTimetable(user: String, startDate: String, endDate: String): List<Event>
 
-    suspend fun fetchTimeTableInfo(startDate: String, endDate: String): List<TimeTableInfo>
+    suspend fun fetchTimeTableCalendar(startDate: String, endDate: String): List<TimeTableInfo>
 
     suspend fun insert(classes: List<Event>)
 
