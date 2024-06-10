@@ -31,7 +31,7 @@ fun AttendanceItem(attendanceItem: Dolazak) {
                 (attendanceItem.vrsta ?: "").replaceFirstChar { it.uppercase() })
         },
         supportingContent = {
-            Column{
+            Column {
                 LinearProgressIndicator(
                     progress = { percent }, modifier = Modifier.padding(top = 8.dp)
                 )
