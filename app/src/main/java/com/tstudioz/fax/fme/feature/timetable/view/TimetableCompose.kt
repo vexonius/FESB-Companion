@@ -67,7 +67,8 @@ fun TimetableCompose(
     fetchUserTimetable: (LocalDate, LocalDate, LocalDate) -> Unit,
     showEvent: (Event) -> Unit,
     showWeekChooseMenu: (Boolean) -> Unit,
-    hideEvent: () -> Unit){
+    hideEvent: () -> Unit
+    ) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
