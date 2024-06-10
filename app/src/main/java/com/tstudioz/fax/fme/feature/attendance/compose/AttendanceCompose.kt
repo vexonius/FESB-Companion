@@ -17,10 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.models.AttendanceEntry
 
 @Composable
-fun AttendanceCompose(attendanceItems: LiveData<List<List<Dolazak>>>) {
+fun AttendanceCompose(attendanceItems: LiveData<List<List<AttendanceEntry>>>) {
 
     AppTheme {
         if (attendanceItems.observeAsState().value?.isEmpty() == true) {

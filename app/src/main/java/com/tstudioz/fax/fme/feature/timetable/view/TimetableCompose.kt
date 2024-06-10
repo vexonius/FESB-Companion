@@ -33,7 +33,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -46,7 +45,6 @@ import com.tstudioz.fax.fme.compose.BottomInfoCompose
 import com.tstudioz.fax.fme.compose.Schedule
 import com.tstudioz.fax.fme.compose.SimpleCalendarTitle
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.MonthData
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

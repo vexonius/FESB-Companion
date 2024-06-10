@@ -1,11 +1,11 @@
 package com.tstudioz.fax.fme.feature.attendance.dao
 
-import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.models.AttendanceEntry
 
 interface AttendanceDaoInterface {
 
-    suspend fun insert(attendance: List<Dolazak>)
+    suspend fun insert(attendance: List<AttendanceEntry>)
 
-    suspend fun read(): List<List<Dolazak>>
+    suspend fun read(): List<List<AttendanceEntry>>
 
 }

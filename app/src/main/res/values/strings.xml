@@ -64,5 +64,9 @@
     <string name="attendance_offline">Niste povezani</string>
     <string name="attendance_retry">Ponovi</string>
 
+    //Attendance misc
+
+    <string name="attendance_required">Obavezno %1$s</string>
+
 
 </resources>

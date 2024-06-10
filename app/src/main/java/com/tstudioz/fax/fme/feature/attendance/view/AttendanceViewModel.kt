@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.User
@@ -27,16 +27,13 @@ class AttendanceViewModel(
     private var _error = MutableLiveData(false)
     val error: LiveData<Boolean> = _error
 
-    private var _attendanceList: MutableLiveData<List<List<Dolazak>>> = MutableLiveData(emptyList())
-    val attendanceList: LiveData<List<List<Dolazak>>> = _attendanceList
+    private var _attendanceList: MutableLiveData<List<List<AttendanceEntry>>> = MutableLiveData(emptyList())
+    val attendanceList: LiveData<List<List<AttendanceEntry>>> = _attendanceList
 
     var user: MutableLiveData<User> = MutableLiveData<User>()
 
     init {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            _attendanceList.postValue(repository.readAttendance())
-            _shouldShow.postValue(true)
-        }
+        loadFromDb()
         user.postValue(User(shPref.getString("username", "") ?: "", shPref.getString("password", "") ?: ""))
     }
 
@@ -54,6 +51,13 @@ class AttendanceViewModel(
                     _error.postValue(true)
                 }
             }
+        }
+    }
+
+    private fun loadFromDb() {
+        viewModelScope.launch(context = Dispatchers.IO) {
+            _attendanceList.postValue(repository.readAttendance())
+            _shouldShow.postValue(true)
         }
     }
 }

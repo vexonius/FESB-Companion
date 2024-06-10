@@ -1,33 +1,34 @@
 package com.tstudioz.fax.fme.feature.attendance
 
 import android.util.Log
-import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.util.UUID
 
 class ParseAttendance{
+
     fun parseAttendance(
         element: Element,
         body: String,
         semester: Int
-    ): List<Dolazak> {
-        val attendanceForOneKolegij = mutableListOf<Dolazak>()
+    ): List<AttendanceEntry> {
+        val attendanceForOneKolegij = mutableListOf<AttendanceEntry>()
         Jsoup.parse(body).select(".courseCategories div.courseCategory").forEach { kat ->
-            val mDolazak = Dolazak()
-            mDolazak.semestar = semester
-            mDolazak.predmet = element.select(".cellContent").first()?.text()
-            mDolazak.vrsta = kat.getElementsByClass("name").first()?.text()
-            mDolazak.attended = kat.select(".attended > span.num").first()?.text()?.toInt() ?: 99
-            mDolazak.absent = kat.select(".absent > span.num").first()?.text()?.toInt() ?: 99
-            mDolazak.required = kat.select(".required-attendance > span").first()?.text()
-            mDolazak.total = (mDolazak.required?.split("od")?.last()?.trim() ?: "99").toInt()
-            mDolazak.id = UUID.nameUUIDFromBytes(
-                ("${mDolazak.attended}${mDolazak.absent}${mDolazak.predmet}" +
-                        "${mDolazak.vrsta}${mDolazak.required}${mDolazak.total}${mDolazak.semestar}").toByteArray()
+            val mAttendanceEntry = AttendanceEntry()
+            mAttendanceEntry.semestar = semester
+            mAttendanceEntry.predmet = element.select(".cellContent").first()?.text()
+            mAttendanceEntry.vrsta = kat.getElementsByClass("name").first()?.text()
+            mAttendanceEntry.attended = kat.select(".attended > span.num").first()?.text()?.toInt() ?: 99
+            mAttendanceEntry.absent = kat.select(".absent > span.num").first()?.text()?.toInt() ?: 99
+            mAttendanceEntry.required = kat.select(".required-attendance > span").first()?.text()
+            mAttendanceEntry.total = (mAttendanceEntry.required?.split("od")?.last()?.trim() ?: "99").toInt()
+            mAttendanceEntry.id = UUID.nameUUIDFromBytes(
+                ("${mAttendanceEntry.attended}${mAttendanceEntry.absent}${mAttendanceEntry.predmet}" +
+                        "${mAttendanceEntry.vrsta}${mAttendanceEntry.required}${mAttendanceEntry.total}${mAttendanceEntry.semestar}").toByteArray()
             )
                 .toString()
-            attendanceForOneKolegij.add(mDolazak)
+            attendanceForOneKolegij.add(mAttendanceEntry)
         }
 
         return attendanceForOneKolegij

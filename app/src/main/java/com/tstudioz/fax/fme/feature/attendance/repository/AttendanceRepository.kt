@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.feature.attendance.repository
 
-import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.ParseAttendance
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 
 class AttendanceRepository(
     private val attendanceService: AttendanceServiceInterface,
-    private val attendanceDao: AttendanceDaoInterface
+    private val attendanceDao: AttendanceDaoInterface,
+    private val parseAttendance: ParseAttendance = ParseAttendance()
 ) : AttendanceRepositoryInterface {
 
     override suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceParseResult {
@@ -28,16 +29,15 @@ class AttendanceRepository(
 
         when (val list = attendanceService.fetchAttendance(user)) {
             is NetworkServiceResult.AttendanceFetchResult.Success -> {
-                val attendanceList = mutableListOf<List<Dolazak>>()
+                val attendanceList = mutableListOf<List<AttendanceEntry>>()
                 val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                     println("Caught exception $throwable in CoroutineExceptionHandler")
                 }
-                val parseAtt = ParseAttendance()
-                val coroutines = parseAtt.parseAttendList(list.data as String).map {
+                val coroutines = parseAttendance.parseAttendList(list.data as String).map {
                     CoroutineScope(Dispatchers.IO).launch(exceptionHandler) {
                         when (val kolegijData = attendanceService.getDetailedPrisutnost(it.first)) {
                             is NetworkServiceResult.AttendanceFetchResult.Success -> {
-                                attendanceList.add(parseAtt.parseAttendance(it.first, kolegijData.data as String, it.second))
+                                attendanceList.add(parseAttendance.parseAttendance(it.first, kolegijData.data as String, it.second))
                             }
 
                             is NetworkServiceResult.AttendanceFetchResult.Failure -> {
@@ -68,11 +68,11 @@ class AttendanceRepository(
         }
     }
 
-    override suspend fun insertAttendance(attendance: List<Dolazak>) {
+    override suspend fun insertAttendance(attendance: List<AttendanceEntry>) {
         attendanceDao.insert(attendance)
     }
 
-    override suspend fun readAttendance(): List<List<Dolazak>> {
+    override suspend fun readAttendance(): List<List<AttendanceEntry>> {
         return attendanceDao.read()
     }
 

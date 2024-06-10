@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.models.data
 
 import android.util.Log
-import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
@@ -68,7 +68,7 @@ class UserRepository(
 
     override suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceFetchResult = attendanceService.fetchAttendance(user)
 
-    override suspend fun insertAttendance(attendance: List<Dolazak>) {
+    override suspend fun insertAttendance(attendance: List<AttendanceEntry>) {
         attendanceDao.insert(attendance)
     }
 
