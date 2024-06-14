@@ -1,9 +1,11 @@
 package com.tstudioz.fax.fme.view.fragments
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -51,14 +53,14 @@ class HomeFragment : Fragment() {
     private val dbManager: DatabaseManagerInterface by inject()
     private val shPref: SharedPreferences by inject()
 
-    private var binding: TabHomeBinding? = null
-    private val forecastUrl =
-        "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
-    private val homeViewModel: HomeViewModel by viewModel()
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by activityViewModel()
+    private val homeViewModel: HomeViewModel by viewModel()
+
+    private var binding: TabHomeBinding? = null
     private var snack: Snackbar? = null
+    private val forecastUrl =
+        "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -108,18 +110,18 @@ class HomeFragment : Fragment() {
     @SuppressLint("DiscouragedApi")
     private fun updateWeatherDisplay() {
         try {
-            binding?.temperaturaVrijednost?.text =
+            binding?.tempValue?.text =
                 String.format(Locale.US, getString(R.string.weatherTemp), homeViewModel.temperature.value)
-            binding?.vlaznostVrijednost?.text =
+            binding?.humidityValue?.text =
                 String.format(Locale.US, getString(R.string.weatherHumidity), homeViewModel.humidity.value)
-            binding?.oborineVrijednost?.text =
+            binding?.percipValue?.text =
                 String.format(Locale.US, getString(R.string.weatherPrecipChance), homeViewModel.precipChance.value)
             binding?.trenutniVjetar?.text =
                 String.format(Locale.US, getString(R.string.weatherWind), homeViewModel.wind.value)
-            binding?.opis?.text = homeViewModel.summary.value
+            binding?.description?.text = homeViewModel.summary.value
             binding?.shimmerWeather?.visibility = View.GONE
             binding?.cardHome?.visibility = View.VISIBLE
-            binding?.vrijemeImage?.setImageDrawable(
+            binding?.weatherImage?.setImageDrawable(
                 ResourcesCompat.getDrawable(
                     resources,
                     resources.getIdentifier(homeViewModel.icon.value, "drawable", requireContext().packageName),
@@ -182,30 +184,24 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadIksicaAd() {
-        /*binding?.iksicaAd?.setOnClickListener {
-            val appPackageName = "com.tstud.iksica"
-            try {
-                val intent =
-                    requireActivity().packageManager.getLaunchIntentForPackage(appPackageName)
-                if (intent != null) {
-                    startActivity(intent)
-                }
-
-            } catch (anfe: Exception) {
-                try {
-                    startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName"))
-                    )
-                } catch (ex: ActivityNotFoundException) {
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-                        )
-                    )
-                }
+        binding?.iksicaAd?.setOnClickListener {
+            val appPackageName = "com.ugovori.studentskiugovori"
+            val intent = requireActivity().packageManager.getLaunchIntentForPackage(appPackageName)
+            if (intent != null) {
+                startActivity(intent)
+                return@setOnClickListener
             }
-        }*/
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
+            } catch (ex: ActivityNotFoundException) {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+                    )
+                )
+            }
+        }
     }
 
     private fun loadMenzaView() {

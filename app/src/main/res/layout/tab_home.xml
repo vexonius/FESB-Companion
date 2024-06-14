@@ -216,7 +216,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
                     android:layout_marginTop="20dp"
-                    android:text="Iksica"
+                    android:text="Studentski Ugovori"
                     android:textColor="@color/white"
                     android:textSize="35dp" />
 
@@ -226,7 +226,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/iksicaText"
                     android:layout_marginLeft="30dp"
-                    android:text="Provjeri stanje svoje x-ice"
+                    android:text="Provjeri stanje svojih ugovora"
                     android:textColor="@color/white"
                     android:textSize="14dp" />
 
@@ -309,7 +309,7 @@
                                 android:gravity="center">
 
                                 <ImageView
-                                    android:id="@+id/vrijeme_image"
+                                    android:id="@+id/weather_image"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:layout_margin="0dp"
@@ -330,7 +330,7 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/temperatura_vrijednost"
+                                android:id="@+id/temp_value"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:gravity="center_horizontal"
@@ -341,7 +341,7 @@
                                 android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/opis"
+                                android:id="@+id/description"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:gravity="center_horizontal"
@@ -399,7 +399,7 @@
                                         android:src="@drawable/vlaga" />
 
                                     <TextView
-                                        android:id="@+id/vlaznost_vrijednost"
+                                        android:id="@+id/humidity_value"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:layout_below="@+id/vlaznost"
@@ -425,7 +425,7 @@
                                         android:src="@drawable/oborine" />
 
                                     <TextView
-                                        android:id="@+id/oborine_vrijednost"
+                                        android:id="@+id/percip_value"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:layout_below="@+id/oborine"
