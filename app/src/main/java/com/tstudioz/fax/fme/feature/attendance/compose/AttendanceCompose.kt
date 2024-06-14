@@ -35,24 +35,9 @@ fun AttendanceCompose(attendanceItems: LiveData<List<List<AttendanceEntry>>>) {
             }
         } else {
             val items = attendanceItems.observeAsState().value ?: emptyList()
+            items.sortedBy { it.first().semestar }
             LazyColumn {
-                items(items.filter { it.all { it1 -> it1.semestar == 1 } }.size) { index ->
-                    ListItem(headlineContent = {
-                        Text(
-                            text = items[index].first().predmet ?: ""
-                        )
-                    },
-                        supportingContent = {
-                            Column {
-                                (items[index]).forEach {
-                                    AttendanceItem(it)
-                                }
-                            }
-                        }
-                    )
-                    Divider(modifier = Modifier.padding(4.dp))
-                }
-                items(items.filter { it.all { it1 -> it1.semestar == 2 } }.size) { index ->
+                items(items.size) { index ->
                     ListItem(headlineContent = {
                         Text(
                             text = items[index].first().predmet ?: ""
