@@ -56,7 +56,7 @@
                     android:transitionName="@string/trans"
                     android:layout_width="160dp"
                     android:layout_height="160dp"
-                    android:src="@drawable/moon_with_clouds"
+                    android:src="@drawable/_1d"
                     />
             </LinearLayout>
 
