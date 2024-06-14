@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +38,7 @@ import com.tstudioz.fax.fme.R
 fun HomeTabCompose() {
     AppTheme {
         Scaffold {
-            LazyColumn (Modifier.padding(it)) {
+            LazyColumn(Modifier.padding(it)) {
                 item { WeatherCompose() }
                 item { RemindersCompose() }
                 item { TodayTimetableCompose() }
@@ -84,9 +84,9 @@ fun WeatherCompose() {
                 Text(text = "20°C", fontSize = 64.sp, fontWeight = FontWeight.Bold)
                 Text(text = "Clear sky", fontSize = 13.sp)
                 Row {
-                    WeatherItem(text = "5.1 km/h", id = R.drawable.wind)
-                    WeatherItem(text = "56.5%", id = R.drawable.vlaga)
-                    WeatherItem(text = "0.0 mm", id = R.drawable.oborine)
+                    Box(Modifier.weight(.3f, false)) { WeatherItem(text = "5.1 km/h", id = R.drawable.wind) }
+                    Box(Modifier.weight(.3f, false)) { WeatherItem(text = "56.5%", id = R.drawable.vlaga) }
+                    Box(Modifier.weight(.3f, false)) { WeatherItem(text = "0.0 mm", id = R.drawable.oborine) }
                 }
             }
         }
@@ -141,12 +141,17 @@ fun TodayTimetableCompose() {
             Text(
                 text = "DANAŠNJA PREDAVANJA",
                 fontSize = 13.sp,
-                modifier = Modifier.padding(20.dp, 10.dp, 0.dp, 0.dp)
+                modifier = Modifier
+                    .padding(20.dp, 10.dp, 0.dp, 0.dp)
+                    .weight(.6f, false)
             )
             Text(
-                text = "14.6.2024 22:29:31",
+                text = "22:29:31 14.6.2024",
+                overflow = TextOverflow.Ellipsis,
                 fontSize = 10.sp,
-                modifier = Modifier.padding(0.dp, 10.dp, 20.dp, 0.dp)
+                modifier = Modifier
+                    .padding(0.dp, 10.dp, 20.dp, 0.dp)
+                    .weight(.4f, false)
             )
         }
         Column(
@@ -201,7 +206,8 @@ fun CardsCompose() {
                 text = "PREHRANA",
                 fontSize = 13.sp,
                 modifier = Modifier.padding(20.dp, 10.dp, 0.dp, 0.dp)
-            )}
+            )
+        }
         CardCompose()
         CardCompose()
         CardCompose()
