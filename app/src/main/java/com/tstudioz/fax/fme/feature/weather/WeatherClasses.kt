@@ -90,3 +90,13 @@ data class ForecastDetails(
 data class Summary(
     @SerialName("symbol_code") val symbolCode: String?=null
 )
+
+data class WeatherDisplay(
+    val location: String,
+    val temperature: Double,
+    val humidity: Double,
+    val wind: Double,
+    val precipChance: Double,
+    val icon: String,
+    val summary: String
+)

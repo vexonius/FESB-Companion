@@ -2,6 +2,8 @@ package com.tstudioz.fax.fme.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,8 +24,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,7 +37,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getString
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.weather.WeatherDisplay
+import java.util.Locale
 
 @Preview
 @Composable
@@ -39,7 +48,7 @@ fun HomeTabCompose() {
     AppTheme {
         Scaffold {
             LazyColumn(Modifier.padding(it)) {
-                item { WeatherCompose() }
+                //item { WeatherCompose() }
                 item { RemindersCompose() }
                 item { TodayTimetableCompose() }
                 item { CardsCompose() }
@@ -50,7 +59,17 @@ fun HomeTabCompose() {
 }
 
 @Composable
-fun WeatherCompose() {
+fun WeatherCompose(
+    weather: WeatherDisplay = WeatherDisplay(
+        location = "Split",
+        temperature = 20.0,
+        humidity = 56.5,
+        wind = 5.1,
+        precipChance = 0.0,
+        icon = "_42d",
+        summary = "Clear sky"
+    )
+) {
     Column(
         modifier = Modifier
             .background(colorResource(id = R.color.darker_cyan))
@@ -60,7 +79,7 @@ fun WeatherCompose() {
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Split", fontSize = 16.sp, modifier = Modifier.padding(3.dp),
+                text = weather.location, fontSize = 16.sp, modifier = Modifier.padding(3.dp),
             )
         }
         Row(
@@ -68,8 +87,15 @@ fun WeatherCompose() {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val context = LocalContext.current
             Image(
-                painter = painterResource(id = R.drawable._42d),
+                painter = painterResource(
+                    id = context.resources.getIdentifier(
+                        weather.icon,
+                        "drawable",
+                        context.packageName
+                    )
+                ),
                 contentDescription = "Weather icon",
                 modifier = Modifier
                     .weight(0.45f)
@@ -81,12 +107,40 @@ fun WeatherCompose() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "20°C", fontSize = 64.sp, fontWeight = FontWeight.Bold)
-                Text(text = "Clear sky", fontSize = 13.sp)
+                Text(
+                    text = String.format(Locale.US, getString(context, R.string.weatherTemp), weather.temperature),
+                    fontSize = 64.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(text = weather.summary, fontSize = 13.sp)
                 Row {
-                    Box(Modifier.weight(.3f, false)) { WeatherItem(text = "5.1 km/h", id = R.drawable.wind) }
-                    Box(Modifier.weight(.3f, false)) { WeatherItem(text = "56.5%", id = R.drawable.vlaga) }
-                    Box(Modifier.weight(.3f, false)) { WeatherItem(text = "0.0 mm", id = R.drawable.oborine) }
+                    Box(Modifier.weight(.3f, false)) {
+                        WeatherItem(
+                            text = String.format(
+                                Locale.US,
+                                getString(context, R.string.weatherWind),
+                                weather.wind
+                            ), id = R.drawable.wind
+                        )
+                    }
+                    Box(Modifier.weight(.3f, false)) {
+                        WeatherItem(
+                            text = String.format(
+                                Locale.US,
+                                getString(context, R.string.weatherHumidity),
+                                weather.humidity
+                            ), id = R.drawable.vlaga
+                        )
+                    }
+                    Box(Modifier.weight(.3f, false)) {
+                        WeatherItem(
+                            text = String.format(
+                                Locale.US,
+                                getString(context, R.string.weatherPrecipChance),
+                                weather.precipChance
+                            ), id = R.drawable.oborine
+                        )
+                    }
                 }
             }
         }
@@ -115,24 +169,61 @@ fun RemindersCompose() {
         verticalArrangement = Arrangement.Center,
     ) {
         Row { Text(text = "PODSJETNICI", fontSize = 13.sp, modifier = Modifier.padding(20.dp, 10.dp, 0.dp, 0.dp)) }
-        Row(
-            verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+        Column(
+            modifier = Modifier
                 .background(colorResource(id = R.color.colorPrimaryDark))
                 .padding(20.dp, 0.dp)
                 .fillMaxWidth()
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.add_new),
-                contentDescription = "Add reminder",
-                modifier = Modifier.size(25.dp)
-            )
-            Text(text = "Dodaj podsjetnik", fontSize = 16.sp, modifier = Modifier.padding(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Icon(
+                    painter = painterResource(id = R.drawable.add_new),
+                    contentDescription = "Add reminder",
+                    modifier = Modifier.size(25.dp)
+                )
+                Text(text = "Dodaj podsjetnik", fontSize = 16.sp, modifier = Modifier.padding(10.dp))
+            }
+            ReminderItem()
         }
     }
 }
 
 @Composable
-fun TodayTimetableCompose() {
+fun ReminderItem(reminderText: String = "text remonders") {
+    val clicked = remember { mutableStateOf(false) }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+    ) {
+        Image(
+            painter = painterResource(id = if (clicked.value) R.drawable.circle_checked else R.drawable.circle_white),
+            contentDescription = "checkmark",
+            modifier = Modifier
+                .size(25.dp)
+                .noRippleClickable {
+                    println(clicked)
+                    clicked.value = !clicked.value
+                }
+        )
+        Text(text = reminderText, fontSize = 16.sp, modifier = Modifier.padding(10.dp))
+    }
+}
+fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
+    this.clickable(
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() }) {
+        onClick()
+    }
+}
+
+
+@Composable
+fun TodayTimetableCompose(
+    lastFetched: String = "22:29:31 14.6.2024"
+) {
     Column(
         modifier = Modifier,
         verticalArrangement = Arrangement.Center,
@@ -146,7 +237,7 @@ fun TodayTimetableCompose() {
                     .weight(.6f, false)
             )
             Text(
-                text = "22:29:31 14.6.2024",
+                text = lastFetched,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 10.sp,
                 modifier = Modifier
@@ -154,10 +245,9 @@ fun TodayTimetableCompose() {
                     .weight(.4f, false)
             )
         }
-        Column(
-        ) {
+        Column {
             TimetableItem()
-            TimetableItem()
+            TimetableItem(colorId = R.color.blue_nice)
         }
     }
 }
@@ -167,7 +257,8 @@ fun TimetableItem(
     title: String = "JEZICI I PREVODITELJI",
     time: String = "10:15 - 15:00",
     type: String = "Ispit",
-    classroom: String = "B525"
+    classroom: String = "B525",
+    colorId: Int = R.color.purple_nice
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -179,7 +270,7 @@ fun TimetableItem(
             .height(IntrinsicSize.Min),
     ) {
         VerticalDivider(
-            color = colorResource(id = R.color.purple_nice),
+            color = colorResource(id = colorId),
             modifier = Modifier
                 .fillMaxHeight()
                 .width(20.dp),
@@ -208,25 +299,29 @@ fun CardsCompose() {
                 modifier = Modifier.padding(20.dp, 10.dp, 0.dp, 0.dp)
             )
         }
-        CardCompose()
-        CardCompose()
-        CardCompose()
+        CardCompose("Menza", "Pregledaj dnevni jelovnik")
+        CardCompose("Studentski Ugovori", "Pregledaj svoje ugovore")
     }
 }
 
 @Composable
-fun CardCompose() {
+fun CardCompose(title: String, description: String) {
     Box(
         modifier = Modifier
-            .padding(20.dp, 10.dp, 20.dp, 0.dp)
+            .padding(20.dp, 0.dp, 20.dp, 10.dp)
             .height(140.dp)
             .fillMaxWidth()
             .background(colorResource(id = R.color.colorPrimaryDark))
     ) {
         Column {
-            Text(text = "Menza", fontSize = 35.sp, modifier = Modifier.padding(20.dp, 20.dp, 0.dp, 0.dp))
             Text(
-                text = "Pregledaj dnevni jelovnik",
+                text = title,
+                fontSize = 35.sp,
+                modifier = Modifier.padding(20.dp, 20.dp, 0.dp, 0.dp),
+                lineHeight = 37.sp
+            )
+            Text(
+                text = description,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(20.dp, 0.dp, 0.dp, 0.dp)
             )
