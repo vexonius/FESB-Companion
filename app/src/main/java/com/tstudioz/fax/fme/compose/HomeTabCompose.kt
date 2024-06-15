@@ -204,7 +204,6 @@ fun ReminderItem(reminderText: String = "text remonders") {
             modifier = Modifier
                 .size(25.dp)
                 .noRippleClickable {
-                    println(clicked)
                     clicked.value = !clicked.value
                 }
         )
