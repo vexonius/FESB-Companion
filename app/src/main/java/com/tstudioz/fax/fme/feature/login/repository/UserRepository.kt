@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.feature.login.repository
 import android.content.SharedPreferences
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Meni
+import com.tstudioz.fax.fme.database.models.NoteRealm
 import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.feature.menza.service.MenzaServiceInterface
@@ -82,6 +83,18 @@ class UserRepository(
 
     override suspend fun readMenza(): List<Meni> {
         return menzaDao.getCachedMenza()
+    }
+
+    override suspend fun getNotes(): List<NoteRealm> {
+        return menzaDao.getNotes()
+    }
+
+    override suspend fun insert(note: NoteRealm) {
+        menzaDao.insert(note)
+    }
+
+    override suspend fun delete(note : NoteRealm) {
+        menzaDao.delete(note)
     }
 
     companion object {

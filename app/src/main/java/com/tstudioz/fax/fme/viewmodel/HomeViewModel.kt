@@ -5,7 +5,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.database.models.Note
+import com.tstudioz.fax.fme.database.models.toNote
+import com.tstudioz.fax.fme.database.models.toNoteRealm
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
+import com.tstudioz.fax.fme.feature.weather.WeatherDisplay
 import com.tstudioz.fax.fme.feature.weather.codeToDisplay
 import com.tstudioz.fax.fme.feature.weather.weatherSymbolKeys
 import kotlinx.coroutines.Dispatchers
@@ -20,21 +24,12 @@ class HomeViewModel(
     private val repository: UserRepositoryInterface
 ) : AndroidViewModel(application) {
 
-    private val _humidity = MutableLiveData<Double>()
-    private val _icon = MutableLiveData<String>()
-    private val _precipChance = MutableLiveData<Double>()
-    private val _summary = MutableLiveData<String>()
-    private val _wind = MutableLiveData<Double>()
-    private val _temperature = MutableLiveData<Double>()
     private var _forecastGot = MutableLiveData<Boolean>()
-
-    val humidity: LiveData<Double> = _humidity
-    val icon: LiveData<String> = _icon
-    val precipChance: LiveData<Double> = _precipChance
-    val summary: LiveData<String> = _summary
-    val wind: LiveData<Double> = _wind
-    val temperature: LiveData<Double> = _temperature
+    private val _weatherDisplay = MutableLiveData<WeatherDisplay>()
+    private val _notes = MutableLiveData<List<Note>>()
+    val weatherDisplay: LiveData<WeatherDisplay> = _weatherDisplay
     val forecastGot: LiveData<Boolean> = _forecastGot
+    val notes: LiveData<List<Note>> = _notes
 
     fun getForecast(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -51,16 +46,50 @@ class HomeViewModel(
                         Locale.getDefault()
                     ) else it.toString()
                 }
-                _humidity.postValue(forecastInstantDetails?.relativeHumidity ?: 0.0)
-                _wind.postValue(forecastInstantDetails?.windSpeed ?: 0.0)
-                _temperature.postValue(forecastInstantDetails?.airTemperature ?: 20.0)
-                _precipChance.postValue(forecastNextOneHoursDetails?.precipitationAmount ?: 0.00)
-                _summary.postValue(summary ?: "")
-                _icon.postValue(iconName ?: "")
+                _weatherDisplay.postValue(
+                    WeatherDisplay(
+                        "Split",
+                        forecastInstantDetails?.airTemperature ?: 20.0,
+                        forecastInstantDetails?.relativeHumidity ?: 0.0,
+                        forecastInstantDetails?.windSpeed ?: 0.0,
+                        forecastNextOneHoursDetails?.precipitationAmount ?: 0.00,
+                        iconName,
+                        summary ?: ""
+                    )
+                )
                 _forecastGot.postValue(true)
             } else {
                 _forecastGot.postValue(false)
             }
+        }
+    }
+
+    fun getNotes() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val notes = repository.getNotes()
+            _notes.postValue(notes.map { it.toNote() })
+        }
+    }
+
+    fun insert(note: Note) {
+        if (_notes.value?.any { it.id == note.id } == true)
+            _notes.value?.map {
+                if (it.id == note.id) {
+                    it.checked = note.checked
+                }
+            }
+        else {
+            _notes.value = _notes.value?.plus(note)
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.insert(note.toNoteRealm())
+        }
+    }
+
+    fun delete(note: Note) {
+        _notes.value = _notes.value?.minus(note)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.delete(note.toNoteRealm())
         }
     }
 }

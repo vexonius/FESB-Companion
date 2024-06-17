@@ -47,6 +47,9 @@ class MainViewModel(
         } ?: now.plusDays((1 - start).toLong()))
     }
     private val _showWeekChooseMenu = MutableLiveData<Boolean>().apply { value = false }
+    private val _lastFetched = MutableLiveData<String>().apply {
+        value = sharedPreferences[SPKey.LAST_FETCHED, ""]
+    }
     val showDay: LiveData<Boolean> = _showEvent
     val showDayEvent: LiveData<Event> = _showEventContent
     val lessonsToShow: LiveData<List<Event>> = _lessonsToShow
@@ -54,6 +57,7 @@ class MainViewModel(
     val periods: LiveData<List<TimeTableInfo>> = _periods
     val shownWeek: LiveData<LocalDate> = _shownWeek
     val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
+    val lastFetched: LiveData<String> = _lastFetched
 
     init {
         fetchTimetableInfo()
@@ -96,6 +100,7 @@ class MainViewModel(
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
                 sharedPreferences[SPKey.LAST_FETCHED] =
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
+                _lastFetched.postValue(sharedPreferences[SPKey.LAST_FETCHED, ""])
                 _lessonsPerm.postValue(events)
                 _lessonsToShow.postValue(events)
                 timeTableRepository.insert(events)

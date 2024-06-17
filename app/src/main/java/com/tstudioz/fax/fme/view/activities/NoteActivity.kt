@@ -10,7 +10,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.Note
+import com.tstudioz.fax.fme.database.models.NoteRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -39,7 +39,7 @@ class NoteActivity : AppCompatActivity() {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         if (mTaskId != null) {
-            val note: Note? = realm.query<Note>("id = $0", mTaskId).first()?.find()
+            val note: NoteRealm? = realm.query<NoteRealm>("id = $0", mTaskId).first()?.find()
             et?.setText(note?.noteTekst)
         }
 
@@ -61,7 +61,7 @@ class NoteActivity : AppCompatActivity() {
 
         realm.writeBlocking {
             if (mTaskId != null && stringBiljeska.isNotEmpty()) {
-                val note = this.query<Note>("id = $0", mTaskId).first().find()
+                val note = this.query<NoteRealm>("id = $0", mTaskId).first().find()
 
                 note?.let {
                     it.noteTekst = stringBiljeska
@@ -69,13 +69,13 @@ class NoteActivity : AppCompatActivity() {
                     this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
                 }
             } else if (mTaskId != null && stringBiljeska.isEmpty()) {
-                findLatest(realm.query<Note>("id = $0", mTaskId).find().first()).let {
+                findLatest(realm.query<NoteRealm>("id = $0", mTaskId).find().first()).let {
                     if (it != null) {
                         delete(it)
                     }
                 }
             } else if (stringBiljeska.isNotEmpty()) {
-                val note = Note().apply {
+                val note = NoteRealm().apply {
                     noteTekst = stringBiljeska
                     checked = false
                 }

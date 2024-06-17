@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.Note
+import com.tstudioz.fax.fme.database.models.NoteRealm
 import com.tstudioz.fax.fme.view.activities.NoteActivity
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter.NoteViewHolder
 import io.realm.kotlin.Realm
@@ -20,7 +20,7 @@ import io.realm.kotlin.query.RealmResults
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class NoteAdapter(private val mNotes: RealmResults<Note>) :
+class NoteAdapter(private val mNotes: RealmResults<NoteRealm>) :
     RecyclerView.Adapter<NoteViewHolder>(), KoinComponent {
     var light: Typeface? = null
 
