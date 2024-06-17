@@ -48,6 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,8 +56,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
@@ -75,18 +76,18 @@ import java.util.UUID
 @Composable
 fun HomeTabComposePreview() {
     HomeTabCompose(
-        weather = liveData {
+        weather = MutableLiveData(
             WeatherDisplay(
                 location = "Split",
                 temperature = 20.0,
                 humidity = 56.5,
                 wind = 5.1,
                 precipChance = 0.0,
-                icon = "_42d",
+                icon = "_1n",
                 summary = "Clear sky"
             )
-        },
-        notes = liveData {
+         ),
+        notes = MutableLiveData(
             listOf(
                 Note(
                     id = "1",
@@ -95,25 +96,36 @@ fun HomeTabComposePreview() {
                     checked = false
                 )
             )
-        },
-        lastFetched = liveData { "22:29:31 14.6.2024" },
-        events = liveData {
-            listOf(
-                Event(
-                    id = "1",
-                    name = "JEZICI I PREVODITELJI",
-                    shortName = "JIP",
-                    colorId = R.color.blue_nice,
-                    professor = "prof. dr. sc. Ivan Meštrović",
-                    eventType = TimetableType.KOLOKVIJ,
-                    groups = "1. grupa",
-                    classroom = "B525",
-                    start = LocalDateTime.now(),
-                    end = LocalDateTime.now().plusHours(3),
-                    description = "Predavanje iz kolegija Jezici i prevoditelji"
-                )
+        ),
+        lastFetched = MutableLiveData(  "22:29:31 14.6.2024" ),
+        events = MutableLiveData(listOf(
+            Event(
+                id = "1",
+                name = "JEZICI I PREVODITELJI",
+                shortName = "JIP",
+                colorId = R.color.blue_nice,
+                professor = "prof. dr. sc. Ivan Meštrović",
+                eventType = TimetableType.KOLOKVIJ,
+                groups = "1. grupa",
+                classroom = "B525",
+                start = LocalDateTime.now(),
+                end = LocalDateTime.now().plusHours(3),
+                description = "Predavanje iz kolegija Jezici i prevoditelji"
+            ),
+            Event(
+                id = "2",
+                name = "PREVODITELJI",
+                shortName = "JIP",
+                colorId = R.color.purple_nice,
+                professor = "prof. dr. sc. Ivan Meštrović",
+                eventType = TimetableType.ISPIT,
+                groups = "1. grupa",
+                classroom = "B5",
+                start = LocalDateTime.now(),
+                end = LocalDateTime.now().plusHours(2),
+                description = "Predavanje iz kolegija Jezici i prevoditelji"
             )
-        },
+        )),
         insertNote = { },
         deleteNote = { }
     )
@@ -137,9 +149,15 @@ fun HomeTabCompose(
                     .wrapContentHeight()
             ) {
                 item {
-                    weather.observeAsState().value?.let {
-                        WeatherCompose(it)
-                    }
+                        WeatherCompose(weather.observeAsState().value ?: WeatherDisplay(
+                            location = "Split",
+                            temperature = 20.0,
+                            humidity = 0.00,
+                            wind = 0.00,
+                            precipChance = 0.0,
+                            icon = "_1d",
+                            summary = "Clear sky"
+                        ))
                 }
                 item {
                     NotesCompose(
@@ -152,7 +170,7 @@ fun HomeTabCompose(
                     TodayTimetableCompose(
                         lastFetched.observeAsState().value ?: "",
                         events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
-                            ?: listOf()
+                            ?: emptyList()
                     )
                 }
                 item { CardsCompose() }
@@ -200,7 +218,7 @@ fun WeatherCompose(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = String.format(Locale.US, getString(context, R.string.weatherTemp), weather.temperature),
+                    text = String.format(Locale.US, stringResource(R.string.weatherTemp), weather.temperature),
                     fontSize = 64.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -210,7 +228,7 @@ fun WeatherCompose(
                         WeatherItem(
                             text = String.format(
                                 Locale.US,
-                                getString(context, R.string.weatherWind),
+                                stringResource(R.string.weatherWind),
                                 weather.wind
                             ), id = R.drawable.wind
                         )
@@ -219,7 +237,7 @@ fun WeatherCompose(
                         WeatherItem(
                             text = String.format(
                                 Locale.US,
-                                getString(context, R.string.weatherHumidity),
+                                stringResource(R.string.weatherHumidity),
                                 weather.humidity
                             ), id = R.drawable.vlaga
                         )
@@ -228,7 +246,7 @@ fun WeatherCompose(
                         WeatherItem(
                             text = String.format(
                                 Locale.US,
-                                getString(context, R.string.weatherPrecipChance),
+                                stringResource(R.string.weatherPrecipChance),
                                 weather.precipChance
                             ), id = R.drawable.oborine
                         )
@@ -430,35 +448,8 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
 
 @Composable
 fun TodayTimetableCompose(
-    lastFetched: String = "22:29:31 14.6.2024",
-    events: List<Event> = listOf(
-        Event(
-            id = "1",
-            name = "JEZICI I PREVODITELJI",
-            shortName = "JIP",
-            colorId = R.color.blue_nice,
-            professor = "prof. dr. sc. Ivan Meštrović",
-            eventType = TimetableType.KOLOKVIJ,
-            groups = "1. grupa",
-            classroom = "B525",
-            start = LocalDateTime.now(),
-            end = LocalDateTime.now().plusHours(3),
-            description = "Predavanje iz kolegija Jezici i prevoditelji"
-        ),
-        Event(
-            id = "2",
-            name = "PREVODITELJI",
-            shortName = "JIP",
-            colorId = R.color.purple_nice,
-            professor = "prof. dr. sc. Ivan Meštrović",
-            eventType = TimetableType.ISPIT,
-            groups = "1. grupa",
-            classroom = "B5",
-            start = LocalDateTime.now(),
-            end = LocalDateTime.now().plusHours(2),
-            description = "Predavanje iz kolegija Jezici i prevoditelji"
-        )
-    )
+    lastFetched: String,
+    events: List<Event>
 ) {
     Column(
         modifier = Modifier,
@@ -470,7 +461,7 @@ fun TodayTimetableCompose(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "DANAŠNJA PREDAVANJA",
+                text = stringResource(id = R.string.danasnja_predavanja),
                 fontSize = 13.sp,
                 modifier = Modifier.weight(.6f, false),
                 color = colorResource(id = R.color.shady_blue)
@@ -507,7 +498,7 @@ fun TodayTimetableCompose(
                         .aspectRatio(1f)
                 )
                 Text(
-                    text = "Nemaš predavanja, odmori se",
+                    text = stringResource(id = R.string.odmori_se),
                     fontSize = 18.sp,
                     modifier = Modifier
                         .padding(top = 15.dp, bottom = 10.dp),
@@ -557,7 +548,7 @@ fun CardsCompose() {
     Column {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "PREHRANA",
+                text = stringResource(id = R.string.prehrana),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(20.dp, 7.dp, 0.dp, 0.dp),
                 color = colorResource(id = R.color.shady_blue)
