@@ -1,11 +1,11 @@
-package com.tstudioz.fax.fme.feature.weather
+package com.tstudioz.fax.fme.feature.home.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 
-class WeatherNetworkService(private val client: OkHttpClient) : WeatherNetworkInterface {
+class WeatherService(private val client: OkHttpClient) : WeatherServiceInterface {
 
     override suspend fun fetchWeatherDetails(url: String): NetworkServiceResult.WeatherResult {
         val request: Request = Request.Builder()

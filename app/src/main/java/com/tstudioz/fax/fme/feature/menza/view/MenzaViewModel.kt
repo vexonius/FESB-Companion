@@ -8,13 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.models.Meni
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.menza.MenzaResult
-import com.tstudioz.fax.fme.feature.weather.codeToDisplay
-import com.tstudioz.fax.fme.feature.weather.weatherSymbolKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 
 @InternalCoroutinesApi

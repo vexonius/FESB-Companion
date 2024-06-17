@@ -8,10 +8,4 @@ interface MenzaDaoInterface {
     suspend fun insert(classes: List<Meni> )
 
     suspend fun getCachedMenza(): List<Meni>
-
-    suspend fun getNotes(): List<NoteRealm>
-
-    suspend fun insert(note: NoteRealm)
-
-    suspend fun delete(note: NoteRealm)
 }

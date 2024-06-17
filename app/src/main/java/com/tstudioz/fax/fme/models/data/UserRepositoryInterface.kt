@@ -3,7 +3,7 @@ package com.tstudioz.fax.fme.models.data
 import com.tstudioz.fax.fme.database.models.Dolazak
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.feature.weather.WeatherFeature
+import com.tstudioz.fax.fme.feature.home.WeatherFeature
 import java.time.LocalDate
 
 interface UserRepositoryInterface {

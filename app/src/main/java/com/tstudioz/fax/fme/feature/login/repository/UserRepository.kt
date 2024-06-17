@@ -3,7 +3,6 @@ package com.tstudioz.fax.fme.feature.login.repository
 import android.content.SharedPreferences
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.Meni
-import com.tstudioz.fax.fme.database.models.NoteRealm
 import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.feature.menza.service.MenzaServiceInterface
@@ -12,15 +11,15 @@ import com.tstudioz.fax.fme.feature.menza.dao.interfaces.MenzaDaoInterface
 import com.tstudioz.fax.fme.feature.menza.parseMenza
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.data.UserDaoInterface
-import com.tstudioz.fax.fme.feature.weather.WeatherNetworkInterface
+import com.tstudioz.fax.fme.feature.home.services.WeatherServiceInterface
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
-import com.tstudioz.fax.fme.feature.weather.WeatherFeature
+import com.tstudioz.fax.fme.feature.home.WeatherFeature
 import kotlinx.serialization.json.Json
 
 class UserRepository(
     private val userService: UserServiceInterface,
-    private val weatherNetworkService: WeatherNetworkInterface,
+    private val weatherNetworkService: WeatherServiceInterface,
     private val menzaNetworkService: MenzaServiceInterface,
     private val menzaDao: MenzaDaoInterface,
     private val userDao: UserDaoInterface,
@@ -83,18 +82,6 @@ class UserRepository(
 
     override suspend fun readMenza(): List<Meni> {
         return menzaDao.getCachedMenza()
-    }
-
-    override suspend fun getNotes(): List<NoteRealm> {
-        return menzaDao.getNotes()
-    }
-
-    override suspend fun insert(note: NoteRealm) {
-        menzaDao.insert(note)
-    }
-
-    override suspend fun delete(note : NoteRealm) {
-        menzaDao.delete(note)
     }
 
     companion object {

@@ -9,8 +9,8 @@ import com.tstudioz.fax.fme.feature.timetable.parseTimetable
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
-import com.tstudioz.fax.fme.feature.weather.WeatherNetworkInterface
-import com.tstudioz.fax.fme.feature.weather.WeatherFeature
+import com.tstudioz.fax.fme.feature.home.services.WeatherServiceInterface
+import com.tstudioz.fax.fme.feature.home.WeatherFeature
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter
 class UserRepository(
     private val service: UserServiceInterface,
     private val timetableService: TimetableServiceInterface,
-    private val weatherNetworkService: WeatherNetworkInterface,
+    private val weatherNetworkService: WeatherServiceInterface,
     private val attendanceService: AttendanceServiceInterface,
     private val timeTableDao: TimeTableDaoInterface,
     private val attendanceDao: AttendanceDaoInterface) : UserRepositoryInterface {

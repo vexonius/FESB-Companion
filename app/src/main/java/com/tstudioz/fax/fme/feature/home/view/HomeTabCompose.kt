@@ -1,5 +1,8 @@
-package com.tstudioz.fax.fme.compose
+package com.tstudioz.fax.fme.feature.home.view
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -56,10 +59,12 @@ import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.database.models.TimetableType
-import com.tstudioz.fax.fme.feature.weather.WeatherDisplay
+import com.tstudioz.fax.fme.feature.home.WeatherDisplay
+import com.tstudioz.fax.fme.feature.menza.view.MenzaActivity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -68,48 +73,60 @@ import java.util.UUID
 
 @Preview
 @Composable
+fun HomeTabComposePreview() {
+    HomeTabCompose(
+        weather = liveData {
+            WeatherDisplay(
+                location = "Split",
+                temperature = 20.0,
+                humidity = 56.5,
+                wind = 5.1,
+                precipChance = 0.0,
+                icon = "_42d",
+                summary = "Clear sky"
+            )
+        },
+        notes = liveData {
+            listOf(
+                Note(
+                    id = "1",
+                    noteTekst = "Ovo je bilješka",
+                    dateCreated = LocalDateTime.now(),
+                    checked = false
+                )
+            )
+        },
+        lastFetched = liveData { "22:29:31 14.6.2024" },
+        events = liveData {
+            listOf(
+                Event(
+                    id = "1",
+                    name = "JEZICI I PREVODITELJI",
+                    shortName = "JIP",
+                    colorId = R.color.blue_nice,
+                    professor = "prof. dr. sc. Ivan Meštrović",
+                    eventType = TimetableType.KOLOKVIJ,
+                    groups = "1. grupa",
+                    classroom = "B525",
+                    start = LocalDateTime.now(),
+                    end = LocalDateTime.now().plusHours(3),
+                    description = "Predavanje iz kolegija Jezici i prevoditelji"
+                )
+            )
+        },
+        insertNote = { },
+        deleteNote = { }
+    )
+}
+
+@Composable
 fun HomeTabCompose(
-    weather: LiveData<WeatherDisplay> = liveData {
-        WeatherDisplay(
-            location = "Split",
-            temperature = 20.0,
-            humidity = 56.5,
-            wind = 5.1,
-            precipChance = 0.0,
-            icon = "_42d",
-            summary = "Clear sky"
-        )
-    },
-    notes: LiveData<List<Note>> = liveData {
-        listOf(
-            Note(
-                id = "1",
-                noteTekst = "Ovo je bilješka",
-                dateCreated = LocalDateTime.now(),
-                checked = false
-            )
-        )
-    },
-    lastFetched: LiveData<String> = liveData { "22:29:31 14.6.2024" },
-    events: LiveData<List<Event>> = liveData {
-        listOf(
-            Event(
-                id = "1",
-                name = "JEZICI I PREVODITELJI",
-                shortName = "JIP",
-                colorId = R.color.blue_nice,
-                professor = "prof. dr. sc. Ivan Meštrović",
-                eventType = TimetableType.KOLOKVIJ,
-                groups = "1. grupa",
-                classroom = "B525",
-                start = LocalDateTime.now(),
-                end = LocalDateTime.now().plusHours(3),
-                description = "Predavanje iz kolegija Jezici i prevoditelji"
-            )
-        )
-    },
-    insertNote: (note: Note) -> Unit = { },
-    deleteNote: (note: Note) -> Unit = { }
+    weather: LiveData<WeatherDisplay>,
+    notes: LiveData<List<Note>>,
+    lastFetched: LiveData<String>,
+    events: LiveData<List<Event>>,
+    insertNote: (note: Note) -> Unit,
+    deleteNote: (note: Note) -> Unit
 ) {
     val openDialog = remember { mutableStateOf(false) }
     AppTheme {
@@ -120,17 +137,9 @@ fun HomeTabCompose(
                     .wrapContentHeight()
             ) {
                 item {
-                    WeatherCompose(
-                        weather.observeAsState().value ?: WeatherDisplay(
-                            location = "Split",
-                            temperature = 20.0,
-                            humidity = 56.5,
-                            wind = 5.1,
-                            precipChance = 0.0,
-                            icon = "_42d",
-                            summary = "Clear sky"
-                        )
-                    )
+                    weather.observeAsState().value?.let {
+                        WeatherCompose(it)
+                    }
                 }
                 item {
                     NotesCompose(
@@ -360,20 +369,6 @@ fun NotesCompose(
     }
 }
 
-@Preview
-@Composable
-fun NoteItemPreview() {
-    NoteItem(
-        note = Note(
-            id = "1",
-            noteTekst = "Ovo je bilješka",
-            dateCreated = LocalDateTime.now(),
-            checked = false
-        ),
-        isDone = mutableStateOf(false)
-    )
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NoteItem(
@@ -495,8 +490,10 @@ fun TodayTimetableCompose(
             }
         } else {
             Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .background(colorResource(id = R.color.colorPrimary))
+                    //.background(colorResource(id = R.color.colorPrimary))
                     .fillMaxWidth()
                     .padding(20.dp, 0.dp)
                     .height(140.dp)
@@ -506,15 +503,14 @@ fun TodayTimetableCompose(
                     contentDescription = "Smiley",
                     modifier = Modifier
                         .padding(top = 20.dp)
-                        .size(40.dp)
+                        .size(60.dp)
                         .aspectRatio(1f)
                 )
                 Text(
-                    text = "Odmori se",
-                    fontSize = 14.sp,
+                    text = "Nemaš predavanja, odmori se",
+                    fontSize = 18.sp,
                     modifier = Modifier
-                        .padding(top = 15.dp, bottom = 10.dp)
-                        .fillMaxWidth(),
+                        .padding(top = 15.dp, bottom = 10.dp),
                     color = colorResource(id = R.color.shady_blue)
                 )
             }
@@ -567,16 +563,37 @@ fun CardsCompose() {
                 color = colorResource(id = R.color.shady_blue)
             )
         }
-        CardCompose("Menza", "Pregledaj dnevni jelovnik")
-        CardCompose("Studentski Ugovori", "Pregledaj svoje ugovore")
+        val context = LocalContext.current
+        CardCompose("Menza", "Pregledaj dnevni jelovnik", onClick = {
+            context.startActivity(Intent(context, MenzaActivity::class.java))
+        })
+        CardCompose("Studentski Ugovori", "Pregledaj svoje ugovore", onClick = {
+            val appPackageName = "com.ugovori.studentskiugovori"
+            val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
+            if (intent != null) {
+                context.startActivity(intent)
+            } else {
+                try {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
+                } catch (ex: ActivityNotFoundException) {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+                        )
+                    )
+                }
+            }
+        })
     }
 }
 
 @Composable
-fun CardCompose(title: String, description: String) {
+fun CardCompose(title: String, description: String, onClick: () -> Unit = { }) {
     Box(
         modifier = Modifier
-            .padding(20.dp, 0.dp, 20.dp, 10.dp)
+            .clickable { onClick() }
+            .padding(20.dp, 5.dp, 20.dp, 5.dp)
             .height(140.dp)
             .fillMaxWidth()
             .background(colorResource(id = R.color.colorPrimaryDark))

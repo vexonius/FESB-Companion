@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.viewmodel
+package com.tstudioz.fax.fme.feature.home.view
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -9,9 +9,10 @@ import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.database.models.toNote
 import com.tstudioz.fax.fme.database.models.toNoteRealm
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
-import com.tstudioz.fax.fme.feature.weather.WeatherDisplay
-import com.tstudioz.fax.fme.feature.weather.codeToDisplay
-import com.tstudioz.fax.fme.feature.weather.weatherSymbolKeys
+import com.tstudioz.fax.fme.feature.home.WeatherDisplay
+import com.tstudioz.fax.fme.feature.home.codeToDisplay
+import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
+import com.tstudioz.fax.fme.feature.home.weatherSymbolKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -21,7 +22,8 @@ import java.util.Locale
 @InternalCoroutinesApi
 class HomeViewModel(
     application: Application,
-    private val repository: UserRepositoryInterface
+    private val repository: UserRepositoryInterface,
+    private val noteRepository: NoteRepositoryInterface
 ) : AndroidViewModel(application) {
 
     private var _forecastGot = MutableLiveData<Boolean>()
@@ -66,7 +68,7 @@ class HomeViewModel(
 
     fun getNotes() {
         viewModelScope.launch(Dispatchers.IO) {
-            val notes = repository.getNotes()
+            val notes = noteRepository.getNotes()
             _notes.postValue(notes.map { it.toNote() })
         }
     }
@@ -82,14 +84,14 @@ class HomeViewModel(
             _notes.value = _notes.value?.plus(note)
         }
         viewModelScope.launch(Dispatchers.IO) {
-            repository.insert(note.toNoteRealm())
+            noteRepository.insert(note.toNoteRealm())
         }
     }
 
     fun delete(note: Note) {
         _notes.value = _notes.value?.minus(note)
         viewModelScope.launch(Dispatchers.IO) {
-            repository.delete(note.toNoteRealm())
+            noteRepository.delete(note.toNoteRealm())
         }
     }
 }

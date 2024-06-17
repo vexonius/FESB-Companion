@@ -6,6 +6,9 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
+import com.tstudioz.fax.fme.feature.home.dao.NoteDao
+import com.tstudioz.fax.fme.feature.home.repository.NoteRepository
+import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
 import com.tstudioz.fax.fme.feature.menza.service.MenzaServiceInterface
 import com.tstudioz.fax.fme.feature.menza.service.MenzaService
 import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
@@ -21,12 +24,13 @@ import com.tstudioz.fax.fme.feature.timetable.repository.TimeTableRepository
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
-import com.tstudioz.fax.fme.feature.weather.WeatherNetworkInterface
+import com.tstudioz.fax.fme.feature.home.services.WeatherServiceInterface
 import com.tstudioz.fax.fme.models.services.AttendanceService
 import com.tstudioz.fax.fme.feature.timetable.services.TimetableService
-import com.tstudioz.fax.fme.feature.weather.WeatherNetworkService
+import com.tstudioz.fax.fme.feature.home.services.WeatherService
 import com.tstudioz.fax.fme.viewmodel.AttendanceViewModel
-import com.tstudioz.fax.fme.viewmodel.HomeViewModel
+import com.tstudioz.fax.fme.feature.home.view.HomeViewModel
+import com.tstudioz.fax.fme.feature.menza.dao.interfaces.NoteDaoInterface
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -40,21 +44,13 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalCoroutinesApi::class)
 @InternalCoroutinesApi
 val module = module {
-    single<TimetableServiceInterface> { TimetableService(get()) }
-    single<WeatherNetworkInterface> { WeatherNetworkService(get()) }
-    single<AttendanceServiceInterface> { AttendanceService(get()) }
     single { provideOkHttpClient(androidContext()) }
-    single<DatabaseManagerInterface> { DatabaseManager() }
-    single<AttendanceDaoInterface> { AttendanceDao(get()) }
-    single<TimeTableDaoInterface> { TimeTableDao(get()) }
-    single<MenzaDaoInterface> { MenzaDao(get()) }
-    single<MenzaServiceInterface> { MenzaService(get()) }
-    single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
-    single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single { androidContext().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE) }
+    single<DatabaseManagerInterface> { DatabaseManager() }
+    single<AttendanceServiceInterface> { AttendanceService(get()) }
+    single<AttendanceDaoInterface> { AttendanceDao(get()) }
+    single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
-    viewModel { HomeViewModel(androidApplication(), get()) }
-    viewModel { MenzaViewModel(androidApplication(), get()) }
     viewModel { AttendanceViewModel(get()) }
 }
 

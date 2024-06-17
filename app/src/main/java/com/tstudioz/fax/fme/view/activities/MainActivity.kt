@@ -29,7 +29,7 @@ import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.view.fragments.HomeFragment
+import com.tstudioz.fax.fme.feature.home.view.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
@@ -259,10 +259,10 @@ class MainActivity : AppCompatActivity() {
         var shortPosition = 0
 
         if (intent.action == "podsjetnik") {
-            val newIntent = Intent(this@MainActivity, NoteActivity::class.java)
+            /*val newIntent = Intent(this@MainActivity, NoteActivity::class.java)
             newIntent.putExtra("mode", 2)
             newIntent.putExtra("note_key", "")
-            startActivity(newIntent)
+            startActivity(newIntent)*/
         } else {
             when (intent.action) {
                 "raspored" -> shortPosition = 1
