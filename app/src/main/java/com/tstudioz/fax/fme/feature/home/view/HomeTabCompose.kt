@@ -45,6 +45,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -58,7 +62,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
@@ -71,6 +74,11 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
 
 @Preview
 @Composable
@@ -86,7 +94,7 @@ fun HomeTabComposePreview() {
                 icon = "_1n",
                 summary = "Clear sky"
             )
-         ),
+        ),
         notes = MutableLiveData(
             listOf(
                 Note(
@@ -97,35 +105,37 @@ fun HomeTabComposePreview() {
                 )
             )
         ),
-        lastFetched = MutableLiveData(  "22:29:31 14.6.2024" ),
-        events = MutableLiveData(listOf(
-            Event(
-                id = "1",
-                name = "JEZICI I PREVODITELJI",
-                shortName = "JIP",
-                colorId = R.color.blue_nice,
-                professor = "prof. dr. sc. Ivan Meštrović",
-                eventType = TimetableType.KOLOKVIJ,
-                groups = "1. grupa",
-                classroom = "B525",
-                start = LocalDateTime.now(),
-                end = LocalDateTime.now().plusHours(3),
-                description = "Predavanje iz kolegija Jezici i prevoditelji"
-            ),
-            Event(
-                id = "2",
-                name = "PREVODITELJI",
-                shortName = "JIP",
-                colorId = R.color.purple_nice,
-                professor = "prof. dr. sc. Ivan Meštrović",
-                eventType = TimetableType.ISPIT,
-                groups = "1. grupa",
-                classroom = "B5",
-                start = LocalDateTime.now(),
-                end = LocalDateTime.now().plusHours(2),
-                description = "Predavanje iz kolegija Jezici i prevoditelji"
+        lastFetched = MutableLiveData("22:29:31 14.6.2024"),
+        events = MutableLiveData(
+            listOf(
+                Event(
+                    id = "1",
+                    name = "JEZICI I PREVODITELJI",
+                    shortName = "JIP",
+                    colorId = R.color.blue_nice,
+                    professor = "prof. dr. sc. Ivan Meštrović",
+                    eventType = TimetableType.KOLOKVIJ,
+                    groups = "1. grupa",
+                    classroom = "B525",
+                    start = LocalDateTime.now(),
+                    end = LocalDateTime.now().plusHours(3),
+                    description = "Predavanje iz kolegija Jezici i prevoditelji"
+                ),
+                Event(
+                    id = "2",
+                    name = "PREVODITELJI",
+                    shortName = "JIP",
+                    colorId = R.color.purple_nice,
+                    professor = "prof. dr. sc. Ivan Meštrović",
+                    eventType = TimetableType.ISPIT,
+                    groups = "1. grupa",
+                    classroom = "B5",
+                    start = LocalDateTime.now(),
+                    end = LocalDateTime.now().plusHours(2),
+                    description = "Predavanje iz kolegija Jezici i prevoditelji"
+                )
             )
-        )),
+        ),
         insertNote = { },
         deleteNote = { }
     )
@@ -149,7 +159,8 @@ fun HomeTabCompose(
                     .wrapContentHeight()
             ) {
                 item {
-                        WeatherCompose(weather.observeAsState().value ?: WeatherDisplay(
+                    WeatherCompose(
+                        weather.observeAsState().value ?: WeatherDisplay(
                             location = "Split",
                             temperature = 20.0,
                             humidity = 0.00,
@@ -157,7 +168,8 @@ fun HomeTabCompose(
                             precipChance = 0.0,
                             icon = "_1d",
                             summary = "Clear sky"
-                        ))
+                        )
+                    )
                 }
                 item {
                     NotesCompose(
@@ -555,39 +567,58 @@ fun CardsCompose() {
             )
         }
         val context = LocalContext.current
-        CardCompose("Menza", "Pregledaj dnevni jelovnik", onClick = {
-            context.startActivity(Intent(context, MenzaActivity::class.java))
-        })
-        CardCompose("Studentski Ugovori", "Pregledaj svoje ugovore", onClick = {
-            val appPackageName = "com.ugovori.studentskiugovori"
-            val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
-            if (intent != null) {
-                context.startActivity(intent)
-            } else {
-                try {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
-                } catch (ex: ActivityNotFoundException) {
-                    context.startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+        CardCompose(
+            "Menza",
+            "Pregledaj dnevni jelovnik",
+            colorResource(id = R.color.welcome2),
+            colorResource(id = R.color.welcome2),
+            onClick = {
+                context.startActivity(Intent(context, MenzaActivity::class.java))
+            })
+        CardCompose(
+            "Studentski Ugovori",
+            "Pregledaj svoje ugovore",
+            colorResource(id = R.color.stud_ug),
+            colorResource(id = R.color.stud_ug_2),
+            onClick = {
+                val appPackageName = "com.ugovori.studentskiugovori"
+                val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
+                if (intent != null) {
+                    context.startActivity(intent)
+                } else {
+                    try {
+                        context.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("market://details?id=$appPackageName")
+                            )
                         )
-                    )
+                    } catch (ex: ActivityNotFoundException) {
+                        context.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+                            )
+                        )
+                    }
                 }
-            }
-        })
+            })
     }
 }
 
 @Composable
-fun CardCompose(title: String, description: String, onClick: () -> Unit = { }) {
+fun CardCompose(title: String, description: String, color1: Color, color2: Color, onClick: () -> Unit = { }) {
     Box(
         modifier = Modifier
             .clickable { onClick() }
             .padding(20.dp, 5.dp, 20.dp, 5.dp)
             .height(140.dp)
             .fillMaxWidth()
-            .background(colorResource(id = R.color.colorPrimaryDark))
+            .angledGradientBackground(
+                colors = listOf(color1, color2),
+                degrees = 60f,
+                true
+            )
     ) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
@@ -610,6 +641,93 @@ fun CardCompose(title: String, description: String, onClick: () -> Unit = { }) {
         }
     }
 }
+
+fun Modifier.angledGradientBackground(colors: List<Color>, degrees: Float, halfHalf: Boolean = false) =
+    drawBehind {
+        /*
+        Have to compute length of gradient vector so that it lies within
+        the visible rectangle.
+        --------------------------------------------
+        | length of gradient ^  /                  |
+        |             --->  /  /                   |
+        |                  /  / <- rotation angle  |
+        |                 /  o --------------------|  y
+        |                /  /                      |
+        |               /  /                       |
+        |              v  /                        |
+        --------------------------------------------
+                             x
+
+                   diagonal angle = atan2(y, x)
+                 (it's hard to draw the diagonal)
+
+        Simply rotating the diagonal around the centre of the rectangle
+        will lead to points outside the rectangle area. Further, just
+        truncating the coordinate to be at the nearest edge of the
+        rectangle to the rotated point will distort the angle.
+        Let α be the desired gradient angle (in radians) and γ be the
+        angle of the diagonal of the rectangle.
+        The correct for the length of the gradient is given by:
+        x/|cos(α)|  if -γ <= α <= γ,   or   π - γ <= α <= π + γ
+        y/|sin(α)|  if  γ <= α <= π - γ, or π + γ <= α <= 2π - γ
+        where γ ∈ (0, π/2) is the angle that the diagonal makes with
+        the base of the rectangle.
+
+        */
+
+        var deg2 = degrees
+
+        val (x, y) = size
+        val gamma = atan2(y, x)
+
+        if (halfHalf) {
+            deg2 = atan2(x, y).times(180f / PI).toFloat()
+        }
+
+        if (gamma == 0f || gamma == (PI / 2).toFloat()) {
+            // degenerate rectangle
+            return@drawBehind
+        }
+
+        val degreesNormalised = (deg2 % 360).let { if (it < 0) it + 360 else it }
+
+        val alpha = (degreesNormalised * PI / 180).toFloat()
+
+        val gradientLength = when (alpha) {
+            // ray from centre cuts the right edge of the rectangle
+            in 0f..gamma, in (2 * PI - gamma)..2 * PI -> {
+                x / cos(alpha)
+            }
+            // ray from centre cuts the top edge of the rectangle
+            in gamma..(PI - gamma).toFloat() -> {
+                y / sin(alpha)
+            }
+            // ray from centre cuts the left edge of the rectangle
+            in (PI - gamma)..(PI + gamma) -> {
+                x / -cos(alpha)
+            }
+            // ray from centre cuts the bottom edge of the rectangle
+            in (PI + gamma)..(2 * PI - gamma) -> {
+                y / -sin(alpha)
+            }
+            // default case (which shouldn't really happen)
+            else -> hypot(x, y)
+        }
+
+        val centerOffsetX = cos(alpha) * gradientLength / 2
+        val centerOffsetY = sin(alpha) * gradientLength / 2
+
+        drawRect(
+            brush = Brush.linearGradient(
+                colors = colors,
+                // negative here so that 0 degrees is left -> right and 90 degrees is top -> bottom
+                start = Offset(center.x - centerOffsetX, center.y - centerOffsetY),
+                end = Offset(center.x + centerOffsetX, center.y + centerOffsetY)
+            ),
+            size = size
+        )
+    }
+
 
 @Composable
 fun CustomDialog(
