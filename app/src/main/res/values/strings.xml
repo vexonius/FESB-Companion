@@ -54,6 +54,23 @@
     <string name="login_password">Lozinka</string>
     <string name="login_action_submit">Prijava</string>
 
+    <string name="weather_icon_desc">Ikona vremena</string>
+
+    <string name="notes">PODSJETNICI</string>
+
+    <string name="enter_note">Unesi podsjetnik</string>
+    <string name="add_note">Dodaj podsjetnik</string>
+    <string name="save_note">Spremi</string>
+    <string name="cancel_note">Odustani</string>
+
+    <string name="delete_note_desc">Izbriši</string>
+    <string name="checkmark_note_desc">Označi/odznači</string>
+
+    <string name="ugovori_title">Studentski Ugovori</string>
+    <string name="ugovori_desc">Pregledaj svoje ugovore</string>
+    <string name="menza_title">Menza</string>
+    <string name="menza_desc">Pregledaj dnevni jelovnik</string>
+
     // Compose Strings
 
     <string name="lastMonth">Prošli</string>

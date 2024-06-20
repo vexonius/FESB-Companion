@@ -218,7 +218,7 @@ fun WeatherCompose(
                         context.packageName
                     )
                 ),
-                contentDescription = "Weather icon",
+                contentDescription = stringResource(R.string.weather_icon_desc),
                 modifier = Modifier
                     .weight(0.45f)
                     .aspectRatio(1f)
@@ -277,7 +277,7 @@ fun WeatherItem(text: String, id: Int) {
     ) {
         Icon(
             painter = painterResource(id = id),
-            contentDescription = "Weather icon",
+            contentDescription = stringResource(id = R.string.weather_icon_desc),
             modifier = Modifier.size(20.dp)
         )
         Text(text = text, fontSize = 12.sp)
@@ -297,7 +297,7 @@ fun NotesCompose(
     ) {
         Row {
             Text(
-                text = "PODSJETNICI",
+                text = stringResource(id = R.string.notes),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(20.dp, 5.dp, 0.dp, 0.dp),
                 color = colorResource(id = R.color.shady_blue)
@@ -320,11 +320,11 @@ fun NotesCompose(
                         .clickable { openDialog.value = true }) {
                     Icon(
                         painter = painterResource(id = R.drawable.add_new),
-                        contentDescription = "Add reminder",
+                        contentDescription = stringResource(id = R.string.add_note),
                         modifier = Modifier.size(25.dp)
                     )
                     Text(
-                        text = "Dodaj podsjetnik",
+                        text = stringResource(id = R.string.add_note),
                         fontSize = 16.sp,
                         modifier = Modifier
                             .padding(start = 10.dp)
@@ -346,7 +346,7 @@ fun NotesCompose(
                             ),
                             placeholder = {
                                 Text(
-                                    text = "Dodaj podsjetnik",
+                                    text = stringResource(id = R.string.enter_note),
                                     fontSize = 16.sp,
                                     modifier = Modifier.padding(0.dp)
                                 )
@@ -357,7 +357,7 @@ fun NotesCompose(
                         Row(modifier = Modifier.align(Alignment.End)) {
                             Button(
                                 onClick = { openDialog.value = false }
-                            ) { Text("Odustani") }
+                            ) { Text(stringResource(id = R.string.cancel_note)) }
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(onClick = {
                                 message.value = editMessage.value
@@ -372,7 +372,7 @@ fun NotesCompose(
                                     )
                                 )
                             }
-                            ) { Text("Spremi") }
+                            ) { Text(stringResource(id = R.string.save_note)) }
                         }
                     }
 
@@ -421,7 +421,7 @@ fun NoteItem(
         if (longClicked.value) {
             Image(
                 painter = painterResource(id = R.drawable.deletedelete),
-                contentDescription = "delete",
+                contentDescription = stringResource(id = R.string.delete_note_desc),
                 modifier = Modifier
                     .size(25.dp)
                     .noRippleClickable {
@@ -432,7 +432,7 @@ fun NoteItem(
         } else {
             Image(
                 painter = painterResource(id = if (isDone.value) R.drawable.circle_checked else R.drawable.circle_white),
-                contentDescription = "checkmark",
+                contentDescription = stringResource(id = R.string.checkmark_note_desc),
                 modifier = Modifier
                     .size(25.dp)
                     .noRippleClickable {
@@ -496,7 +496,6 @@ fun TodayTimetableCompose(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    //.background(colorResource(id = R.color.colorPrimary))
                     .fillMaxWidth()
                     .padding(20.dp, 0.dp)
                     .height(140.dp)
@@ -568,16 +567,16 @@ fun CardsCompose() {
         }
         val context = LocalContext.current
         CardCompose(
-            "Menza",
-            "Pregledaj dnevni jelovnik",
+            stringResource(id = R.string.menza_title),
+            stringResource(id = R.string.menza_desc),
             colorResource(id = R.color.welcome2),
             colorResource(id = R.color.welcome2),
             onClick = {
                 context.startActivity(Intent(context, MenzaActivity::class.java))
             })
         CardCompose(
-            "Studentski Ugovori",
-            "Pregledaj svoje ugovore",
+            stringResource(id = R.string.ugovori_title),
+            stringResource(id = R.string.ugovori_desc),
             colorResource(id = R.color.stud_ug),
             colorResource(id = R.color.stud_ug_2),
             onClick = {
@@ -744,7 +743,7 @@ fun CustomDialog(
         Column(
             modifier = Modifier.padding(16.dp),
         ) {
-            Text(text = "Unesi Bilješku")
+            Text(text = stringResource(id = R.string.enter_note))
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = editMessage.value,
@@ -766,7 +765,7 @@ fun CustomDialog(
                     openDialog.value = false
                 }
             ) {
-                Text("Odustani")
+                Text(stringResource(id = R.string.cancel_note))
             }
             Spacer(modifier = Modifier.width(8.dp))
             Button(
@@ -775,7 +774,7 @@ fun CustomDialog(
                     openDialog.value = false
                 }
             ) {
-                Text("Spremi")
+                Text(stringResource(id = R.string.save_note))
             }
         }
     }
