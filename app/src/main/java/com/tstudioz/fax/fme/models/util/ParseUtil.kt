@@ -1,8 +1,10 @@
 package com.tstudioz.fax.fme.models.util
 
 import android.util.Log
+import com.tstudioz.fax.fme.database.models.IksicaSaldo
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
+import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.models.data.EventRecurring
 import com.tstudioz.fax.fme.models.data.TimetableEvent
@@ -175,6 +177,59 @@ fun parseWeatherDetails(data: String): Current {
     return current
 }
 
+/*data class IksicaSaldo(
+    val balance: Double,
+    val spentToday: Double,
+)
+class StudentDataIksica {
+    val nameSurname: String = ""
+    val rightsLevel: String = ""
+    val dailySupport: Double = 0.0
+    val oib: String = ""
+    val iksicaNumber: String = ""
+}*/
+
+fun parseStudentInfo(body: String): Pair<IksicaSaldo, StudentDataIksica> {
+    val doc = Jsoup.parse(body)
+
+    val image = doc.select(".slikastud").attr("src")
+    val user = doc.select(".card-title").first()?.text()
+    val number = doc.select("td:contains(Izdana)").first()?.parent()?.select("td")?.first()?.text()
+    val oib = doc.select("span:contains(OIB:)").first()?.nextSibling()?.toString()?.trim()
+    val jmbag = doc.select("span:contains(JMBAG:)").first()?.nextSibling()?.toString()?.trim()
+    val university = doc.select("span:contains(Nadležna ustanova:)").first()?.nextSibling().toString()
+    val rightsLevel = doc.select("p:contains(RAZINA PRAVA)").first()?.parent()?.select("u")?.text().toString()
+    val rightsFrom = doc.select("span:contains(Prava od datuma:)").first()?.nextSibling().toString()
+    val rightsTo = doc.select("span:contains(Prava do datuma:)").first()?.nextSibling().toString()
+    val balance =
+        doc.select("p:contains(RASPOLOŽIVI SALDO)")
+            .first()?.parent()?.lastElementChild()?.text()
+            ?.substringBefore(" €").toString().replace(",", ".")
+    val spentToday =
+        doc.select("p:contains(POTROŠENO DANAS)").
+        first()?.parent()?.lastElementChild()?.text()
+            ?.substringBefore(" €").toString().replace(",", ".")
+    val dailySupport =
+        doc.select("p:contains(DNEVNA POTPORA)")
+            .first()?.parent()?.lastElementChild()?.text()
+            ?.substringBefore(" €").toString().replace(",", ".")
+    val iksicaSaldo = IksicaSaldo(
+        balance.toDouble(),
+        spentToday.toDouble()
+    )
+    val studentData = StudentDataIksica(
+        nameSurname = user ?: "",
+        rightsLevel = rightsLevel,
+        dailySupport = dailySupport.toDouble(),
+        oib = oib ?: "",
+        jmbag = jmbag ?: "",
+        iksicaNumber = number ?: "",
+        rightsFrom = rightsFrom ?: "",
+        rightsTo = rightsTo ?: ""
+    )
+    return Pair(iksicaSaldo, studentData)
+}
+
 fun parseRacuni(doc: String): List<Receipt> {
     val racuni = mutableListOf<Receipt>()
     val table = Jsoup.parse(doc).select("table")
@@ -215,10 +270,10 @@ fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {
         val cols = row.select("td")
         val item = ReceiptItem(
             cols[0].text(),
-            cols[1].text(),
-            cols[2].text(),
-            cols[3].text(),
-            cols[4].text()
+            cols[1].text().toIntOrNull() ?: 0,
+            cols[2].text().replace(",", ".").toDoubleOrNull() ?: 0.0,
+            cols[3].text().replace(",", ".").toDoubleOrNull() ?: 0.0,
+            cols[4].text().replace(",", ".").toDoubleOrNull() ?: 0.0
         )
         if (!detaljiRacuna.any { it.nazivArtikla == item.nazivArtikla && it.cijenaJednogArtikla == item.cijenaJednogArtikla }) {
             detaljiRacuna.add(item)
@@ -227,7 +282,7 @@ fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {
                 detaljiRacuna.first {
                     it.nazivArtikla == item.nazivArtikla && it.cijenaJednogArtikla == item.cijenaJednogArtikla
                 })
-            detaljiRacuna[index].kolicina = (detaljiRacuna[index].kolicina.toInt() + item.kolicina.toInt()).toString()
+            detaljiRacuna[index].kolicina = (detaljiRacuna[index].kolicina + item.kolicina)
         }
     }
     return detaljiRacuna

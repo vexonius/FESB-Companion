@@ -5,7 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.database.models.IksicaSaldo
 import com.tstudioz.fax.fme.database.models.Receipt
+import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.models.data.IksicaRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -30,6 +32,12 @@ class IksicaViewModel(
     private var _loadingTxt = MutableLiveData<String>()
     val loadingTxt: LiveData<String> = _loadingTxt
 
+    private val _iksicaSaldo = MutableLiveData<IksicaSaldo>()
+    val iksicaSaldo: LiveData<IksicaSaldo> = _iksicaSaldo
+
+    private val _studentDataIksica = MutableLiveData<StudentDataIksica>()
+    val studentDataIksica: LiveData<StudentDataIksica> = _studentDataIksica
+
     fun toggleShowItem(value: Boolean) {
         _showItem.postValue(value)
     }
@@ -47,7 +55,9 @@ class IksicaViewModel(
                 _loadingTxt.postValue("Logging in...")
                 repository.login(email, password)
                 _loadingTxt.postValue("Getting ASP.NET Session...")
-                repository.getAspNetSessionSAML()
+                val (iksicaSaldo, studentDataIksica) =  repository.getAspNetSessionSAML()
+                _iksicaSaldo.postValue(iksicaSaldo)
+                _studentDataIksica.postValue(studentDataIksica)
                 _loadingTxt.postValue("Parsing Data...")
                 _receipts.postValue(repository.getRacuni())
             } catch (e: Exception) {

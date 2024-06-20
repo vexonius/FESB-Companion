@@ -8,6 +8,7 @@ import org.jsoup.Jsoup
 interface IksicaServiceInterface {
 
     suspend fun getAuthState(): NetworkServiceResult.IksicaResult
+
     suspend fun login( email: String, password: String): NetworkServiceResult.IksicaResult
 
     suspend fun getAspNetSessionSAML() : NetworkServiceResult.IksicaResult

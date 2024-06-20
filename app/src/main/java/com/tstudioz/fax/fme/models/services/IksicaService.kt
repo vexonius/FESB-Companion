@@ -67,6 +67,7 @@ class IksicaService(private val client: OkHttpClient, private val client2: OkHtt
             .build()
 
         val response = client.newCall(request).execute()
+        val body = response.body?.string() ?: ""
         aspnetSession = (response.priorResponse?.headers?.get("Set-Cookie") ?: "").split(";")[0]
 
 
@@ -74,7 +75,7 @@ class IksicaService(private val client: OkHttpClient, private val client2: OkHtt
             return NetworkServiceResult.IksicaResult.Failure(Throwable("Failure getAspNetSessionSAML"))
         }
 
-        return NetworkServiceResult.IksicaResult.Success("Success getAspNetSessionSAML")
+        return NetworkServiceResult.IksicaResult.Success(body)
     }
 
     override suspend fun getRacuni() : NetworkServiceResult.IksicaResult  {
