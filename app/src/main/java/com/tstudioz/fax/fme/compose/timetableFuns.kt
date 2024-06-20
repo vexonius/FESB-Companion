@@ -45,10 +45,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.viewmodel.MainViewModel
+import com.tstudioz.fax.fme.database.models.TimetableType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.java.KoinJavaComponent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -85,6 +84,7 @@ val EventTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 fun BasicEvent(
     positionedEvent: PositionedEvent,
     modifier: Modifier = Modifier,
+    onClick : (Event) -> Unit = {}
 ) {
     val event = positionedEvent.event
     val topRadius =
@@ -110,11 +110,8 @@ fun BasicEvent(
                     bottomStart = bottomRadius,
                 )
             )
-            .padding(4.dp)
-            .clickable { //refactor this, homeviewmodel inited too many times
-                val mainViewModel: MainViewModel by KoinJavaComponent.inject(MainViewModel::class.java)
-                mainViewModel.showDay(event)
-            }
+            .padding(2.dp)
+            .clickable { onClick(positionedEvent.event) }
     ) {
         Text(
             text = event.shortName,
@@ -128,7 +125,7 @@ fun BasicEvent(
 
         if (event.description != null) {
             Text(
-                text = event.description,
+                text = event.classroom,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -373,9 +370,11 @@ sealed class ScheduleSize {
 fun Schedule(
     events: List<Event>,
     modifier: Modifier = Modifier,
+    onClick: (Event) -> Unit = { },
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
         BasicEvent(
-            positionedEvent = it
+            positionedEvent = it,
+            onClick = onClick
         )
     },
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
@@ -467,7 +466,8 @@ fun BasicSchedule(
     modifier: Modifier = Modifier,
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
         BasicEvent(
-            positionedEvent = it
+            positionedEvent = it,
+            onClick = { }
         )
     },
     minDate: LocalDate = events.minByOrNull(Event::start)?.start?.toLocalDate() ?: LocalDate.now(),
@@ -567,7 +567,8 @@ fun EventPreview(
             event.start.toLocalTime(),
             event.end.toLocalTime()
         ),
-        modifier = Modifier.sizeIn(maxHeight = 64.dp)
+        modifier = Modifier.sizeIn(maxHeight = 64.dp),
+        onClick = { }
     )
 }
 
@@ -578,7 +579,6 @@ private val sampleEvents = listOf(
         color = Color(0xFFAFBBF2),
         start = LocalDateTime.parse("2021-05-18T09:00:00"),
         end = LocalDateTime.parse("2021-05-18T11:00:00"),
-        fullName = "Google I/O Keynote",
         id = "keynote",
         description = "Tune in to find out about how we're furthering our mission to organize the world’s information and make it universally accessible and useful.",
     ),
@@ -588,7 +588,6 @@ private val sampleEvents = listOf(
         color = Color(0xFFAFBBF2),
         start = LocalDateTime.parse("2021-05-18T09:00:00"),
         end = LocalDateTime.parse("2021-05-18T10:00:00"),
-        fullName = "Developer Keynote",
         id = "dev-keynote",
         description = "Learn about the latest updates to our developer products and platforms from Google Developers.",
     ),
@@ -598,7 +597,6 @@ private val sampleEvents = listOf(
         color = Color(0xFF1B998B),
         start = LocalDateTime.parse("2021-05-18T10:00:00"),
         end = LocalDateTime.parse("2021-05-18T11:00:00"),
-        fullName = "What's new in Android",
         id = "android",
         description = "In this Keynote, Chet Haase, Dan Sandler, and Romain Guy discuss the latest Android features and enhancements for developers.",
     ),
@@ -608,7 +606,6 @@ private val sampleEvents = listOf(
         color = Color(0xFF6DD3CE),
         start = LocalDateTime.parse("2021-05-18T11:00:00"),
         end = LocalDateTime.parse("2021-05-18T11:45:00"),
-        fullName = "What's new in Android",
         id = "android",
         description = "Learn about the latest design improvements to help you build personal dynamic experiences with Material Design.",
     ),
@@ -618,7 +615,6 @@ private val sampleEvents = listOf(
         color = Color(0xFFF4BFDB),
         start = LocalDateTime.parse("2021-05-18T10:00:00"),
         end = LocalDateTime.parse("2021-05-18T11:00:00"),
-        fullName = "What's new in Android",
         id = "android",
         description = "Learn about the latest and greatest in ML from Google. We’ll cover what’s available to developers when it comes to creating, understanding, and deploying models for a variety of different applications.",
     ),
@@ -628,7 +624,6 @@ private val sampleEvents = listOf(
         color = Color(0xFFF4BFDB),
         start = LocalDateTime.parse("2021-05-18T10:30:00"),
         end = LocalDateTime.parse("2021-05-18T11:30:00"),
-        fullName = "What's new in Android",
         id = "android",
         description = "Learn about the latest and greatest in ML from Google. We’ll cover what’s available to developers when it comes to creating, understanding, and deploying models for a variety of different applications.",
     ),
@@ -638,7 +633,6 @@ private val sampleEvents = listOf(
         color = Color(0xFF1B998B),
         start = LocalDateTime.parse("2021-05-20T12:00:00"),
         end = LocalDateTime.parse("2021-05-20T13:00:00"),
-        fullName = "What's new in Android",
         id = "android",
         description = "This Workshop will take you through the basics of building your first app with Jetpack Compose, Android's new modern UI toolkit that simplifies and accelerates UI development on Android.",
     ),
@@ -647,15 +641,13 @@ private val sampleEvents2 = listOf(
     Event(
         id = "0",
         name = "Ponedjeljak",
-        fullName = "Ponedjeljak",
         shortName = "P",
         color = Color.Blue,
         colorId = 2131099687,
-        teacher = "matko",
-        type="Pred",
+        professor = "matko",
+        eventType = TimetableType.OTHER,
         groups = "nemaa",
         classroom = "C502",
-        classroomShort = "C502",
         start = LocalDateTime.parse("2024-05-02T10:15"),
         end = LocalDateTime.parse("2024-05-02T11:00"),
         description = "C502"
@@ -663,15 +655,13 @@ private val sampleEvents2 = listOf(
     Event(
         id = "532059",
         name = "Kriptografija i mrežna sigurnost",
-        fullName = "Kriptografija i mrežna sigurnost",
         shortName = "KIMS",
         color = Color.Blue,
         colorId = 2131099687,
-        teacher = "Čagalj Mario",
-        type = "Predavanje",
+        professor = "Čagalj Mario",
+        eventType = TimetableType.PREDAVANJE,
         groups = "",
         classroom = "C501",
-        classroomShort = "C501",
         start = LocalDateTime.parse("2024-04-29T10:15"),
         end = LocalDateTime.parse("2024-04-29T12:00"),
         description = "C501"
@@ -679,15 +669,13 @@ private val sampleEvents2 = listOf(
     Event(
         id = "534198",
         name = "Metode optimizacije",
-        fullName = "Metode optimizacije",
         shortName = "MO",
         color = Color.Blue,
         colorId = 2131100480,
-        teacher = "Bašić Martina",
-        type = "Laboratorijske vježbe",
+        professor = "Bašić Martina",
+        eventType = TimetableType.LABORATORIJSKA_VJEZBA,
         groups = "Grupa 1,",
         classroom = "B420",
-        classroomShort = "B420",
         start = LocalDateTime.parse("2024-04-29T18:30"),
         end = LocalDateTime.parse("2024-04-29T20:00"),
         description = "B420"
@@ -695,15 +683,13 @@ private val sampleEvents2 = listOf(
     Event(
         id = "532144",
         name = "Podržano strojno učenje",
-        fullName = "Podržano strojno učenje",
         shortName = "PSU",
         color = Color.Blue,
         colorId = 2131099687,
-        teacher = "Vasilj Josip",
-        type = "Predavanje",
+        professor = "Vasilj Josip",
+        eventType = TimetableType.PREDAVANJE,
         groups = "",
         classroom = "A243",
-        classroomShort = "A243",
         start = LocalDateTime.parse("2024-04-30T08:15"),
         end = LocalDateTime.parse("2024-04-30T10:00"),
         description = "A243"
@@ -711,15 +697,13 @@ private val sampleEvents2 = listOf(
     Event(
         id = "532084",
         name = "Metode optimizacije",
-        fullName = "Metode optimizacije",
         shortName = "MO",
         color = Color.Blue,
         colorId = 2131099687,
-        teacher = "Marasović Jadranka",
-        type = "Predavanje",
+        professor = "Marasović Jadranka",
+        eventType = TimetableType.PREDAVANJE,
         groups = "",
         classroom = "C502",
-        classroomShort = "C502",
         start = LocalDateTime.parse("2024-04-30T10:15"),
         end = LocalDateTime.parse("2024-04-30T12:00"),
         description = "C502"
@@ -727,15 +711,13 @@ private val sampleEvents2 = listOf(
     Event(
         id = "532120",
         name = "IP komunikacije",
-        fullName = "IP komunikacije",
         shortName = "IK",
         color = Color.Blue,
         colorId = 2131099687,
-        teacher = "Russo Mladen",
-        type = "Predavanje",
+        professor = "Russo Mladen",
+        eventType = TimetableType.PREDAVANJE,
         groups = "",
         classroom = "A105",
-        classroomShort = "A105",
         start = LocalDateTime.parse("2024-04-30T12:15"),
         end = LocalDateTime.parse("2024-04-30T14:00"),
         description = "A105"
@@ -743,15 +725,13 @@ private val sampleEvents2 = listOf(
     Event(
         id = "538989",
         name = "Podržano strojno učenje",
-        fullName = "Podržano strojno učenje",
         shortName = "PSU",
         color = Color.Blue,
         colorId = 2131100480,
-        teacher = "Vasilj Josip",
-        type = "Laboratorijske vježbe",
+        professor = "Vasilj Josip",
+        eventType = TimetableType.LABORATORIJSKA_VJEZBA,
         groups = "Grupa 1,",
         classroom = "A507",
-        classroomShort = "A507",
         start = LocalDateTime.parse("2024-05-02T10:00"),
         end = LocalDateTime.parse("2024-05-02T12:15"),
         description = "A507"
@@ -759,15 +739,13 @@ private val sampleEvents2 = listOf(
     Event(
         id = "535595",
         name = "Jezici i prevoditelji",
-        fullName = "Jezici i prevoditelji",
         shortName = "JIP",
         color = Color.Blue,
         colorId = 2131100480,
-        teacher = "Sikora Marjan",
-        type = "Laboratorijske vježbe",
+        professor = "Sikora Marjan",
+        eventType = TimetableType.LABORATORIJSKA_VJEZBA,
         groups = "Grupa 1,",
         classroom = "B526",
-        classroomShort = "B526",
         start = LocalDateTime.parse("2024-05-02T08:30"),
         end = LocalDateTime.parse("2024-05-02T10:00"),
         description = "B526"
@@ -775,15 +753,13 @@ private val sampleEvents2 = listOf(
     Event(
         id = "535336",
         name = "IP komunikacije",
-        fullName = "IP komunikacije",
         shortName = "IK",
         color = Color.Blue,
         colorId = 2131100480,
-        teacher = "Meter Davor",
-        type = "Laboratorijske vježbe",
+        professor = "Meter Davor",
+        eventType = TimetableType.LABORATORIJSKA_VJEZBA,
         groups = "Grupa 1,",
         classroom = "B526",
-        classroomShort = "B526",
         start = LocalDateTime.parse("2024-05-03T08:00"),
         end = LocalDateTime.parse("2024-05-03T09:30"),
         description = "B526"
@@ -791,7 +767,7 @@ private val sampleEvents2 = listOf(
 )
 
 class EventsProvider : PreviewParameterProvider<Event> {
-    override val values = sampleEvents.asSequence()
+    override val values = sampleEvents2.asSequence()
 }
 
 @Preview(showBackground = true)

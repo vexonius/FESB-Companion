@@ -45,8 +45,8 @@ class IksicaFragment : Fragment() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        menu.findItem(R.id.refresMe).isVisible = true
-        menu.findItem(R.id.choosesched).setVisible(true)
+        menu.findItem(R.id.refreshTimetable).isVisible = true
+        menu.findItem(R.id.chooseSchedule).setVisible(true)
         super.onPrepareOptionsMenu(menu)
     }
 }

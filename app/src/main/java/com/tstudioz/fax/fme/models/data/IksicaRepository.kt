@@ -3,19 +3,14 @@ package com.tstudioz.fax.fme.models.data
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.tstudioz.fax.fme.database.models.IksicaSaldo
-import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.database.models.StudentDataIksica
-import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.models.interfaces.IksicaServiceInterface
-import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.util.parseDetaljeRacuna
 import com.tstudioz.fax.fme.models.util.parseRacuni
 import com.tstudioz.fax.fme.models.util.parseStudentInfo
-import com.tstudioz.fax.fme.models.util.parseTimetable
-import com.tstudioz.fax.fme.models.util.parseTimetableInfo
 
 
 class IksicaRepository(
