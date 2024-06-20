@@ -30,7 +30,7 @@ import com.tstudioz.fax.fme.models.util.SPKey
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 @OptIn(InternalCoroutinesApi::class)

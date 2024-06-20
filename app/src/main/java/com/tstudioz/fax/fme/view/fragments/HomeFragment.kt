@@ -1,10 +1,8 @@
 package com.tstudioz.fax.fme.view.fragments
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,30 +17,35 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Note
-import com.tstudioz.fax.fme.database.models.Predavanja
 import com.tstudioz.fax.fme.databinding.HomeTabBinding
+import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.activities.IndexActivity
+import com.tstudioz.fax.fme.view.activities.MainActivity
 import com.tstudioz.fax.fme.view.activities.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
-import com.tstudioz.fax.fme.viewmodel.IksicaViewModel
+import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 
@@ -53,11 +56,11 @@ class HomeFragment : Fragment() {
     private val shPref: SharedPreferences by inject()
 
     private var binding: HomeTabBinding? = null
-    private val forecastUrl =
-        "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
+    private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
-    private val iksicaViewModel: IksicaViewModel by inject()
-    private var mrealm: Realm? = null
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val mainViewModel: MainViewModel by activityViewModel()
     private var date: String? = null
     private var snack: Snackbar? = null
 
@@ -83,7 +86,7 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         setCyanStatusBarColor()
-        showList()
+        (activity as MainActivity?)?.mojRaspored()
     }
 
     private fun getDate() {
@@ -92,7 +95,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setLastRaspGot() {
-        binding?.TimeRaspGot?.text = shPref.getString("timeGotcurrentrasp", "") ?: ""
+        binding?.TimeRaspGot?.text = shPref[SPKey.LAST_FETCHED, ""]
         binding?.TimeRaspGot?.visibility = View.VISIBLE
     }
 
@@ -156,22 +159,22 @@ class HomeFragment : Fragment() {
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun showList() {
-        mrealm = Realm.open(dbManager.getDefaultConfiguration())
-        val rezultati = date?.let {
-            mrealm?.query<Predavanja>("detaljnoVrijeme CONTAINS $0", it)?.find()
-
-        }
-        if (rezultati != null && rezultati.isEmpty()) {
-            binding?.rv?.visibility = View.INVISIBLE
-            binding?.nemaPredavanja?.visibility = View.VISIBLE
-        } else if (rezultati != null) {
-            binding?.nemaPredavanja?.visibility = View.GONE
-            binding?.rv?.visibility = View.VISIBLE
-            val adapter = HomePredavanjaAdapter(rezultati)
-            binding?.rv?.adapter = adapter
-            binding?.rv?.layoutManager = LinearLayoutManager(activity)
-            binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
+        mainViewModel.lessonsPerm.observe(viewLifecycleOwner) { lessons ->
+            val filteredLessons = lessons.filter { it.start.toLocalDate() == LocalDate.now() }
+            binding?.TimeRaspGot?.text = shPref[SPKey.LAST_FETCHED, ""]
+            if (filteredLessons.isEmpty()) {
+                binding?.rv?.visibility = View.INVISIBLE
+                binding?.nemaPredavanja?.visibility = View.VISIBLE
+            } else {
+                binding?.nemaPredavanja?.visibility = View.GONE
+                binding?.rv?.visibility = View.VISIBLE
+                val adapter = HomePredavanjaAdapter(filteredLessons)
+                binding?.rv?.adapter = adapter
+                binding?.rv?.layoutManager = LinearLayoutManager(activity)
+                binding?.rv?.let { ViewCompat.setNestedScrollingEnabled(it, false) }
+            }
         }
     }
 
@@ -271,9 +274,6 @@ class HomeFragment : Fragment() {
             )
         requireActivity().window.statusBarColor =
             ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
-        if (mrealm != null) {
-            mrealm?.close()
-        }
         super.onStop()
     }
 

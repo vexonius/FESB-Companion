@@ -17,8 +17,8 @@ import com.tstudioz.fax.fme.view.activities.NoteActivity
 import com.tstudioz.fax.fme.view.adapters.NoteAdapter.NoteViewHolder
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.RealmResults
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class NoteAdapter(private val mNotes: RealmResults<Note>) :
     RecyclerView.Adapter<NoteViewHolder>(), KoinComponent {

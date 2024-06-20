@@ -1,17 +1,25 @@
 package com.tstudioz.fax.fme.database.models
 
+import com.google.gson.annotations.SerializedName
 import java.time.LocalDate
 
 data class TimeTableInfo (
-    var Id: Int = 0,
-    var Name: String = "",
-    var StartDateEpochSec: Long = 0,
-    var EndDateEpochSec: Long = 0,
-    var StartDateText: String = "",
-    var EndDateText: String = "",
-    var Category: String = "",
-    var ColorCode: String = "",
-    var IsWorking: Boolean = false,
-    var StartDate: LocalDate? = null,
-    var EndDate: LocalDate?= null
+    @SerializedName("Id")
+    var id: Int = 0,
+    @SerializedName("Name")
+    var name: String = "",
+    @SerializedName("StartDate")
+    var startDate: LocalDate? = null,
+    @SerializedName("EndDate")
+    var endDate: LocalDate?= null,
+    @SerializedName("StartDateText")
+    var startDateText: String = "",
+    @SerializedName("EndDateText")
+    var endDateText: String = "",
+    @SerializedName("Category")
+    var category: String = "",
+    @SerializedName("ColorCode")
+    var colorCode: Long = 0xFF191C1D,
+    @SerializedName("IsWorking")
+    var isWorking: Boolean = false,
 )

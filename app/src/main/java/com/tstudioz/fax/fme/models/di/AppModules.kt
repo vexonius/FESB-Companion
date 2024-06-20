@@ -14,8 +14,6 @@ import com.tstudioz.fax.fme.models.data.IksicaRepository
 import com.tstudioz.fax.fme.models.data.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.models.data.TimeTableDao
 import com.tstudioz.fax.fme.models.data.TimeTableDaoInterface
-import com.tstudioz.fax.fme.models.data.TimeTableRepository
-import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.IksicaServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
@@ -33,7 +31,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
-import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
@@ -42,7 +40,7 @@ import java.util.concurrent.TimeUnit
 @InternalCoroutinesApi
 val module = module {
     single<TimetableServiceInterface> { TimetableService(get()) }
-    single<IksicaServiceInterface> {IksicaService(get(),get(named("client2")))}
+    single<IksicaServiceInterface> { IksicaService(get(),get(named("client2"))) }
     single <IksicaRepositoryInterface> { IksicaRepository(get()) }
     single<WeatherNetworkInterface> { WeatherNetworkService(get()) }
     single<AttendanceServiceInterface> { AttendanceService(get()) }
@@ -54,8 +52,8 @@ val module = module {
     single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single { androidContext().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE) }
-    single { MainViewModel(get(), get()) }
-    single { IksicaViewModel(androidApplication(), get())}
+    single { IksicaViewModel(androidApplication(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
     viewModel { AttendanceViewModel(get()) }
 }

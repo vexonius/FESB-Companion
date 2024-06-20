@@ -46,7 +46,7 @@
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
                 android:background="@color/colorPrimary"
-                android:hint="FESB korisničko ime"
+                android:hint="@string/login_email_or_username"
                 android:padding="10dp"
                 android:singleLine="true"
                 android:textColor="@color/white"
@@ -61,7 +61,7 @@
                 android:layout_marginRight="50dp"
                 android:layout_marginTop="1dp"
                 android:background="@color/colorPrimary"
-                android:hint="Lozinka"
+                android:hint="@string/login_password"
                 android:inputType="textPassword"
                 android:padding="10dp"
                 android:singleLine="true"
@@ -95,7 +95,7 @@
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/button_blue"
                     android:padding="15dp"
-                    android:text="Prijava"
+                    android:text="@string/login_action_submit"
                     android:textColor="@color/white" />
 
 

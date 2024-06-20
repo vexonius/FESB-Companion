@@ -11,7 +11,7 @@ import com.tstudioz.fax.fme.database.models.Meni
 import com.tstudioz.fax.fme.view.adapters.MeniesAdapter.MeniViewHolder
 import io.realm.kotlin.query.RealmResults
 
-class MeniesAdapter(var mMenies: RealmResults<Meni>, val timeGot: String) : RecyclerView.Adapter<MeniViewHolder>() {
+class MeniesAdapter(var mMenies: RealmResults<Meni>) : RecyclerView.Adapter<MeniViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeniViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(
@@ -30,10 +30,6 @@ class MeniesAdapter(var mMenies: RealmResults<Meni>, val timeGot: String) : Recy
         holder.jelo4.typeface = holder.lighttf
         holder.jelo5.typeface = holder.lighttf
         holder.cijena.typeface = holder.regulartf
-        if (meni?.type == "MENI 1"){
-            holder.time.text = timeGot
-            holder.time.textSize = 14f
-        }
         if (meni?.id == "R-MENI") {
             holder.title.text = meni.type
             holder.jelo1.text = meni.jelo1
@@ -68,7 +64,6 @@ class MeniesAdapter(var mMenies: RealmResults<Meni>, val timeGot: String) : Recy
         var regulartf: Typeface
         var lighttf: Typeface
         var boldtf: Typeface
-        var time: TextView
 
         init {
             title = mView.findViewById<View>(R.id.meni_title) as TextView
@@ -90,7 +85,6 @@ class MeniesAdapter(var mMenies: RealmResults<Meni>, val timeGot: String) : Recy
                 itemView.context.assets, "fonts/OpenSans" +
                         "-Bold.ttf"
             )
-            time = mView.findViewById<View>(R.id.meni_time) as TextView
         }
     }
 

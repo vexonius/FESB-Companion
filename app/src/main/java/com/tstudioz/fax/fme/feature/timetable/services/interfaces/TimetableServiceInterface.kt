@@ -1,19 +1,15 @@
-package com.tstudioz.fax.fme.models.interfaces
+package com.tstudioz.fax.fme.feature.timetable.services.interfaces
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface TimetableServiceInterface {
 
     suspend fun fetchTimeTable(
-        userName: String,
-        startDate: String,
-        endDate: String
+        params: HashMap<String, String>
     ): NetworkServiceResult.TimeTableResult
 
-    suspend fun fetchTimeTableInfo(
-        startDate: String,
-        endDate: String
+    suspend fun fetchTimetableCalendar(
+        params: HashMap<String, String>
     ): NetworkServiceResult.TimeTableResult
-
 
 }
