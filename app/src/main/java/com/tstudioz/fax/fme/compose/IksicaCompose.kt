@@ -49,6 +49,7 @@ import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
+import java.math.RoundingMode
 import java.time.LocalDate
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -293,7 +294,10 @@ fun IksicaReceiptDetailed(
                     .padding(10.dp)
             ) {
                 Text(text = "Ukupno plaćeno: ")
-                Text(text = receipt?.iznosRacuna.toString() + " €")
+                Text(
+                    text = receipt?.iznosRacuna?.minus(receipt.iznosSubvencije)?.toBigDecimal()
+                        ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €"
+                )
             }
             HorizontalDivider()
             Row(
