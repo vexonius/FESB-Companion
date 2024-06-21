@@ -42,7 +42,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
@@ -50,7 +49,6 @@ import com.tstudioz.fax.fme.viewmodel.IksicaViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.java.KoinJavaComponent.inject
 import java.time.LocalDate
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -60,9 +58,10 @@ import kotlin.math.sin
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun IksicaCompose(mainViewModel: MainViewModel) {
-
-    val iksicaViewModel: IksicaViewModel by inject(IksicaViewModel::class.java)
+fun IksicaCompose(
+    iksicaViewModel: IksicaViewModel,
+    mainViewModel: MainViewModel
+) {
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -87,9 +86,9 @@ fun IksicaCompose(mainViewModel: MainViewModel) {
             LazyColumn {
                 item {
                     ElevatedCardIksica(
-                        mainViewModel.studentDataIksica.value?.nameSurname ?: "",
-                        mainViewModel.studentDataIksica.value?.jmbag ?: "",
-                        mainViewModel.iksicaSaldo.value?.balance.toString()
+                        mainViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
+                        mainViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
+                        mainViewModel.iksicaSaldo.observeAsState().value?.balance.toString()
                     )
                 }
                 items(list) {
@@ -107,8 +106,8 @@ fun IksicaCompose(mainViewModel: MainViewModel) {
 @Preview
 @Composable
 fun ElevatedCardIksica(
-    name: String = "Iksica",
-    jmbag: String = "JMBAG",
+    name: String = "Ime Prezime",
+    iksicaNumber: String = "0000000000000000",
     balance: String = "0.00"
 ) {
     Box(
@@ -119,22 +118,32 @@ fun ElevatedCardIksica(
             .clip(shape = RoundedCornerShape(10.dp))
             .angledGradientBackground(
                 colors = listOf(
-                    Color(0xFF00A8E8),
+                    Color(0xFFfa2531),
                     Color(0xFF0075B2)
                 ),
-                degrees = 45f
+                degrees = 45f,
+                halfHalf = true
             )
     ) {
-        Column (Modifier.fillMaxSize(),
+        Column(
+            Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween) {
-            Column(Modifier.padding(25.dp)){
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                Modifier
+                    .padding(25.dp, 25.dp, 0.dp, 0.dp)
+                    .weight(0.7f)
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(0.dp, 5.dp)
                 ) {
-                    Text(text = name)
+                    Text(
+                        text = name,
+                        fontSize = 25.sp,
+                    )
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -143,19 +152,26 @@ fun ElevatedCardIksica(
                         .padding(0.dp, 5.dp)
                         .fillMaxWidth()
                 ) {
-                    Text(text = jmbag)
+                    Text(
+                        text = iksicaNumber,
+                        fontSize = 20.sp,
+                    )
                 }
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
                 modifier = Modifier
-                    .padding(25.dp, 25.dp)
-                    .fillMaxWidth()
+                    .padding(0.dp, 0.dp, 25.dp, 25.dp)
+                    .weight(0.3f)
+                    .fillMaxSize()
             ) {
-                Text(text = "$balance €",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold)
+                Text(
+                    text = "$balance €",
+                    fontSize = 25.sp,
+                    lineHeight = 25.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -171,8 +187,39 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
                 Text(receipt.datumString + " " + receipt.vrijeme + " ")
             },
             overlineContent = { Text(receipt.autorizacija) },
-            trailingContent = { Text(receipt.iznosRacuna + "€") })
+            trailingContent = {
+                Text(
+                    text = receipt.iznosRacuna.toString() + " €",
+                    fontSize = 15.sp,
+                )
+            })
     }
+}
+
+@Preview
+@Composable
+fun IksicaItemPreview() {
+    IksicaItem(
+        receipt = Receipt(
+            restoran = "Restoran",
+            datumString = "Datum",
+            vrijeme = "Vrijeme",
+            detaljiRacuna = listOf(
+                ReceiptItem(
+                    nazivArtikla = "Naziv",
+                    kolicina = 1,
+                    cijenaUkupno = 0.55,
+                    iznosSubvencije = 0.27,
+                    cijenaJednogArtikla = 0.58
+                )
+            ),
+            iznosRacuna = 0.55,
+            iznosSubvencije = 0.27,
+            autorizacija = "Autorizacija",
+            urlSastavnica = "https://www.google.com",
+            datum = LocalDate.now()
+        )
+    ) {}
 }
 
 @Composable
@@ -202,8 +249,8 @@ fun IksicaReceiptDetailed(
                 cijenaJednogArtikla = 0.58
             )
         ),
-        iznosRacuna = "0.55",
-        iznosSubvencije = "0.27",
+        iznosRacuna = 0.55,
+        iznosSubvencije = 0.27,
         autorizacija = "Autorizacija",
         urlSastavnica = "https://www.google.com",
         datum = LocalDate.now()
@@ -246,7 +293,7 @@ fun IksicaReceiptDetailed(
                     .padding(10.dp)
             ) {
                 Text(text = "Ukupno plaćeno: ")
-                Text(text = receipt?.iznosRacuna ?: "")
+                Text(text = receipt?.iznosRacuna.toString() + " €")
             }
             HorizontalDivider()
             Row(
@@ -255,7 +302,7 @@ fun IksicaReceiptDetailed(
                     .padding(10.dp)
             ) {
                 Text(text = "Ukupno subvencionirano: ")
-                Text(text = receipt?.iznosSubvencije ?: "")
+                Text(text = receipt?.iznosRacuna.toString() + " €")
             }
         }
     }

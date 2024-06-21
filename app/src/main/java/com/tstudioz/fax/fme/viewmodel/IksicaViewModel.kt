@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
@@ -47,6 +48,7 @@ class IksicaViewModel(
                     viewModelScope.launch(Dispatchers.IO) {
                         _receipts.postValue(repository.getRacuni())
                     }
+
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -70,7 +72,7 @@ class IksicaViewModel(
 private fun <T> LiveData<T>.observeOnce( observer: (T) -> Unit) {
     observeForever( object : Observer<T> {
         override fun onChanged(value: T) {
-            removeObserver(this)
+            if (value is Boolean && value){ removeObserver(this) }
             observer(value)
         }
     })

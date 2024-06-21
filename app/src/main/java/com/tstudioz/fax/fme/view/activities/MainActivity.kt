@@ -89,8 +89,8 @@ class MainActivity : AppCompatActivity() {
         loginIkisca()
     }
 
-    fun loginIkisca() {
-        mainViewModel.login()
+    private fun loginIkisca() {
+        mainViewModel.loginIksica()
     }
 
     private fun isThereAction() {

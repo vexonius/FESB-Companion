@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.view.fragments
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -15,7 +14,6 @@ import com.tstudioz.fax.fme.viewmodel.IksicaViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -23,7 +21,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class IksicaFragment : Fragment() {
 
     @OptIn(InternalCoroutinesApi::class)
-    private val iksicaViewModel: IksicaViewModel by inject()
+    private val iksicaViewModel: IksicaViewModel by viewModel()
     private var binding: FragmentIksicaBinding? = null
     private val mainViewModel: MainViewModel by activityViewModel()
 
@@ -37,7 +35,12 @@ class IksicaFragment : Fragment() {
 
         iksicaViewModel.getReceipts()
         composeView.setContent {
-            AppTheme { IksicaCompose(mainViewModel) }
+            AppTheme {
+                IksicaCompose(
+                    iksicaViewModel,
+                    mainViewModel
+                )
+            }
         }
 
         setHasOptionsMenu(true)

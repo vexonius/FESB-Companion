@@ -135,7 +135,7 @@ class MainViewModel(
         }
     }
 
-    fun login() {
+    fun loginIksica() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _loadingTxt.postValue("Getting AuthState...")
@@ -150,10 +150,12 @@ class MainViewModel(
                 _iksicaSaldo.postValue(iksicaSaldo)
                 _studentDataIksica.postValue(studentDataIksica)
                 _loadingTxt.postValue("Parsing Data...")
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
+
     }
 
     fun showThisWeeksEvents() {

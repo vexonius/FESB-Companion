@@ -94,15 +94,18 @@ fun parseRacuni(doc: String): List<Receipt> {
                     LocalDate.parse(cols[1].text(), DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                     cols[1].text(),
                     cols[2].text(),
-                    cols[3].text(),
-                    cols[4].text(),
+                    cols[3].text().toDoubleOrNull() ?: 0.0,
+                    cols[4].text().toDoubleOrNull() ?: 0.0,
                     cols[5].text(),
                     cols[6].select("a").attr("href")
                 )
             )
         }
     }
-    return racuni.sortedByDescending { LocalTime.parse(it.vrijeme) }.sortedByDescending { it.datum }
+    val test = racuni
+        .sortedByDescending { LocalTime.parse(it.vrijeme) }
+        .sortedByDescending { it.datum }
+    return test
 }
 
 fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {

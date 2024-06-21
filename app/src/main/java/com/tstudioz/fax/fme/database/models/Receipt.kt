@@ -7,8 +7,8 @@ data class Receipt(
     val datum: LocalDate,
     val datumString: String,
     val vrijeme: String,
-    val iznosRacuna: String,
-    val iznosSubvencije: String,
+    val iznosRacuna: Double,
+    val iznosSubvencije: Double,
     val autorizacija: String,
     val urlSastavnica: String,
     var detaljiRacuna: List<ReceiptItem>? = null
