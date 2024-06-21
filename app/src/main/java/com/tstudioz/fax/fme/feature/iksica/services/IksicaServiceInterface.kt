@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.models.interfaces
+package com.tstudioz.fax.fme.feature.iksica.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import okhttp3.FormBody

@@ -1,20 +1,16 @@
-package com.tstudioz.fax.fme.viewmodel
+package com.tstudioz.fax.fme.feature.iksica
 
 import android.app.Application
-import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.models.data.IksicaRepositoryInterface
+import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-
 
 @InternalCoroutinesApi
 class IksicaViewModel(
@@ -31,6 +27,9 @@ class IksicaViewModel(
     private val _itemToShow = MutableLiveData<Receipt>()
     val itemToShow: LiveData<Receipt> = _itemToShow
 
+    init {
+        getReceipts()
+    }
 
     fun toggleShowItem(value: Boolean) {
         _showItem.postValue(value)
@@ -42,13 +41,21 @@ class IksicaViewModel(
 
 
     fun getReceipts() {
+        viewModelScope.launch {
+            try {
+                _receipts.postValue(repository.read().first)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
         repository.loggedIn.observeOnce() {
             if (it) {
                 try {
                     viewModelScope.launch(Dispatchers.IO) {
-                        _receipts.postValue(repository.getRacuni())
+                        val receiptsNew = repository.getReceipts()
+                        _receipts.postValue(receiptsNew)
+                        repository.insert(receiptsNew)
                     }
-
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -69,12 +76,15 @@ class IksicaViewModel(
     }
 }
 
-private fun <T> LiveData<T>.observeOnce( observer: (T) -> Unit) {
-    observeForever( object : Observer<T> {
+private fun <T> LiveData<T>.observeOnce(observer: (T) -> Unit) {
+    observeForever(object : Observer<T> {
         override fun onChanged(value: T) {
-            if (value is Boolean && value){ removeObserver(this) }
+            if (value is Boolean && value) {
+                removeObserver(this)
+            } else if (value !is Boolean) {
+                removeObserver(this)
+            }
             observer(value)
         }
     })
 }
-

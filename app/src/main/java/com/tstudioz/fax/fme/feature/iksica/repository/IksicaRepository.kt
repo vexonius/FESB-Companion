@@ -1,14 +1,16 @@
-package com.tstudioz.fax.fme.models.data
+package com.tstudioz.fax.fme.feature.iksica.repository
 
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.tstudioz.fax.fme.database.models.IksicaSaldo
+import com.tstudioz.fax.fme.database.models.IksicaBalance
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.database.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDao
+import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDaoInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.models.interfaces.IksicaServiceInterface
+import com.tstudioz.fax.fme.feature.iksica.services.IksicaServiceInterface
 import com.tstudioz.fax.fme.models.util.parseDetaljeRacuna
 import com.tstudioz.fax.fme.models.util.parseRacuni
 import com.tstudioz.fax.fme.models.util.parseStudentInfo
@@ -16,6 +18,7 @@ import com.tstudioz.fax.fme.models.util.parseStudentInfo
 
 class IksicaRepository(
     private val iksicaService: IksicaServiceInterface,
+    private val iksicaDao: IksicaDaoInterface
 ) : IksicaRepositoryInterface {
 
     val _loggedIn = MutableLiveData<Boolean>(false)
@@ -48,7 +51,7 @@ class IksicaRepository(
         }
     }
 
-    override suspend fun getAspNetSessionSAML(): Pair<IksicaSaldo, StudentDataIksica> {
+    override suspend fun getAspNetSessionSAML(): Pair<IksicaBalance, StudentDataIksica> {
         when (val result = iksicaService.getAspNetSessionSAML()) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 Log.d(TAG, "AspNetSessionSAML fetched")
@@ -63,7 +66,7 @@ class IksicaRepository(
         }
     }
 
-    override suspend fun getRacuni(): List<Receipt> {
+    override suspend fun getReceipts(): List<Receipt> {
         return when (val result = iksicaService.getRacuni()) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 Log.d(TAG, "Racuni fetched")
@@ -89,53 +92,17 @@ class IksicaRepository(
         }
     }
 
-    /*suspend fun loginAndGetData(email: String, password: String): List<Receipt> {
-        suspend fun getData(
-            username: String,
-            password: String,
-            forceLogin: Boolean,
-            timeout: Boolean = false
-        ): Result.LoginResult {
+    override suspend fun insert(receipts: List<Receipt>) {
+        iksicaDao.insert(receipts)
+    }
 
-            if (username == "" || password == "") {
-                return Result.LoginResult.Error("Username or password is empty")
-            }
-            if (timeout && (System.currentTimeMillis() - iksicaService.lastTimeGotData) < 60000) {
-                return Result.LoginResult.Refresh("Data fresh enough, not refreshing")
-            }
+    override suspend fun insert(iksicaBalance: IksicaBalance, studentDataIksica: StudentDataIksica){
+        iksicaDao.insert(iksicaBalance, studentDataIksica)
+    }
 
-            try {
-                if ((System.currentTimeMillis() - iksicaService.lastTimeLoggedIn) > 3600000 || forceLogin) {
-                    when (val result = iksicaService.getAuthState()) {
-                        is NetworkServiceResult.IksicaResult..Success -> {}
-                        is NetworkServiceResult.IksicaResult.Error -> return Result.LoginResult.Error("Error getting SAMLRequest: ${result.error}")
-                    }
-                    when (val result = iksicaService.login(username, password)) {
-                        is NetworkServiceResult.IksicaResult.Success -> {}
-                        is NetworkServiceResult.IksicaResult.Error -> return Result.LoginResult.Error("Error getting SAMLResponse: ${result.error}")
-                    }
-                    when (val result = iksicaService.getAspNetSessionSAML()) {
-                        is NetworkServiceResult.IksicaResult.Success -> {}
-                        is NetworkServiceResult.IksicaResult.Error -> return Result.LoginResult.Error("Error sending SAMLRequest to ISVU: ${result.error}")
-                    }
-                    when (val result = iksicaService.getRacuni()) {
-                        is NetworkServiceResult.IksicaResult.Success -> {}
-                        is NetworkServiceResult.IksicaResult.Error -> return Result.LoginResult.Error("Error getting data:${result.error}")
-                    }
-                }
+    override suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentDataIksica?> {
+        return iksicaDao.read()
+    }
 
-                return when (val result = iksicaService.getUgovoriData()) {
-                    is NetworkServiceResult.IksicaResult.Success -> {
-                        if (forceLogin) { iksicaService.resetLastTimeGotData() }
-                        Result.LoginResult.Success(result.data)
-                    }
 
-                    is NetworkServiceResult.IksicaResult.Error -> Result.LoginResult.Error("Error getting data:${result.error}")
-                }
-            } catch (e: Exception) {
-                iksicaService.resetLastTimeLoggedIn()
-                return Result.LoginResult.Error("Error: ${e.message}")
-            }
-        }
-    }*/
 }

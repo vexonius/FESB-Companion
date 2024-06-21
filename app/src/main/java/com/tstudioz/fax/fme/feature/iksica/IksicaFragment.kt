@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.view.fragments
+package com.tstudioz.fax.fme.feature.iksica
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.compose.IksicaCompose
 import com.tstudioz.fax.fme.databinding.FragmentIksicaBinding
-import com.tstudioz.fax.fme.viewmodel.IksicaViewModel
+import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -33,7 +33,6 @@ class IksicaFragment : Fragment() {
         binding = FragmentIksicaBinding.inflate(inflater, container, false)
         val composeView = binding?.composeView!!
 
-        iksicaViewModel.getReceipts()
         composeView.setContent {
             AppTheme {
                 IksicaCompose(

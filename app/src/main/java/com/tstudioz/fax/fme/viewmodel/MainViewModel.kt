@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.IksicaSaldo
+import com.tstudioz.fax.fme.database.models.IksicaBalance
 import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
+import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.models.data.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
@@ -60,16 +60,23 @@ class MainViewModel(
     val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
 
     private var _loadingTxt = MutableLiveData<String>()
-    private val _iksicaSaldo = MutableLiveData<IksicaSaldo>()
+    private val _iksicaBalance = MutableLiveData<IksicaBalance>()
     private val _studentDataIksica = MutableLiveData<StudentDataIksica>()
     val loadingTxt: LiveData<String> = _loadingTxt
-    val iksicaSaldo: LiveData<IksicaSaldo> = _iksicaSaldo
+    val iksicaBalance: LiveData<IksicaBalance> = _iksicaBalance
     val studentDataIksica: LiveData<StudentDataIksica> = _studentDataIksica
 
     init {
         fetchTimetableInfo()
         viewModelScope.launch(Dispatchers.IO) {
             _lessonsPerm.postValue(timeTableRepository.getCachedEvents())
+            val (_, iksicaBalance, studentDataIksica) = iksicaRepository.read()
+            if (iksicaBalance != null) {
+                _iksicaBalance.postValue(iksicaBalance!!)
+            }
+            if (studentDataIksica != null) {
+                _studentDataIksica.postValue(studentDataIksica!!)
+            }
         }
     }
 
@@ -146,9 +153,10 @@ class MainViewModel(
                     sharedPreferences.getString("password", "") ?: ""
                 )
                 _loadingTxt.postValue("Getting ASP.NET Session...")
-                val (iksicaSaldo, studentDataIksica) = iksicaRepository.getAspNetSessionSAML()
-                _iksicaSaldo.postValue(iksicaSaldo)
+                val (iksicaBalance, studentDataIksica) = iksicaRepository.getAspNetSessionSAML()
+                _iksicaBalance.postValue(iksicaBalance)
                 _studentDataIksica.postValue(studentDataIksica)
+                iksicaRepository.insert(iksicaBalance, studentDataIksica)
                 _loadingTxt.postValue("Parsing Data...")
 
             } catch (e: Exception) {

@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
-import com.tstudioz.fax.fme.viewmodel.IksicaViewModel
+import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -72,7 +72,7 @@ fun IksicaCompose(
         sheetContent = {
             if (iksicaViewModel.showItem.observeAsState(initial = false).value) {
                 val receipt = iksicaViewModel.itemToShow.observeAsState().value
-                val sheetState = rememberModalBottomSheetState()
+                val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
                 ModalBottomSheet(
                     sheetState = sheetState,
                     onDismissRequest = { iksicaViewModel.toggleShowItem(false) },
@@ -88,7 +88,7 @@ fun IksicaCompose(
                     ElevatedCardIksica(
                         mainViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
                         mainViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
-                        mainViewModel.iksicaSaldo.observeAsState().value?.balance.toString()
+                        mainViewModel.iksicaBalance.observeAsState().value?.balance.toString()
                     )
                 }
                 items(list) {
@@ -107,7 +107,7 @@ fun IksicaCompose(
 @Composable
 fun ElevatedCardIksica(
     name: String = "Ime Prezime",
-    iksicaNumber: String = "0000000000000000",
+    iksicaNumber: String = "0000000000000000000",
     balance: String = "0.00"
 ) {
     Box(
@@ -302,7 +302,7 @@ fun IksicaReceiptDetailed(
                     .padding(10.dp)
             ) {
                 Text(text = "Ukupno subvencionirano: ")
-                Text(text = receipt?.iznosRacuna.toString() + " €")
+                Text(text = receipt?.iznosSubvencije.toString() + " €")
             }
         }
     }

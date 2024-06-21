@@ -1,12 +1,10 @@
-package com.tstudioz.fax.fme.models.services
+package com.tstudioz.fax.fme.feature.iksica.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.models.interfaces.IksicaServiceInterface
 import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import org.jsoup.Jsoup
 
 

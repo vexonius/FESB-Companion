@@ -12,7 +12,10 @@ class DatabaseManager: DatabaseManagerInterface {
                 Note::class,
                 Dolazak::class,
                 Meni::class,
-                EventRealm::class))
+                EventRealm::class,
+                IksicaBalanceRealm::class,
+                ReceiptRealm::class,
+                StudentDataIksicaRealm::class))
             .name("default.realm")
             .schemaVersion(1)
             .encryptionKey("nekikljuckojicemopromjenitiubuducnostialisadjetujernedamisebolje".toByteArray())

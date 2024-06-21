@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.models.util
 
-import com.tstudioz.fax.fme.database.models.IksicaSaldo
+import com.tstudioz.fax.fme.database.models.IksicaBalance
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.database.models.StudentDataIksica
@@ -41,7 +41,7 @@ fun parseWeatherDetails(data: String): Current {
 }
 
 
-fun parseStudentInfo(body: String): Pair<IksicaSaldo, StudentDataIksica> {
+fun parseStudentInfo(body: String): Pair<IksicaBalance, StudentDataIksica> {
     val doc = Jsoup.parse(body)
 
     val image = doc.select(".slikastud").attr("src")
@@ -64,7 +64,7 @@ fun parseStudentInfo(body: String): Pair<IksicaSaldo, StudentDataIksica> {
         doc.select("p:contains(DNEVNA POTPORA)")
             .first()?.parent()?.lastElementChild()?.text()
             ?.substringBefore(" €").toString().replace(",", ".")
-    val iksicaSaldo = IksicaSaldo(
+    val iksicaBalance = IksicaBalance(
         balance.toDoubleOrNull() ?: 0.0,
         spentToday.toDoubleOrNull() ?: 0.0,
     )
@@ -78,7 +78,7 @@ fun parseStudentInfo(body: String): Pair<IksicaSaldo, StudentDataIksica> {
         rightsFrom = rightsFrom ?: "",
         rightsTo = rightsTo ?: ""
     )
-    return Pair(iksicaSaldo, studentData)
+    return Pair(iksicaBalance, studentData)
 }
 
 fun parseRacuni(doc: String): List<Receipt> {
