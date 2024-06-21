@@ -86,6 +86,11 @@ class MainActivity : AppCompatActivity() {
 
         checkVersion()
         shouldShowGDPRDialog()
+        loginIkisca()
+    }
+
+    fun loginIkisca() {
+        mainViewModel.login()
     }
 
     private fun isThereAction() {
@@ -144,6 +149,13 @@ class MainActivity : AppCompatActivity() {
 
         bar?.addTab(
             bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.iksica),
+                "Iksica",
+                R.id.tab_iksica
+            )
+        )
+        bar?.addTab(
+            bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.attend),
                 "Prisutnost",
                 R.id.tab_prisutnost
@@ -161,13 +173,6 @@ class MainActivity : AppCompatActivity() {
                 AppCompatResources.getDrawable(this, R.drawable.cal),
                 "Raspored",
                 R.id.tab_raspored
-            )
-        )
-        bar?.addTab(
-            bar.createTab(
-                AppCompatResources.getDrawable(this, R.drawable.cal),
-                "Iksica",
-                R.id.tab_iksica
             )
         )
         bar?.selectTabById(R.id.tab_home, true)
@@ -191,6 +196,11 @@ class MainActivity : AppCompatActivity() {
         val ft = supportFragmentManager.beginTransaction()
         ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
         when (pos) {
+            R.id.tab_iksica -> {
+                supportActionBar?.title = "Iksica"
+                ft.replace(R.id.frame, IksicaFragment())
+            }
+
             R.id.tab_prisutnost -> {
                 supportActionBar?.title = "Prisutnost"
                 ft.replace(R.id.frame, prisutnostFragment)
@@ -204,11 +214,6 @@ class MainActivity : AppCompatActivity() {
             R.id.tab_raspored -> {
                 supportActionBar?.title = "Raspored"
                 ft.replace(R.id.frame, timeTableFragment)
-            }
-
-            R.id.tab_iksica -> {
-                supportActionBar?.title = "Iksica"
-                ft.replace(R.id.frame, IksicaFragment())
             }
         }
         ft.addToBackStack(null)

@@ -1,14 +1,15 @@
 package com.tstudioz.fax.fme.models.util
 
-import com.tstudioz.fax.fme.weather.Current
-import org.json.JSONObject
 import com.tstudioz.fax.fme.database.models.IksicaSaldo
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.database.models.StudentDataIksica
+import com.tstudioz.fax.fme.weather.Current
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 
 fun parseWeatherDetails(data: String): Current {
@@ -16,9 +17,10 @@ fun parseWeatherDetails(data: String): Current {
 
     val currently0 = forecastjson.getJSONObject("properties")
     val currentlyArray = currently0.getJSONArray("timeseries")
-    val currently =
-        currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("instant").getJSONObject("details")
-    val currentlyNextOneHours = currentlyArray.getJSONObject(0).getJSONObject("data").getJSONObject("next_1_hours")
+    val currently = currentlyArray.getJSONObject(0).getJSONObject("data")
+        .getJSONObject("instant").getJSONObject("details")
+    val currentlyNextOneHours = currentlyArray.getJSONObject(0).getJSONObject("data")
+        .getJSONObject("next_1_hours")
     val currentlyNextOneHoursSummary = currentlyNextOneHours.getJSONObject("summary")
     val currentlyNextOneHoursDetails = currentlyNextOneHours.getJSONObject("details")
     val unparsedsummary = currentlyNextOneHoursSummary.getString("symbol_code")
@@ -38,17 +40,6 @@ fun parseWeatherDetails(data: String): Current {
     return current
 }
 
-/*data class IksicaSaldo(
-    val balance: Double,
-    val spentToday: Double,
-)
-class StudentDataIksica {
-    val nameSurname: String = ""
-    val rightsLevel: String = ""
-    val dailySupport: Double = 0.0
-    val oib: String = ""
-    val iksicaNumber: String = ""
-}*/
 
 fun parseStudentInfo(body: String): Pair<IksicaSaldo, StudentDataIksica> {
     val doc = Jsoup.parse(body)
@@ -67,21 +58,20 @@ fun parseStudentInfo(body: String): Pair<IksicaSaldo, StudentDataIksica> {
             .first()?.parent()?.lastElementChild()?.text()
             ?.substringBefore(" €").toString().replace(",", ".")
     val spentToday =
-        doc.select("p:contains(POTROŠENO DANAS)").
-        first()?.parent()?.lastElementChild()?.text()
+        doc.select("p:contains(POTROŠENO DANAS)").first()?.parent()?.lastElementChild()?.text()
             ?.substringBefore(" €").toString().replace(",", ".")
     val dailySupport =
         doc.select("p:contains(DNEVNA POTPORA)")
             .first()?.parent()?.lastElementChild()?.text()
             ?.substringBefore(" €").toString().replace(",", ".")
     val iksicaSaldo = IksicaSaldo(
-        balance.toDouble(),
-        spentToday.toDouble()
+        balance.toDoubleOrNull() ?: 0.0,
+        spentToday.toDoubleOrNull() ?: 0.0,
     )
     val studentData = StudentDataIksica(
         nameSurname = user ?: "",
         rightsLevel = rightsLevel,
-        dailySupport = dailySupport.toDouble(),
+        dailySupport = dailySupport.toDoubleOrNull() ?: 0.0,
         oib = oib ?: "",
         jmbag = jmbag ?: "",
         iksicaNumber = number ?: "",
@@ -101,11 +91,7 @@ fun parseRacuni(doc: String): List<Receipt> {
             racuni.add(
                 Receipt(
                     cols[0].text(),
-                    LocalDate.of(
-                        cols[1].text().split(".")[2].toInt(),
-                        cols[1].text().split(".")[1].toInt(),
-                        cols[1].text().split(".")[0].toInt()
-                    ),
+                    LocalDate.parse(cols[1].text(), DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                     cols[1].text(),
                     cols[2].text(),
                     cols[3].text(),
@@ -116,11 +102,7 @@ fun parseRacuni(doc: String): List<Receipt> {
             )
         }
     }
-    return racuni.sortedByDescending {
-        LocalTime.of(
-            it.vrijeme.split(":")[0].toInt(), it.vrijeme.split(":")[1].toInt()
-        )
-    }.sortedByDescending { it.datum }
+    return racuni.sortedByDescending { LocalTime.parse(it.vrijeme) }.sortedByDescending { it.datum }
 }
 
 fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {

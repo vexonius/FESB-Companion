@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.models.data
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.database.models.IksicaSaldo
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
@@ -16,6 +17,9 @@ import com.tstudioz.fax.fme.models.util.parseStudentInfo
 class IksicaRepository(
     private val iksicaService: IksicaServiceInterface,
 ) : IksicaRepositoryInterface {
+
+    val _loggedIn = MutableLiveData<Boolean>(false)
+    override val loggedIn: MutableLiveData<Boolean> = _loggedIn
 
 
     override suspend fun getAuthState(): NetworkServiceResult.IksicaResult {
@@ -45,10 +49,12 @@ class IksicaRepository(
     }
 
     override suspend fun getAspNetSessionSAML(): Pair<IksicaSaldo, StudentDataIksica> {
-        return when (val result = iksicaService.getAspNetSessionSAML()) {
+        when (val result = iksicaService.getAspNetSessionSAML()) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 Log.d(TAG, "AspNetSessionSAML fetched")
-                parseStudentInfo(result.data)
+                val info = parseStudentInfo(result.data)
+                _loggedIn.postValue(true)
+                return info
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
                 Log.e(TAG, "AspNetSessionSAML fetching error")

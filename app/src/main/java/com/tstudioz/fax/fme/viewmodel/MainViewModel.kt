@@ -8,9 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.database.models.IksicaSaldo
+import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.models.data.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
@@ -29,7 +32,8 @@ class MainViewModel(
     private val userRepository: UserRepositoryInterface,
     private val timeTableRepository: TimeTableRepositoryInterface,
     private val dbManager: DatabaseManagerInterface,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    private val iksicaRepository: IksicaRepositoryInterface
 ) : ViewModel() {
 
     private val _showEvent = MutableLiveData<Boolean>(false)
@@ -54,6 +58,13 @@ class MainViewModel(
     val periods: LiveData<List<TimeTableInfo>> = _periods
     val shownWeek: LiveData<LocalDate> = _shownWeek
     val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
+
+    private var _loadingTxt = MutableLiveData<String>()
+    private val _iksicaSaldo = MutableLiveData<IksicaSaldo>()
+    private val _studentDataIksica = MutableLiveData<StudentDataIksica>()
+    val loadingTxt: LiveData<String> = _loadingTxt
+    val iksicaSaldo: LiveData<IksicaSaldo> = _iksicaSaldo
+    val studentDataIksica: LiveData<StudentDataIksica> = _studentDataIksica
 
     init {
         fetchTimetableInfo()
@@ -120,6 +131,27 @@ class MainViewModel(
                 _periods.postValue(result)
             } catch (e: Exception) {
                 Log.e("Error timetableinfo", e.toString())
+            }
+        }
+    }
+
+    fun login() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _loadingTxt.postValue("Getting AuthState...")
+                iksicaRepository.getAuthState()
+                _loadingTxt.postValue("Logging in...")
+                iksicaRepository.login(
+                    (sharedPreferences.getString("username", "") + "@fesb.hr") ?: "",
+                    sharedPreferences.getString("password", "") ?: ""
+                )
+                _loadingTxt.postValue("Getting ASP.NET Session...")
+                val (iksicaSaldo, studentDataIksica) = iksicaRepository.getAspNetSessionSAML()
+                _iksicaSaldo.postValue(iksicaSaldo)
+                _studentDataIksica.postValue(studentDataIksica)
+                _loadingTxt.postValue("Parsing Data...")
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.models.data
 
+import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.database.models.IksicaSaldo
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
@@ -7,6 +8,8 @@ import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface IksicaRepositoryInterface {
+
+    val loggedIn: MutableLiveData<Boolean>
 
     suspend fun getAuthState(): NetworkServiceResult.IksicaResult
 

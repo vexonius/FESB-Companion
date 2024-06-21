@@ -42,10 +42,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.viewmodel.IksicaViewModel
+import com.tstudioz.fax.fme.viewmodel.MainViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.java.KoinJavaComponent.inject
 import java.time.LocalDate
@@ -55,9 +58,9 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-@OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class)
+@OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun IksicaCompose() {
+fun IksicaCompose(mainViewModel: MainViewModel) {
 
     val iksicaViewModel: IksicaViewModel by inject(IksicaViewModel::class.java)
 
@@ -84,19 +87,19 @@ fun IksicaCompose() {
             LazyColumn {
                 item {
                     ElevatedCardIksica(
-                        iksicaViewModel.studentDataIksica.value?.nameSurname ?: "",
-                        iksicaViewModel.studentDataIksica.value?.jmbag ?: "",
-                        iksicaViewModel.iksicaSaldo.value?.balance.toString()
+                        mainViewModel.studentDataIksica.value?.nameSurname ?: "",
+                        mainViewModel.studentDataIksica.value?.jmbag ?: "",
+                        mainViewModel.iksicaSaldo.value?.balance.toString()
                     )
                 }
                 items(list) {
                     IksicaItem(it) {
-                        iksicaViewModel.getRacun(it)
+                        iksicaViewModel.getReceiptDetails(it)
                     }
                 }
             }
         } else {
-            IksicaLoading(iksicaViewModel.loadingTxt.observeAsState().value ?: "Loading...")
+            IksicaLoading(mainViewModel.loadingTxt.observeAsState().value ?: "Loading...")
         }
     }
 }
@@ -137,7 +140,7 @@ fun ElevatedCardIksica(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
                     modifier = Modifier
-                        .padding( 0.dp, 5.dp)
+                        .padding(0.dp, 5.dp)
                         .fillMaxWidth()
                 ) {
                     Text(text = jmbag)

@@ -1,13 +1,14 @@
 package com.tstudioz.fax.fme.viewmodel
 
 import android.app.Application
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.database.models.IksicaSaldo
 import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.models.data.IksicaRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -29,14 +30,6 @@ class IksicaViewModel(
     private val _itemToShow = MutableLiveData<Receipt>()
     val itemToShow: LiveData<Receipt> = _itemToShow
 
-    private var _loadingTxt = MutableLiveData<String>()
-    val loadingTxt: LiveData<String> = _loadingTxt
-
-    private val _iksicaSaldo = MutableLiveData<IksicaSaldo>()
-    val iksicaSaldo: LiveData<IksicaSaldo> = _iksicaSaldo
-
-    private val _studentDataIksica = MutableLiveData<StudentDataIksica>()
-    val studentDataIksica: LiveData<StudentDataIksica> = _studentDataIksica
 
     fun toggleShowItem(value: Boolean) {
         _showItem.postValue(value)
@@ -47,26 +40,21 @@ class IksicaViewModel(
     }
 
 
-    fun login(email: String, password: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                _loadingTxt.postValue("Getting AuthState...")
-                repository.getAuthState()
-                _loadingTxt.postValue("Logging in...")
-                repository.login(email, password)
-                _loadingTxt.postValue("Getting ASP.NET Session...")
-                val (iksicaSaldo, studentDataIksica) =  repository.getAspNetSessionSAML()
-                _iksicaSaldo.postValue(iksicaSaldo)
-                _studentDataIksica.postValue(studentDataIksica)
-                _loadingTxt.postValue("Parsing Data...")
-                _receipts.postValue(repository.getRacuni())
-            } catch (e: Exception) {
-                e.printStackTrace()
+    fun getReceipts() {
+        repository.loggedIn.observeOnce() {
+            if (it) {
+                try {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        _receipts.postValue(repository.getRacuni())
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
 
-    fun getRacun(receipt: Receipt) {
+    fun getReceiptDetails(receipt: Receipt) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val list = repository.getRacun(receipt.urlSastavnica)
@@ -77,5 +65,14 @@ class IksicaViewModel(
             }
         }
     }
+}
+
+private fun <T> LiveData<T>.observeOnce( observer: (T) -> Unit) {
+    observeForever( object : Observer<T> {
+        override fun onChanged(value: T) {
+            removeObserver(this)
+            observer(value)
+        }
+    })
 }
 

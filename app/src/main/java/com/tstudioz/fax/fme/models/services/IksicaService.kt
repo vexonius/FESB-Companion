@@ -33,7 +33,7 @@ class IksicaService(private val client: OkHttpClient, private val client2: OkHtt
 
         return NetworkServiceResult.IksicaResult.Success("Success")
     }
-    override suspend fun login( email: String, password: String): NetworkServiceResult.IksicaResult {
+    override suspend fun login(email: String, password: String): NetworkServiceResult.IksicaResult {
         val formBody = FormBody.Builder()
             .add("username", email)
             .add("password", password)

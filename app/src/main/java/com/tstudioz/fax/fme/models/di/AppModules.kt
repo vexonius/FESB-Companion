@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.models.di
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
@@ -55,7 +56,7 @@ val module = module {
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single { androidContext().getSharedPreferences("PRIVATE_PREFS", Context.MODE_PRIVATE) }
     single { IksicaViewModel(androidApplication(), get()) }
-    viewModel { MainViewModel(get(), get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
     viewModel { AttendanceViewModel(get()) }
 }
