@@ -16,17 +16,12 @@ import com.tstudioz.fax.fme.models.data.AttendanceDao
 import com.tstudioz.fax.fme.models.data.AttendanceDaoInterface
 import com.tstudioz.fax.fme.models.data.AttendanceRepository
 import com.tstudioz.fax.fme.models.data.AttendanceRepositoryInterface
-import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepository
-import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
-import com.tstudioz.fax.fme.feature.iksica.services.IksicaServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
 import com.tstudioz.fax.fme.models.services.AttendanceService
-import com.tstudioz.fax.fme.feature.iksica.services.IksicaService
 import com.tstudioz.fax.fme.models.services.WeatherNetworkService
 import com.tstudioz.fax.fme.viewmodel.AttendanceViewModel
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
-import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -34,7 +29,6 @@ import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
@@ -58,8 +52,8 @@ val module = module {
 
 fun provideOkHttpClient(context: Context) : OkHttpClient {
     return OkHttpClient.Builder()
-        .callTimeout(30, TimeUnit.SECONDS)
-        .connectTimeout(30, TimeUnit.SECONDS)
+        .callTimeout(60, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
         .cookieJar(PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context)))
         .build()
 }

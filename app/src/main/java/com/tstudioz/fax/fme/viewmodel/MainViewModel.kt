@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.viewmodel
 
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -59,24 +60,10 @@ class MainViewModel(
     val shownWeek: LiveData<LocalDate> = _shownWeek
     val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
 
-    private var _loadingTxt = MutableLiveData<String>()
-    private val _iksicaBalance = MutableLiveData<IksicaBalance>()
-    private val _studentDataIksica = MutableLiveData<StudentDataIksica>()
-    val loadingTxt: LiveData<String> = _loadingTxt
-    val iksicaBalance: LiveData<IksicaBalance> = _iksicaBalance
-    val studentDataIksica: LiveData<StudentDataIksica> = _studentDataIksica
-
     init {
         fetchTimetableInfo()
         viewModelScope.launch(Dispatchers.IO) {
             _lessonsPerm.postValue(timeTableRepository.getCachedEvents())
-            val (_, iksicaBalance, studentDataIksica) = iksicaRepository.read()
-            if (iksicaBalance != null) {
-                _iksicaBalance.postValue(iksicaBalance!!)
-            }
-            if (studentDataIksica != null) {
-                _studentDataIksica.postValue(studentDataIksica!!)
-            }
         }
     }
 
@@ -144,24 +131,10 @@ class MainViewModel(
 
     fun loginIksica() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                _loadingTxt.postValue("Getting AuthState...")
-                iksicaRepository.getAuthState()
-                _loadingTxt.postValue("Logging in...")
-                iksicaRepository.login(
-                    (sharedPreferences.getString("username", "") + "@fesb.hr") ?: "",
-                    sharedPreferences.getString("password", "") ?: ""
-                )
-                _loadingTxt.postValue("Getting ASP.NET Session...")
-                val (iksicaBalance, studentDataIksica) = iksicaRepository.getAspNetSessionSAML()
-                _iksicaBalance.postValue(iksicaBalance)
-                _studentDataIksica.postValue(studentDataIksica)
-                iksicaRepository.insert(iksicaBalance, studentDataIksica)
-                _loadingTxt.postValue("Parsing Data...")
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            iksicaRepository.loginIksica(
+                (sharedPreferences.getString("username", "") ?: "") +"@fesb.hr",
+                sharedPreferences.getString("password", "") ?: ""
+            )
         }
 
     }

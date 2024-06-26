@@ -15,6 +15,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -22,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -42,11 +47,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
-import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
@@ -57,19 +62,29 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-@OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalCoroutinesApi::class)
+
+@OptIn(
+    InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalCoroutinesApi::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun IksicaCompose(
     iksicaViewModel: IksicaViewModel,
-    mainViewModel: MainViewModel
 ) {
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val isRefreshing = iksicaViewModel.isRefreshing.observeAsState(false).value
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, {
+        iksicaViewModel.getReceipts(true)
+    })
 
     BottomSheetScaffold(sheetPeekHeight = 0.dp,
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .pullRefresh(pullRefreshState)
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         scaffoldState = scaffoldState,
+        snackbarHost = { SnackbarHost(hostState = iksicaViewModel.snackbarHostState) },
         sheetContent = {
             if (iksicaViewModel.showItem.observeAsState(initial = false).value) {
                 val receipt = iksicaViewModel.itemToShow.observeAsState().value
@@ -82,24 +97,31 @@ fun IksicaCompose(
                 }
             }
         }) {
-        val list = iksicaViewModel.receipts.observeAsState().value
-        if (!list.isNullOrEmpty()) {
-            LazyColumn {
-                item {
-                    ElevatedCardIksica(
-                        mainViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
-                        mainViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
-                        mainViewModel.iksicaBalance.observeAsState().value?.balance.toString()
-                    )
-                }
-                items(list) {
-                    IksicaItem(it) {
-                        iksicaViewModel.getReceiptDetails(it)
+        Box {
+            PullRefreshIndicator(
+                isRefreshing, pullRefreshState, Modifier
+                    .align(Alignment.TopCenter)
+                    .zIndex(2f)
+            )
+            val list = iksicaViewModel.receipts.observeAsState().value
+            if (!list.isNullOrEmpty()) {
+                LazyColumn {
+                    item {
+                        ElevatedCardIksica(
+                            iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
+                            iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
+                            iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
+                        )
+                    }
+                    items(list) {
+                        IksicaItem(it) {
+                            iksicaViewModel.getReceiptDetails(it)
+                        }
                     }
                 }
+            } else {
+                IksicaLoading(iksicaViewModel.loadingTxt.observeAsState().value ?: "Loading...")
             }
-        } else {
-            IksicaLoading(mainViewModel.loadingTxt.observeAsState().value ?: "Loading...")
         }
     }
 }

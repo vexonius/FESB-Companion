@@ -2,6 +2,9 @@ package com.tstudioz.fax.fme.feature.iksica.repository
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.database.models.IksicaBalance
 import com.tstudioz.fax.fme.database.models.Receipt
@@ -23,6 +26,48 @@ class IksicaRepository(
 
     val _loggedIn = MutableLiveData<Boolean>(false)
     override val loggedIn: MutableLiveData<Boolean> = _loggedIn
+
+    private val _loadingTxt = MutableLiveData<String>()
+    private val _iksicaBalance = MutableLiveData<IksicaBalance>()
+    private val _studentDataIksica = MutableLiveData<StudentDataIksica>()
+    override val loadingTxt: LiveData<String> = _loadingTxt
+    override val iksicaBalance: LiveData<IksicaBalance> = _iksicaBalance
+    override val studentDataIksica: LiveData<StudentDataIksica> = _studentDataIksica
+    override val snackbarHostState = SnackbarHostState()
+
+    override suspend fun loadData() {
+        try {
+            val (_, iksicaBalance, studentDataIksica) = read()
+            if (iksicaBalance != null) {
+                _iksicaBalance.postValue(iksicaBalance!!)
+            }
+            if (studentDataIksica != null) {
+                _studentDataIksica.postValue(studentDataIksica!!)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
+    override suspend fun loginIksica(email: String, password: String) {
+        try {
+            _loadingTxt.postValue("Getting AuthState...")
+            getAuthState()
+            _loadingTxt.postValue("Logging in...")
+            login(email, password)
+            _loadingTxt.postValue("Getting ASP.NET Session...")
+            val (iksicaBalance, studentDataIksica) = getAspNetSessionSAML()
+            _iksicaBalance.postValue(iksicaBalance)
+            _studentDataIksica.postValue(studentDataIksica)
+            insert(iksicaBalance, studentDataIksica)
+            _loadingTxt.postValue("Parsing Data...")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar("Greška prilikom prijave: " + e.message, duration = SnackbarDuration.Short)
+        }
+    }
 
 
     override suspend fun getAuthState(): NetworkServiceResult.IksicaResult {
@@ -74,6 +119,8 @@ class IksicaRepository(
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
                 Log.e(TAG, "Racuni fetching error")
+                snackbarHostState.currentSnackbarData?.dismiss()
+                snackbarHostState.showSnackbar("Greška prilikom dohvaćanja liste računa", duration = SnackbarDuration.Short)
                 throw Exception("Racuni fetching error")
             }
         }
@@ -87,6 +134,8 @@ class IksicaRepository(
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
                 Log.e(TAG, "Racuni fetching error")
+                snackbarHostState.currentSnackbarData?.dismiss()
+                snackbarHostState.showSnackbar("Greška prilikom dohvaćanja detalja računa", duration = SnackbarDuration.Short)
                 throw Exception("Racuni fetching error")
             }
         }

@@ -1,5 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica.repository
 
+import androidx.compose.material3.SnackbarHostState
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.database.models.IksicaBalance
 import com.tstudioz.fax.fme.database.models.Receipt
@@ -10,6 +12,14 @@ import com.tstudioz.fax.fme.models.NetworkServiceResult
 interface IksicaRepositoryInterface {
 
     val loggedIn: MutableLiveData<Boolean>
+    val loadingTxt: LiveData<String>
+    val iksicaBalance: LiveData<IksicaBalance>
+    val studentDataIksica: LiveData<StudentDataIksica>
+    val snackbarHostState: SnackbarHostState
+
+    suspend fun loadData()
+
+    suspend fun loginIksica(email: String, password: String)
 
     suspend fun getAuthState(): NetworkServiceResult.IksicaResult
 

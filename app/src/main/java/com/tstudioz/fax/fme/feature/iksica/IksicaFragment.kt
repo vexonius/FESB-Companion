@@ -23,8 +23,6 @@ class IksicaFragment : Fragment() {
     @OptIn(InternalCoroutinesApi::class)
     private val iksicaViewModel: IksicaViewModel by viewModel()
     private var binding: FragmentIksicaBinding? = null
-    private val mainViewModel: MainViewModel by activityViewModel()
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,10 +33,7 @@ class IksicaFragment : Fragment() {
 
         composeView.setContent {
             AppTheme {
-                IksicaCompose(
-                    iksicaViewModel,
-                    mainViewModel
-                )
+                IksicaCompose(iksicaViewModel)
             }
         }
 

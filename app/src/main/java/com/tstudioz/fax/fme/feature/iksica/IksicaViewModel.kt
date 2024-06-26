@@ -6,10 +6,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.database.models.IksicaBalance
 import com.tstudioz.fax.fme.database.models.Receipt
+import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
@@ -27,8 +30,17 @@ class IksicaViewModel(
     private val _itemToShow = MutableLiveData<Receipt>()
     val itemToShow: LiveData<Receipt> = _itemToShow
 
+    private val _isRefreshing = MutableLiveData<Boolean>(false)
+    val isRefreshing: LiveData<Boolean> = _isRefreshing
+
+    val loadingTxt: LiveData<String> = repository.loadingTxt
+    val iksicaBalance: LiveData<IksicaBalance> = repository.iksicaBalance
+    val studentDataIksica: LiveData<StudentDataIksica> = repository.studentDataIksica
+    val snackbarHostState = repository.snackbarHostState
+
+
     init {
-        getReceipts()
+        loadReceipts()
     }
 
     fun toggleShowItem(value: Boolean) {
@@ -40,25 +52,35 @@ class IksicaViewModel(
     }
 
 
-    fun getReceipts() {
-        viewModelScope.launch {
+    fun loadReceipts() {
+        viewModelScope.launch(Dispatchers.IO)  {
             try {
+                repository.loadData()
                 _receipts.postValue(repository.read().first)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-        repository.loggedIn.observeOnce() {
+        repository.loggedIn.observeOnce {
             if (it) {
-                try {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        val receiptsNew = repository.getReceipts()
-                        _receipts.postValue(receiptsNew)
-                        repository.insert(receiptsNew)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                getReceipts(false)
+            }
+        }
+    }
+
+    fun getReceipts( isRefreshing: Boolean = false) {
+        viewModelScope.launch(Dispatchers.IO)  {
+            try {
+                if (isRefreshing){ _isRefreshing.postValue(true) }
+                val receiptsNew = repository.getReceipts()
+                _receipts.postValue(receiptsNew)
+                repository.insert(receiptsNew)
+            } catch (e: Exception) {
+                // ode dodati snackbar jer nekad moze failat bez da ide preko failure
+                e.printStackTrace()
+                delay(1000)
+            } finally {
+                if (isRefreshing){ _isRefreshing.postValue(false) }
             }
         }
     }

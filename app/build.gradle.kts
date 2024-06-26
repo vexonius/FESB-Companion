@@ -97,8 +97,10 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-    implementation("androidx.compose.material3:material3-android:1.2.1")
+    val materialVersion = "1.2.1"
 
+    implementation("androidx.compose.material3:material3-android:$materialVersion")
+    implementation("androidx.compose.material:material:1.6.8")
     val composeVersion = "1.6.7"
 
     //compose livedata state
@@ -108,7 +110,7 @@ dependencies {
     //EncryptedSharedPreferences
     implementation("androidx.security:security-crypto:1.0.0")
 
-    //pull to refresh compose
+    //compose ui
     implementation("androidx.compose.ui:ui-android:$composeVersion")
 
     //choose calendar
