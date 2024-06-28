@@ -1,5 +1,6 @@
-package com.tstudioz.fax.fme.compose
+package com.tstudioz.fax.fme.feature.iksica
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
@@ -49,9 +51,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.CircularIndicator
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
-import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
+import com.tstudioz.fax.fme.feature.iksica.repository.Status
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
@@ -71,7 +74,7 @@ import kotlin.math.sin
 fun IksicaCompose(
     iksicaViewModel: IksicaViewModel,
 ) {
-
+    val status = iksicaViewModel.status.observeAsState().value
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val isRefreshing = iksicaViewModel.isRefreshing.observeAsState(false).value
@@ -88,13 +91,15 @@ fun IksicaCompose(
         sheetContent = {
             if (iksicaViewModel.showItem.observeAsState(initial = false).value) {
                 val receipt = iksicaViewModel.itemToShow.observeAsState().value
-                val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
                 ModalBottomSheet(
                     sheetState = sheetState,
                     onDismissRequest = { iksicaViewModel.toggleShowItem(false) },
+                    containerColor = MaterialTheme.colorScheme.surface
                 ) {
                     IksicaReceiptDetailed(receipt)
                 }
+
             }
         }) {
         Box {
@@ -103,6 +108,9 @@ fun IksicaCompose(
                     .align(Alignment.TopCenter)
                     .zIndex(2f)
             )
+            if ((status == Status.FETCHING) && !isRefreshing) {
+                CircularIndicator()
+            }
             val list = iksicaViewModel.receipts.observeAsState().value
             if (!list.isNullOrEmpty()) {
                 LazyColumn {
@@ -279,12 +287,12 @@ fun IksicaReceiptDetailed(
         datum = LocalDate.now()
     )
 ) {
-    LazyColumn(modifier = Modifier.padding(10.dp)) {
+    LazyColumn(modifier = Modifier.padding(0.dp)) {
         item {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(10.dp, 5.dp)
+                modifier = Modifier.padding(20.dp, 5.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.location_pin_svgrepo_com),
@@ -296,7 +304,7 @@ fun IksicaReceiptDetailed(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(10.dp, 5.dp)
+                modifier = Modifier.padding(20.dp, 5.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.date_time_svgrepo_com),
@@ -306,30 +314,29 @@ fun IksicaReceiptDetailed(
                 Text(text = (receipt?.datumString ?: "") + ", " + (receipt?.vrijeme ?: ""))
             }
         }
-        items(receipt?.detaljiRacuna ?: emptyList()) {
-            IksicaItemDetailed(it)
-        }
         item {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
+                    .padding(20.dp, 10.dp, 20.dp, 0.dp)
             ) {
-                Text(text = "Ukupno plaćeno: ")
+                Text(text = "Ukupno plaćeno: ", fontSize = 18.sp)
                 Text(
                     text = receipt?.iznosRacuna?.minus(receipt.iznosSubvencije)?.toBigDecimal()
-                        ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €"
+                        ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €", fontSize = 18.sp
                 )
             }
-            HorizontalDivider()
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
+                    .padding(20.dp, 10.dp, 20.dp, 10.dp)
             ) {
-                Text(text = "Ukupno subvencionirano: ")
-                Text(text = receipt?.iznosSubvencije.toString() + " €")
+                Text(text = "Ukupno subvencionirano: ", fontSize = 18.sp)
+                Text(text = receipt?.iznosSubvencije.toString() + " €", fontSize = 18.sp)
             }
+        }
+        items(receipt?.detaljiRacuna ?: emptyList()) {
+            IksicaItemDetailed(it)
         }
     }
 }
@@ -347,23 +354,34 @@ fun IksicaItemDetailed(
 ) {
     Row(
         Modifier
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(15.dp, 10.dp, 15.dp, 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
-        Row(Modifier.weight(0.85f)) {
-            Text(text = item.kolicina.toString() + "x")
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = item.nazivArtikla)
+        Column(Modifier.weight(0.85f)) {
+            Row(Modifier.padding(bottom = 5.dp)) {
+                Text(text = item.kolicina.toString() + "x", fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(text = item.nazivArtikla, fontWeight = FontWeight.Bold)
+            }
+            Text(
+                text = "Cijena: " + item.cijenaJednogArtikla.toString() + " €",
+                color = MaterialTheme.colorScheme.outline
+            )
+            Text(
+                text = "Subvencija: " + item.iznosSubvencije.toString() + " €",
+                color = MaterialTheme.colorScheme.outline
+            )
         }
-        Column(Modifier.padding(start = 15.dp)) {
-            Text(text = item.cijenaUkupno.toString() + " €")
-            Text(text = item.iznosSubvencije.toString() + " €", color = Color.Red)
-        }
-        Column(Modifier.padding(start = 15.dp)) {
-            Text(text = item.cijenaUkupno.times(item.kolicina).toString() + " €")
-            Text(text = item.iznosSubvencije.times(item.kolicina).toString() + " €", color = Color.Red)
+        Column(
+            Modifier.padding(start = 15.dp)
+        ) {
+            Text(
+                text = item.cijenaUkupno.toBigDecimal().minus(item.iznosSubvencije.toBigDecimal())
+                    .times(item.kolicina.toBigDecimal()).toString() + " €"
+            )
         }
     }
     HorizontalDivider()

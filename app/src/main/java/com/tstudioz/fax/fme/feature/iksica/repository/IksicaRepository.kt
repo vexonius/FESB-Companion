@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica.repository
 
 import android.content.ContentValues.TAG
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -10,7 +11,6 @@ import com.tstudioz.fax.fme.database.models.IksicaBalance
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.database.models.StudentDataIksica
-import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDao
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDaoInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaServiceInterface
@@ -21,18 +21,22 @@ import com.tstudioz.fax.fme.models.util.parseStudentInfo
 
 class IksicaRepository(
     private val iksicaService: IksicaServiceInterface,
-    private val iksicaDao: IksicaDaoInterface
+    private val iksicaDao: IksicaDaoInterface,
+    private val sharedPreferences: SharedPreferences
 ) : IksicaRepositoryInterface {
 
-    val _loggedIn = MutableLiveData<Boolean>(false)
-    override val loggedIn: MutableLiveData<Boolean> = _loggedIn
-
+    private val _loggedIn = MutableLiveData<Boolean>(false)
     private val _loadingTxt = MutableLiveData<String>()
     private val _iksicaBalance = MutableLiveData<IksicaBalance>()
     private val _studentDataIksica = MutableLiveData<StudentDataIksica>()
+    private val _status = MutableLiveData<Status>(Status.UNSET)
+
+    override val loggedIn: MutableLiveData<Boolean> = _loggedIn
     override val loadingTxt: LiveData<String> = _loadingTxt
     override val iksicaBalance: LiveData<IksicaBalance> = _iksicaBalance
     override val studentDataIksica: LiveData<StudentDataIksica> = _studentDataIksica
+    override val status: LiveData<Status> = _status
+
     override val snackbarHostState = SnackbarHostState()
 
     override suspend fun loadData() {
@@ -50,7 +54,9 @@ class IksicaRepository(
     }
 
 
-    override suspend fun loginIksica(email: String, password: String) {
+    override suspend fun loginIksica() {
+        val email = (sharedPreferences.getString("username", "") ?: "") + "@fesb.hr"
+        val password = sharedPreferences.getString("password", "") ?: ""
         try {
             _loadingTxt.postValue("Getting AuthState...")
             getAuthState()
@@ -90,6 +96,7 @@ class IksicaRepository(
                 result
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
+                _loggedIn.postValue(false)
                 Log.e(TAG, "Login error")
                 throw Exception("Login error")
             }
@@ -105,6 +112,7 @@ class IksicaRepository(
                 return info
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
+                _loggedIn.postValue(false)
                 Log.e(TAG, "AspNetSessionSAML fetching error")
                 throw Exception("AspNetSessionSAML fetching error")
             }
@@ -112,6 +120,9 @@ class IksicaRepository(
     }
 
     override suspend fun getReceipts(): List<Receipt> {
+        if (_loggedIn.value == false) {
+            loginIksica()
+        }
         return when (val result = iksicaService.getRacuni()) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 Log.d(TAG, "Racuni fetched")
@@ -119,24 +130,36 @@ class IksicaRepository(
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
                 Log.e(TAG, "Racuni fetching error")
+                if (result.throwable.message?.contains("Not logged in", false) == true) {
+                    _loggedIn.postValue(false)
+                }
                 snackbarHostState.currentSnackbarData?.dismiss()
                 snackbarHostState.showSnackbar("Greška prilikom dohvaćanja liste računa", duration = SnackbarDuration.Short)
-                throw Exception("Racuni fetching error")
+                throw Exception("Racuni fetching error: " + result.throwable.message)
             }
         }
     }
 
     override suspend fun getRacun(url: String): MutableList<ReceiptItem> {
+        _status.postValue(Status.FETCHING)
+        if (_loggedIn.value == false) {
+            loginIksica()
+        }
         return when (val result = iksicaService.getRacun(url)) {
             is NetworkServiceResult.IksicaResult.Success -> {
-                Log.d(TAG, "Racuni fetched")
+                Log.d(TAG, "Racun fetched")
+                _status.postValue(Status.FETCHED)
                 parseDetaljeRacuna(result.data)
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
-                Log.e(TAG, "Racuni fetching error")
+                Log.e(TAG, "Racun fetching error")
+                if (result.throwable.message?.contains("Not logged in", false) == true) {
+                    _loggedIn.postValue(false)
+                }
                 snackbarHostState.currentSnackbarData?.dismiss()
                 snackbarHostState.showSnackbar("Greška prilikom dohvaćanja detalja računa", duration = SnackbarDuration.Short)
-                throw Exception("Racuni fetching error")
+                _status.postValue(Status.FETCHING_ERROR)
+                throw Exception("Racun fetching error" + result.throwable.message)
             }
         }
     }
@@ -153,5 +176,13 @@ class IksicaRepository(
         return iksicaDao.read()
     }
 
+}
 
+
+enum class Status {
+    FETCHING,
+    FETCHED,
+    FETCHED_NEW,
+    FETCHING_ERROR,
+    UNSET
 }

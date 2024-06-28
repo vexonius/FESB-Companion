@@ -17,14 +17,9 @@ import org.koin.dsl.module
 
 @OptIn(InternalCoroutinesApi::class)
 val iksicaModule = module {
-    single(named("client2")) { provideOkHttpClient2() }
-    single<IksicaRepositoryInterface> { IksicaRepository(get(), get()) }
-    single<IksicaServiceInterface> { IksicaService(get(),get(named("client2")))}
+    single<IksicaRepositoryInterface> { IksicaRepository(get(), get(), get()) }
+    single<IksicaServiceInterface> { IksicaService(get())}
     single<IksicaDaoInterface> { IksicaDao(get()) }
     viewModel { IksicaViewModel(androidApplication(), get()) }
 }
 
-fun provideOkHttpClient2() : OkHttpClient {
-    return OkHttpClient.Builder()
-        .build()
-}

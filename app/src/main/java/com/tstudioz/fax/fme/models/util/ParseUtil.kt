@@ -24,11 +24,7 @@ fun parseWeatherDetails(data: String): Current {
     val currentlyNextOneHoursSummary = currentlyNextOneHours.getJSONObject("summary")
     val currentlyNextOneHoursDetails = currentlyNextOneHours.getJSONObject("details")
     val unparsedsummary = currentlyNextOneHoursSummary.getString("symbol_code")
-    val summarycode: String? = if (unparsedsummary.contains("_")) {
-        unparsedsummary.substring(0, unparsedsummary.indexOf('_'))
-    } else {
-        unparsedsummary
-    }
+    val summarycode: String = unparsedsummary.substringBefore("_")
 
     val current = Current()
     current.humidity = currently.getDouble("relative_humidity")
@@ -44,25 +40,25 @@ fun parseWeatherDetails(data: String): Current {
 fun parseStudentInfo(body: String): Pair<IksicaBalance, StudentDataIksica> {
     val doc = Jsoup.parse(body)
 
-    val image = doc.select(".slikastud").attr("src")
-    val user = doc.select(".card-title").first()?.text()
-    val number = doc.select("td:contains(Izdana)").first()?.parent()?.select("td")?.first()?.text()
-    val oib = doc.select("span:contains(OIB:)").first()?.nextSibling()?.toString()?.trim()
-    val jmbag = doc.select("span:contains(JMBAG:)").first()?.nextSibling()?.toString()?.trim()
-    val university = doc.select("span:contains(Nadležna ustanova:)").first()?.nextSibling().toString()
-    val rightsLevel = doc.select("p:contains(RAZINA PRAVA)").first()?.parent()?.select("u")?.text().toString()
-    val rightsFrom = doc.select("span:contains(Prava od datuma:)").first()?.nextSibling().toString()
-    val rightsTo = doc.select("span:contains(Prava do datuma:)").first()?.nextSibling().toString()
+    val image = doc.selectFirst(".slikastud")?.attr("src")
+    val user = doc.selectFirst(".card-title")?.text()
+    val number = doc.selectFirst("td:contains(Izdana)")?.parent()?.selectFirst("td")?.text()
+    val oib = doc.selectFirst("span:contains(OIB:)")?.nextSibling()?.toString()?.trim()
+    val jmbag = doc.selectFirst("span:contains(JMBAG:)")?.nextSibling()?.toString()?.trim()
+    val university = doc.selectFirst("span:contains(Nadležna ustanova:)")?.nextSibling().toString()
+    val rightsLevel = doc.selectFirst("p:contains(RAZINA PRAVA)")?.parent()?.selectFirst("u")?.text().toString()
+    val rightsFrom = doc.selectFirst("span:contains(Prava od datuma:)")?.nextSibling().toString()
+    val rightsTo = doc.selectFirst("span:contains(Prava do datuma:)")?.nextSibling().toString()
     val balance =
-        doc.select("p:contains(RASPOLOŽIVI SALDO)")
-            .first()?.parent()?.lastElementChild()?.text()
+        doc.selectFirst("p:contains(RASPOLOŽIVI SALDO)")
+            ?.parent()?.lastElementChild()?.text()
             ?.substringBefore(" €").toString().replace(",", ".")
     val spentToday =
-        doc.select("p:contains(POTROŠENO DANAS)").first()?.parent()?.lastElementChild()?.text()
+        doc.selectFirst("p:contains(POTROŠENO DANAS)")?.parent()?.lastElementChild()?.text()
             ?.substringBefore(" €").toString().replace(",", ".")
     val dailySupport =
-        doc.select("p:contains(DNEVNA POTPORA)")
-            .first()?.parent()?.lastElementChild()?.text()
+        doc.selectFirst("p:contains(DNEVNA POTPORA)")
+            ?.parent()?.lastElementChild()?.text()
             ?.substringBefore(" €").toString().replace(",", ".")
     val iksicaBalance = IksicaBalance(
         balance.toDoubleOrNull() ?: 0.0,
@@ -83,9 +79,9 @@ fun parseStudentInfo(body: String): Pair<IksicaBalance, StudentDataIksica> {
 
 fun parseRacuni(doc: String): List<Receipt> {
     val racuni = mutableListOf<Receipt>()
-    val table = Jsoup.parse(doc).select("table")
-    val rows = table.select("tr")
-    for (row in rows) {
+    val table = Jsoup.parse(doc).selectFirst("table")
+    val rows = table?.select("tr")
+    rows?.forEach { row ->
         val cols = row.select("td")
         if (cols.size >= 6) {
             racuni.add(
@@ -97,21 +93,20 @@ fun parseRacuni(doc: String): List<Receipt> {
                     cols[3].text().toDoubleOrNull() ?: 0.0,
                     cols[4].text().toDoubleOrNull() ?: 0.0,
                     cols[5].text(),
-                    cols[6].select("a").attr("href")
+                    cols[6].selectFirst("a")?.attr("href") ?: ""
                 )
             )
         }
     }
-    val test = racuni
+    return racuni
         .sortedByDescending { LocalTime.parse(it.vrijeme) }
         .sortedByDescending { it.datum }
-    return test
 }
 
 fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {
     val detaljiRacuna = mutableListOf<ReceiptItem>()
-    val table = Jsoup.parse(doc).select(".table-responsive").first()
-    val rows = table?.select("tbody")?.select("tr")
+    val table = Jsoup.parse(doc).selectFirst(".table-responsive")
+    val rows = table?.selectFirst("tbody")?.select("tr")
     rows?.forEach { row ->
         val cols = row.select("td")
         val item = ReceiptItem(

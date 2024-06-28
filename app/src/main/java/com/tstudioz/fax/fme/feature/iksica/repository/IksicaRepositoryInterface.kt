@@ -16,10 +16,11 @@ interface IksicaRepositoryInterface {
     val iksicaBalance: LiveData<IksicaBalance>
     val studentDataIksica: LiveData<StudentDataIksica>
     val snackbarHostState: SnackbarHostState
+    val status: LiveData<Status>
 
     suspend fun loadData()
 
-    suspend fun loginIksica(email: String, password: String)
+    suspend fun loginIksica()
 
     suspend fun getAuthState(): NetworkServiceResult.IksicaResult
 
@@ -32,6 +33,9 @@ interface IksicaRepositoryInterface {
     suspend fun getRacun(url: String): MutableList<ReceiptItem>
 
     suspend fun insert(receipts: List<Receipt>)
+
     suspend fun insert(iksicaBalance: IksicaBalance, studentDataIksica: StudentDataIksica)
+
     suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentDataIksica?>
+
 }

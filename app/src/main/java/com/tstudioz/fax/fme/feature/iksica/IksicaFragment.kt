@@ -8,13 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.IksicaCompose
 import com.tstudioz.fax.fme.databinding.FragmentIksicaBinding
-import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
-import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)

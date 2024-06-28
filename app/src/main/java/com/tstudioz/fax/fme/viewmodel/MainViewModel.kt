@@ -131,12 +131,8 @@ class MainViewModel(
 
     fun loginIksica() {
         viewModelScope.launch(Dispatchers.IO) {
-            iksicaRepository.loginIksica(
-                (sharedPreferences.getString("username", "") ?: "") +"@fesb.hr",
-                sharedPreferences.getString("password", "") ?: ""
-            )
+            iksicaRepository.loginIksica()
         }
-
     }
 
     fun showThisWeeksEvents() {

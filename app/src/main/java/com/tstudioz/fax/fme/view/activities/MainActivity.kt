@@ -86,10 +86,10 @@ class MainActivity : AppCompatActivity() {
 
         checkVersion()
         shouldShowGDPRDialog()
-        loginIkisca()
+        loginX()
     }
 
-    private fun loginIkisca() {
+    private fun loginX() {
         mainViewModel.loginIksica()
     }
 
