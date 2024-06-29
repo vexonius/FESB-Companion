@@ -40,6 +40,9 @@ class IksicaViewModel(
     val studentDataIksica: LiveData<StudentDataIksica> = repository.studentDataIksica
     val snackbarHostState = repository.snackbarHostState
     val status: LiveData<Status> = repository.status
+    val haveRightPassword: LiveData<Boolean> = repository.haveRightPassword
+    private val _showLoading = MutableLiveData<Boolean>().apply { value = false }
+    val showLoading: LiveData<Boolean> = _showLoading
 
     init {
         loadReceipts()
@@ -47,6 +50,14 @@ class IksicaViewModel(
 
     fun toggleShowItem(value: Boolean) {
         _showItem.postValue(value)
+    }
+
+    fun loginIksica(username:String, password: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _showLoading.postValue(true)
+            repository.loginIksica(username, password)
+            _showLoading.postValue(false)
+        }
     }
 
 
