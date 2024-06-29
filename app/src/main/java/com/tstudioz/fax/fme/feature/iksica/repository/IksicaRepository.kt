@@ -30,14 +30,12 @@ class IksicaRepository(
     private val _iksicaBalance = MutableLiveData<IksicaBalance>()
     private val _studentDataIksica = MutableLiveData<StudentDataIksica>()
     private val _status = MutableLiveData<Status>(Status.UNSET)
-    private val _haveRightPassword = MutableLiveData<Boolean>(true)
 
     override val loggedIn: MutableLiveData<Boolean> = _loggedIn
     override val loadingTxt: LiveData<String> = _loadingTxt
     override val iksicaBalance: LiveData<IksicaBalance> = _iksicaBalance
     override val studentDataIksica: LiveData<StudentDataIksica> = _studentDataIksica
     override val status: LiveData<Status> = _status
-    override val haveRightPassword: LiveData<Boolean> = _haveRightPassword
 
     override val snackbarHostState = SnackbarHostState()
 
@@ -56,13 +54,9 @@ class IksicaRepository(
     }
 
 
-    override suspend fun loginIksica(usernameNew: String, passwordNew: String) {
-        var email = (sharedPreferences.getString("username", "") ?: "") + "@fesb.hr"
-        var password = sharedPreferences.getString("passwordIksica", "") ?: ""
-        if (usernameNew.isNotEmpty() && passwordNew.isNotEmpty()) {
-            email = "$usernameNew@fesb.hr"
-            password = passwordNew
-        }
+    override suspend fun loginIksica() {
+        val email = (sharedPreferences.getString("username", "") ?: "") + "@fesb.hr"
+        val password = sharedPreferences.getString("password", "") ?: ""
         try {
             _loadingTxt.postValue("Getting AuthState...")
             getAuthState()
@@ -74,14 +68,10 @@ class IksicaRepository(
             _studentDataIksica.postValue(studentDataIksica)
             insert(iksicaBalance, studentDataIksica)
             _loadingTxt.postValue("Parsing Data...")
-            _haveRightPassword.postValue(true)
         } catch (e: Exception) {
             e.printStackTrace()
             snackbarHostState.currentSnackbarData?.dismiss()
             snackbarHostState.showSnackbar("Greška prilikom prijave: " + e.message, duration = SnackbarDuration.Short)
-        }
-        if (email.isNotEmpty() && password.isNotEmpty()) {
-            sharedPreferences.edit().putString("passwordIksica", passwordNew).apply()
         }
     }
 
@@ -106,17 +96,9 @@ class IksicaRepository(
                 result
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
-                result.throwable.printStackTrace()
-                if (result.throwable.message?.contains("Neispravna korisnička oznaka ili zaporka", false) == true) {
-                    _haveRightPassword.postValue(false)
-                }
-                result.throwable.message?.let {
-                    snackbarHostState.currentSnackbarData?.dismiss()
-                    snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
-                }
                 _loggedIn.postValue(false)
-                Log.e(TAG, "Prijava pogreška")
-                throw Exception("Prijava pogreška")
+                Log.e(TAG, "Login error")
+                throw Exception("Login error")
             }
         }
     }
@@ -139,7 +121,7 @@ class IksicaRepository(
 
     override suspend fun getReceipts(): List<Receipt> {
         if (_loggedIn.value == false) {
-            loginIksica("","")
+            loginIksica()
         }
         return when (val result = iksicaService.getRacuni()) {
             is NetworkServiceResult.IksicaResult.Success -> {
@@ -161,7 +143,7 @@ class IksicaRepository(
     override suspend fun getRacun(url: String): MutableList<ReceiptItem> {
         _status.postValue(Status.FETCHING)
         if (_loggedIn.value == false) {
-            loginIksica("","")
+            loginIksica()
         }
         return when (val result = iksicaService.getRacun(url)) {
             is NetworkServiceResult.IksicaResult.Success -> {

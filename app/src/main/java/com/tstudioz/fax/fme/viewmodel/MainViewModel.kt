@@ -131,7 +131,7 @@ class MainViewModel(
 
     fun loginIksica() {
         viewModelScope.launch(Dispatchers.IO) {
-            iksicaRepository.loginIksica("","")
+            iksicaRepository.loginIksica()
         }
     }
 

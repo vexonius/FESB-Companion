@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.CircularIndicator
-import com.tstudioz.fax.fme.compose.IksicaLoginCompose
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.feature.iksica.repository.Status
@@ -103,43 +102,34 @@ fun IksicaCompose(
 
             }
         }) {
-        if (iksicaViewModel.haveRightPassword.observeAsState().value == true) {
-            Box {
-                PullRefreshIndicator(
-                    isRefreshing, pullRefreshState, Modifier
-                        .align(Alignment.TopCenter)
-                        .zIndex(2f)
-                )
-                if ((status == Status.FETCHING) && !isRefreshing) {
-                    CircularIndicator()
-                }
-                val list = iksicaViewModel.receipts.observeAsState().value
-                if (!list.isNullOrEmpty()) {
-                    LazyColumn {
-                        item {
-                            ElevatedCardIksica(
-                                iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
-                                iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
-                                iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
-                            )
-                        }
-                        items(list) {
-                            IksicaItem(it) {
-                                iksicaViewModel.getReceiptDetails(it)
-                            }
+        Box {
+            PullRefreshIndicator(
+                isRefreshing, pullRefreshState, Modifier
+                    .align(Alignment.TopCenter)
+                    .zIndex(2f)
+            )
+            if ((status == Status.FETCHING) && !isRefreshing) {
+                CircularIndicator()
+            }
+            val list = iksicaViewModel.receipts.observeAsState().value
+            if (!list.isNullOrEmpty()) {
+                LazyColumn {
+                    item {
+                        ElevatedCardIksica(
+                            iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
+                            iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
+                            iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
+                        )
+                    }
+                    items(list) {
+                        IksicaItem(it) {
+                            iksicaViewModel.getReceiptDetails(it)
                         }
                     }
-                } else {
-                    IksicaLoading(iksicaViewModel.loadingTxt.observeAsState().value ?: "Loading...")
                 }
+            } else {
+                IksicaLoading(iksicaViewModel.loadingTxt.observeAsState().value ?: "Loading...")
             }
-        }
-        else {
-            IksicaLoginCompose(
-                iksicaViewModel.snackbarHostState,
-                iksicaViewModel::loginIksica,
-                iksicaViewModel.showLoading
-            )
         }
     }
 }

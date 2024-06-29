@@ -127,7 +127,6 @@ class MainActivity : AppCompatActivity() {
                 editor = shPref.edit()
                 editor?.putString("username", korisnik.username)
                 editor?.putString("password", korisnik.password)
-                editor?.putString("passwordIksica", korisnik.password)
                 editor?.commit()
                 mojRaspored()
             } else {
