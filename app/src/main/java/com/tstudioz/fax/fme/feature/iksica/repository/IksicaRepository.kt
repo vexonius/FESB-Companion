@@ -59,7 +59,7 @@ class IksicaRepository(
     override suspend fun loginIksica(usernameNew: String, passwordNew: String) {
         var email = (sharedPreferences.getString("username", "") ?: "") + "@fesb.hr"
         var password = sharedPreferences.getString("passwordIksica", "") ?: ""
-        if (email.isNotEmpty() && password.isNotEmpty()) {
+        if (usernameNew.isNotEmpty() && passwordNew.isNotEmpty()) {
             email = "$usernameNew@fesb.hr"
             password = passwordNew
         }
