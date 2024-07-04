@@ -53,21 +53,25 @@ class IksicaRepository(
         }
     }
 
+    private fun displayText(text: String) {
+        _loadingTxt.postValue(text)
+    }
+
 
     override suspend fun loginIksica() {
         val email = (sharedPreferences.getString("username", "") ?: "") + "@fesb.hr"
         val password = sharedPreferences.getString("password", "") ?: ""
         try {
-            _loadingTxt.postValue("Getting AuthState...")
+            displayText("Getting AuthState...")
             getAuthState()
-            _loadingTxt.postValue("Logging in...")
+            displayText("Logging in...")
             login(email, password)
-            _loadingTxt.postValue("Getting ASP.NET Session...")
+            displayText("Getting ASP.NET Session...")
             val (iksicaBalance, studentDataIksica) = getAspNetSessionSAML()
             _iksicaBalance.postValue(iksicaBalance)
             _studentDataIksica.postValue(studentDataIksica)
             insert(iksicaBalance, studentDataIksica)
-            _loadingTxt.postValue("Parsing Data...")
+            displayText("Parsing Data...")
         } catch (e: Exception) {
             e.printStackTrace()
             snackbarHostState.currentSnackbarData?.dismiss()
@@ -83,8 +87,8 @@ class IksicaRepository(
                 result
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
-                Log.e(TAG, "TimetableInfo fetching error")
-                throw Exception("TimetableInfo fetching error")
+                Log.e(TAG, result.throwable.message ?: "AuthState fetching error")
+                throw Exception(result.throwable.message ?: "AuthState fetching error")
             }
         }
     }
@@ -97,8 +101,8 @@ class IksicaRepository(
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
                 _loggedIn.postValue(false)
-                Log.e(TAG, "Login error")
-                throw Exception("Login error")
+                Log.e(TAG, result.throwable.message ?: "Login error")
+                throw Exception(result.throwable.message ?: "Login error")
             }
         }
     }
@@ -113,8 +117,8 @@ class IksicaRepository(
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
                 _loggedIn.postValue(false)
-                Log.e(TAG, "AspNetSessionSAML fetching error")
-                throw Exception("AspNetSessionSAML fetching error")
+                Log.e(TAG, result.throwable.message ?: "AspNetSessionSAML fetching error")
+                throw Exception(result.throwable.message ?: "AspNetSessionSAML fetching error")
             }
         }
     }

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,10 +37,13 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -49,11 +54,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.CircularIndicator
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
+import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.repository.Status
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -81,6 +89,7 @@ fun IksicaCompose(
     val pullRefreshState = rememberPullRefreshState(isRefreshing, {
         iksicaViewModel.getReceipts(true)
     })
+    val showPopup = remember { mutableStateOf(false) }
 
     BottomSheetScaffold(sheetPeekHeight = 0.dp,
         modifier = Modifier
@@ -115,11 +124,11 @@ fun IksicaCompose(
             if (!list.isNullOrEmpty()) {
                 LazyColumn {
                     item {
-                        ElevatedCardIksica(
-                            iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
-                            iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
-                            iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
-                        )
+                            ElevatedCardIksica(
+                                iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
+                                iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
+                                iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
+                            ) { showPopup.value = true }
                     }
                     items(list) {
                         IksicaItem(it) {
@@ -131,6 +140,25 @@ fun IksicaCompose(
                 IksicaLoading(iksicaViewModel.loadingTxt.observeAsState().value ?: "Loading...")
             }
         }
+        PopupBox(
+            showPopup = showPopup.value,
+            onClickOutside = { showPopup.value = !showPopup.value }
+        ) {
+            CardIksicaPopupContent(
+                studentDataIksica = iksicaViewModel.studentDataIksica.observeAsState().value ?: StudentDataIksica(
+                    nameSurname = "",
+                    rightsLevel = "",
+                    dailySupport = 0.0,
+                    oib = "",
+                    jmbag = "",
+                    iksicaNumber = "",
+                    rightsFrom = "",
+                    rightsTo = ""
+                ),
+                iksicaBalance = iksicaViewModel.iksicaBalance.observeAsState().value?.balance ?: 0.0
+            )
+
+        }
     }
 }
 
@@ -139,7 +167,8 @@ fun IksicaCompose(
 fun ElevatedCardIksica(
     name: String = "Ime Prezime",
     iksicaNumber: String = "0000000000000000000",
-    balance: String = "0.00"
+    balance: String = "0.00",
+    onClick: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -157,7 +186,9 @@ fun ElevatedCardIksica(
             )
     ) {
         Column(
-            Modifier.fillMaxSize(),
+            Modifier
+                .fillMaxSize()
+                .clickable { onClick() },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -203,6 +234,161 @@ fun ElevatedCardIksica(
                     lineHeight = 25.sp,
                     fontWeight = FontWeight.Bold
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun CardIksicaPopupContent(
+    studentDataIksica: StudentDataIksica,
+    iksicaBalance: Double
+) {
+
+    val rowModifier = Modifier
+        .padding(20.dp, 10.dp)
+        .fillMaxWidth()
+    Column (
+        Modifier
+            .padding(15.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .width(300.dp)
+    ){
+        Row(
+            rowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Ime")
+            Text(text = studentDataIksica.nameSurname)
+        }
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+        Row(
+            rowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Razina prava")
+            Text(text = studentDataIksica.rightsLevel)
+        }
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+        Row(
+            rowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Dnevna potpora")
+            Text(text = studentDataIksica.dailySupport.toString())
+        }
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+        Row(
+            rowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "OIB")
+            Text(text = studentDataIksica.oib)
+        }
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+        Row(
+            rowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "JMBAG")
+            Text(text = studentDataIksica.jmbag)
+        }
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+        Row(
+            rowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Broj iksice")
+            Text(text = studentDataIksica.iksicaNumber)
+        }
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+        Row(
+            rowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Prava od")
+            Text(text = studentDataIksica.rightsFrom)
+        }
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+        Row(
+            rowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Prava do")
+            Text(text = studentDataIksica.rightsTo)
+        }
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+        Row(
+            rowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Stanje iksice")
+            Text(text = iksicaBalance.toString())
+        }
+    }
+}
+
+@Composable
+fun PopupBox(
+    showPopup: Boolean,
+    onClickOutside: () -> Unit,
+    content: @Composable() () -> Unit
+) {
+    if (showPopup) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
+                .zIndex(10F)
+                .clickable {}, // da ne bi klinkilo kroz popup background na stvari ispod
+            contentAlignment = Alignment.Center
+        ) {
+            // popup
+            Popup(
+                alignment = Alignment.Center,
+                properties = PopupProperties(
+                    excludeFromSystemGesture = true,
+                ),
+                // to dismiss on click outside
+                onDismissRequest = { onClickOutside() },
+            ) {
+                Box(modifier = Modifier
+                    .shadow(elevation = 8.dp, shape = RoundedCornerShape(10.dp))) {
+                    Box(
+                        Modifier
+                            .wrapContentSize(align = Alignment.Center)
+                            .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(10.dp))
+                            .clip(RoundedCornerShape(4.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        content()
+                    }
+                }
             }
         }
     }

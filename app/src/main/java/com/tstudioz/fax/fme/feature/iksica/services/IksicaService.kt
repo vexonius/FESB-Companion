@@ -43,12 +43,12 @@ class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
             .build()
 
         val response = client.newCall(request).execute()
-        val doc1 = Jsoup.parse(response.body?.string() ?: "")
-        sAMLResponse = doc1.select("input[name=SAMLResponse]").attr("value")
+        val doc = Jsoup.parse(response.body?.string() ?: "")
+        sAMLResponse = doc.select("input[name=SAMLResponse]").attr("value")
 
-        val content = doc1.selectFirst("p.content_text")?.text()
-        val submit = doc1.selectFirst("button[type=submit]")?.text()
-        val error = doc1.selectFirst("div.error")?.text()
+        val content = doc.selectFirst("p.content_text")?.text()
+        val submit = doc.selectFirst("button[type=submit]")?.text()
+        val error = doc.selectFirst("div.error")?.text()
 
         if (content != null && content.contains("Uspješno", true)
             || submit != null && submit.contains("Da, nastavi", true)
@@ -74,6 +74,12 @@ class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
         val response = client.newCall(request).execute()
         val body = response.body?.string() ?: ""
 
+        val error = Jsoup.parse(body).selectFirst(".alert-danger")?.text()
+
+        if (error != null && error.contains("Greška", true)) {
+            return NetworkServiceResult.IksicaResult.Failure(Throwable(error.substringAfter("error_outline ")))
+        }
+
         if (!response.isSuccessful) {
             return NetworkServiceResult.IksicaResult.Failure(Throwable("Failure getAspNetSessionSAML"))
         }
@@ -89,17 +95,13 @@ class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
         val response = client.newCall(request).execute()
         val doc = response.body?.string() ?: ""
 
-        val h2 = Jsoup.parse(doc).selectFirst("h2")?.text()
-        val test = response.headers.size
-
-        if (h2?.contains("Odaberi nacin prijave u sustav") == true) {
+        if (Jsoup.parse(doc).selectFirst("h2")?.text()?.contains("Odaberi nacin prijave u sustav") == true) {
             return NetworkServiceResult.IksicaResult.Failure(Throwable("Failure getRacuni: Not logged in"))
         }
 
         if (!response.isSuccessful) {
             return NetworkServiceResult.IksicaResult.Failure(Throwable("Failure getRacuni"))
         }
-
 
         return NetworkServiceResult.IksicaResult.Success(doc)
     }
@@ -112,9 +114,7 @@ class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
         val response = client.newCall(request).execute()
         val doc = response.body?.string() ?: ""
 
-        val h2 = Jsoup.parse(doc).selectFirst("h2")?.text()
-
-        if (h2?.contains("Odaberi nacin prijave u sustav") == true) {
+        if (Jsoup.parse(doc).selectFirst("h2")?.text()?.contains("Odaberi nacin prijave u sustav") == true) {
             return NetworkServiceResult.IksicaResult.Failure(Throwable("Failure getRacun: Not logged in"))
         }
 
