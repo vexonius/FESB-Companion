@@ -9,6 +9,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
+import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +68,7 @@ class LoginViewModel(
 
     fun checkIfFirstTimeInApp() {
         firstTimeInApp.value = sharedPreferences[SPKey.FIRST_TIME, true]
+        sharedPreferences[SPKey.FIRST_TIME] = false
     }
 
     fun checkIfLoggedIn() {
