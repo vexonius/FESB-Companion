@@ -161,7 +161,7 @@ fun BasicDayHeader(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = day.format(DayFormatter).replaceFirstChar { day.format(DayFormatter)[0].uppercase() },
+        text = day.format(DayFormatter).replaceFirstChar { day.format(DayFormatter).firstOrNull()?.uppercase() ?: ""  },
         textAlign = TextAlign.Center,
         modifier = modifier
             .fillMaxWidth()

@@ -47,11 +47,10 @@ class StudomatRepository(private val studomatService: StudomatService) {
                     StudomatRepositoryResult.LoginResult.Failure("Failure getting data:${result.throwable.message}")
                 }
             }
-
-        } catch (e: Exception) {
+        } catch (t: Throwable) { //should throwable be here?? or just Exception or should i change the way i handle exceptions
             studomatService.resetLastTimeLoggedInCount()
-            Log.d("StudomatRepository", "loginUser: ${e.message}")
-            return StudomatRepositoryResult.LoginResult.Failure("Failure: ${e.message}")
+            Log.d("StudomatRepository", "loginUser: ${t.message}")
+            return StudomatRepositoryResult.LoginResult.Failure("Failure: ${t.message}")
         }
     }
 
@@ -60,7 +59,7 @@ class StudomatRepository(private val studomatService: StudomatService) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetGodine = parseUpisaneGodine(result.data)
                 godine.postValue(resultGetGodine)
-                selectedGodina.postValue(resultGetGodine[0])
+                selectedGodina.postValue(resultGetGodine.firstOrNull())
                 loadedTxt.postValue("fetchedNew")
                 Log.d("StudomatRepository", "getYears: $resultGetGodine")
             }

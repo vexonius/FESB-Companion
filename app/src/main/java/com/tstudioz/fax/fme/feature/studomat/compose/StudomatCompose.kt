@@ -116,7 +116,7 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
 
     if (!godine.isNullOrEmpty()) {
         var expanded by remember { mutableStateOf(false) }
-        var selectedOptionText by remember { mutableStateOf(godine[0].first) }
+        var selectedOptionText by remember { mutableStateOf(godine.firstOrNull()?.first) }
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -128,7 +128,7 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
         ) {
             TextField(
                 readOnly = true,
-                value = selectedOptionText,
+                value = selectedOptionText ?: "",
                 onValueChange = { },
                 label = { Text("Godina") },
                 trailingIcon = {
@@ -148,7 +148,7 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
             ) {
                 if (godine.isNotEmpty()) {
                     godine.forEach {
-                        if (it != godine[0]) {
+                        if (it != godine.firstOrNull()) {
                             HorizontalDivider(Modifier.padding(4.dp))
                         }
                         DropdownMenuItem(onClick = {

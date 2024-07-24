@@ -122,7 +122,7 @@ suspend fun makeAcronym(name: String): String {
     ) {
         val nameSplit = name.split(" ").toTypedArray()
         for (str in nameSplit)
-            acronym.append(str[0])
+            acronym.append(str.firstOrNull())
         return acronym.toString().uppercase()
     }
     return name
