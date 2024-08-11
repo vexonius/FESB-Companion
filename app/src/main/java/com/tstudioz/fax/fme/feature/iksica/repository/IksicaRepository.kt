@@ -127,7 +127,7 @@ class IksicaRepository(
         if (_loggedIn.value == false) {
             loginIksica()
         }
-        return when (val result = iksicaService.getRacuni()) {
+        return when (val result = iksicaService.getRacuni(studentDataIksica.value?.oib ?: "")) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 Log.d(TAG, "Racuni fetched")
                 parseRacuni(result.data)

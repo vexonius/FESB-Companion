@@ -87,13 +87,21 @@ class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
         return NetworkServiceResult.IksicaResult.Success(body)
     }
 
-    override suspend fun getRacuni(): NetworkServiceResult.IksicaResult {
+    override suspend fun getRacuni(oib: String): NetworkServiceResult.IksicaResult {
         val request = Request.Builder()
-            .url("https://issp.srce.hr/student/studentracuni?oib=34106510630")
+            .url("https://issp.srce.hr/student/studentracuni?oib=$oib")
             .build()
 
         val response = client.newCall(request).execute()
         val doc = response.body?.string() ?: ""
+
+        //it can happen that there are no receipts in the last 30 days so it returns the start page (https://issp.srce.hr/student)
+        // with text under the student link that says
+        // "- nema računa u zadnjih 30 dana."
+
+        if (Jsoup.parse(doc).selectFirst("p.text-danger")?.text()?.contains("- nema računa u zadnjih 30 dana.") == true) {
+            return NetworkServiceResult.IksicaResult.Failure(Throwable("Failure getRacuni: nema računa u zadnjih 30 dana"))
+        }
 
         if (Jsoup.parse(doc).selectFirst("h2")?.text()?.contains("Odaberi nacin prijave u sustav") == true) {
             return NetworkServiceResult.IksicaResult.Failure(Throwable("Failure getRacuni: Not logged in"))
