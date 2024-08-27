@@ -34,7 +34,8 @@ import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
-import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
@@ -46,6 +47,7 @@ import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 
@@ -56,16 +58,13 @@ class MainActivity : AppCompatActivity() {
     private val dbManager: DatabaseManagerInterface by inject()
     private val shPref: SharedPreferences by inject()
 
-
-    var date: String? = null
-
     private var realmLog: Realm? = null
     private var client: OkHttpClient? = null
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
     private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
-    private val prisutnostFragment = PrisutnostFragment()
+    private val attendanceFragment = AttendanceFragment()
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     private val mainViewModel: MainViewModel by viewModel()
@@ -122,7 +121,6 @@ class MainActivity : AppCompatActivity() {
                 editor?.putString("username", korisnik.username)
                 editor?.putString("password", korisnik.password)
                 editor?.commit()
-                mojRaspored()
             } else {
                 invalidCreds()
             }
@@ -185,7 +183,7 @@ class MainActivity : AppCompatActivity() {
         when (pos) {
             R.id.tab_prisutnost -> {
                 supportActionBar?.title = "Prisutnost"
-                ft.replace(R.id.frame, prisutnostFragment)
+                ft.replace(R.id.frame, attendanceFragment)
             }
 
             R.id.tab_home -> {
@@ -290,7 +288,7 @@ class MainActivity : AppCompatActivity() {
         val staraVerzija = shPref.getInt("version_number", 14)
         val trenutnaVerzija: Int = BuildConfig.VERSION_CODE
 
-        if ((staraVerzija != null) && (staraVerzija < trenutnaVerzija)) {
+        if (staraVerzija < trenutnaVerzija) {
             showChangelog()
             editor = shPref.edit()
             editor?.putInt("version_number", trenutnaVerzija)
@@ -344,13 +342,13 @@ class MainActivity : AppCompatActivity() {
                         .build()
                 customTabsIntent.launchUrl(
                     view.context, Uri.parse(
-                        "http://tstud" + ".io/privacy"
+                        "http://tstud.io/privacy"
                     )
                 )
             } catch (ex: Exception) {
                 Toast.makeText(
                     view.context,
-                    "Ažurirajte Chrome preglednik za pregled " + "web stranice",
+                    "Ažurirajte Chrome preglednik za pregled web stranice",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -369,10 +367,5 @@ class MainActivity : AppCompatActivity() {
         if (client != null) {
             client?.dispatcher?.cancelAll()
         }
-    }
-
-    public override fun onResume() {
-        mojRaspored()
-        super.onResume()
     }
 }

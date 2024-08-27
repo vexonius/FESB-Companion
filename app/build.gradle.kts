@@ -32,6 +32,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs = listOf("-Xdebug") // da ne bi bilo optimised out vars
     }
 
     viewBinding {
@@ -108,6 +109,7 @@ dependencies {
     implementation("androidx.security:security-crypto:1.0.0")
 
     //pull to refresh compose
+    implementation("androidx.compose.material:material:$composeVersion")
     implementation("androidx.compose.ui:ui-android:$composeVersion")
 
     //choose calendar

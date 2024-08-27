@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.models
 
-import com.tstudioz.fax.fme.database.models.Dolazak
+import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import com.tstudioz.fax.fme.models.data.User
 
 sealed class NetworkServiceResult {
@@ -20,9 +20,14 @@ sealed class NetworkServiceResult {
         class Failure(throwable: Throwable) : TimeTableResult()
     }
 
-    sealed class PrisutnostResult: NetworkServiceResult(){
-        class Success(val pris: MutableList<Dolazak>) : PrisutnostResult()
-        class Failure(throwable: Throwable) : PrisutnostResult()
+    sealed class AttendanceFetchResult: NetworkServiceResult(){
+        class Success(val data: String) : AttendanceFetchResult()
+        class Failure(throwable: Throwable) : AttendanceFetchResult()
+    }
+
+    sealed class AttendanceParseResult: NetworkServiceResult(){
+        class Success(val data: List<List<AttendanceEntry>>) : AttendanceParseResult()
+        class Failure(throwable: Throwable) : AttendanceParseResult()
     }
 
     sealed class WeatherResult: NetworkServiceResult()  {
