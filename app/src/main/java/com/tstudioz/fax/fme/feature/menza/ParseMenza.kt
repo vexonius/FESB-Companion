@@ -21,12 +21,12 @@ fun parseMenza(json: String?): MutableList<Meni>? {
                 meni.jelo3 = itemsArray?.getString(4)
                 meni.jelo4 = itemsArray?.getString(5)
                 meni.desert = itemsArray?.getString(6)
-                meni.cijena = itemsArray?.getString(7) + " eur"
+                meni.cijena = itemsArray?.getString(7)
 
                 menies.add(meni)
             } catch (ex: Exception) {
                 Log.d("Menza activity", ex.toString())
-                return null
+                //return null
             }
         }
         for (k in 13..15) {
@@ -34,15 +34,12 @@ fun parseMenza(json: String?): MutableList<Meni>? {
                 val itemsArray = array?.getJSONArray(k)
                 val izborniMeni = Meni()
                 izborniMeni.id = itemsArray?.getString(0)
-                izborniMeni.jelo1 = itemsArray?.getString(1)?.substring(0, itemsArray.getString(1).length - 4)
-                izborniMeni.cijena = itemsArray?.getString(1)?.substring(
-                    itemsArray.getString(1).length - 4,
-                    itemsArray.getString(1).length
-                ) + " eur"
+                izborniMeni.jelo1 = itemsArray?.getString(1)?.split(Regex("(?=\\d)"))?.firstOrNull()
+                izborniMeni.cijena = itemsArray?.getString(1)?.split(" ")?.lastOrNull()
                 menies.add(izborniMeni)
             } catch (exc: Exception) {
                 Log.d("Menza activity", exc.toString())
-                return null
+                //return null
             }
         }
     } catch (ex: Exception) {

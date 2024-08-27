@@ -33,11 +33,11 @@ class MeniesAdapter(private var mMenies: List<Meni>?) : RecyclerView.Adapter<Men
             holder.jelo3.text = meni.jelo3
             holder.jelo4.text = meni.jelo4
             holder.jelo5.text = meni.desert
-            holder.cijena.text = meni.cijena
+            holder.cijena.text = meni.cijena + " eur"
         } else if (meni?.id == "R-JELO PO IZBORU") {
             holder.title.text = "JELO PO IZBORU"
             holder.jelo1.text = meni.jelo1
-            holder.cijena.text = meni.cijena
+            holder.cijena.text = meni.cijena + " eur"
             holder.jelo2.visibility = View.GONE
             holder.jelo3.visibility = View.GONE
             holder.jelo4.visibility = View.GONE

@@ -35,32 +35,37 @@ class HomeViewModel(
 
     fun getForecast(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val weather = repository.fetchWeatherDetails(url)
-            if (weather != null) {
-                val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
-                val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
-                val forecastNextOneHoursDetails = forecastNextOneHours?.details
-                val unparsedSummary = forecastNextOneHours?.summary?.symbolCode
-                val weatherSymbol = weatherSymbolKeys[unparsedSummary]
-                val iconName = "_" + weatherSymbol?.first.toString() + weatherSymbol?.second
-                val summary = codeToDisplay[weatherSymbol?.first]?.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(
-                        Locale.getDefault()
-                    ) else it.toString()
-                }
-                _weatherDisplay.postValue(
-                    WeatherDisplay(
-                        "Split",
-                        forecastInstantDetails?.airTemperature ?: 20.0,
-                        forecastInstantDetails?.relativeHumidity ?: 0.0,
-                        forecastInstantDetails?.windSpeed ?: 0.0,
-                        forecastNextOneHoursDetails?.precipitationAmount ?: 0.00,
-                        iconName,
-                        summary ?: ""
+            try {
+                val weather = repository.fetchWeatherDetails(url)
+                if (weather != null) {
+                    val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
+                    val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
+                    val forecastNextOneHoursDetails = forecastNextOneHours?.details
+                    val unparsedSummary = forecastNextOneHours?.summary?.symbolCode
+                    val weatherSymbol = weatherSymbolKeys[unparsedSummary]
+                    val iconName = "_" + weatherSymbol?.first.toString() + weatherSymbol?.second
+                    val summary = codeToDisplay[weatherSymbol?.first]?.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(
+                            Locale.getDefault()
+                        ) else it.toString()
+                    }
+                    _weatherDisplay.postValue(
+                        WeatherDisplay(
+                            "Split",
+                            forecastInstantDetails?.airTemperature ?: 20.0,
+                            forecastInstantDetails?.relativeHumidity ?: 0.0,
+                            forecastInstantDetails?.windSpeed ?: 0.0,
+                            forecastNextOneHoursDetails?.precipitationAmount ?: 0.00,
+                            iconName,
+                            summary ?: ""
+                        )
                     )
-                )
-                _forecastGot.postValue(true)
-            } else {
+                    _forecastGot.postValue(true)
+                } else {
+                    _forecastGot.postValue(false)
+                }
+            }
+            catch (e: Exception) {
                 _forecastGot.postValue(false)
             }
         }

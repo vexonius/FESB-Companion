@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -141,6 +142,8 @@ fun HomeTabComposePreview() {
     )
 }
 
+val sidePadding = 15.dp
+
 @Composable
 fun HomeTabCompose(
     weather: LiveData<WeatherDisplay>,
@@ -222,7 +225,6 @@ fun WeatherCompose(
                 modifier = Modifier
                     .weight(0.45f)
                     .aspectRatio(1f)
-                    .padding(15.dp)
             )
             Column(
                 modifier = Modifier.weight(0.55f),
@@ -299,7 +301,7 @@ fun NotesCompose(
             Text(
                 text = stringResource(id = R.string.notes),
                 fontSize = 13.sp,
-                modifier = Modifier.padding(20.dp, 5.dp, 0.dp, 0.dp),
+                modifier = Modifier.padding(sidePadding, 5.dp, sidePadding, 0.dp),
                 color = colorResource(id = R.color.shady_blue)
             )
         }
@@ -307,6 +309,7 @@ fun NotesCompose(
             modifier = Modifier
                 .background(colorResource(id = R.color.colorPrimaryDark))
                 .fillMaxWidth()
+                .padding(sidePadding,0.dp)
         ) {
             val editMessage = remember { mutableStateOf("") }
             val message = remember { mutableStateOf("") }
@@ -316,7 +319,7 @@ fun NotesCompose(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp, 10.dp, 20.dp, 10.dp)
+                        .padding(vertical = 10.dp)
                         .clickable { openDialog.value = true }) {
                     Icon(
                         painter = painterResource(id = R.drawable.add_new),
@@ -333,7 +336,6 @@ fun NotesCompose(
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp, 0.dp)
                     .clickable { onClick() }) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         TextField(
@@ -355,11 +357,11 @@ fun NotesCompose(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(modifier = Modifier.align(Alignment.End)) {
-                            Button(
+                            OutlinedButton(
                                 onClick = { openDialog.value = false }
                             ) { Text(stringResource(id = R.string.cancel_note)) }
                             Spacer(modifier = Modifier.width(8.dp))
-                            Button(onClick = {
+                            OutlinedButton(onClick = {
                                 message.value = editMessage.value
                                 openDialog.value = false
                                 editMessage.value = ""
@@ -414,7 +416,6 @@ fun NoteItem(
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
             .combinedClickable(onLongClick = { longClicked.value = !longClicked.value }) {}
-            .padding(20.dp, 0.dp)
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
     ) {
@@ -464,12 +465,12 @@ fun TodayTimetableCompose(
     events: List<Event>
 ) {
     Column(
-        modifier = Modifier,
+        modifier = Modifier.padding(horizontal = sidePadding),
         verticalArrangement = Arrangement.Center,
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
-                .padding(20.dp, 7.dp, 20.dp, 0.dp)
+                .padding(top = 7.dp)
                 .fillMaxWidth()
         ) {
             Text(
@@ -497,7 +498,6 @@ fun TodayTimetableCompose(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp, 0.dp)
                     .height(140.dp)
             ) {
                 Image(
@@ -527,7 +527,6 @@ fun TimetableItem(event: Event) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .padding(20.dp, 0.dp)
             .background(colorResource(id = R.color.colorPrimaryDark))
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
@@ -556,12 +555,12 @@ fun TimetableItem(event: Event) {
 
 @Composable
 fun CardsCompose() {
-    Column {
+    Column (Modifier.padding(horizontal = sidePadding)){
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(id = R.string.prehrana),
                 fontSize = 13.sp,
-                modifier = Modifier.padding(20.dp, 7.dp, 0.dp, 0.dp),
+                modifier = Modifier.padding(top = 7.dp),
                 color = colorResource(id = R.color.shady_blue)
             )
         }
@@ -610,7 +609,7 @@ fun CardCompose(title: String, description: String, color1: Color, color2: Color
     Box(
         modifier = Modifier
             .clickable { onClick() }
-            .padding(20.dp, 5.dp, 20.dp, 5.dp)
+            .padding(vertical = 5.dp)
             .height(140.dp)
             .fillMaxWidth()
             .angledGradientBackground(
