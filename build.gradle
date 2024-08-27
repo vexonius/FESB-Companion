@@ -10,16 +10,24 @@ buildscript {
             name 'Google'
         }
         maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
+        maven{
+            url = uri("https://plugins.gradle.org/m2/")
+        }
         google()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.autonomousapps:dependency-analysis-gradle-plugin:1.33.0"
+
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
+apply plugin : "com.autonomousapps.dependency-analysis"
+
+
 
 allprojects {
     repositories {
