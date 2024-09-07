@@ -31,7 +31,7 @@ class StudomatFragment : Fragment() {
 
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menu.findItem(R.id.refresMe).isVisible = false
+                menu.findItem(R.id.refreshTimetable).isVisible = false
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {

@@ -18,7 +18,7 @@ class StudomatViewModel(
 ) : ViewModel() {
 
     val snackbarHostState get() = repository.snackbarHostState
-    val predmetList get() = repository.predmetList
+    val predmetList get() = repository.subjectList
     val loadedTxt get() = repository.loadedTxt
     val student get() = repository.student
     val isRefreshing: MutableLiveData<Boolean> = MutableLiveData(false)

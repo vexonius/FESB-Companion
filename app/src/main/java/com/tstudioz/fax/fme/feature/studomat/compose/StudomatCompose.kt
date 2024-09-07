@@ -101,7 +101,7 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
                         }
                     }
                     items(predmetList.size) { item ->
-                        PredmetCompose(predmet = predmetList[item])
+                        PredmetCompose(subject = predmetList[item])
                     }
                 }
             }

@@ -1,24 +1,8 @@
 package com.tstudioz.fax.fme.feature.studomat.data
 
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.Predmet
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
 import org.jsoup.Jsoup
-
-/*fun parseExamData(data: Document): Exam {
-
-    val segment = data.select(".price-table__info").select("li")
-
-    val exam = Exam()
-    exam.name = data.select(".price-table__title").select("span").first()?.text() ?: ""
-    exam.date = data.select(".datumRok").text() ?: ""
-    exam.registerUntilDate = segment[0].text() ?: ""
-    exam.unregisterUntilDate = segment[1].text() ?: ""
-    exam.type = segment[2].text() ?: ""
-    exam.description = segment[3].text() ?: ""
-    exam.totalAttendances = data.select("#naslov1").select("p").first()?.text() ?: ""
-    exam.attendancesThisYear = data.select("#naslov2").select("p").first()?.text() ?: ""
-    return exam
-}*/
 
 fun parseUpisaneGodine(body: String): List<Pair<String, String>> {
     val data = Jsoup.parse(body)
@@ -43,13 +27,13 @@ fun parseStudent(body: String): Student {
     )
 }
 
-fun parseTrenutnuGodinu(body: String): Triple<MutableList<Predmet>, String, Pair<Int, Int>> {
+fun parseTrenutnuGodinu(body: String): Triple<MutableList<StudomatSubject>, String, Pair<Int, Int>> {
     val data = Jsoup.parse(body)
-    val listaPredmeta: MutableList<Predmet> = mutableListOf()
+    val listaPredmeta: MutableList<StudomatSubject> = mutableListOf()
     var polozeniKrozUpisani = Pair(0, 0)
     data.select(".responsive-table tbody tr").forEach { tr ->
         listaPredmeta.add(
-            Predmet(
+            StudomatSubject(
                 tr.selectFirst("td[data-title=Naziv predmeta:]")?.text() ?: "",
                 tr.selectFirst("td[data-title=Izborna grupa:]")?.text() ?: "",
                 tr.selectFirst("td[data-title=Semestar:]")?.text() ?: "",
@@ -59,7 +43,8 @@ fun parseTrenutnuGodinu(body: String): Triple<MutableList<Predmet>, String, Pair
                 tr.selectFirst("td[data-title=Polaže se:]")?.text() ?: "",
                 tr.selectFirst("td[data-title=Status:]")?.text() ?: "",
                 tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "",
-                tr.selectFirst("td[data-title=Datum ispitnog roka:]")?.text() ?: ""
+                tr.selectFirst("td[data-title=Datum ispitnog roka:]")?.text() ?: "",
+                data.title().substringAfter("godinu ")
             )
         )
         val ocjena = tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: ""

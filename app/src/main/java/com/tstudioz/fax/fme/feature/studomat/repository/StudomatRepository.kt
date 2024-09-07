@@ -3,20 +3,25 @@ package com.tstudioz.fax.fme.feature.studomat.repository
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.MutableLiveData
+import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
+import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDaoInterface
 import com.tstudioz.fax.fme.feature.studomat.data.parseStudent
 import com.tstudioz.fax.fme.feature.studomat.data.parseTrenutnuGodinu
 import com.tstudioz.fax.fme.feature.studomat.data.parseUpisaneGodine
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.Predmet
 import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 
-class StudomatRepository(private val studomatService: StudomatService) {
+class StudomatRepository(
+    private val studomatService: StudomatService,
+    private val studomatDao: StudomatDao
+) {
 
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
 
-    var predmetList = MutableLiveData<List<Predmet>>(emptyList())
+    var subjectList = MutableLiveData<List<StudomatSubject>>(emptyList())
     var loadedTxt = MutableLiveData("unset")
     var student = MutableLiveData(Student())
     var generated = MutableLiveData("")
@@ -24,14 +29,18 @@ class StudomatRepository(private val studomatService: StudomatService) {
     var selectedGodina = MutableLiveData(Pair("", ""))
     var polozeniKrozUpisani = MutableLiveData(Pair(0, 0))
 
-    suspend fun loginUser(username: String, password: String, forceLogin:Boolean): StudomatRepositoryResult.LoginResult {
+    suspend fun loginUser(
+        username: String,
+        password: String,
+        forceLogin: Boolean
+    ): StudomatRepositoryResult.LoginResult {
 
-        if (username == "" || password == ""){
+        if (username == "" || password == "") {
             return StudomatRepositoryResult.LoginResult.Failure("Username or password is empty")
         }
 
         try {
-            if ((System.currentTimeMillis() - studomatService.lastTimeLoggedIn )> 3600000 || forceLogin) {
+            if ((System.currentTimeMillis() - studomatService.lastTimeLoggedIn) > 3600000 || forceLogin) {
                 studomatService.getSamlRequest()
                 studomatService.sendSamlResponseToAAIEDU()
                 studomatService.getSamlResponse(username, password)
@@ -39,9 +48,12 @@ class StudomatRepository(private val studomatService: StudomatService) {
                 studomatService.sendSAMLToISVU()
             }
             return when (val result = studomatService.getStudomatData()) {
-                is NetworkServiceResult.StudomatResult.Success -> { StudomatRepositoryResult.LoginResult.Success(
-                    parseStudent(result.data)
-                ) }
+                is NetworkServiceResult.StudomatResult.Success -> {
+                    StudomatRepositoryResult.LoginResult.Success(
+                        parseStudent(result.data)
+                    )
+                }
+
                 is NetworkServiceResult.StudomatResult.Failure -> {
                     Log.d("StudomatRepository", "loginUser: ${result.throwable.message}")
                     StudomatRepositoryResult.LoginResult.Failure("Failure getting data:${result.throwable.message}")
@@ -63,6 +75,7 @@ class StudomatRepository(private val studomatService: StudomatService) {
                 loadedTxt.postValue("fetchedNew")
                 Log.d("StudomatRepository", "getYears: $resultGetGodine")
             }
+
             is NetworkServiceResult.StudomatResult.Failure -> {
                 snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
                 loadedTxt.postValue("fetchingError")
@@ -71,11 +84,11 @@ class StudomatRepository(private val studomatService: StudomatService) {
         }
     }
 
-    suspend fun getOdabranuGodinu(pair: Pair<String, String>){
+    suspend fun getOdabranuGodinu(pair: Pair<String, String>) {
         when (val data1 = studomatService.getTrenutnuGodinuData(pair.second)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val result = parseTrenutnuGodinu(data1.data)
-                predmetList.postValue(result.first)
+                subjectList.postValue(result.first)
                 generated.postValue(result.second)
                 polozeniKrozUpisani.postValue(result.third)
                 loadedTxt.postValue("fetchedNew")
@@ -84,12 +97,20 @@ class StudomatRepository(private val studomatService: StudomatService) {
                 _loadedTxt.postValue("fetchedOld")*/
                 Log.d("StudomatRepository", "getOdabranuGodinu: ${result.first}")
             }
+
             is NetworkServiceResult.StudomatResult.Failure -> {
                 snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
                 loadedTxt.postValue("fetchingError")
                 Log.d("StudomatRepository", "getOdabranuGodinu: ${data1.throwable.message}")
             }
         }
+    }
 
+    suspend fun insert(subjects: List<StudomatSubject>) {
+        studomatDao.insert(subjects)
+    }
+
+    suspend fun read(): List<StudomatSubject> {
+        return studomatDao.read()
     }
 }

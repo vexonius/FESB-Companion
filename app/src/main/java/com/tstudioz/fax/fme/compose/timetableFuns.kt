@@ -161,7 +161,7 @@ fun BasicDayHeader(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = day.format(DayFormatter).replaceFirstChar { day.format(DayFormatter).firstOrNull()?.uppercase() ?: ""  },
+        text = day.format(DayFormatter).replaceFirstChar { day.format(DayFormatter)[0].uppercase() },
         textAlign = TextAlign.Center,
         modifier = modifier
             .fillMaxWidth()
@@ -767,7 +767,7 @@ private val sampleEvents2 = listOf(
 )
 
 class EventsProvider : PreviewParameterProvider<Event> {
-    override val values = sampleEvents.asSequence()
+    override val values = sampleEvents2.asSequence()
 }
 
 @Preview(showBackground = true)
