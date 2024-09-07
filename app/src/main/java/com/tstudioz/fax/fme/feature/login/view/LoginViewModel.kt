@@ -44,7 +44,7 @@ class LoginViewModel(
         val password = password.value
 
         if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
-            errorMessage.postValue("Niste unijeli korisničke podatke")
+            errorMessage.postValue(application.getString(R.string.login_error_empty_credentials))
             return
         } else if (isEmailValid(username)) {
             // If user inputted email, get only username,

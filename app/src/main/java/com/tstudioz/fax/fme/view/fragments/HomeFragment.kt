@@ -56,8 +56,7 @@ class HomeFragment : Fragment() {
     private val shPref: SharedPreferences by inject()
 
     private var binding: HomeTabBinding? = null
-    private val forecastUrl =
-        "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
+    private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$mLatitude&lon=$mLongitude"
     private val homeViewModel: HomeViewModel by viewModel()
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -96,7 +95,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setLastRaspGot() {
-        binding?.TimeRaspGot?.text = shPref[SPKey.TIMEGOTPERMRASP, ""]
+        binding?.TimeRaspGot?.text = shPref[SPKey.LAST_FETCHED, ""]
         binding?.TimeRaspGot?.visibility = View.VISIBLE
     }
 
@@ -164,7 +163,7 @@ class HomeFragment : Fragment() {
     fun showList() {
         mainViewModel.lessonsPerm.observe(viewLifecycleOwner) { lessons ->
             val filteredLessons = lessons.filter { it.start.toLocalDate() == LocalDate.now() }
-            binding?.TimeRaspGot?.text = shPref[SPKey.TIMEGOTPERMRASP, ""]
+            binding?.TimeRaspGot?.text = shPref[SPKey.LAST_FETCHED, ""]
             if (filteredLessons.isEmpty()) {
                 binding?.rv?.visibility = View.INVISIBLE
                 binding?.nemaPredavanja?.visibility = View.VISIBLE

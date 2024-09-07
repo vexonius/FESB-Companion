@@ -1,17 +1,18 @@
 package com.tstudioz.fax.fme.database.models
 
 import androidx.compose.ui.graphics.Color
+import com.tstudioz.fax.fme.R
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import java.time.LocalDateTime
 
 
 data class Event(
-    val id : String,
+    val id: String,
     val name: String,
     val shortName: String,
     var color: Color = Color.Blue,
-    val colorId : Int = 0,
+    val colorId: Int = 0,
     val professor: String = "",
     val eventType: TimetableType = TimetableType.OTHER,
     val groups: String = "",
@@ -23,7 +24,7 @@ data class Event(
     val recurringType: Recurring = Recurring.UNDEFINED,
     val recurringUntil: String = "",
     val studyCode: String = "",
-    )
+)
 
 enum class Recurring {
     ONCE, WEEKLY, EVERY_TWO_WEEKS, MONTHLY, UNDEFINED
@@ -56,7 +57,13 @@ fun fromRealmObject(eventRealm: EventRealm): Event {
         shortName = eventRealm.shortName ?: "",
         colorId = eventRealm.colorId ?: 0,
         professor = eventRealm.professor ?: "",
-        eventType = eventRealm.eventType?.let { TimetableType.valueOf(it) } ?: TimetableType.OTHER,
+        eventType = eventRealm.eventType?.let {
+            try {
+                TimetableType.valueOf(it)
+            } catch (error: IllegalArgumentException) {
+                TimetableType.OTHER
+            }
+        } ?: TimetableType.OTHER,
         groups = eventRealm.groups ?: "",
         classroom = eventRealm.classroom ?: "",
         start = LocalDateTime.parse(eventRealm.start),
@@ -89,13 +96,14 @@ open class EventRealm : RealmObject {
     var studyCode: String? = null
 }
 
-enum class TimetableType(val type: String) {
-    PREDAVANJE("Predavanje"),
-    AUDITORNA_VJEZBA("Auditorna vježba"),
-    KOLOKVIJ("Kolokvij"),
-    LABORATORIJSKA_VJEZBA("Laboratorijska vježba"),
-    KONSTRUKCIJSKA_VJEZBA("Konstrukcijska vježba"),
-    SEMINAR("Seminar"),
-    ISPIT("Ispit"),
-    OTHER("Other")
+enum class TimetableType(val type: String, val color: Int) {
+    PREDAVANJE("Predavanje", R.color.blue_nice),
+    AUDITORNA_VJEZBA("Auditorna vježba", R.color.green_nice),
+    KOLOKVIJ("Kolokvij", R.color.purple_nice),
+    LABORATORIJSKA_VJEZBA("Laboratorijska vježba", R.color.red_nice),
+    KONSTRUKCIJSKA_VJEZBA("Konstrukcijska vježba", R.color.grey_nice),
+    SEMINAR("Seminar", R.color.blue_nice),
+    ISPIT("Ispit", R.color.purple_dark),
+    OTHER("Other", R.color.blue_nice)
 }
+

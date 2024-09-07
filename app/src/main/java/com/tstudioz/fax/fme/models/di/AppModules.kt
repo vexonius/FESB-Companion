@@ -9,22 +9,21 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.feature.login.services.UserService
-import com.tstudioz.fax.fme.models.data.AttendanceDao
-import com.tstudioz.fax.fme.models.data.AttendanceDaoInterface
-import com.tstudioz.fax.fme.models.data.AttendanceRepository
-import com.tstudioz.fax.fme.models.data.AttendanceRepositoryInterface
-import com.tstudioz.fax.fme.models.data.TimeTableDao
-import com.tstudioz.fax.fme.models.data.TimeTableDaoInterface
-import com.tstudioz.fax.fme.models.data.TimeTableRepository
-import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
-import com.tstudioz.fax.fme.models.interfaces.TimetableServiceInterface
+import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDao
+import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
+import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepository
+import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
+import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
+import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
+import com.tstudioz.fax.fme.feature.timetable.repository.TimeTableRepository
+import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
+import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
-import com.tstudioz.fax.fme.models.services.AttendanceService
-import com.tstudioz.fax.fme.models.services.TimetableService
+import com.tstudioz.fax.fme.feature.attendance.services.AttendanceService
+import com.tstudioz.fax.fme.feature.timetable.services.TimetableService
 import com.tstudioz.fax.fme.models.services.WeatherNetworkService
-import com.tstudioz.fax.fme.viewmodel.AttendanceViewModel
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,7 +50,7 @@ val module = module {
     single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
-    viewModel { AttendanceViewModel(get()) }
+    viewModel { AttendanceViewModel(get(), get()) }
 }
 
 fun provideOkHttpClient(context: Context) : OkHttpClient {

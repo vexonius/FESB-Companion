@@ -6,11 +6,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.feature.timetable.view.MonthData
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
-import com.tstudioz.fax.fme.models.data.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
@@ -21,6 +23,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 @ExperimentalCoroutinesApi
@@ -32,7 +35,7 @@ class MainViewModel(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    private val _showEvent = MutableLiveData<Boolean>().apply { value = false }
+    private val _showEvent = MutableLiveData<Boolean>(false)
     private val _showEventContent = MutableLiveData<Event>()
     private val _lessonsToShow = MutableLiveData<List<Event>>().apply { value = emptyList() }
     private val _lessonsPerm = MutableLiveData<List<Event>>().apply { value = emptyList() }
@@ -53,12 +56,21 @@ class MainViewModel(
     val lessonsPerm: LiveData<List<Event>> = _lessonsPerm
     val periods: LiveData<List<TimeTableInfo>> = _periods
     val shownWeek: LiveData<LocalDate> = _shownWeek
-    val showWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
+    val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
+
+    val monthData = MutableLiveData(
+        MonthData(
+            currentMonth = YearMonth.now(),
+            startMonth = YearMonth.now().minusMonths(100),
+            endMonth = YearMonth.now().plusMonths(100),
+            firstDayOfWeek = firstDayOfWeekFromLocale()
+        )
+    )
 
     init {
         fetchTimetableInfo()
         viewModelScope.launch(Dispatchers.IO) {
-            _lessonsPerm.postValue(timeTableRepository.loadFromDb())
+            _lessonsPerm.postValue(timeTableRepository.getCachedEvents())
         }
     }
 
@@ -68,10 +80,12 @@ class MainViewModel(
         endDate: LocalDate,
         shownWeekMonday: LocalDate
     ) {
+        val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
+        val startDate = dateFormatter.format(startDate)
+        val endDate = dateFormatter.format(endDate)
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                println("started fetching timetable for user")
                 val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(shownWeekMonday)
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
@@ -88,16 +102,20 @@ class MainViewModel(
         endDate: LocalDate,
         shownWeekMonday: LocalDate
     ) {
+        val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
+        val startDate = dateFormatter.format(startDate)
+        val endDate = dateFormatter.format(endDate)
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 println("started Fetching Timetable for user")
                 val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(shownWeekMonday)
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
-                sharedPreferences[SPKey.TIMEGOTPERMRASP] =
+                sharedPreferences[SPKey.LAST_FETCHED] =
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
                 _lessonsPerm.postValue(events)
-                timeTableRepository.insertTimeTable(events)
+                timeTableRepository.insert(events)
             } catch (e: Exception) {
                 Log.e("Error timetable", e.toString())
             }
@@ -110,15 +128,15 @@ class MainViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                println("started Fetching TimetableInfo")
-                _periods.postValue(timeTableRepository.fetchTimeTableInfo(startDate, endDate))
+                val result = timeTableRepository.fetchTimeTableCalendar(startDate, endDate)
+                _periods.postValue(result)
             } catch (e: Exception) {
                 Log.e("Error timetableinfo", e.toString())
             }
         }
     }
 
-    fun loadPermEvents() {
+    fun showThisWeeksEvents() {
         _lessonsToShow.postValue(_lessonsPerm.value)
     }
 

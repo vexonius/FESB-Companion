@@ -15,11 +15,10 @@
     <string name="card_iksica">Iksica</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="petak">Petak</string>
-    <string name="odmori_se">Odmori se, danas nemaš obaveza!</string>
-    <string name="danasnja_predavanja">DANAŠNJA PREDAVANJA</string>
-    <string name="nema_biljeski">Trenutno nema bilješki</string>
-    <string name="prisutnost">Prisutnost</string>
-    <string name="kolegiji">Kolegiji</string>
+    <string name="getRest">Odmori se, danas nemaš obaveza!</string>
+    <string name="todaysEvents">DANAŠNJA PREDAVANJA</string>
+    <string name="noNotes">Trenutno nema bilješki</string>
+    <string name="attendance">Prisutnost</string>
 
     /* Shortcuts */
     <string name="unavailabe">Nedostupna radnja</string>
@@ -39,7 +38,7 @@
     <string name="winter_semester">ZIMSKI SEMESTAR</string>
     <string name="home">Home</string>
     <string name="timetable_Title">Raspored</string>
-    <string name="studomat_Title">Raspored</string>
+    <string name="studomat_Title">Studomat</string>
     <string name="change_week">Promjena tjedna</string>
 
     <string name="default_group">Jedna grupa</string>
@@ -53,7 +52,23 @@
     <string name="login_password">Lozinka</string>
     <string name="login_action_submit">Prijava</string>
 
+    // Compose Strings
 
-    <string name="Raspored_za">Raspored za </string>
+    <string name="lastMonth">Prošli</string>
+    <string name="nextMonth">Sljedeći</string>
+
+    <string name="cancelChoosingWeek">Odustani</string>
+    <string name="chooseChoosingWeek">Odaberi</string>
+
+    // Attendance Error Snacks
+
+    <string name="attendance_error">Došlo je do pogreške</string>
+    <string name="attendance_offline">Niste povezani</string>
+    <string name="attendance_retry">Ponovi</string>
+
+    //Attendance misc
+
+    <string name="attendance_required">Obavezno %1$s</string>
+
 
 </resources>

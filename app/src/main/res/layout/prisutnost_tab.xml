@@ -6,86 +6,10 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark">
 
-    <FrameLayout
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <ProgressBar
-            android:id="@+id/progress_attend"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="visible" />
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nested_attend"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="visible">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/textZimskiSem"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/winter_semester"
-                android:textAllCaps="true"
-                android:textColor="@color/shady_blue"
-                android:textSize="14dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerZimski"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:scrollbarSize="5dp"
-                android:scrollbarStyle="outsideOverlay"
-                android:scrollbarThumbVertical="@color/_20white"
-                android:visibility="visible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textZimskiSem">
-            </androidx.recyclerview.widget.RecyclerView>
-
-
-            <TextView
-                android:id="@+id/textLitnjiSem"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/summer_semester"
-                android:textAllCaps="true"
-                android:textColor="@color/shady_blue"
-                android:textSize="14dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerZimski" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerLItnji"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:paddingBottom="10dp"
-                android:scrollbarSize="5dp"
-                android:scrollbarStyle="outsideOverlay"
-                android:scrollbarThumbVertical="@color/_20white"
-                android:smoothScrollbar="true"
-                android:visibility="visible"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textLitnjiSem">
-            </androidx.recyclerview.widget.RecyclerView>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
-    </FrameLayout>
+    </androidx.compose.ui.platform.ComposeView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
