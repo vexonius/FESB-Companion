@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.studomatisvu.model.dataclasses.Student
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import kotlinx.coroutines.Dispatchers

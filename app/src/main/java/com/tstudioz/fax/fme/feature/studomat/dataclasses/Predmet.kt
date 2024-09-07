@@ -1,4 +1,4 @@
-package com.example.studomatisvu.model.dataclasses
+package com.tstudioz.fax.fme.feature.studomat.dataclasses
 
 data class Predmet(
     var name: String = "",

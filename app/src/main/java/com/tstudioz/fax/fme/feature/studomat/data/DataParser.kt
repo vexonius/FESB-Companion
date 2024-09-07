@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.feature.studomat.data
 
-import com.example.studomatisvu.model.dataclasses.Predmet
-import com.example.studomatisvu.model.dataclasses.Student
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Predmet
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
 import org.jsoup.Jsoup
 
 /*fun parseExamData(data: Document): Exam {

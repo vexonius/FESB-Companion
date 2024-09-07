@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.feature.studomat.data.parseStudent
 import com.tstudioz.fax.fme.feature.studomat.data.parseTrenutnuGodinu
 import com.tstudioz.fax.fme.feature.studomat.data.parseUpisaneGodine
-import com.example.studomatisvu.model.dataclasses.Predmet
-import com.example.studomatisvu.model.dataclasses.Student
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Predmet
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
 import com.tstudioz.fax.fme.models.NetworkServiceResult

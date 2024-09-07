@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.studomatisvu.model.dataclasses.Predmet
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Predmet
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 

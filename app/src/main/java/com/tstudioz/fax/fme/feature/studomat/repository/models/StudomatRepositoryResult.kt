@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.feature.studomat.repository.models
 
-import com.example.studomatisvu.model.dataclasses.Student
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
 
 sealed class StudomatRepositoryResult {
 

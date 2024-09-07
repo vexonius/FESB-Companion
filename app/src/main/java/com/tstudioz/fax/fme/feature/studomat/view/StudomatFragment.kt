@@ -29,27 +29,28 @@ class StudomatFragment : Fragment() {
 
         studomatViewModel.getStudomatData()
 
-        (requireActivity() as MenuHost).addMenuProvider(object :MenuProvider{
+        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menu.findItem(R.id.refresMe).isVisible = false
             }
 
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {return false }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return false
+            }
 
         })
 
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            studomatViewModel.predmetList.observe(viewLifecycleOwner) {
-                setContent {
-                    AppTheme{ HomeCompose(studomatViewModel) }
-                }
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnLifecycleDestroyed(
-                        viewLifecycleOwner
-                    )
-                )
+            setContent {
+                AppTheme { HomeCompose(studomatViewModel) }
             }
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(
+                    viewLifecycleOwner
+                )
+            )
+
         }
     }
 }
