@@ -43,7 +43,7 @@ class StudomatRepository(
         }
 
         try {
-            if ((System.currentTimeMillis() - studomatService.lastTimeLoggedIn) > 3600000 || forceLogin) {
+            if ((System.currentTimeMillis() - studomatService.lastTimeLoggedIn) > 3600000 || forceLogin) { //check this, mabye it should be less time? or check the login status with a network call
                 studomatService.getSamlRequest()
                 studomatService.sendSamlResponseToAAIEDU()
                 studomatService.getSamlResponse(username, password)
