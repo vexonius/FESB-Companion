@@ -47,7 +47,7 @@ class StudomatFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                AppTheme { HomeCompose(studomatViewModel) }
+                AppTheme { HomeCompose(studomatViewModel, ) }
             }
             setViewCompositionStrategy(
                 ViewCompositionStrategy.DisposeOnLifecycleDestroyed(

@@ -28,10 +28,9 @@ fun parseStudent(body: String): Student {
     )
 }
 
-fun parseTrenutnuGodinu(body: String): Triple<MutableList<StudomatSubject>, String, Pair<Int, Int>> {
+fun parseTrenutnuGodinu(body: String): Pair<MutableList<StudomatSubject>, String> {
     val data = Jsoup.parse(body)
     val listaPredmeta: MutableList<StudomatSubject> = mutableListOf()
-    var polozeniKrozUpisani = Pair(0, 0)
     data.select(".responsive-table tbody tr").forEach { tr ->
         listaPredmeta.add(
             StudomatSubject(
@@ -48,19 +47,9 @@ fun parseTrenutnuGodinu(body: String): Triple<MutableList<StudomatSubject>, Stri
                 data.title().substringAfter("godinu ")
             )
         )
-        val ocjena = tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: ""
-        var polozen = 0
-        if (ocjena == "2" || ocjena == "3" || ocjena == "4" || ocjena == "5") {
-            polozen = 1
-        }
-        polozeniKrozUpisani = Pair(
-            first = polozeniKrozUpisani.first + polozen,
-            second = polozeniKrozUpisani.second + 1
-        )
     }
-    return Triple(
+    return Pair(
         listaPredmeta,
         data.selectFirst(".prijavaVrijeme span:nth-child(2)")?.text() ?: "",
-        polozeniKrozUpisani
     )
 }

@@ -28,7 +28,7 @@ class StudomatViewModel(
     val generated get() = repository.generated
     val godine get() = repository.years
     val selectedGodina get() = repository.selectedGodina
-    val polozeniKrozUpisani get() = repository.polozeniKrozUpisani
+    val offline get() = !networkUtils.isNetworkAvailable()
 
     val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()

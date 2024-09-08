@@ -16,23 +16,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
 
-@Preview
 @Composable
-fun ProgressBarCompose(pku: Pair<Int, Int> = Pair(0, 1)) {
+fun ProgressBarCompose(passed: Int, total: Int) {
     Row(
         Modifier
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (pku.first <= pku.second && pku.second != 0) {
+        if (passed <= total && total != 0) {
             LinearProgressIndicator(
-                progress = { pku.first.toFloat() / pku.second.toFloat() },
+                progress = { passed.toFloat() / total.toFloat() },
                 modifier = Modifier.wrapContentWidth(),
                 color = colorResource(id = R.color.StudomatBlue),
             )
             Text(
-                text = pku.first.toString() + "/" + pku.second.toString(),
+                text = "$passed/$total",
                 Modifier
                     .wrapContentWidth()
                     .padding(10.dp, 0.dp),

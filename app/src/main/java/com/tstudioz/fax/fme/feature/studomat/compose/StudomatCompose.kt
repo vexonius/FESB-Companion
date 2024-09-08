@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.studomat.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.compose.CircularIndicator
@@ -71,6 +73,21 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
             }
         }
 
+        if (studomatViewModel.offline) {
+            Row(
+                Modifier
+                    .fillMaxSize()
+                    .zIndex(1f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Row (Modifier.background(color = Color.Red).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center ) {
+                    Text("offline mode")
+                }
+            }
+        }
+
         Box(
             modifier = Modifier
                 .wrapContentHeight()
@@ -96,7 +113,9 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
                                 Modifier.padding(8.dp, 4.dp)
                             )
                         }
-                        studomatViewModel.polozeniKrozUpisani.value?.let { it1 -> ProgressBarCompose(it1) }
+                        var upisani = predmetList?.size ?: 0
+                        val polozeni = predmetList?.count { it.grade in listOf("2", "3", "4", "5") } ?: 0
+                        ProgressBarCompose(polozeni, upisani)
                     }
                 }
                 if (!predmetList.isNullOrEmpty()) {

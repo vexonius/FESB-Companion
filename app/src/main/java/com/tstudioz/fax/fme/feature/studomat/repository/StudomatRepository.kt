@@ -31,7 +31,6 @@ class StudomatRepository(
     var generated = MutableLiveData("")
     var years = MutableLiveData<List<Year>>(emptyList())
     var selectedGodina = MutableLiveData(Year("", ""))
-    var polozeniKrozUpisani = MutableLiveData(Pair(0, 0))
 
     suspend fun loginUser(
         username: String,
@@ -108,7 +107,6 @@ class StudomatRepository(
                 subjectList.postValue(result.first)
                 generated.postValue(result.second)
                 sharedPreferences.edit().putString("gen" + year.title, result.second).apply()
-                polozeniKrozUpisani.postValue(result.third)
                 loadedTxt.postValue("fetchedNew")
                 Log.d("StudomatRepository", "getOdabranuGodinu: ${result.first}")
                 insert(result.first)
