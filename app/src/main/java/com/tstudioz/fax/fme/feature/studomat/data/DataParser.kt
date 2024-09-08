@@ -2,14 +2,15 @@ package com.tstudioz.fax.fme.feature.studomat.data
 
 import com.tstudioz.fax.fme.feature.studomat.dataclasses.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Year
 import org.jsoup.Jsoup
 
-fun parseUpisaneGodine(body: String): List<Pair<String, String>> {
+fun parseUpisaneGodine(body: String): List<Year> {
     val data = Jsoup.parse(body)
-    val listOfYears = mutableListOf<Pair<String, String>>()
+    val listOfYears = mutableListOf<Year>()
     data.select(".price-table__item").forEach { element ->
         listOfYears.add(
-            Pair(
+            Year(
                 element.selectFirst(".price-table__title")?.text() ?: "",
                 element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
             )

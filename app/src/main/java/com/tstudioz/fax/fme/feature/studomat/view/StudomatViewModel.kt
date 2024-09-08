@@ -5,16 +5,19 @@ import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Year
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
+import com.tstudioz.fax.fme.random.NetworkUtils
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class StudomatViewModel(
     private val repository: StudomatRepository,
     context: Context,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
     val snackbarHostState get() = repository.snackbarHostState
@@ -23,56 +26,30 @@ class StudomatViewModel(
     val student get() = repository.student
     val isRefreshing: MutableLiveData<Boolean> = MutableLiveData(false)
     val generated get() = repository.generated
-    val godine get() = repository.godine
+    val godine get() = repository.years
     val selectedGodina get() = repository.selectedGodina
     val polozeniKrozUpisani get() = repository.polozeniKrozUpisani
 
+    val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+    }
 
-    fun getStudomatData(refresh: Boolean = false) {
-        loadedTxt.postValue("fetching")
-        viewModelScope.launch(Dispatchers.IO) {
-            when (val result = repository.loginUser(
-                sharedPreferences.getString("username", "") ?: "",
-                sharedPreferences.getString("password", "") ?: "",
-                false
-            )) {
-                is StudomatRepositoryResult.LoginResult.Success -> {
-                    student.postValue(result.data as Student)
-                }
-
-                is StudomatRepositoryResult.LoginResult.Failure -> {
-                    snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
-                    loadedTxt.postValue("fetchingError")
-                    return@launch
-                }
-            }
-            repository.getYears()
-            val odabrana =
-                if (refresh) {
-                    selectedGodina.value
-                } else {
-                    godine.value?.getOrNull(0) // suspiucious
-                }
-            if (odabrana != null) {
-                getOdabranuGodinu(odabrana)
-            }
+    init {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            repository.loadFromDb()
         }
     }
 
-    fun getOdabranuGodinu(pair: Pair<String, String>, pulldownTriggered: Boolean = false) {
-        if (pulldownTriggered) {
-            isRefreshing.postValue(true)
-        }
-        repository.loadedTxt.postValue("fetching")
-        repository.selectedGodina.postValue(pair)
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun login(pulldownTriggered: Boolean = false) {
+        if (networkUtils.isNetworkAvailable()) {
+            loadedTxt.postValue("fetching")
             when (val result = repository.loginUser(
                 sharedPreferences.getString("username", "") ?: "",
                 sharedPreferences.getString("password", "") ?: "",
                 false
             )) {
                 is StudomatRepositoryResult.LoginResult.Success -> {
-                    repository.student.postValue(result.data as Student)
+                    repository.student.postValue(result.data)
                 }
 
                 is StudomatRepositoryResult.LoginResult.Failure -> {
@@ -81,13 +58,62 @@ class StudomatViewModel(
                     }
                     repository.snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
                     repository.loadedTxt.postValue("fetchingError")
-                    return@launch
                 }
             }
-            repository.getOdabranuGodinu(pair)
-
+        } else {
             if (pulldownTriggered) {
                 isRefreshing.postValue(false)
+            }
+            repository.snackbarHostState.showSnackbar("Nema interneta")
+            repository.loadedTxt.postValue("fetchingError")
+        }
+    }
+
+
+    fun initStudomat(refresh: Boolean = false) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            if (!networkUtils.isNetworkAvailable()) {
+                loadedTxt.postValue("fetchingError")
+                snackbarHostState.showSnackbar("Nema interneta")
+                return@launch
+            } else {
+                login()
+                when (val years = repository.getYears()) {
+                    is StudomatRepositoryResult.YearsResult.Success -> {
+                        if (refresh) {
+                            selectedGodina.value?.let { getChosenYear(it) }
+                        } else {
+                            years.data.firstOrNull()?.let { getChosenYear(it) }
+                        }
+                    }
+
+                    is StudomatRepositoryResult.YearsResult.Failure -> {
+                        loadedTxt.postValue("fetchingError")
+                        snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+                    }
+                }
+            }
+
+        }
+    }
+
+    fun getChosenYear(year: Year, pulldownTriggered: Boolean = false) {
+        if (!networkUtils.isNetworkAvailable()) {
+            repository.selectedGodina.postValue(year)
+            viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+                repository.getChosenYear(year, offline = true)
+            }
+        } else {
+            if (pulldownTriggered) {
+                isRefreshing.postValue(true)
+            }
+            repository.selectedGodina.postValue(year)
+            viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+                login(pulldownTriggered)
+                repository.getChosenYear(year)
+                if (pulldownTriggered) {
+                    isRefreshing.postValue(false)
+                }
             }
         }
     }

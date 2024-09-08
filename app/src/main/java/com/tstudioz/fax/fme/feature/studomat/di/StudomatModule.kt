@@ -10,7 +10,7 @@ import org.koin.dsl.module
 
 val studomatModule = module {
     single{ StudomatService() }
-    single { StudomatRepository(get(), get()) }
+    single { StudomatRepository(get(), get(), get(), get()) }
     single { StudomatDao(get()) }
-    viewModel { StudomatViewModel(get(), androidContext(), get()) }
+    viewModel { StudomatViewModel(get(), androidContext(), get(), get()) }
 }

@@ -41,14 +41,14 @@ import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 @Composable
 fun HomeCompose(studomatViewModel: StudomatViewModel) {
 
-    val predmetList = studomatViewModel.predmetList.observeAsState().value
+    val predmetList = studomatViewModel.predmetList.observeAsState().value?.sortedBy { it.name }
     val loadedTxt = studomatViewModel.loadedTxt.observeAsState().value
     val snackbarHostState = remember { studomatViewModel.snackbarHostState }
     val isRefreshing = studomatViewModel.isRefreshing.observeAsState().value
     val pullRefreshState = isRefreshing?.let { it ->
         rememberPullRefreshState(it, {
             studomatViewModel.selectedGodina.value?.let {
-                studomatViewModel.getOdabranuGodinu(it, true)
+                studomatViewModel.getChosenYear(it, true)
             }
         })
     }
@@ -57,8 +57,7 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
     Scaffold(modifier = Modifier
         .pullRefresh(pullRefreshState ?: rememberPullRefreshState(false, {}))
         .padding(0.dp),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { innerPadding ->
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { innerPadding ->
 
         if ((loadedTxt == "fetching" || loadedTxt == "unset") && isRefreshing == false) {
             Row(
@@ -77,29 +76,30 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
                 .wrapContentHeight()
                 .padding(innerPadding),
         ) {
-            if (!predmetList.isNullOrEmpty()) {
-                if (pullRefreshState != null) {
-                    PullRefreshIndicator(
-                        isRefreshing, pullRefreshState, Modifier
-                            .align(Alignment.TopCenter)
-                            .zIndex(2f), scale = true
-                    )
-                }
-                LazyColumn(
-                    modifier = Modifier.padding(16.dp, 10.dp, 16.dp, 0.dp)
-                ) {
-                    item {
-                        Column(Modifier.zIndex(1f)) {
-                            Dropdown(studomatViewModel)
-                            Row {
-                                Text(
-                                    text = "Generirano: ${studomatViewModel.generated.value ?: ""}",
-                                    Modifier.padding(8.dp, 4.dp)
-                                )
-                            }
-                            studomatViewModel.polozeniKrozUpisani.value?.let { it1 -> ProgressBarCompose(it1) }
+            if (pullRefreshState != null) {
+                PullRefreshIndicator(
+                    isRefreshing, pullRefreshState,
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .zIndex(2f), scale = true
+                )
+            }
+            LazyColumn(
+                modifier = Modifier.padding(16.dp, 10.dp, 16.dp, 0.dp)
+            ) {
+                item {
+                    Column(Modifier.zIndex(1f)) {
+                        Dropdown(studomatViewModel)
+                        Row {
+                            Text(
+                                text = "Generirano: ${studomatViewModel.generated.value ?: ""}",
+                                Modifier.padding(8.dp, 4.dp)
+                            )
                         }
+                        studomatViewModel.polozeniKrozUpisani.value?.let { it1 -> ProgressBarCompose(it1) }
                     }
+                }
+                if (!predmetList.isNullOrEmpty()) {
                     items(predmetList.size) { item ->
                         PredmetCompose(subject = predmetList[item])
                     }
@@ -116,15 +116,12 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
 
     if (!godine.isNullOrEmpty()) {
         var expanded by remember { mutableStateOf(false) }
-        var selectedOptionText by remember { mutableStateOf(godine.firstOrNull()?.first) }
+        var selectedOptionText by remember { mutableStateOf(godine.firstOrNull()?.title) }
 
         ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = {
+            expanded = expanded, onExpandedChange = {
                 expanded = !expanded
-            },
-            modifier = Modifier
-                .fillMaxWidth()
+            }, modifier = Modifier.fillMaxWidth()
         ) {
             TextField(
                 readOnly = true,
@@ -141,10 +138,7 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
                     .wrapContentWidth()
             )
             DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                Modifier
-                    .exposedDropdownSize()
+                expanded = expanded, onDismissRequest = { expanded = false }, Modifier.exposedDropdownSize()
             ) {
                 if (godine.isNotEmpty()) {
                     godine.forEach {
@@ -152,10 +146,10 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
                             HorizontalDivider(Modifier.padding(4.dp))
                         }
                         DropdownMenuItem(onClick = {
-                            studomatViewModel.getOdabranuGodinu(it)
-                            selectedOptionText = it.first
+                            studomatViewModel.getChosenYear(it)
+                            selectedOptionText = it.title
                             expanded = false
-                        }, text = { Text(text = it.first) })
+                        }, text = { Text(text = it.title) })
                     }
                 }
             }

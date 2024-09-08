@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.database
 
 import com.tstudioz.fax.fme.database.models.*
 import com.tstudioz.fax.fme.feature.studomat.dataclasses.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Year
 import io.realm.kotlin.RealmConfiguration
 
 class DatabaseManager: DatabaseManagerInterface {
@@ -14,7 +15,8 @@ class DatabaseManager: DatabaseManagerInterface {
                 AttendanceEntry::class,
                 Meni::class,
                 EventRealm::class,
-                StudomatSubject::class))
+                StudomatSubject::class,
+                Year::class))
             .name("default.realm")
             .schemaVersion(1)
             .encryptionKey("nekikljuckojicemopromjenitiubuducnostialisadjetujernedamisebolje".toByteArray())

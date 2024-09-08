@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     private val dbManager: DatabaseManagerInterface by inject()
     private val shPref: SharedPreferences by inject()
+    private val networkUtils: NetworkUtils by inject()
 
     private var realmLog: Realm? = null
     private var client: OkHttpClient? = null
@@ -224,7 +225,7 @@ class MainActivity : AppCompatActivity() {
                 mainViewModel.showWeekChooseMenu()
             }
 
-            R.id.refreshTimetable -> if (NetworkUtils.isNetworkAvailable(this)) {
+            R.id.refreshTimetable -> if (networkUtils.isNetworkAvailable()) {
                 mojRaspored()
             } else {
                 showSnacOffline()
@@ -235,7 +236,7 @@ class MainActivity : AppCompatActivity() {
 
 
     fun mojRaspored() {
-        if (NetworkUtils.isNetworkAvailable(this)) {
+        if (networkUtils.isNetworkAvailable()) {
             val user = shPref.getString("username", "")?.let { User(it, "") }
 
             val now = LocalDate.now().plusDays(1)

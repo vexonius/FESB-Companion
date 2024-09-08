@@ -24,6 +24,7 @@ import com.tstudioz.fax.fme.feature.attendance.services.AttendanceService
 import com.tstudioz.fax.fme.feature.timetable.services.TimetableService
 import com.tstudioz.fax.fme.models.services.WeatherNetworkService
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
+import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.viewmodel.HomeViewModel
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,6 +39,7 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalCoroutinesApi::class)
 @InternalCoroutinesApi
 val module = module {
+    single { NetworkUtils(androidContext()) }
     single<TimetableServiceInterface> { TimetableService(get()) }
     single<WeatherNetworkInterface> { WeatherNetworkService(get()) }
     single<AttendanceServiceInterface> { AttendanceService(get()) }

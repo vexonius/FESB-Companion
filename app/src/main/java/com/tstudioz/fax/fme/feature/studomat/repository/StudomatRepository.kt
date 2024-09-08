@@ -1,22 +1,26 @@
 package com.tstudioz.fax.fme.feature.studomat.repository
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
-import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDaoInterface
 import com.tstudioz.fax.fme.feature.studomat.data.parseStudent
 import com.tstudioz.fax.fme.feature.studomat.data.parseTrenutnuGodinu
 import com.tstudioz.fax.fme.feature.studomat.data.parseUpisaneGodine
 import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
 import com.tstudioz.fax.fme.feature.studomat.dataclasses.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.dataclasses.Year
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
 import com.tstudioz.fax.fme.models.NetworkServiceResult
+import com.tstudioz.fax.fme.random.NetworkUtils
 
 class StudomatRepository(
     private val studomatService: StudomatService,
-    private val studomatDao: StudomatDao
+    private val studomatDao: StudomatDao,
+    private val networkUtils: NetworkUtils,
+    private val sharedPreferences: SharedPreferences
 ) {
 
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
@@ -25,8 +29,8 @@ class StudomatRepository(
     var loadedTxt = MutableLiveData("unset")
     var student = MutableLiveData(Student())
     var generated = MutableLiveData("")
-    var godine = MutableLiveData<List<Pair<String, String>>>(emptyList())
-    var selectedGodina = MutableLiveData(Pair("", ""))
+    var years = MutableLiveData<List<Year>>(emptyList())
+    var selectedGodina = MutableLiveData(Year("", ""))
     var polozeniKrozUpisani = MutableLiveData(Pair(0, 0))
 
     suspend fun loginUser(
@@ -66,36 +70,48 @@ class StudomatRepository(
         }
     }
 
-    suspend fun getYears() {
-        when (val result = studomatService.getUpisaneGodine()) {
+    suspend fun getYears(offline: Boolean = false): StudomatRepositoryResult.YearsResult {
+        if (offline) {
+            return StudomatRepositoryResult.YearsResult.Failure("No internet connection")
+        }
+        return when (val result = studomatService.getUpisaneGodine()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetGodine = parseUpisaneGodine(result.data)
-                godine.postValue(resultGetGodine)
+                insertYears(resultGetGodine)
+                years.postValue(resultGetGodine)
                 selectedGodina.postValue(resultGetGodine.firstOrNull())
                 loadedTxt.postValue("fetchedNew")
                 Log.d("StudomatRepository", "getYears: $resultGetGodine")
+                StudomatRepositoryResult.YearsResult.Success(resultGetGodine)
             }
 
             is NetworkServiceResult.StudomatResult.Failure -> {
                 snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
                 loadedTxt.postValue("fetchingError")
                 Log.d("StudomatRepository", "getYears: ${result.throwable.message}")
+                StudomatRepositoryResult.YearsResult.Failure("Failure getting data:${result.throwable.message}")
             }
         }
     }
 
-    suspend fun getOdabranuGodinu(pair: Pair<String, String>) {
-        when (val data1 = studomatService.getTrenutnuGodinuData(pair.second)) {
+    suspend fun getChosenYear(year: Year, offline: Boolean = false) {
+        subjectList.postValue(read(year.title.substringBefore(" ")))
+        sharedPreferences.getString("gen" + year.title, "").let {
+            generated.postValue(it)
+        }
+        if (offline) {
+            return
+        }
+        when (val data1 = studomatService.getTrenutnuGodinuData(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val result = parseTrenutnuGodinu(data1.data)
                 subjectList.postValue(result.first)
                 generated.postValue(result.second)
+                sharedPreferences.edit().putString("gen" + year.title, result.second).apply()
                 polozeniKrozUpisani.postValue(result.third)
                 loadedTxt.postValue("fetchedNew")
-                //for refresh listener
-                /*delay(50)
-                _loadedTxt.postValue("fetchedOld")*/
                 Log.d("StudomatRepository", "getOdabranuGodinu: ${result.first}")
+                insert(result.first)
             }
 
             is NetworkServiceResult.StudomatResult.Failure -> {
@@ -106,11 +122,26 @@ class StudomatRepository(
         }
     }
 
+    suspend fun loadFromDb() {
+        val yearsRealm = readYears().sortedByDescending { it.title }
+        years.postValue(yearsRealm)
+        subjectList.postValue(read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: ""))
+        generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
+    }
+
     suspend fun insert(subjects: List<StudomatSubject>) {
         studomatDao.insert(subjects)
     }
 
-    suspend fun read(): List<StudomatSubject> {
-        return studomatDao.read()
+    suspend fun insertYears(years: List<Year>) {
+        studomatDao.insertYears(years)
+    }
+
+    suspend fun read(year: String): List<StudomatSubject> {
+        return studomatDao.read(year)
+    }
+
+    suspend fun readYears(): List<Year> {
+        return studomatDao.readYears()
     }
 }

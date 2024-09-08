@@ -15,7 +15,11 @@ import androidx.fragment.app.Fragment
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.feature.studomat.compose.HomeCompose
+import com.tstudioz.fax.fme.random.NetworkUtils
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.java.KoinJavaComponent
+import org.koin.java.KoinJavaComponent.inject
 
 
 class StudomatFragment : Fragment() {
@@ -25,9 +29,9 @@ class StudomatFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val studomatViewModel: StudomatViewModel by KoinJavaComponent.inject(StudomatViewModel::class.java)
+        val studomatViewModel: StudomatViewModel by viewModel<StudomatViewModel>()
 
-        studomatViewModel.getStudomatData()
+        studomatViewModel.initStudomat()
 
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
