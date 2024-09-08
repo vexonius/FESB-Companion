@@ -26,8 +26,8 @@ class StudomatViewModel(
     val student get() = repository.student
     val isRefreshing: MutableLiveData<Boolean> = MutableLiveData(false)
     val generated get() = repository.generated
-    val godine get() = repository.years
-    val selectedGodina get() = repository.selectedGodina
+    val years get() = repository.years
+    val selectedYear get() = repository.selectedYear
     val offline get() = !networkUtils.isNetworkAvailable()
 
     val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -36,7 +36,7 @@ class StudomatViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            repository.loadFromDb()
+            repository.initRepo()
         }
     }
 
@@ -70,7 +70,7 @@ class StudomatViewModel(
     }
 
 
-    fun initStudomat(refresh: Boolean = false) {
+    fun initStudomat() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (!networkUtils.isNetworkAvailable()) {
                 loadedTxt.postValue("fetchingError")
@@ -80,11 +80,7 @@ class StudomatViewModel(
                 login()
                 when (val years = repository.getYears()) {
                     is StudomatRepositoryResult.YearsResult.Success -> {
-                        if (refresh) {
-                            selectedGodina.value?.let { getChosenYear(it) }
-                        } else {
-                            years.data.firstOrNull()?.let { getChosenYear(it) }
-                        }
+                        years.data.firstOrNull()?.let { getChosenYear(it) }
                     }
 
                     is StudomatRepositoryResult.YearsResult.Failure -> {
@@ -93,22 +89,26 @@ class StudomatViewModel(
                     }
                 }
             }
-
         }
     }
 
     fun getChosenYear(year: Year, pulldownTriggered: Boolean = false) {
         if (!networkUtils.isNetworkAvailable()) {
-            repository.selectedGodina.postValue(year)
             viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-                repository.getChosenYear(year, offline = true)
+                val chosenYear = if (year.href.isEmpty() || year.title.isEmpty()) {
+                    years.value?.firstOrNull()
+                } else { year }
+                repository.selectedYear.postValue(chosenYear)
+                if (chosenYear != null) {
+                    repository.getChosenYear(chosenYear, offline = true)
+                }
             }
         } else {
-            if (pulldownTriggered) {
-                isRefreshing.postValue(true)
-            }
-            repository.selectedGodina.postValue(year)
             viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+                if (pulldownTriggered) {
+                    isRefreshing.postValue(true)
+                }
+                repository.selectedYear.postValue(year)
                 login(pulldownTriggered)
                 repository.getChosenYear(year)
                 if (pulldownTriggered) {

@@ -30,7 +30,7 @@ class StudomatRepository(
     var student = MutableLiveData(Student())
     var generated = MutableLiveData("")
     var years = MutableLiveData<List<Year>>(emptyList())
-    var selectedGodina = MutableLiveData(Year("", ""))
+    var selectedYear = MutableLiveData(Year("", ""))
 
     suspend fun loginUser(
         username: String,
@@ -76,9 +76,9 @@ class StudomatRepository(
         return when (val result = studomatService.getUpisaneGodine()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetGodine = parseUpisaneGodine(result.data)
-                insertYears(resultGetGodine)
+                studomatDao.insertYears(resultGetGodine)
                 years.postValue(resultGetGodine)
-                selectedGodina.postValue(resultGetGodine.firstOrNull())
+                selectedYear.postValue(resultGetGodine.firstOrNull())
                 loadedTxt.postValue("fetchedNew")
                 Log.d("StudomatRepository", "getYears: $resultGetGodine")
                 StudomatRepositoryResult.YearsResult.Success(resultGetGodine)
@@ -94,7 +94,7 @@ class StudomatRepository(
     }
 
     suspend fun getChosenYear(year: Year, offline: Boolean = false) {
-        subjectList.postValue(read(year.title.substringBefore(" ")))
+        subjectList.postValue(studomatDao.read(year.title.substringBefore(" ")))
         sharedPreferences.getString("gen" + year.title, "").let {
             generated.postValue(it)
         }
@@ -104,12 +104,12 @@ class StudomatRepository(
         when (val data1 = studomatService.getTrenutnuGodinuData(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val result = parseTrenutnuGodinu(data1.data)
+                loadedTxt.postValue("fetchedNew")
                 subjectList.postValue(result.first)
                 generated.postValue(result.second)
                 sharedPreferences.edit().putString("gen" + year.title, result.second).apply()
-                loadedTxt.postValue("fetchedNew")
+                studomatDao.insert(result.first)
                 Log.d("StudomatRepository", "getOdabranuGodinu: ${result.first}")
-                insert(result.first)
             }
 
             is NetworkServiceResult.StudomatResult.Failure -> {
@@ -120,26 +120,11 @@ class StudomatRepository(
         }
     }
 
-    suspend fun loadFromDb() {
-        val yearsRealm = readYears().sortedByDescending { it.title }
+    suspend fun initRepo() {
+        val yearsRealm = studomatDao.readYears().sortedByDescending { it.title }
+        val latestYearSubjects = studomatDao.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
         years.postValue(yearsRealm)
-        subjectList.postValue(read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: ""))
+        subjectList.postValue(latestYearSubjects)
         generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
-    }
-
-    suspend fun insert(subjects: List<StudomatSubject>) {
-        studomatDao.insert(subjects)
-    }
-
-    suspend fun insertYears(years: List<Year>) {
-        studomatDao.insertYears(years)
-    }
-
-    suspend fun read(year: String): List<StudomatSubject> {
-        return studomatDao.read(year)
-    }
-
-    suspend fun readYears(): List<Year> {
-        return studomatDao.readYears()
     }
 }
