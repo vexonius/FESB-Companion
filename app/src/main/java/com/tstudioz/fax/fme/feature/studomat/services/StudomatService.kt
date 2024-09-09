@@ -175,6 +175,10 @@ class StudomatService {
             lastTimeLoggedIn = System.currentTimeMillis()
             Log.d("StudomatService", "getStudomatData: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
+        } else if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+            lastTimeLoggedIn = 0L
+            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
         } else {
             lastTimeLoggedIn = 0L
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
@@ -189,9 +193,14 @@ class StudomatService {
             .build()
         val response = client.newCall(request).execute()
         val body = response.body?.string() ?: ""
+
         return if (body != "") {
             Log.d("StudomatService", "getUpisaneGodine: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
+        } else if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+            lastTimeLoggedIn = 0L
+            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
         } else {
             lastTimeLoggedIn = 0L
             Log.d("StudomatService", "getUpisaneGodine: Couldn't get upisane godine data!")

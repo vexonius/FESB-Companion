@@ -9,6 +9,7 @@ import com.tstudioz.fax.fme.feature.studomat.dataclasses.Year
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.random.NetworkUtils
+import io.realm.kotlin.internal.platform.runBlocking
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,9 +36,7 @@ class StudomatViewModel(
     }
 
     init {
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            repository.initRepo()
-        }
+        runBlocking { repository.initRepo() }
     }
 
     suspend fun login(pulldownTriggered: Boolean = false) {
