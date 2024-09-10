@@ -55,13 +55,13 @@ fun SubjectView(subject: StudomatSubject) {
                     .padding(4.dp, 2.dp, 4.dp, 2.dp)
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
-                PredmetText(text = "Predmet: ", value = subject.name.trim() ?: "")
+                PredmetText(text = "Predmet: ", value = subject.name.trim() ?: "", isTitle = true)
             }
             Column(
                 Modifier.padding(4.dp, 0.dp, 0.dp, 8.dp)
             ) {
                 if (expanded) {
-                    PredmetText(text = stringResource(id = R.string.elective_group), value = subject.electiveGroup ?: "", isTitle = true)
+                    PredmetText(text = stringResource(id = R.string.elective_group), value = subject.electiveGroup ?: "")
                     PredmetText(text = stringResource(id = R.string.semester), value = subject.semester ?: "")
                     PredmetText(text = stringResource(id = R.string.lectures), value = subject.lectures ?: "")
                     PredmetText(text = stringResource(id = R.string.exercises), value = subject.exercises ?: "")
