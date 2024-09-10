@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.feature.studomat.repository.models
 
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.Year
+import com.tstudioz.fax.fme.feature.studomat.models.Student
+import com.tstudioz.fax.fme.feature.studomat.models.Year
 
 sealed class StudomatRepositoryResult {
 

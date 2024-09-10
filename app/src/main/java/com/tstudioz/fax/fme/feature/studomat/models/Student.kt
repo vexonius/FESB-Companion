@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.studomat.dataclasses
+package com.tstudioz.fax.fme.feature.studomat.models
 
 data class Student(
     var name: String = "",

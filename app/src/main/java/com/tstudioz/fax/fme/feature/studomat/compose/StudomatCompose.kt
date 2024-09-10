@@ -47,8 +47,8 @@ import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 @Composable
 fun HomeCompose(studomatViewModel: StudomatViewModel) {
 
-    val predmetList = studomatViewModel.predmetList.observeAsState().value?.sortedBy { it.name }
-    val loadedTxt = studomatViewModel.loadedTxt.observeAsState().value
+    val subjectList = studomatViewModel.subjectList.observeAsState().value?.sortedBy { it.name }
+    val loading = studomatViewModel.loading.observeAsState().value
     val snackbarHostState = remember { studomatViewModel.snackbarHostState }
     val isRefreshing = studomatViewModel.isRefreshing.observeAsState().value
     val pullRefreshState = isRefreshing?.let { it ->
@@ -78,7 +78,7 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
 
-        if ((loadedTxt == "fetching" || loadedTxt == "unset") && isRefreshing == false) {
+        if (loading == true && isRefreshing == false) {
             Row(
                 Modifier
                     .fillMaxSize()
@@ -115,14 +115,14 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
                                 Modifier.padding(8.dp, 4.dp)
                             )
                         }
-                        val upisani = predmetList?.size ?: 0
-                        val polozeni = predmetList?.count { it.grade in listOf("2", "3", "4", "5") } ?: 0
+                        val upisani = subjectList?.size ?: 0
+                        val polozeni = subjectList?.count { it.grade in listOf("2", "3", "4", "5") } ?: 0
                         ProgressBarCompose(polozeni, upisani)
                     }
                 }
-                if (!predmetList.isNullOrEmpty()) {
-                    items(predmetList.size) { item ->
-                        PredmetCompose(subject = predmetList[item])
+                if (!subjectList.isNullOrEmpty()) {
+                    items(subjectList.size) { item ->
+                        SubjectView(subject = subjectList[item])
                     }
                 } else {
                     item {
@@ -135,7 +135,7 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
                             verticalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.file_wrong_svgrepo_com),
+                                painter = painterResource(id = R.drawable.no_data_icon),
                                 contentDescription = "page_not_found",
                                 modifier = Modifier
                                     .padding(12.dp, 80.dp, 12.dp, 12.dp)

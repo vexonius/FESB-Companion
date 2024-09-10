@@ -1,8 +1,8 @@
 package com.tstudioz.fax.fme.feature.studomat.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.StudomatSubject
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.Year
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.models.Year
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 

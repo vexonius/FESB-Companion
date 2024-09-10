@@ -6,11 +6,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
 import com.tstudioz.fax.fme.feature.studomat.data.parseStudent
-import com.tstudioz.fax.fme.feature.studomat.data.parseTrenutnuGodinu
-import com.tstudioz.fax.fme.feature.studomat.data.parseUpisaneGodine
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.Student
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.StudomatSubject
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.Year
+import com.tstudioz.fax.fme.feature.studomat.data.parseCurrentYear
+import com.tstudioz.fax.fme.feature.studomat.data.parseYears
+import com.tstudioz.fax.fme.feature.studomat.models.Student
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -75,7 +75,7 @@ class StudomatRepository(
         }
         return when (val result = studomatService.getUpisaneGodine()) {
             is NetworkServiceResult.StudomatResult.Success -> {
-                val resultGetGodine = parseUpisaneGodine(result.data)
+                val resultGetGodine = parseYears(result.data)
                 studomatDao.insertYears(resultGetGodine)
                 years.postValue(resultGetGodine)
                 selectedYear.postValue(resultGetGodine.firstOrNull())
@@ -103,7 +103,7 @@ class StudomatRepository(
         }
         when (val data1 = studomatService.getTrenutnuGodinuData(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
-                val result = parseTrenutnuGodinu(data1.data)
+                val result = parseCurrentYear(data1.data)
                 loadedTxt.postValue("fetchedNew")
                 subjectList.postValue(result.first)
                 generated.postValue(result.second)

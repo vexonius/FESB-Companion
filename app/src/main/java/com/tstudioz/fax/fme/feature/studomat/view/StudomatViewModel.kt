@@ -4,8 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.Year
+import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.random.NetworkUtils
@@ -14,6 +15,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 class StudomatViewModel(
     private val repository: StudomatRepository,
     context: Context,
@@ -21,15 +23,25 @@ class StudomatViewModel(
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
-    val snackbarHostState get() = repository.snackbarHostState
-    val predmetList get() = repository.subjectList
-    val loadedTxt get() = repository.loadedTxt
-    val student get() = repository.student
-    val isRefreshing: MutableLiveData<Boolean> = MutableLiveData(false)
-    val generated get() = repository.generated
-    val years get() = repository.years
-    val selectedYear get() = repository.selectedYear
-    val offline get() = !networkUtils.isNetworkAvailable()
+    val isRefreshing = MutableLiveData(false)
+
+    val snackbarHostState
+        get() = repository.snackbarHostState
+    val subjectList
+        get() = repository.subjectList
+    val loading = repository.loadedTxt.map{ value ->
+        value == "fetching" || value == "unset"
+    }
+    val student
+        get() = repository.student
+    val generated
+        get() = repository.generated
+    val years
+        get() = repository.years
+    val selectedYear
+        get() = repository.selectedYear
+    val offline
+        get() = !networkUtils.isNetworkAvailable()
 
     val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
@@ -41,7 +53,7 @@ class StudomatViewModel(
 
     suspend fun login(pulldownTriggered: Boolean = false) {
         if (networkUtils.isNetworkAvailable()) {
-            loadedTxt.postValue("fetching")
+            repository.loadedTxt.postValue("fetching")
             when (val result = repository.loginUser(
                 sharedPreferences.getString("username", "") ?: "",
                 sharedPreferences.getString("password", "") ?: "",
@@ -72,7 +84,7 @@ class StudomatViewModel(
     fun initStudomat() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (!networkUtils.isNetworkAvailable()) {
-                loadedTxt.postValue("fetchingError")
+                repository.loadedTxt.postValue("fetchingError")
                 snackbarHostState.showSnackbar("Nema interneta")
                 return@launch
             } else {
@@ -83,7 +95,7 @@ class StudomatViewModel(
                     }
 
                     is StudomatRepositoryResult.YearsResult.Failure -> {
-                        loadedTxt.postValue("fetchingError")
+                        repository.loadedTxt.postValue("fetchingError")
                         snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
                     }
                 }

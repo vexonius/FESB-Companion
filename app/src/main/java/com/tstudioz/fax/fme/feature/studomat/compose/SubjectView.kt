@@ -24,38 +24,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tstudioz.fax.fme.feature.studomat.dataclasses.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 
 
-@Preview
 @Composable
-fun PredmetComposePrev() {
-    AppTheme {
-        PredmetCompose(
-            StudomatSubject(
-                "Predmet",
-                "Izborna grupa",
-                "Semestar",
-                "Predavanja",
-                "Vježbe",
-                "ECTS upisano",
-                "Polaže se",
-                "obavljen",
-                "Ocjena",
-                "Datum ispitnog roka"
-            )
-        )
-    }
-}
-
-@Composable
-fun PredmetCompose(subject: StudomatSubject) {
+fun SubjectView(subject: StudomatSubject) {
 
     var expanded: Boolean by remember { mutableStateOf(false) }
 
@@ -71,7 +51,7 @@ fun PredmetCompose(subject: StudomatSubject) {
         ) {
             Column(
                 Modifier
-                    .background(color = colorResource(id = R.color.StudomatBlue))
+                    .background(color = colorResource(id = R.color.Endeavour))
                     .padding(4.dp, 2.dp, 4.dp, 2.dp)
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
@@ -81,21 +61,22 @@ fun PredmetCompose(subject: StudomatSubject) {
                 Modifier.padding(4.dp, 0.dp, 0.dp, 8.dp)
             ) {
                 if (expanded) {
-                    PredmetText(text = "Izborna grupa: ", value = subject.electiveGroup ?: "")
-                    PredmetText(text = "Semestar: ", value = subject.semester ?: "")
-                    PredmetText(text = "Predavanja: ", value = subject.lectures ?: "")
-                    PredmetText(text = "Vježbe: ", value = subject.exercises ?: "")
-                    PredmetText(text = "ECTS upisano: ", value = subject.ectsEnrolled ?: "")
-                    PredmetText(text = "Polaže se: ", value = subject.isTaken ?: "")
-                    PredmetText(text = "Status: ", value = subject.status ?: "")
-                    PredmetText(text = "Ocjena: ", value = subject.grade ?: "")
-                    PredmetText(text = "Datum ispitnog roka: ", value = subject.examDate ?: "")
+                    PredmetText(text = stringResource(id = R.string.elective_group), value = subject.electiveGroup ?: "", isTitle = true)
+                    PredmetText(text = stringResource(id = R.string.semester), value = subject.semester ?: "")
+                    PredmetText(text = stringResource(id = R.string.lectures), value = subject.lectures ?: "")
+                    PredmetText(text = stringResource(id = R.string.exercises), value = subject.exercises ?: "")
+                    PredmetText(text = stringResource(id = R.string.ects_enrolled), value = subject.ectsEnrolled ?: "")
+                    PredmetText(text = stringResource(id = R.string.is_taken), value = subject.isTaken ?: "")
+                    PredmetText(text = stringResource(id = R.string.status), value = subject.status ?: "", isPassed = subject.isPassed)
+                    PredmetText(text = stringResource(id = R.string.grade), value = subject.grade ?: "")
+                    PredmetText(text = stringResource(id = R.string.exam_date), value = subject.examDate ?: "")
                 } else {
-                    PredmetText(text = "Semestar: ", value = subject.semester ?: "")
-                    PredmetText(text = "ECTS upisano: ", value = subject.ectsEnrolled ?: "")
-                    PredmetText(text = "Status: ", value = subject.status ?: "")
-                    PredmetText(text = "Ocjena: ", value = subject.grade ?: "")
+                    PredmetText(text = stringResource(id = R.string.semester), value = subject.semester ?: "")
+                    PredmetText(text = stringResource(id = R.string.ects_enrolled), value = subject.ectsEnrolled ?: "")
+                    PredmetText(text = stringResource(id = R.string.status), value = subject.status ?: "", isPassed = subject.isPassed)
+                    PredmetText(text = stringResource(id = R.string.grade), value = subject.grade ?: "")
                 }
+
             }
         }
     }
@@ -103,7 +84,7 @@ fun PredmetCompose(subject: StudomatSubject) {
 
 
 @Composable
-fun PredmetText(text: String = "", value: String = "") {
+fun PredmetText(text: String, value: String, isTitle: Boolean = false, isPassed: Boolean = false) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -116,13 +97,13 @@ fun PredmetText(text: String = "", value: String = "") {
             modifier = Modifier
                 .wrapContentSize()
                 .padding(16.dp, 8.dp, 8.dp, 8.dp),
-            fontSize = if (text.contains("Predmet:")) 16.sp else 14.sp,
+            fontSize = if (isTitle) 16.sp else 14.sp,
             textAlign = TextAlign.Left
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = value,
-            modifier = if (text == "Status: " && (value.contains("obavljen") || value.contains("priznat"))) {
+            modifier = if (isPassed) {
                 Modifier
                     .wrapContentSize()
                     .clip(RoundedCornerShape(12.dp, 0.dp, 0.dp, 12.dp))
@@ -133,9 +114,30 @@ fun PredmetText(text: String = "", value: String = "") {
                     .wrapContentSize()
                     .padding(8.dp, 8.dp, 16.dp, 8.dp)
             },
-            fontSize = if (text.contains("Predmet:")) 16.sp else 14.sp,
+            fontSize = if (isTitle) 16.sp else 14.sp,
             textAlign = TextAlign.Right
         )
     }
 
+}
+
+@Preview
+@Composable
+fun PredmetComposePrev() {
+    AppTheme {
+        SubjectView(
+            StudomatSubject(
+                "Predmet",
+                "Izborna grupa",
+                "Semestar",
+                "Predavanja",
+                "Vježbe",
+                "ECTS upisano",
+                "Polaže se",
+                "obavljen",
+                "Ocjena",
+                "Datum ispitnog roka"
+            )
+        )
+    }
 }
