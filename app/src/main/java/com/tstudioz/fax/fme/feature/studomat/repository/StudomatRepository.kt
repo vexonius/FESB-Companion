@@ -43,7 +43,12 @@ class StudomatRepository(
         }
 
         try {
+            Log.d("StudomatRepository", "loginUser: ${System.currentTimeMillis() - studomatService.lastTimeLoggedIn}")
+            Log.d("StudomatRepository", "System.currentTimeMillis(): ${System.currentTimeMillis()}")
+            Log.d("StudomatRepository", "lastTimeLoggedIn: ${studomatService.lastTimeLoggedIn}")
+
             if ((System.currentTimeMillis() - studomatService.lastTimeLoggedIn) > 3600000 || forceLogin) { //check this, mabye it should be less time? or check the login status with a network call
+                Log.d("StudomatRepository", "loginUser: logging in")
                 studomatService.getSamlRequest()
                 studomatService.sendSamlResponseToAAIEDU()
                 studomatService.getSamlResponse(username, password)
