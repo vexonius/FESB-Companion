@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -83,6 +82,7 @@ fun IksicaCompose(
     iksicaViewModel: IksicaViewModel,
 ) {
     val status = iksicaViewModel.status.observeAsState().value
+    val receiptStatus = iksicaViewModel.receiptsStatus.observeAsState().value
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val isRefreshing = iksicaViewModel.isRefreshing.observeAsState(false).value
@@ -121,24 +121,43 @@ fun IksicaCompose(
                 CircularIndicator()
             }
             val list = iksicaViewModel.receipts.observeAsState().value
-            if (!list.isNullOrEmpty()) {
-                LazyColumn {
-                    item {
-                            ElevatedCardIksica(
-                                iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
-                                iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
-                                iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
-                            ) { showPopup.value = true }
-                    }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(0.dp)
+            ) {
+                item {
+                    ElevatedCardIksica(
+                        iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
+                        iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
+                        iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
+                    ) { showPopup.value = true }
+                }
+                if (!list.isNullOrEmpty()) {
                     items(list) {
                         IksicaItem(it) {
                             iksicaViewModel.getReceiptDetails(it)
                         }
                     }
                 }
-            } else {
-                IksicaLoading(iksicaViewModel.loadingTxt.observeAsState().value ?: "Loading...")
+                if (receiptStatus == Status.EMPTY) {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(20.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Nema računa u zadnjih 30 dana",
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+                }
             }
+
         }
         PopupBox(
             showPopup = showPopup.value,
@@ -248,12 +267,12 @@ fun CardIksicaPopupContent(
     val rowModifier = Modifier
         .padding(20.dp, 10.dp)
         .fillMaxWidth()
-    Column (
+    Column(
         Modifier
             .padding(15.dp)
             .background(MaterialTheme.colorScheme.background)
             .width(300.dp)
-    ){
+    ) {
         Row(
             rowModifier,
             verticalAlignment = Alignment.CenterVertically,
@@ -377,8 +396,10 @@ fun PopupBox(
                 // to dismiss on click outside
                 onDismissRequest = { onClickOutside() },
             ) {
-                Box(modifier = Modifier
-                    .shadow(elevation = 8.dp, shape = RoundedCornerShape(10.dp))) {
+                Box(
+                    modifier = Modifier
+                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(10.dp))
+                ) {
                     Box(
                         Modifier
                             .wrapContentSize(align = Alignment.Center)

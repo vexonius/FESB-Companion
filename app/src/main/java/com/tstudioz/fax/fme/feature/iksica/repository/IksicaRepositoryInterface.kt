@@ -17,6 +17,7 @@ interface IksicaRepositoryInterface {
     val studentDataIksica: LiveData<StudentDataIksica>
     val snackbarHostState: SnackbarHostState
     val status: LiveData<Status>
+    val receiptsStatus: LiveData<Status>
 
     suspend fun loadData()
 

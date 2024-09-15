@@ -40,6 +40,7 @@ class IksicaViewModel(
     val studentDataIksica: LiveData<StudentDataIksica> = repository.studentDataIksica
     val snackbarHostState = repository.snackbarHostState
     val status: LiveData<Status> = repository.status
+    val receiptsStatus: LiveData<Status> = repository.receiptsStatus
 
     init {
         loadReceipts()

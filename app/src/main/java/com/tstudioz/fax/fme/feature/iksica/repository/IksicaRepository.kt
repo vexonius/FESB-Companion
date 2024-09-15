@@ -30,12 +30,14 @@ class IksicaRepository(
     private val _iksicaBalance = MutableLiveData<IksicaBalance>()
     private val _studentDataIksica = MutableLiveData<StudentDataIksica>()
     private val _status = MutableLiveData<Status>(Status.UNSET)
+    private val _receiptsStatus = MutableLiveData<Status>(Status.UNSET)
 
     override val loggedIn: MutableLiveData<Boolean> = _loggedIn
     override val loadingTxt: LiveData<String> = _loadingTxt
     override val iksicaBalance: LiveData<IksicaBalance> = _iksicaBalance
     override val studentDataIksica: LiveData<StudentDataIksica> = _studentDataIksica
     override val status: LiveData<Status> = _status
+    override val receiptsStatus: LiveData<Status> = _receiptsStatus
 
     override val snackbarHostState = SnackbarHostState()
 
@@ -130,9 +132,13 @@ class IksicaRepository(
         return when (val result = iksicaService.getRacuni(studentDataIksica.value?.oib ?: "")) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 Log.d(TAG, "Racuni fetched")
+                _receiptsStatus.postValue(Status.FETCHED)
                 parseRacuni(result.data)
             }
             is NetworkServiceResult.IksicaResult.Failure -> {
+                if (result.throwable.message?.contains("nema računa u zadnjih 30 dana", false) == true) {
+                    _receiptsStatus.postValue(Status.EMPTY)
+                }
                 Log.e(TAG, "Racuni fetching error")
                 if (result.throwable.message?.contains("Not logged in", false) == true) {
                     _loggedIn.postValue(false)
@@ -182,11 +188,11 @@ class IksicaRepository(
 
 }
 
-
 enum class Status {
     FETCHING,
     FETCHED,
     FETCHED_NEW,
     FETCHING_ERROR,
+    EMPTY,
     UNSET
 }
