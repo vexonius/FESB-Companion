@@ -39,17 +39,27 @@ class AttendanceViewModel(
 
     fun fetchAttendance() {
         viewModelScope.launch(context = Dispatchers.IO) {
-            when (val attendance = repository.fetchAttendance(user.value ?: User("", ""))) {
-                is NetworkServiceResult.AttendanceParseResult.Success -> {
-                    val data = attendance.data
-                    _attendanceList.postValue(data)
-                    _shouldShow.postValue(true)
-                }
+            try {
+                when (val attendance = repository.fetchAttendance(user.value ?: User("", ""))) {
+                    is NetworkServiceResult.AttendanceParseResult.Success -> {
+                        val data = attendance.data
+                        _attendanceList.postValue(data)
+                        _shouldShow.postValue(true)
+                    }
 
-                is NetworkServiceResult.AttendanceParseResult.Failure -> {
-                    _shouldShow.postValue(false)
-                    _error.postValue(true)
+                    is NetworkServiceResult.AttendanceParseResult.Failure -> {
+                        _shouldShow.postValue(false)
+                        _error.postValue(true)
+                    }
                 }
+            }
+            catch (e:Exception){
+                _shouldShow.postValue(false)
+                _error.postValue(true)
+            }
+            catch (t: Throwable) {
+                _shouldShow.postValue(false)
+                _error.postValue(true)
             }
         }
     }

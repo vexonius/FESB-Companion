@@ -23,7 +23,6 @@ import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.databinding.HomeTabBinding
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.view.activities.IndexActivity
 import com.tstudioz.fax.fme.view.activities.MainActivity
 import com.tstudioz.fax.fme.view.activities.MenzaActivity
 import com.tstudioz.fax.fme.view.adapters.HomePredavanjaAdapter
@@ -240,9 +239,6 @@ class HomeFragment : Fragment() {
     private fun loadMenzaView() {
         binding?.menzaRelative?.setOnClickListener {
             startActivity(Intent(activity, MenzaActivity::class.java))
-        }
-        binding?.eindexRelative?.setOnClickListener {
-            startActivity(Intent(activity, IndexActivity::class.java))
         }
     }
 
