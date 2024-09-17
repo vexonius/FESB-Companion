@@ -1,11 +1,13 @@
 package com.tstudioz.fax.fme.feature.studomat.view
 
-import android.content.Context
 import android.content.SharedPreferences
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.feature.studomat.models.Student
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
@@ -18,28 +20,24 @@ import kotlinx.coroutines.launch
 
 class StudomatViewModel(
     private val repository: StudomatRepository,
-    context: Context,
     private val sharedPreferences: SharedPreferences,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
     val isRefreshing = MutableLiveData(false)
 
-    val snackbarHostState
-        get() = repository.snackbarHostState
-    val subjectList
-        get() = repository.subjectList
-    val loading = repository.loadedTxt.map{ value ->
-        value == "fetching" || value == "unset"
-    }
-    val student
-        get() = repository.student
-    val generated
-        get() = repository.generated
-    val years
-        get() = repository.years
-    val selectedYear
-        get() = repository.selectedYear
+    var subjectList = MutableLiveData<List<StudomatSubject>>(emptyList())
+    var loadedTxt = MutableLiveData("unset")
+    var student = MutableLiveData(Student())
+    var generated = MutableLiveData("")
+    var years = MutableLiveData<List<Year>>(emptyList())
+    var selectedYear = MutableLiveData(Year("", ""))
+    val snackbarHostState: SnackbarHostState = SnackbarHostState()
+
+    val username = sharedPreferences.getString("username", "") ?: ""
+    val password = sharedPreferences.getString("password", "") ?: ""
+
+    val loading = loadedTxt.map { it == "fetching" || it == "unset" }
     val offline
         get() = !networkUtils.isNetworkAvailable()
 
@@ -48,35 +46,42 @@ class StudomatViewModel(
     }
 
     init {
-        runBlocking { repository.initRepo() }
+        runBlocking { loadData() }
     }
 
-    suspend fun login(pulldownTriggered: Boolean = false) {
+    suspend fun loadData() {
+        val yearsRealm = repository.readYears().sortedByDescending { it.title }
+        val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
+        years.postValue(yearsRealm)
+        subjectList.postValue(latestYearSubjects)
+        generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
+    }
+
+    suspend fun login(pulldownTriggered: Boolean = false): Boolean {
         if (networkUtils.isNetworkAvailable()) {
-            repository.loadedTxt.postValue("fetching")
-            when (val result = repository.loginUser(
-                sharedPreferences.getString("username", "") ?: "",
-                sharedPreferences.getString("password", "") ?: "",
-                false
-            )) {
+            loadedTxt.postValue("fetching")
+            return when (val result = repository.loginUser(username, password)) {
                 is StudomatRepositoryResult.LoginResult.Success -> {
-                    repository.student.postValue(result.data)
+                    student.postValue(result.data)
+                    true
                 }
 
                 is StudomatRepositoryResult.LoginResult.Failure -> {
                     if (pulldownTriggered) {
                         isRefreshing.postValue(false)
                     }
-                    repository.snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
-                    repository.loadedTxt.postValue("fetchingError")
+                    snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+                    loadedTxt.postValue("fetchingError")
+                    false
                 }
             }
         } else {
             if (pulldownTriggered) {
                 isRefreshing.postValue(false)
             }
-            repository.snackbarHostState.showSnackbar("Nema interneta")
-            repository.loadedTxt.postValue("fetchingError")
+            snackbarHostState.showSnackbar("Nema interneta")
+            loadedTxt.postValue("fetchingError")
+            return false
         }
     }
 
@@ -84,18 +89,21 @@ class StudomatViewModel(
     fun initStudomat() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (!networkUtils.isNetworkAvailable()) {
-                repository.loadedTxt.postValue("fetchingError")
+                loadedTxt.postValue("fetchingError")
                 snackbarHostState.showSnackbar("Nema interneta")
                 return@launch
             } else {
-                login()
-                when (val years = repository.getYears()) {
+                if (!login()) return@launch
+                when (val result = repository.getYears()) {
                     is StudomatRepositoryResult.YearsResult.Success -> {
-                        years.data.firstOrNull()?.let { getChosenYear(it) }
+                        result.data.firstOrNull()?.let { getChosenYear(it) }
+                        years.postValue(result.data)
+                        selectedYear.postValue(result.data.firstOrNull())
+                        loadedTxt.postValue("fetchedNew")
                     }
 
                     is StudomatRepositoryResult.YearsResult.Failure -> {
-                        repository.loadedTxt.postValue("fetchingError")
+                        loadedTxt.postValue("fetchingError")
                         snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
                     }
                 }
@@ -104,27 +112,38 @@ class StudomatViewModel(
     }
 
     fun getChosenYear(year: Year, pulldownTriggered: Boolean = false) {
-        if (!networkUtils.isNetworkAvailable()) {
-            viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-                val chosenYear = if (year.href.isEmpty() || year.title.isEmpty()) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            if (pulldownTriggered) {
+                isRefreshing.postValue(true)
+            }
+            val chosenYear =
+                if (year.href.isEmpty() || year.title.isEmpty()) {
                     years.value?.firstOrNull()
-                } else { year }
-                repository.selectedYear.postValue(chosenYear)
-                if (chosenYear != null) {
-                    repository.getChosenYear(chosenYear, offline = true)
+                } else {
+                    year
+                }
+            selectedYear.postValue(chosenYear)
+            subjectList.postValue(repository.read(year.title.substringBefore(" ")))
+            sharedPreferences.getString("gen" + year.title, "").let { generated.postValue(it) }
+            if (chosenYear != null) {
+                if (networkUtils.isNetworkAvailable()) {
+                    if (!login(pulldownTriggered)) return@launch
+                    when (val result = repository.getChosenYear(chosenYear)) {
+                        is StudomatRepositoryResult.ChosenYearResult.Success -> {
+                            loadedTxt.postValue("fetchedNew")
+                            subjectList.postValue(result.data.first)
+                            generated.postValue(result.data.second)
+                        }
+
+                        is StudomatRepositoryResult.ChosenYearResult.Failure -> {
+                            snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+                            loadedTxt.postValue("fetchingError")
+                        }
+                    }
                 }
             }
-        } else {
-            viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-                if (pulldownTriggered) {
-                    isRefreshing.postValue(true)
-                }
-                repository.selectedYear.postValue(year)
-                login(pulldownTriggered)
-                repository.getChosenYear(year)
-                if (pulldownTriggered) {
-                    isRefreshing.postValue(false)
-                }
+            if (pulldownTriggered) {
+                isRefreshing.postValue(false)
             }
         }
     }

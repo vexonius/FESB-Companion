@@ -40,6 +40,28 @@ class StudomatService {
         lastTimeLoggedIn = 0L
     }
 
+    fun login(username: String, password: String): NetworkServiceResult.StudomatResult {
+        try {
+            if ((System.currentTimeMillis() - lastTimeLoggedIn) > 3600000) {
+                getSamlRequest()
+                sendSamlResponseToAAIEDU()
+                getSamlResponse(username, password)
+                sendSAMLToDecrypt()
+                sendSAMLToISVU()
+            }
+            return when (val result = getStudomatData()) {
+                is NetworkServiceResult.StudomatResult.Success -> {
+                    NetworkServiceResult.StudomatResult.Success("Logged in!")
+                }
+                is NetworkServiceResult.StudomatResult.Failure -> {
+                    NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get Studomat data!"))
+                }
+            }
+        } catch (e: Throwable) {
+            return NetworkServiceResult.StudomatResult.Failure(e)
+        }
+    }
+
     fun getSamlRequest(): NetworkServiceResult.StudomatResult {
 
         val request = Request.Builder()

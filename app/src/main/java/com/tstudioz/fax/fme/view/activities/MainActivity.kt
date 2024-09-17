@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
     private val attendanceFragment = AttendanceFragment()
+    private val studomatFragment = StudomatFragment()
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     private val mainViewModel: MainViewModel by viewModel()
@@ -161,12 +162,12 @@ class MainActivity : AppCompatActivity() {
             )
         )
         bar?.addTab(
-                bar.createTab(
-                    AppCompatResources.getDrawable(this, R.drawable.studomat_icon),
-                    "Studomat",
-                    R.id.tab_studomat
-                )
-                )
+            bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.studomat_icon),
+                "Studomat",
+                R.id.tab_studomat
+            )
+        )
         bar?.selectTabById(R.id.tab_home, true)
     }
 
@@ -202,9 +203,10 @@ class MainActivity : AppCompatActivity() {
                 supportActionBar?.title = "Raspored"
                 ft.replace(R.id.frame, timeTableFragment)
             }
+
             R.id.tab_studomat -> {
                 supportActionBar?.title = "Studomat"
-                ft.replace(R.id.frame, StudomatFragment())
+                ft.replace(R.id.frame, studomatFragment)
             }
         }
         ft.addToBackStack(null)

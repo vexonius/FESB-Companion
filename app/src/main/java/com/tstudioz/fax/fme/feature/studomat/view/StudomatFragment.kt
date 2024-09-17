@@ -38,7 +38,6 @@ class StudomatFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return false
             }
-
         })
 
         return ComposeView(requireContext()).apply {
@@ -51,7 +50,6 @@ class StudomatFragment : Fragment() {
                     viewLifecycleOwner
                 )
             )
-
         }
     }
 }

@@ -115,9 +115,7 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
                                 Modifier.padding(8.dp, 4.dp)
                             )
                         }
-                        val upisani = subjectList?.size ?: 0
-                        val polozeni = subjectList?.count { it.grade in listOf("2", "3", "4", "5") } ?: 0
-                        ProgressBarCompose(polozeni, upisani)
+                        ProgressBarCompose(subjectList?.count { it.isPassed } ?: 0, subjectList?.size ?: 0)
                     }
                 }
                 if (!subjectList.isNullOrEmpty()) {

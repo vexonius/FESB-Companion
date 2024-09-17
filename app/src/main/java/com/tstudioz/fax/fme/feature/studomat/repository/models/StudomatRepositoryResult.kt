@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.studomat.repository.models
 
 import com.tstudioz.fax.fme.feature.studomat.models.Student
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 
 sealed class StudomatRepositoryResult {
@@ -15,6 +16,12 @@ sealed class StudomatRepositoryResult {
 
         class Failure(val throwable: String) : YearsResult()
 
+    }
+
+    sealed class ChosenYearResult : StudomatRepositoryResult() {
+        data class Success(val data: Pair<List<StudomatSubject>, String>) : ChosenYearResult()
+
+        class Failure(val throwable: String) : ChosenYearResult()
     }
 
 }
