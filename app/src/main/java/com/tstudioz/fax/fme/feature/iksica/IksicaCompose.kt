@@ -418,14 +418,14 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
     Column {
         HorizontalDivider()
         ListItem(modifier = Modifier.clickable(onClick = onClick),
-            headlineContent = { Text(receipt.restoran, overflow = TextOverflow.Ellipsis) },
+            headlineContent = { Text(receipt.restaurant, overflow = TextOverflow.Ellipsis) },
             supportingContent = {
-                Text(receipt.datumString + " " + receipt.vrijeme + " ")
+                Text(receipt.dateString + " " + receipt.time + " ")
             },
-            overlineContent = { Text(receipt.autorizacija) },
+            overlineContent = { Text(receipt.authorised) },
             trailingContent = {
                 Text(
-                    text = receipt.iznosPlaceno.toBigDecimal()
+                    text = receipt.paidAmount.toBigDecimal()
                         .setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
                     fontSize = 15.sp,
                 )
@@ -438,24 +438,24 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
 fun IksicaItemPreview() {
     IksicaItem(
         receipt = Receipt(
-            restoran = "Restoran",
-            datumString = "Datum",
-            vrijeme = "Vrijeme",
-            detaljiRacuna = listOf(
+            restaurant = "Restoran",
+            dateString = "Datum",
+            time = "Vrijeme",
+            receiptDetails = listOf(
                 ReceiptItem(
-                    nazivArtikla = "Naziv",
-                    kolicina = 1,
-                    cijenaUkupno = 0.55,
-                    iznosSubvencije = 0.27,
-                    cijenaJednogArtikla = 0.58
+                    articleName = "Naziv",
+                    amount = 1,
+                    total = 0.55,
+                    subsidizedAmount = 0.27,
+                    price = 0.58
                 )
             ),
-            iznosRacuna = 0.55,
-            iznosSubvencije = 0.27,
-            iznosPlaceno = 0.55,
-            autorizacija = "Autorizacija",
-            urlSastavnica = "https://www.google.com",
-            datum = LocalDate.now()
+            receiptAmount = 0.55,
+            subsidizedAmount = 0.27,
+            paidAmount = 0.55,
+            authorised = "Autorizacija",
+            href = "https://www.google.com",
+            date = LocalDate.now()
         )
     ) {}
 }
@@ -475,24 +475,24 @@ fun IksicaLoading(loadingTxt: String = "Loading...") {
 @Composable
 fun IksicaReceiptDetailed(
     receipt: Receipt? = Receipt(
-        restoran = "Restoran",
-        datumString = "Datum",
-        vrijeme = "Vrijeme",
-        detaljiRacuna = listOf(
+        restaurant = "Restoran",
+        dateString = "Datum",
+        time = "Vrijeme",
+        receiptDetails = listOf(
             ReceiptItem(
-                nazivArtikla = "Naziv",
-                kolicina = 1,
-                cijenaUkupno = 0.55,
-                iznosSubvencije = 0.27,
-                cijenaJednogArtikla = 0.58
+                articleName = "Naziv",
+                amount = 1,
+                total = 0.55,
+                subsidizedAmount = 0.27,
+                price = 0.58
             )
         ),
-        iznosRacuna = 0.55,
-        iznosSubvencije = 0.27,
-        iznosPlaceno = 0.55,
-        autorizacija = "Autorizacija",
-        urlSastavnica = "https://www.google.com",
-        datum = LocalDate.now()
+        receiptAmount = 0.55,
+        subsidizedAmount = 0.27,
+        paidAmount = 0.55,
+        authorised = "Autorizacija",
+        href = "https://www.google.com",
+        date = LocalDate.now()
     )
 ) {
     LazyColumn(modifier = Modifier.padding(0.dp)) {
@@ -507,7 +507,7 @@ fun IksicaReceiptDetailed(
                     contentDescription = "Lokacija",
                     Modifier.height(20.dp)
                 )
-                Text(text = receipt?.restoran ?: "")
+                Text(text = receipt?.restaurant ?: "")
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -519,7 +519,7 @@ fun IksicaReceiptDetailed(
                     contentDescription = "Vrijeme",
                     Modifier.height(20.dp)
                 )
-                Text(text = (receipt?.datumString ?: "") + ", " + (receipt?.vrijeme ?: ""))
+                Text(text = (receipt?.dateString ?: "") + ", " + (receipt?.time ?: ""))
             }
         }
         item {
@@ -530,7 +530,7 @@ fun IksicaReceiptDetailed(
             ) {
                 Text(text = "Ukupno plaćeno: ", fontSize = 18.sp)
                 Text(
-                    text = receipt?.iznosPlaceno?.toBigDecimal()
+                    text = receipt?.paidAmount?.toBigDecimal()
                         ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €", fontSize = 18.sp
                 )
             }
@@ -540,10 +540,10 @@ fun IksicaReceiptDetailed(
                     .padding(20.dp, 10.dp, 20.dp, 10.dp)
             ) {
                 Text(text = "Ukupno subvencionirano: ", fontSize = 18.sp)
-                Text(text = receipt?.iznosSubvencije.toString() + " €", fontSize = 18.sp)
+                Text(text = receipt?.subsidizedAmount.toString() + " €", fontSize = 18.sp)
             }
         }
-        items(receipt?.detaljiRacuna ?: emptyList()) {
+        items(receipt?.receiptDetails ?: emptyList()) {
             IksicaItemDetailed(it)
         }
     }
@@ -553,11 +553,11 @@ fun IksicaReceiptDetailed(
 @Composable
 fun IksicaItemDetailed(
     item: ReceiptItem = ReceiptItem(
-        nazivArtikla = "Naziv",
-        kolicina = 1,
-        cijenaUkupno = 0.55,
-        iznosSubvencije = 0.27,
-        cijenaJednogArtikla = 0.58
+        articleName = "Naziv",
+        amount = 1,
+        total = 0.55,
+        subsidizedAmount = 0.27,
+        price = 0.58
     )
 ) {
     Row(
@@ -570,16 +570,16 @@ fun IksicaItemDetailed(
     ) {
         Column(Modifier.weight(0.85f)) {
             Row(Modifier.padding(bottom = 5.dp)) {
-                Text(text = item.kolicina.toString() + "x", fontWeight = FontWeight.Bold)
+                Text(text = item.amount.toString() + "x", fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.width(6.dp))
-                Text(text = item.nazivArtikla, fontWeight = FontWeight.Bold)
+                Text(text = item.articleName, fontWeight = FontWeight.Bold)
             }
             Text(
-                text = "Cijena: " + item.cijenaJednogArtikla.toString() + " €",
+                text = "Cijena: " + item.price.toString() + " €",
                 color = MaterialTheme.colorScheme.outline
             )
             Text(
-                text = "Subvencija: " + item.iznosSubvencije.toString() + " €",
+                text = "Subvencija: " + item.subsidizedAmount.toString() + " €",
                 color = MaterialTheme.colorScheme.outline
             )
         }
@@ -587,8 +587,8 @@ fun IksicaItemDetailed(
             Modifier.padding(start = 15.dp)
         ) {
             Text(
-                text = item.cijenaUkupno.toBigDecimal().minus(item.iznosSubvencije.toBigDecimal())
-                    .times(item.kolicina.toBigDecimal()).toString() + " €"
+                text = item.total.toBigDecimal().minus(item.subsidizedAmount.toBigDecimal())
+                    .times(item.amount.toBigDecimal()).toString() + " €"
             )
         }
     }
@@ -600,11 +600,11 @@ fun IksicaItemDetailed(
 fun Test() {
     IksicaItemDetailed(
         item = ReceiptItem(
-            nazivArtikla = "Naziva a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a",
-            kolicina = 1,
-            cijenaUkupno = 0.55,
-            iznosSubvencije = 0.27,
-            cijenaJednogArtikla = 0.58
+            articleName = "Naziva a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a",
+            amount = 1,
+            total = 0.55,
+            subsidizedAmount = 0.27,
+            price = 0.58
         )
     )
 }

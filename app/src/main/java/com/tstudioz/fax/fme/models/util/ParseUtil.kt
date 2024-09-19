@@ -100,8 +100,8 @@ fun parseRacuni(doc: String): List<Receipt> {
         }
     }
     return racuni
-        .sortedByDescending { LocalTime.parse(it.vrijeme) }
-        .sortedByDescending { it.datum }
+        .sortedByDescending { LocalTime.parse(it.time) }
+        .sortedByDescending { it.date }
 }
 
 fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {
@@ -117,14 +117,14 @@ fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {
             cols[3].text().replace(",", ".").toDoubleOrNull() ?: 0.0,
             cols[4].text().replace(",", ".").toDoubleOrNull() ?: 0.0
         )
-        if (!detaljiRacuna.any { it.nazivArtikla == item.nazivArtikla && it.cijenaJednogArtikla == item.cijenaJednogArtikla }) {
+        if (!detaljiRacuna.any { it.articleName == item.articleName && it.price == item.price }) {
             detaljiRacuna.add(item)
         } else {
             val index = detaljiRacuna.indexOf(
                 detaljiRacuna.first {
-                    it.nazivArtikla == item.nazivArtikla && it.cijenaJednogArtikla == item.cijenaJednogArtikla
+                    it.articleName == item.articleName && it.price == item.price
                 })
-            detaljiRacuna[index].kolicina = (detaljiRacuna[index].kolicina + item.kolicina)
+            detaljiRacuna[index].amount = (detaljiRacuna[index].amount + item.amount)
         }
     }
     return detaljiRacuna

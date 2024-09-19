@@ -46,8 +46,8 @@ class IksicaDao(private val dbManager: DatabaseManagerInterface) : IksicaDaoInte
     override suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentDataIksica?> {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
         val receipts = realm.query<ReceiptRealm>().find().map { it.fromRealmObject() }
-            .sortedByDescending { LocalTime.parse(it.vrijeme) }
-            .sortedByDescending { it.datum }
+            .sortedByDescending { LocalTime.parse(it.time) }
+            .sortedByDescending { it.date }
         val iksicaBalance = realm.query<IksicaBalanceRealm>().find().map { it.fromRealmObject() }.firstOrNull()
         val studentDataIksica = realm.query<StudentDataIksicaRealm>().find().map { it.fromRealmObject() }.firstOrNull()
         return Triple(receipts, iksicaBalance, studentDataIksica)

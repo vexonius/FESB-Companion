@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.database.models
 
-import android.util.Log
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import java.time.LocalDate
@@ -8,30 +7,30 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 data class Receipt(
-    val restoran: String,
-    val datum: LocalDate,
-    val datumString: String,
-    val vrijeme: String,
-    val iznosRacuna: Double,
-    val iznosSubvencije: Double,
-    val iznosPlaceno: Double,
-    val autorizacija: String,
-    val urlSastavnica: String,
-    var detaljiRacuna: List<ReceiptItem>? = null
+    val restaurant: String,
+    val date: LocalDate,
+    val dateString: String,
+    val time: String,
+    val receiptAmount: Double,
+    val subsidizedAmount: Double,
+    val paidAmount: Double,
+    val authorised: String,
+    val href: String,
+    var receiptDetails: List<ReceiptItem>? = null
 )
 
 fun Receipt.toRealmObject(): ReceiptRealm {
     val receipt = this
     val rlm = ReceiptRealm().apply {
-        restoran = receipt.restoran
-        datum = receipt.datum.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-        datumString = receipt.datumString
-        vrijeme = receipt.vrijeme
-        iznosRacuna = receipt.iznosRacuna
-        iznosSubvencije = receipt.iznosSubvencije
-        iznosPlaceno = receipt.iznosPlaceno
-        autorizacija = receipt.autorizacija
-        urlSastavnica = receipt.urlSastavnica
+        restaurant = receipt.restaurant
+        date = receipt.date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+        dateString = receipt.dateString
+        time = receipt.time
+        receiptAmount = receipt.receiptAmount
+        subsidizedAmount = receipt.subsidizedAmount
+        paidAmount = receipt.paidAmount
+        authorised = receipt.authorised
+        href = receipt.href
     }
     return rlm
 }
@@ -39,28 +38,28 @@ fun Receipt.toRealmObject(): ReceiptRealm {
 fun ReceiptRealm.fromRealmObject(): Receipt {
     val receiptRealm = this
     return Receipt(
-        restoran = receiptRealm.restoran ?: "",
-        datum = LocalDate.parse(receiptRealm.datum, DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-        datumString = receiptRealm.datumString ?: "",
-        vrijeme = receiptRealm.vrijeme ?: "",
-        iznosRacuna = receiptRealm.iznosRacuna ?: 0.0,
-        iznosSubvencije = receiptRealm.iznosSubvencije ?: 0.0,
-        iznosPlaceno = receiptRealm.iznosPlaceno ?: 0.0,
-        autorizacija = receiptRealm.autorizacija ?: "",
-        urlSastavnica = receiptRealm.urlSastavnica ?: ""
+        restaurant = receiptRealm.restaurant ?: "",
+        date = LocalDate.parse(receiptRealm.date, DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+        dateString = receiptRealm.dateString ?: "",
+        time = receiptRealm.time ?: "",
+        receiptAmount = receiptRealm.receiptAmount ?: 0.0,
+        subsidizedAmount = receiptRealm.subsidizedAmount ?: 0.0,
+        paidAmount = receiptRealm.paidAmount ?: 0.0,
+        authorised = receiptRealm.authorised ?: "",
+        href = receiptRealm.href ?: ""
     )
 }
 
 open class ReceiptRealm : RealmObject {
     @PrimaryKey
     var id : String = UUID.randomUUID().toString()
-    var restoran: String? = null
-    var datum: String? = null
-    var datumString: String? = null
-    var vrijeme: String? = null
-    var iznosRacuna: Double? = null
-    var iznosSubvencije: Double? = null
-    var iznosPlaceno: Double? = null
-    var autorizacija: String? = null
-    var urlSastavnica: String? = null
+    var restaurant: String? = null
+    var date: String? = null
+    var dateString: String? = null
+    var time: String? = null
+    var receiptAmount: Double? = null
+    var subsidizedAmount: Double? = null
+    var paidAmount: Double? = null
+    var authorised: String? = null
+    var href: String? = null
 }

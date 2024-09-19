@@ -72,7 +72,7 @@ class IksicaViewModel(
         loadingTxt.postValue(text)
     }
 
-    suspend fun loginIksica() {
+    private suspend fun loginIksica() {
         val email = (sharedPreferences.getString("username", "") ?: "") + "@fesb.hr"
         val password = sharedPreferences.getString("password", "") ?: ""
         try {
@@ -145,11 +145,11 @@ class IksicaViewModel(
             }
             try {
                 status.postValue(Status.FETCHING)
-                when (val details = repository.getReceipt(receipt.urlSastavnica)) {
+                when (val details = repository.getReceipt(receipt.href)) {
                     is IksicaResult.ReceiptResult.Success -> {
                         status.postValue(Status.FETCHED)
                         showItem.postValue(true)
-                        itemToShow.postValue(receipt.copy(detaljiRacuna = details.data))
+                        itemToShow.postValue(receipt.copy(receiptDetails = details.data))
                     }
 
                     is IksicaResult.ReceiptResult.Failure -> {
