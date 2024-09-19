@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.models.data
 
-import android.util.Log
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import io.realm.kotlin.Realm

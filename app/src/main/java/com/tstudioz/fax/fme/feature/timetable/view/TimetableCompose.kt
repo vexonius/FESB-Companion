@@ -54,16 +54,19 @@ import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimetableCompose(showDay: LiveData<Boolean>,
-                     showDayEvent: LiveData<Event>,
-                     shownWeekChooseMenu: LiveData<Boolean>,
-                     lessonsToShow: LiveData<List<Event>>,
-                     shownWeek: LiveData<LocalDate>,
-                     periods:  LiveData<List<TimeTableInfo>>,
-                     fetchUserTimetable: (LocalDate, LocalDate, LocalDate) -> Unit,
-                     showEvent: (Event) -> Unit,
-                     showWeekChooseMenu: (Boolean) -> Unit,
-                     hideEvent: () -> Unit){
+fun TimetableCompose(
+    showDay: LiveData<Boolean>,
+    showDayEvent: LiveData<Event>,
+    shownWeekChooseMenu: LiveData<Boolean>,
+    lessonsToShow: LiveData<List<Event>>,
+    shownWeek: LiveData<LocalDate>,
+    periods:  LiveData<List<TimeTableInfo>>,
+    monthData: LiveData<MonthData>,
+    fetchUserTimetable: (LocalDate, LocalDate, LocalDate) -> Unit,
+    showEvent: (Event) -> Unit,
+    showWeekChooseMenu: (Boolean) -> Unit,
+    hideEvent: () -> Unit
+    ) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -92,10 +95,6 @@ fun TimetableCompose(showDay: LiveData<Boolean>,
                     })
                 {
                     Column(Modifier.padding(8.dp, 8.dp, 8.dp, 20.dp)) {
-                        val currentMonth = remember { YearMonth.now() }
-                        val startMonth = remember { currentMonth.minusMonths(100) }
-                        val endMonth = remember { currentMonth.plusMonths(100) }
-                        val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
                         var selection by remember {
                             mutableStateOf<CalendarDay?>(
                                 CalendarDay(
@@ -105,10 +104,10 @@ fun TimetableCompose(showDay: LiveData<Boolean>,
                             )
                         }
                         val state = rememberCalendarState(
-                            startMonth = startMonth,
-                            endMonth = endMonth,
-                            firstVisibleMonth = currentMonth,
-                            firstDayOfWeek = firstDayOfWeek
+                            startMonth = monthData.value?.startMonth ?: YearMonth.now(),
+                            endMonth = monthData.value?.endMonth ?: YearMonth.now(),
+                            firstVisibleMonth = monthData.value?.currentMonth ?: YearMonth.now(),
+                            firstDayOfWeek = monthData.value?.firstDayOfWeek ?: firstDayOfWeekFromLocale()
                         )
                         val coroutineScope = rememberCoroutineScope()
                         SimpleCalendarTitle(

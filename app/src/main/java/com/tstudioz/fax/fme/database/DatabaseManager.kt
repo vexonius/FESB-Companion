@@ -10,7 +10,7 @@ class DatabaseManager: DatabaseManagerInterface {
             setOf(
                 Korisnik::class,
                 Note::class,
-                Dolazak::class,
+                AttendanceEntry::class,
                 Meni::class,
                 EventRealm::class,
                 IksicaBalanceRealm::class,

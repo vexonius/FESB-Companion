@@ -66,11 +66,6 @@
             android:name=".view.activities.MenzaActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Simple" />
-        <activity
-            android:name=".view.activities.IndexActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
     </application>
 
 </manifest>

@@ -21,7 +21,6 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("debug")
         }
     }
     namespace = "com.tstudioz.fax.fme"
@@ -33,6 +32,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs = listOf("-Xdebug") // da ne bi bilo optimised out vars
     }
 
     viewBinding {
@@ -62,7 +62,6 @@ dependencies {
     implementation("io.coil-kt:coil:2.5.0")
     implementation("nl.joery.animatedbottombar:library:1.1.0")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("com.philliphsu:bottomsheetpickers:2.4.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.cardview:cardview:1.0.0")
@@ -71,10 +70,8 @@ dependencies {
     implementation("androidx.browser:browser:1.8.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
-    implementation("io.realm:android-adapters:2.1.1")
     implementation("com.github.doctoror.particlesdrawable:library:2.0.2")
     implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")
-    implementation("com.github.PhilJay:MPAndroidChart:v3.0.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("io.github.lizhangqu:coreprogress:1.0.2")
     implementation("com.github.apl-devs:appintro:v4.2.2")
@@ -110,7 +107,8 @@ dependencies {
     //EncryptedSharedPreferences
     implementation("androidx.security:security-crypto:1.0.0")
 
-    //compose ui
+    //pull to refresh compose
+    implementation("androidx.compose.material:material:$composeVersion")
     implementation("androidx.compose.ui:ui-android:$composeVersion")
 
     //choose calendar

@@ -63,7 +63,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
-                android:text="@string/danasnja_predavanja"
+                android:text="@string/todaysEvents"
                 android:textColor="@color/shady_blue"
                 android:textSize="13sp" />
 
@@ -119,7 +119,7 @@
                         android:layout_below="@+id/smile"
                         android:layout_marginTop="15dp"
                         android:paddingBottom="10dp"
-                        android:text="@string/odmori_se"
+                        android:text="@string/getRest"
                         android:textAlignment="center"
                         android:textColor="#cacaca"
                         android:textSize="14dp" />
@@ -230,64 +230,6 @@
                     android:textColor="@color/white"
                     android:textSize="14dp" />
 
-
-            </RelativeLayout>
-
-            <TextView
-                android:id="@+id/indeksHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/iksica_ad"
-                android:layout_marginLeft="20dp"
-                android:layout_marginBottom="3dp"
-                android:text="OCJENE"
-                android:textColor="@color/shady_blue"
-                android:textSize="14dp" />
-
-            <RelativeLayout
-                android:id="@+id/eindex_Relative"
-                android:layout_width="match_parent"
-                android:layout_height="140dp"
-                android:layout_below="@+id/indeksHeader"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@color/purple_nice"
-                android:clickable="true">
-
-                <com.doctoror.particlesdrawable.ParticlesView
-                    android:id="@+id/particles_indeks"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:particleColor="@color/white"
-                    app:frameDelayMillis="10"
-                    app:lineColor="@color/white"
-                    app:lineLength="110dp"
-                    app:lineThickness="1dp"
-                    app:particleRadiusMax="3dp"
-                    app:particleRadiusMin="1dp"
-                    app:density="12"
-                    app:speedFactor="1" />
-
-                <TextView
-                    android:id="@+id/eindexText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginTop="20dp"
-                    android:text="eIndeks"
-                    android:textColor="@color/white"
-                    android:textSize="35dp" />
-
-                <TextView
-                    android:id="@+id/eindex_text_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/eindexText"
-                    android:layout_marginLeft="30dp"
-                    android:text="Pregled ocjena"
-                    android:textColor="@color/white"
-                    android:textSize="14dp" />
 
             </RelativeLayout>
 
