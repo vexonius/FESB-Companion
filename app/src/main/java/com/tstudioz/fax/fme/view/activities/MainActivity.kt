@@ -28,17 +28,15 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.view.fragments.HomeFragment
-import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
-import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import com.tstudioz.fax.fme.feature.iksica.IksicaFragment
-import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
+import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.exceptions.RealmException
@@ -64,6 +62,7 @@ class MainActivity : AppCompatActivity() {
     private var client: OkHttpClient? = null
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
+    private val iksicaFragment = IksicaFragment()
     private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
     private val attendanceFragment = AttendanceFragment()
@@ -86,12 +85,8 @@ class MainActivity : AppCompatActivity() {
 
         checkVersion()
         shouldShowGDPRDialog()
-        loginX()
     }
 
-    private fun loginX() {
-        mainViewModel.loginIksica()
-    }
 
     private fun isThereAction() {
         if (intent.action != null) {
@@ -197,7 +192,7 @@ class MainActivity : AppCompatActivity() {
         when (pos) {
             R.id.tab_iksica -> {
                 supportActionBar?.title = "Iksica"
-                ft.replace(R.id.frame, IksicaFragment())
+                ft.replace(R.id.frame, iksicaFragment)
             }
 
             R.id.tab_prisutnost -> {

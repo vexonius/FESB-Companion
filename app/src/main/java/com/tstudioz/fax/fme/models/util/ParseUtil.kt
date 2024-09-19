@@ -92,6 +92,7 @@ fun parseRacuni(doc: String): List<Receipt> {
                     cols[2].text(),
                     cols[3].text().toDoubleOrNull() ?: 0.0,
                     cols[4].text().toDoubleOrNull() ?: 0.0,
+                    ((cols[3].text().toDoubleOrNull() ?: 0.0) - (cols[4].text().toDoubleOrNull() ?: 0.0)) ?: 0.0,
                     cols[5].text(),
                     cols[6].selectFirst("a")?.attr("href") ?: ""
                 )

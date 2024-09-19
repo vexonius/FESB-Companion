@@ -7,21 +7,11 @@ import com.tstudioz.fax.fme.database.models.IksicaBalance
 import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.database.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.IksicaResult
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface IksicaRepositoryInterface {
 
-    val loggedIn: MutableLiveData<Boolean>
-    val loadingTxt: LiveData<String>
-    val iksicaBalance: LiveData<IksicaBalance>
-    val studentDataIksica: LiveData<StudentDataIksica>
-    val snackbarHostState: SnackbarHostState
-    val status: LiveData<Status>
-    val receiptsStatus: LiveData<Status>
-
-    suspend fun loadData()
-
-    suspend fun loginIksica()
 
     suspend fun getAuthState(): NetworkServiceResult.IksicaResult
 
@@ -29,9 +19,9 @@ interface IksicaRepositoryInterface {
 
     suspend fun getAspNetSessionSAML(): Pair<IksicaBalance, StudentDataIksica>
 
-    suspend fun getReceipts(): List<Receipt>
+    suspend fun getReceipts(oib:String): IksicaResult.ReceiptsResult
 
-    suspend fun getRacun(url: String): MutableList<ReceiptItem>
+    suspend fun getReceipt(url: String): IksicaResult.ReceiptResult
 
     suspend fun insert(receipts: List<Receipt>)
 

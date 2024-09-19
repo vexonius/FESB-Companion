@@ -14,9 +14,9 @@ import org.koin.dsl.module
 
 @OptIn(InternalCoroutinesApi::class)
 val iksicaModule = module {
-    single<IksicaRepositoryInterface> { IksicaRepository(get(), get(), get()) }
+    single<IksicaRepositoryInterface> { IksicaRepository(get(), get()) }
     single<IksicaServiceInterface> { IksicaService(get())}
     single<IksicaDaoInterface> { IksicaDao(get()) }
-    viewModel { IksicaViewModel(androidApplication(), get()) }
+    viewModel { IksicaViewModel(androidApplication(), get(),get()) }
 }
 

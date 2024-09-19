@@ -141,12 +141,6 @@ class MainViewModel(
         }
     }
 
-    fun loginIksica() {
-        viewModelScope.launch(Dispatchers.IO) {
-            iksicaRepository.loginIksica()
-        }
-    }
-
     fun showThisWeeksEvents() {
         _lessonsToShow.postValue(_lessonsPerm.value)
     }

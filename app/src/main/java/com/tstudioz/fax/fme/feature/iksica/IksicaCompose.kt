@@ -62,7 +62,6 @@ import com.tstudioz.fax.fme.database.models.Receipt
 import com.tstudioz.fax.fme.database.models.ReceiptItem
 import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.repository.Status
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -72,11 +71,10 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
+//kada je prazna db stoju null i sve je prazno,
+//popravit za taj slucaj posto je to prva stvar sto ce videjt korisnik
 
-@OptIn(
-    InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalCoroutinesApi::class,
-    ExperimentalMaterialApi::class
-)
+@OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun IksicaCompose(
     iksicaViewModel: IksicaViewModel,
@@ -427,7 +425,8 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
             overlineContent = { Text(receipt.autorizacija) },
             trailingContent = {
                 Text(
-                    text = receipt.iznosRacuna.toString() + " €",
+                    text = receipt.iznosPlaceno.toBigDecimal()
+                        .setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
                     fontSize = 15.sp,
                 )
             })
@@ -453,6 +452,7 @@ fun IksicaItemPreview() {
             ),
             iznosRacuna = 0.55,
             iznosSubvencije = 0.27,
+            iznosPlaceno = 0.55,
             autorizacija = "Autorizacija",
             urlSastavnica = "https://www.google.com",
             datum = LocalDate.now()
@@ -489,6 +489,7 @@ fun IksicaReceiptDetailed(
         ),
         iznosRacuna = 0.55,
         iznosSubvencije = 0.27,
+        iznosPlaceno = 0.55,
         autorizacija = "Autorizacija",
         urlSastavnica = "https://www.google.com",
         datum = LocalDate.now()
@@ -529,7 +530,7 @@ fun IksicaReceiptDetailed(
             ) {
                 Text(text = "Ukupno plaćeno: ", fontSize = 18.sp)
                 Text(
-                    text = receipt?.iznosRacuna?.minus(receipt.iznosSubvencije)?.toBigDecimal()
+                    text = receipt?.iznosPlaceno?.toBigDecimal()
                         ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €", fontSize = 18.sp
                 )
             }

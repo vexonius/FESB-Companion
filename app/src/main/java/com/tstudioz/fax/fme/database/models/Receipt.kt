@@ -14,6 +14,7 @@ data class Receipt(
     val vrijeme: String,
     val iznosRacuna: Double,
     val iznosSubvencije: Double,
+    val iznosPlaceno: Double,
     val autorizacija: String,
     val urlSastavnica: String,
     var detaljiRacuna: List<ReceiptItem>? = null
@@ -28,6 +29,7 @@ fun Receipt.toRealmObject(): ReceiptRealm {
         vrijeme = receipt.vrijeme
         iznosRacuna = receipt.iznosRacuna
         iznosSubvencije = receipt.iznosSubvencije
+        iznosPlaceno = receipt.iznosPlaceno
         autorizacija = receipt.autorizacija
         urlSastavnica = receipt.urlSastavnica
     }
@@ -43,6 +45,7 @@ fun ReceiptRealm.fromRealmObject(): Receipt {
         vrijeme = receiptRealm.vrijeme ?: "",
         iznosRacuna = receiptRealm.iznosRacuna ?: 0.0,
         iznosSubvencije = receiptRealm.iznosSubvencije ?: 0.0,
+        iznosPlaceno = receiptRealm.iznosPlaceno ?: 0.0,
         autorizacija = receiptRealm.autorizacija ?: "",
         urlSastavnica = receiptRealm.urlSastavnica ?: ""
     )
@@ -57,6 +60,7 @@ open class ReceiptRealm : RealmObject {
     var vrijeme: String? = null
     var iznosRacuna: Double? = null
     var iznosSubvencije: Double? = null
+    var iznosPlaceno: Double? = null
     var autorizacija: String? = null
     var urlSastavnica: String? = null
 }
