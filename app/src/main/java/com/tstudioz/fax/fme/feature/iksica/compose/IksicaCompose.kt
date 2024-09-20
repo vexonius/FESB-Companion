@@ -62,8 +62,6 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-//kada je prazna db stoju null i sve je prazno,
-//popravit za taj slucaj posto je to prva stvar sto ce videjt korisnik
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -102,44 +100,54 @@ fun IksicaCompose(
                 CircularIndicator()
             }
             val list = iksicaViewModel.receipts.observeAsState().value
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                item {
-                    ElevatedCardIksica(
-                        iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
-                        iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
-                        iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString(),
-                    ) { showPopup.value = true }
-                }
-                if (loginStatus != LoginStatus.SUCCESS) {
+            if (iksicaViewModel.iksicaBalance.observeAsState().value != null && list != null){
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
                     item {
-                        IksicaLoading(loginStatus ?: LoginStatus.UNSET)
+                        ElevatedCardIksica(
+                            iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
+                            iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
+                            iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString(),
+                        ) { showPopup.value = true }
                     }
-                }
-                if (!list.isNullOrEmpty()) {
-                    items(list) {
-                        IksicaItem(it) {
-                            iksicaViewModel.getReceiptDetails(it)
+                    if (loginStatus != LoginStatus.SUCCESS) {
+                        item {
+                            IksicaLoading(loginStatus ?: LoginStatus.UNSET)
+                        }
+                    }
+                    if (!list.isNullOrEmpty()) {
+                        items(list) {
+                            IksicaItem(it) {
+                                iksicaViewModel.getReceiptDetails(it)
+                            }
+                        }
+                    }
+                    if (receiptsStatus == Status.EMPTY) {
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(20.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Nema računa u zadnjih 30 dana",
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                )
+                            }
                         }
                     }
                 }
-                if (receiptsStatus == Status.EMPTY) {
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(20.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Nema računa u zadnjih 30 dana",
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            )
-                        }
-                    }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularIndicator()
                 }
             }
         }
