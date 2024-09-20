@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.iksica
+package com.tstudioz.fax.fme.feature.iksica.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,9 +49,8 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.compose.CircularIndicator
-import com.tstudioz.fax.fme.feature.iksica.compose.BottomSheetIksica
-import com.tstudioz.fax.fme.feature.iksica.compose.CardIksicaPopupContent
-import com.tstudioz.fax.fme.feature.iksica.compose.ElevatedCardIksica
+import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
+import com.tstudioz.fax.fme.feature.iksica.LoginStatus
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.repository.Status
