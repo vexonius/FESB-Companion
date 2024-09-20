@@ -1,6 +1,9 @@
 package com.tstudioz.fax.fme.database
 
 import com.tstudioz.fax.fme.database.models.*
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalanceRealm
+import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksicaRealm
 import io.realm.kotlin.RealmConfiguration
 
 class DatabaseManager: DatabaseManagerInterface {

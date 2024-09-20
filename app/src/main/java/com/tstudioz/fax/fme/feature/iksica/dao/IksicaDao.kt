@@ -1,14 +1,14 @@
 package com.tstudioz.fax.fme.feature.iksica.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.IksicaBalance
-import com.tstudioz.fax.fme.database.models.IksicaBalanceRealm
-import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.database.models.ReceiptRealm
-import com.tstudioz.fax.fme.database.models.StudentDataIksica
-import com.tstudioz.fax.fme.database.models.StudentDataIksicaRealm
-import com.tstudioz.fax.fme.database.models.fromRealmObject
-import com.tstudioz.fax.fme.database.models.toRealmObject
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalanceRealm
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksicaRealm
+import com.tstudioz.fax.fme.feature.iksica.models.fromRealmObject
+import com.tstudioz.fax.fme.feature.iksica.models.toRealmObject
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query

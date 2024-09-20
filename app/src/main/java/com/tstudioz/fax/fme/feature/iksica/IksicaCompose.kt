@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,16 +22,13 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -47,24 +42,21 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
-import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.CircularIndicator
-import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.database.models.ReceiptItem
-import com.tstudioz.fax.fme.database.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.compose.BottomSheetIksica
+import com.tstudioz.fax.fme.feature.iksica.compose.CardIksicaPopupContent
+import com.tstudioz.fax.fme.feature.iksica.compose.ElevatedCardIksica
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.repository.Status
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
-import java.time.LocalDate
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -80,7 +72,8 @@ fun IksicaCompose(
     iksicaViewModel: IksicaViewModel,
 ) {
     val status = iksicaViewModel.status.observeAsState().value
-    val receiptStatus = iksicaViewModel.receiptsStatus.observeAsState().value
+    val loginStatus = iksicaViewModel.loginStatus.observeAsState().value
+    val receiptsStatus = iksicaViewModel.receiptsStatus.observeAsState().value
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val isRefreshing = iksicaViewModel.isRefreshing.observeAsState(false).value
@@ -97,16 +90,7 @@ fun IksicaCompose(
         snackbarHost = { SnackbarHost(hostState = iksicaViewModel.snackbarHostState) },
         sheetContent = {
             if (iksicaViewModel.showItem.observeAsState(initial = false).value) {
-                val receipt = iksicaViewModel.itemToShow.observeAsState().value
-                val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-                ModalBottomSheet(
-                    sheetState = sheetState,
-                    onDismissRequest = { iksicaViewModel.toggleShowItem(false) },
-                    containerColor = MaterialTheme.colorScheme.surface
-                ) {
-                    IksicaReceiptDetailed(receipt)
-                }
-
+                BottomSheetIksica(iksicaViewModel.itemToShow) { iksicaViewModel.toggleShowItem(it) }
             }
         }) {
         Box {
@@ -122,14 +106,18 @@ fun IksicaCompose(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(0.dp)
             ) {
                 item {
                     ElevatedCardIksica(
                         iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
                         iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
-                        iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
+                        iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString(),
                     ) { showPopup.value = true }
+                }
+                if (loginStatus != LoginStatus.SUCCESS) {
+                    item {
+                        IksicaLoading(loginStatus ?: LoginStatus.UNSET)
+                    }
                 }
                 if (!list.isNullOrEmpty()) {
                     items(list) {
@@ -138,7 +126,7 @@ fun IksicaCompose(
                         }
                     }
                 }
-                if (receiptStatus == Status.EMPTY) {
+                if (receiptsStatus == Status.EMPTY) {
                     item {
                         Row(
                             modifier = Modifier
@@ -155,7 +143,6 @@ fun IksicaCompose(
                     }
                 }
             }
-
         }
         PopupBox(
             showPopup = showPopup.value,
@@ -175,197 +162,6 @@ fun IksicaCompose(
                 iksicaBalance = iksicaViewModel.iksicaBalance.observeAsState().value?.balance ?: 0.0
             )
 
-        }
-    }
-}
-
-@Preview
-@Composable
-fun ElevatedCardIksica(
-    name: String = "Ime Prezime",
-    iksicaNumber: String = "0000000000000000000",
-    balance: String = "0.00",
-    onClick: () -> Unit = {}
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1.586f)
-            .padding(25.dp)
-            .clip(shape = RoundedCornerShape(10.dp))
-            .angledGradientBackground(
-                colors = listOf(
-                    Color(0xFFfa2531),
-                    Color(0xFF0075B2)
-                ),
-                degrees = 45f,
-                halfHalf = true
-            )
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .clickable { onClick() },
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(
-                Modifier
-                    .padding(25.dp, 25.dp, 0.dp, 0.dp)
-                    .weight(0.7f)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(0.dp, 5.dp)
-                ) {
-                    Text(
-                        text = name,
-                        fontSize = 25.sp,
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier
-                        .padding(0.dp, 5.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = iksicaNumber,
-                        fontSize = 20.sp,
-                    )
-                }
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier
-                    .padding(0.dp, 0.dp, 25.dp, 25.dp)
-                    .weight(0.3f)
-                    .fillMaxSize()
-            ) {
-                Text(
-                    text = "$balance €",
-                    fontSize = 25.sp,
-                    lineHeight = 25.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun CardIksicaPopupContent(
-    studentDataIksica: StudentDataIksica,
-    iksicaBalance: Double
-) {
-
-    val rowModifier = Modifier
-        .padding(20.dp, 10.dp)
-        .fillMaxWidth()
-    Column(
-        Modifier
-            .padding(15.dp)
-            .background(MaterialTheme.colorScheme.background)
-            .width(300.dp)
-    ) {
-        Row(
-            rowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Ime")
-            Text(text = studentDataIksica.nameSurname)
-        }
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Row(
-            rowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Razina prava")
-            Text(text = studentDataIksica.rightsLevel)
-        }
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Row(
-            rowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Dnevna potpora")
-            Text(text = studentDataIksica.dailySupport.toString())
-        }
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Row(
-            rowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "OIB")
-            Text(text = studentDataIksica.oib)
-        }
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Row(
-            rowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "JMBAG")
-            Text(text = studentDataIksica.jmbag)
-        }
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Row(
-            rowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Broj iksice")
-            Text(text = studentDataIksica.iksicaNumber)
-        }
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Row(
-            rowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Prava od")
-            Text(text = studentDataIksica.rightsFrom)
-        }
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Row(
-            rowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Prava do")
-            Text(text = studentDataIksica.rightsTo)
-        }
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Row(
-            rowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Stanje iksice")
-            Text(text = iksicaBalance.toString())
         }
     }
 }
@@ -433,185 +229,21 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
     }
 }
 
-@Preview
 @Composable
-fun IksicaItemPreview() {
-    IksicaItem(
-        receipt = Receipt(
-            restaurant = "Restoran",
-            dateString = "Datum",
-            time = "Vrijeme",
-            receiptDetails = listOf(
-                ReceiptItem(
-                    articleName = "Naziv",
-                    amount = 1,
-                    total = 0.55,
-                    subsidizedAmount = 0.27,
-                    price = 0.58
-                )
-            ),
-            receiptAmount = 0.55,
-            subsidizedAmount = 0.27,
-            paidAmount = 0.55,
-            authorised = "Autorizacija",
-            href = "https://www.google.com",
-            date = LocalDate.now()
-        )
-    ) {}
-}
-
-@Composable
-fun IksicaLoading(loadingTxt: String = "Loading...") {
+fun IksicaLoading(loginStatus: LoginStatus) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = loadingTxt)
-            Spacer(modifier = Modifier.height(8.dp))
-            LinearProgressIndicator()
+            Text(text = loginStatus.text)
+            Spacer(modifier = Modifier.height(6.dp))
+            LinearProgressIndicator(Modifier.fillMaxWidth())
         }
     }
 }
 
-@Preview
-@Composable
-fun IksicaReceiptDetailed(
-    receipt: Receipt? = Receipt(
-        restaurant = "Restoran",
-        dateString = "Datum",
-        time = "Vrijeme",
-        receiptDetails = listOf(
-            ReceiptItem(
-                articleName = "Naziv",
-                amount = 1,
-                total = 0.55,
-                subsidizedAmount = 0.27,
-                price = 0.58
-            )
-        ),
-        receiptAmount = 0.55,
-        subsidizedAmount = 0.27,
-        paidAmount = 0.55,
-        authorised = "Autorizacija",
-        href = "https://www.google.com",
-        date = LocalDate.now()
-    )
-) {
-    LazyColumn(modifier = Modifier.padding(0.dp)) {
-        item {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(20.dp, 5.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.location_pin_svgrepo_com),
-                    contentDescription = "Lokacija",
-                    Modifier.height(20.dp)
-                )
-                Text(text = receipt?.restaurant ?: "")
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(20.dp, 5.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.date_time_svgrepo_com),
-                    contentDescription = "Vrijeme",
-                    Modifier.height(20.dp)
-                )
-                Text(text = (receipt?.dateString ?: "") + ", " + (receipt?.time ?: ""))
-            }
-        }
-        item {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp, 10.dp, 20.dp, 0.dp)
-            ) {
-                Text(text = "Ukupno plaćeno: ", fontSize = 18.sp)
-                Text(
-                    text = receipt?.paidAmount?.toBigDecimal()
-                        ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €", fontSize = 18.sp
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp, 10.dp, 20.dp, 10.dp)
-            ) {
-                Text(text = "Ukupno subvencionirano: ", fontSize = 18.sp)
-                Text(text = receipt?.subsidizedAmount.toString() + " €", fontSize = 18.sp)
-            }
-        }
-        items(receipt?.receiptDetails ?: emptyList()) {
-            IksicaItemDetailed(it)
-        }
-    }
-}
-
-@Preview
-@Composable
-fun IksicaItemDetailed(
-    item: ReceiptItem = ReceiptItem(
-        articleName = "Naziv",
-        amount = 1,
-        total = 0.55,
-        subsidizedAmount = 0.27,
-        price = 0.58
-    )
-) {
-    Row(
-        Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxWidth()
-            .padding(15.dp, 10.dp, 15.dp, 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
-    ) {
-        Column(Modifier.weight(0.85f)) {
-            Row(Modifier.padding(bottom = 5.dp)) {
-                Text(text = item.amount.toString() + "x", fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(text = item.articleName, fontWeight = FontWeight.Bold)
-            }
-            Text(
-                text = "Cijena: " + item.price.toString() + " €",
-                color = MaterialTheme.colorScheme.outline
-            )
-            Text(
-                text = "Subvencija: " + item.subsidizedAmount.toString() + " €",
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
-        Column(
-            Modifier.padding(start = 15.dp)
-        ) {
-            Text(
-                text = item.total.toBigDecimal().minus(item.subsidizedAmount.toBigDecimal())
-                    .times(item.amount.toBigDecimal()).toString() + " €"
-            )
-        }
-    }
-    HorizontalDivider()
-}
-
-@Preview
-@Composable
-fun Test() {
-    IksicaItemDetailed(
-        item = ReceiptItem(
-            articleName = "Naziva a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a",
-            amount = 1,
-            total = 0.55,
-            subsidizedAmount = 0.27,
-            price = 0.58
-        )
-    )
-}
 
 fun Modifier.angledGradientBackground(colors: List<Color>, degrees: Float, halfHalf: Boolean = false) =
     drawBehind {
-        /*
+        /**
         Have to compute length of gradient vector so that it lies within
         the visible rectangle.
         --------------------------------------------
@@ -623,10 +255,10 @@ fun Modifier.angledGradientBackground(colors: List<Color>, degrees: Float, halfH
         |               /  /                       |
         |              v  /                        |
         --------------------------------------------
-                             x
+        x
 
-                   diagonal angle = atan2(y, x)
-                 (it's hard to draw the diagonal)
+        diagonal angle = atan2(y, x)
+        (it's hard to draw the diagonal)
 
         Simply rotating the diagonal around the centre of the rectangle
         will lead to points outside the rectangle area. Further, just
@@ -640,7 +272,7 @@ fun Modifier.angledGradientBackground(colors: List<Color>, degrees: Float, halfH
         where γ ∈ (0, π/2) is the angle that the diagonal makes with
         the base of the rectangle.
 
-        */
+         **/
 
         var deg2 = degrees
 

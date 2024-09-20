@@ -2,9 +2,9 @@ package com.tstudioz.fax.fme.feature.iksica.repository
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import com.tstudioz.fax.fme.database.models.IksicaBalance
-import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.database.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDaoInterface
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaServiceInterface
@@ -62,7 +62,7 @@ class IksicaRepository(
     }
 
     override suspend fun getReceipts(oib: String): IksicaResult.ReceiptsResult {
-        return when (val result = iksicaService.getRacuni(oib)) {
+        return when (val result = iksicaService.getReceipts(oib)) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 Log.d(TAG, "Recepts fetched")
                 IksicaResult.ReceiptsResult.Success(parseRacuni(result.data))

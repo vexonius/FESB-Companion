@@ -1,9 +1,9 @@
 package com.tstudioz.fax.fme.models.util
 
-import com.tstudioz.fax.fme.database.models.IksicaBalance
-import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.database.models.ReceiptItem
-import com.tstudioz.fax.fme.database.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.weather.Current
 import org.json.JSONObject
 import org.jsoup.Jsoup

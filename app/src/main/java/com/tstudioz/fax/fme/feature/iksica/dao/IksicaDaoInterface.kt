@@ -1,9 +1,8 @@
 package com.tstudioz.fax.fme.feature.iksica.dao
 
-import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.IksicaBalance
-import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.database.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 
 interface IksicaDaoInterface {
     suspend fun insert(receipts: List<Receipt>)

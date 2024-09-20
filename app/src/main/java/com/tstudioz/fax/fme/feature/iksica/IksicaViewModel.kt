@@ -9,9 +9,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.database.models.IksicaBalance
-import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.database.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.feature.iksica.repository.Status
 import kotlinx.coroutines.Dispatchers
@@ -28,15 +28,15 @@ class IksicaViewModel(
     val receipts = MutableLiveData<List<Receipt>>()
     val showItem = MutableLiveData<Boolean>()
     val itemToShow = MutableLiveData<Receipt>()
-    val isRefreshing = MutableLiveData<Boolean>(false)
+    val isRefreshing = MutableLiveData(false)
     val snackbarHostState = SnackbarHostState()
 
-    private val loggedIn = MutableLiveData<Boolean>(false)
-    val loadingTxt = MutableLiveData<String>()
+    private val loggedIn = MutableLiveData(false)
+    val loginStatus = MutableLiveData(LoginStatus.UNSET)
     val iksicaBalance = MutableLiveData<IksicaBalance>()
     val studentDataIksica = MutableLiveData<StudentDataIksica>()
-    val status = MutableLiveData<Status>(Status.UNSET)
-    val receiptsStatus = MutableLiveData<Status>(Status.UNSET)
+    val status = MutableLiveData(Status.UNSET)
+    val receiptsStatus = MutableLiveData(Status.UNSET)
 
     init {
         loadReceipts()
@@ -68,41 +68,49 @@ class IksicaViewModel(
         }
     }
 
-    private fun displayText(text: String) {
-        loadingTxt.postValue(text)
+    private fun displayStatus(status: LoginStatus) {
+        loginStatus.postValue(status)
     }
 
-    private suspend fun loginIksica() {
+    private suspend fun loginIksica(): Boolean {
+        if (loginStatus.value != LoginStatus.UNSET && loginStatus.value != LoginStatus.FAILURE) {
+            return false
+        }
         val email = (sharedPreferences.getString("username", "") ?: "") + "@fesb.hr"
         val password = sharedPreferences.getString("password", "") ?: ""
         try {
-            displayText("Getting AuthState...")
+            displayStatus(LoginStatus.AUTH_STATE)
             repository.getAuthState()
-            displayText("Logging in...")
+            displayStatus(LoginStatus.LOGIN)
             repository.login(email, password)
-            displayText("Getting ASP.NET Session...")
+            displayStatus(LoginStatus.ASP_NET_SESSION)
             val (iksicaBal, studentDataIks) = repository.getAspNetSessionSAML()
             iksicaBalance.postValue(iksicaBal)
             studentDataIksica.postValue(studentDataIks)
             repository.insert(iksicaBal, studentDataIks)
-            displayText("Parsing Data...")
+            displayStatus(LoginStatus.SUCCESS)
             loggedIn.postValue(true)
+            return true
         } catch (e: Exception) {
             loggedIn.postValue(false)
+            loginStatus.postValue(LoginStatus.FAILURE)
             e.printStackTrace()
             snackbarHostState.currentSnackbarData?.dismiss()
             snackbarHostState.showSnackbar("Greška prilikom prijave: " + e.message, duration = SnackbarDuration.Short)
+            return false
         }
     }
 
     fun getReceipts(isRefresh: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (loggedIn.value == false) {
-                loginIksica()
-            }
             try {
                 if (isRefresh) {
                     isRefreshing.postValue(true)
+                }
+                if (loggedIn.value == false) {
+                    if (!loginIksica()) {
+                        return@launch
+                    }
                 }
                 when (val receiptsNew = repository.getReceipts(studentDataIksica.value?.oib ?: "")) {
                     is IksicaResult.ReceiptsResult.Success -> {
@@ -118,6 +126,7 @@ class IksicaViewModel(
                         snackbarHostState.currentSnackbarData?.dismiss()
                         if (receiptsNew.throwable.message?.contains("Not logged in", false) == true) {
                             loggedIn.postValue(false)
+                            loginStatus.postValue(LoginStatus.UNSET)
                         }
                         snackbarHostState.currentSnackbarData?.dismiss()
                         snackbarHostState.showSnackbar(
@@ -141,7 +150,9 @@ class IksicaViewModel(
     fun getReceiptDetails(receipt: Receipt) {
         viewModelScope.launch(Dispatchers.IO) {
             if (loggedIn.value == false) {
-                loginIksica()
+                if (!loginIksica()) {
+                    return@launch
+                }
             }
             try {
                 status.postValue(Status.FETCHING)
@@ -157,6 +168,7 @@ class IksicaViewModel(
                         snackbarHostState.currentSnackbarData?.dismiss()
                         if (details.throwable.message?.contains("Not logged in", false) == true) {
                             loggedIn.postValue(false)
+                            loginStatus.postValue(LoginStatus.UNSET)
                         }
                         snackbarHostState.showSnackbar(
                             "Greška prilikom dohvaćanja detalja računa",
@@ -171,6 +183,15 @@ class IksicaViewModel(
             }
         }
     }
+}
+
+enum class LoginStatus(val text: String) {
+    UNSET("Setting up..."),
+    AUTH_STATE("Getting AuthState..."),
+    LOGIN("Logging in..."),
+    ASP_NET_SESSION("Getting ASP.NET Session..."),
+    SUCCESS("Parsing Data..."),
+    FAILURE("Failure")
 }
 
 private fun <T> LiveData<T>.observeOnce(observer: (T) -> Unit) {

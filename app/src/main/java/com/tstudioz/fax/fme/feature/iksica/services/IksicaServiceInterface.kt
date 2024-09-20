@@ -13,7 +13,7 @@ interface IksicaServiceInterface {
 
     suspend fun getAspNetSessionSAML() : NetworkServiceResult.IksicaResult
 
-    suspend fun getRacuni(oib: String) :NetworkServiceResult.IksicaResult
+    suspend fun getReceipts(oib: String) :NetworkServiceResult.IksicaResult
 
     suspend fun getRacun(url: String) : NetworkServiceResult.IksicaResult
 }

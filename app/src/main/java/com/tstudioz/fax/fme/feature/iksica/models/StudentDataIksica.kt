@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.database.models
+package com.tstudioz.fax.fme.feature.iksica.models
 
 import io.realm.kotlin.types.RealmObject
 

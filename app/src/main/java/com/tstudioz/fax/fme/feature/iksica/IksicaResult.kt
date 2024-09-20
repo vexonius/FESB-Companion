@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica
 
-import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.database.models.ReceiptItem
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
 
 sealed class IksicaResult {
 

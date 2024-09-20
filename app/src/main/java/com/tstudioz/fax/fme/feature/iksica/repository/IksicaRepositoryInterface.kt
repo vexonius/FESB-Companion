@@ -1,12 +1,8 @@
 package com.tstudioz.fax.fme.feature.iksica.repository
 
-import androidx.compose.material3.SnackbarHostState
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.tstudioz.fax.fme.database.models.IksicaBalance
-import com.tstudioz.fax.fme.database.models.Receipt
-import com.tstudioz.fax.fme.database.models.ReceiptItem
-import com.tstudioz.fax.fme.database.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.IksicaResult
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 

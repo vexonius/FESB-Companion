@@ -2,7 +2,6 @@ package com.tstudioz.fax.fme.viewmodel
 
 import android.content.SharedPreferences
 import android.util.Log
-import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,8 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.IksicaBalance
-import com.tstudioz.fax.fme.database.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.timetable.view.MonthData
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface

@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica.services
 
+import android.util.Log
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import okhttp3.FormBody
 import okhttp3.HttpUrl
@@ -9,6 +10,7 @@ import org.jsoup.Jsoup
 
 
 class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
+
 
     private var currentUrl: HttpUrl? = null
     private var authState = ""
@@ -58,6 +60,7 @@ class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
         if (error != null && error.contains("Greška", true)) {
             return NetworkServiceResult.IksicaResult.Failure(Throwable(error))
         }
+        Log.d("IksicaService", doc.toString())
         return NetworkServiceResult.IksicaResult.Failure(Throwable("Failure login"))
     }
 
@@ -87,7 +90,7 @@ class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
         return NetworkServiceResult.IksicaResult.Success(body)
     }
 
-    override suspend fun getRacuni(oib: String): NetworkServiceResult.IksicaResult {
+    override suspend fun getReceipts(oib: String): NetworkServiceResult.IksicaResult {
         val request = Request.Builder()
             .url("https://issp.srce.hr/student/studentracuni?oib=$oib")
             .build()
