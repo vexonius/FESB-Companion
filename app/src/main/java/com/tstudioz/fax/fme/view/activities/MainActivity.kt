@@ -29,6 +29,10 @@ import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
+import com.tstudioz.fax.fme.view.fragments.HomeFragment
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
+import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.feature.home.view.HomeFragment
 import com.tstudioz.fax.fme.view.fragments.PrisutnostFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
@@ -40,6 +44,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 
@@ -55,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     private var bottomSheet: BottomSheetDialog? = null
     private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
-    private val prisutnostFragment = PrisutnostFragment()
+    private val attendanceFragment = AttendanceFragment()
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     private val mainViewModel: MainViewModel by viewModel()
@@ -171,7 +176,7 @@ class MainActivity : AppCompatActivity() {
         when (pos) {
             R.id.tab_prisutnost -> {
                 supportActionBar?.title = "Prisutnost"
-                ft.replace(R.id.frame, prisutnostFragment)
+                ft.replace(R.id.frame, attendanceFragment)
             }
 
             R.id.tab_home -> {
@@ -276,7 +281,7 @@ class MainActivity : AppCompatActivity() {
         val staraVerzija = shPref.getInt("version_number", 14)
         val trenutnaVerzija: Int = BuildConfig.VERSION_CODE
 
-        if ((staraVerzija != null) && (staraVerzija < trenutnaVerzija)) {
+        if (staraVerzija < trenutnaVerzija) {
             showChangelog()
             editor = shPref.edit()
             editor?.putInt("version_number", trenutnaVerzija)

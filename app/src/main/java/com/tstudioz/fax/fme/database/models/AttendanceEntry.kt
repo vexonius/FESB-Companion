@@ -3,7 +3,7 @@ package com.tstudioz.fax.fme.database.models
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 
-open class Dolazak : RealmObject {
+open class AttendanceEntry : RealmObject {
 
     @PrimaryKey
     var id: String? = null

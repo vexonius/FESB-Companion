@@ -6,6 +6,10 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
+import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDao
+import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
+import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepository
+import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.dao.NoteDao
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepository
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
@@ -22,11 +26,16 @@ import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
 import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
 import com.tstudioz.fax.fme.feature.timetable.repository.TimeTableRepository
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.models.interfaces.AttendanceServiceInterface
+import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
+import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
+import com.tstudioz.fax.fme.feature.attendance.services.AttendanceService
 import com.tstudioz.fax.fme.feature.home.services.WeatherServiceInterface
 import com.tstudioz.fax.fme.models.services.AttendanceService
 import com.tstudioz.fax.fme.feature.timetable.services.TimetableService
+import com.tstudioz.fax.fme.models.services.WeatherNetworkService
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
+import com.tstudioz.fax.fme.viewmodel.HomeViewModel
 import com.tstudioz.fax.fme.feature.home.services.WeatherService
 import com.tstudioz.fax.fme.viewmodel.AttendanceViewModel
 import com.tstudioz.fax.fme.feature.home.view.HomeViewModel
@@ -51,7 +60,7 @@ val module = module {
     single<AttendanceDaoInterface> { AttendanceDao(get()) }
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
-    viewModel { AttendanceViewModel(get()) }
+    viewModel { AttendanceViewModel(get(), get()) }
 }
 
 fun provideOkHttpClient(context: Context) : OkHttpClient {

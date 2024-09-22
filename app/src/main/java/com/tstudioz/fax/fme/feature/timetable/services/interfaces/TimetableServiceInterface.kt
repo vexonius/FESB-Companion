@@ -5,7 +5,11 @@ import com.tstudioz.fax.fme.models.NetworkServiceResult
 interface TimetableServiceInterface {
 
     suspend fun fetchTimeTable(
-        url: String
+        params: HashMap<String, String>
+    ): NetworkServiceResult.TimeTableResult
+
+    suspend fun fetchTimetableCalendar(
+        params: HashMap<String, String>
     ): NetworkServiceResult.TimeTableResult
 
 }

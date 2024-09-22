@@ -6,8 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.feature.timetable.view.MonthData
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
@@ -21,6 +23,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 @ExperimentalCoroutinesApi
@@ -59,6 +62,15 @@ class MainViewModel(
     val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
     val lastFetched: LiveData<String> = _lastFetched
 
+    val monthData = MutableLiveData(
+        MonthData(
+            currentMonth = YearMonth.now(),
+            startMonth = YearMonth.now().minusMonths(100),
+            endMonth = YearMonth.now().plusMonths(100),
+            firstDayOfWeek = firstDayOfWeekFromLocale()
+        )
+    )
+
     init {
         fetchTimetableInfo()
         viewModelScope.launch(Dispatchers.IO) {
@@ -72,10 +84,12 @@ class MainViewModel(
         endDate: LocalDate,
         shownWeekMonday: LocalDate
     ) {
+        val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
+        val startDate = dateFormatter.format(startDate)
+        val endDate = dateFormatter.format(endDate)
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                println("started fetching timetable for user")
                 val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
                 _shownWeek.postValue(shownWeekMonday)
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
@@ -92,6 +106,10 @@ class MainViewModel(
         endDate: LocalDate,
         shownWeekMonday: LocalDate
     ) {
+        val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
+        val startDate = dateFormatter.format(startDate)
+        val endDate = dateFormatter.format(endDate)
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 println("started Fetching Timetable for user")
@@ -116,8 +134,8 @@ class MainViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                println("started Fetching TimetableInfo")
-                _periods.postValue(timeTableRepository.fetchTimeTableInfo(startDate, endDate))
+                val result = timeTableRepository.fetchTimeTableCalendar(startDate, endDate)
+                _periods.postValue(result)
             } catch (e: Exception) {
                 Log.e("Error timetableinfo", e.toString())
             }

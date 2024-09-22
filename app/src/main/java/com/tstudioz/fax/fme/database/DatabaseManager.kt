@@ -10,7 +10,7 @@ class DatabaseManager: DatabaseManagerInterface {
             setOf(
                 Korisnik::class,
                 NoteRealm::class,
-                Dolazak::class,
+                AttendanceEntry::class,
                 Meni::class,
                 EventRealm::class))
             .name("default.realm")
