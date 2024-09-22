@@ -92,7 +92,7 @@ fun HomeTabComposePreview() {
                 humidity = 56.5,
                 wind = 5.1,
                 precipChance = 0.0,
-                icon = "_1n",
+                icon = "_21d",
                 summary = "Clear sky"
             )
         ),
@@ -142,7 +142,7 @@ fun HomeTabComposePreview() {
     )
 }
 
-val sidePadding = 15.dp
+val sidePadding = 20.dp
 
 @Composable
 fun HomeTabCompose(
@@ -199,16 +199,13 @@ fun WeatherCompose(
     weather: WeatherDisplay
 ) {
     Column(
-        modifier = Modifier.background(colorResource(id = R.color.dark_cyan))
+        modifier = Modifier.background(colorResource(id = R.color.dark_cyan)),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(text = weather.location, fontSize = 16.sp, modifier = Modifier.padding(3.dp))
-        }
-        Row(
-            modifier = Modifier.wrapContentSize(),
+            modifier = Modifier
+                .wrapContentSize()
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -223,20 +220,31 @@ fun WeatherCompose(
                 ),
                 contentDescription = stringResource(R.string.weather_icon_desc),
                 modifier = Modifier
-                    .weight(0.45f)
+                    .weight(0.45f, false)
                     .aspectRatio(1f)
+                    .padding(10.dp)
             )
             Column(
-                modifier = Modifier.weight(0.55f),
+                modifier = Modifier.weight(0.55f, false),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(
+                    text = weather.location,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(3.dp),
+                    fontWeight = FontWeight.Bold
+                )
                 Text(
                     text = String.format(Locale.US, stringResource(R.string.weatherTemp), weather.temperature),
                     fontSize = 64.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = weather.summary, fontSize = 13.sp)
+                Text(
+                    text = weather.summary,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
                 Row {
                     Box(Modifier.weight(.3f, false)) {
                         WeatherItem(
@@ -309,7 +317,7 @@ fun NotesCompose(
             modifier = Modifier
                 .background(colorResource(id = R.color.colorPrimaryDark))
                 .fillMaxWidth()
-                .padding(sidePadding,0.dp)
+                .padding(sidePadding, 0.dp)
         ) {
             val editMessage = remember { mutableStateOf("") }
             val message = remember { mutableStateOf("") }
@@ -474,7 +482,7 @@ fun TodayTimetableCompose(
                 .fillMaxWidth()
         ) {
             Text(
-                text = stringResource(id = R.string.danasnja_predavanja),
+                text = stringResource(id = R.string.todaysEvents),
                 fontSize = 13.sp,
                 modifier = Modifier.weight(.6f, false),
                 color = colorResource(id = R.color.shady_blue)
@@ -509,7 +517,7 @@ fun TodayTimetableCompose(
                         .aspectRatio(1f)
                 )
                 Text(
-                    text = stringResource(id = R.string.odmori_se),
+                    text = stringResource(id = R.string.getRest),
                     fontSize = 18.sp,
                     modifier = Modifier
                         .padding(top = 15.dp, bottom = 10.dp),
@@ -555,7 +563,7 @@ fun TimetableItem(event: Event) {
 
 @Composable
 fun CardsCompose() {
-    Column (Modifier.padding(horizontal = sidePadding)){
+    Column(Modifier.padding(horizontal = sidePadding)) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(id = R.string.prehrana),
