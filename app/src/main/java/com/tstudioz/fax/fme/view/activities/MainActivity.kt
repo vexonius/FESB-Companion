@@ -23,14 +23,14 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
+import com.tstudioz.fax.fme.feature.home.view.HomeFragment
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
+import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
-import com.tstudioz.fax.fme.feature.home.view.HomeFragment
-import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.exceptions.RealmException
@@ -257,19 +257,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun showShortcutView() {
         var shortPosition = 0
-
-        if (intent.action == "podsjetnik") {
-            /*val newIntent = Intent(this@MainActivity, NoteActivity::class.java)
-            newIntent.putExtra("mode", 2)
-            newIntent.putExtra("note_key", "")
-            startActivity(newIntent)*/
-        } else {
-            when (intent.action) {
-                "raspored" -> shortPosition = 1
-                "prisutnost" -> shortPosition = 2
-            }
-            beginFragTransaction(shortPosition)
+        when (intent.action) {
+            "raspored" -> shortPosition = 1
+            "prisutnost" -> shortPosition = 2
         }
+        beginFragTransaction(shortPosition)
     }
 
     private fun checkVersion() {
