@@ -34,30 +34,40 @@ class StudomatService {
     private var authState = ""
     private var samlResponseEncrypted = ""
     private var samlResponseDecrypted = ""
-    var lastTimeLoggedIn = 0L
+    private var lastTimeLoggedIn = 0L
 
-    fun resetLastTimeLoggedInCount() {
+    private var loggingIn = false
+
+    private fun resetLastTimeLoggedInCount() {
         lastTimeLoggedIn = 0L
     }
 
     fun login(username: String, password: String): NetworkServiceResult.StudomatResult {
         try {
             if ((System.currentTimeMillis() - lastTimeLoggedIn) > 3600000) {
-                getSamlRequest()
-                sendSamlResponseToAAIEDU()
-                getSamlResponse(username, password)
-                sendSAMLToDecrypt()
-                sendSAMLToISVU()
+                if (!loggingIn) {
+                    loggingIn = true
+                    getSamlRequest()
+                    sendSamlResponseToAAIEDU()
+                    getSamlResponse(username, password)
+                    sendSAMLToDecrypt()
+                    sendSAMLToISVU()
+                    loggingIn = false
+                } else {
+                    return NetworkServiceResult.StudomatResult.Failure(Throwable("Already logging in!"))
+                }
             }
             return when (val result = getStudomatData()) {
                 is NetworkServiceResult.StudomatResult.Success -> {
                     NetworkServiceResult.StudomatResult.Success("Logged in!")
                 }
+
                 is NetworkServiceResult.StudomatResult.Failure -> {
                     NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get Studomat data!"))
                 }
             }
         } catch (e: Throwable) {
+            loggingIn = false
             return NetworkServiceResult.StudomatResult.Failure(e)
         }
     }
@@ -75,7 +85,7 @@ class StudomatService {
             Log.d("StudomatService", "getSamlRequest: $samlRequest")
             NetworkServiceResult.StudomatResult.Success("SAMLRequest got!")
         } else {
-            lastTimeLoggedIn = 0L
+            resetLastTimeLoggedInCount()
             Log.d("StudomatService", "getSamlRequest: Couldn't get SAMLRequest!")
             //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get SAMLRequest!"))
             throw Throwable("Couldn't get SAMLRequest!")
@@ -99,7 +109,7 @@ class StudomatService {
             Log.d("StudomatService", "sendSamlResponseToAAIEDU: $authState")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse sent to AAIEDU!")
         } else {
-            lastTimeLoggedIn = 0L
+            resetLastTimeLoggedInCount()
             Log.d("StudomatService", "sendSamlResponseToAAIEDU: Couldn't send SAMLResponse to AAIEDU!")
             //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't send SAMLResponse to AAIEDU!"))
             throw Throwable("Couldn't send SAMLResponse to AAIEDU!")
@@ -129,7 +139,7 @@ class StudomatService {
             Log.d("StudomatService", "getSamlResponse: $samlResponseEncrypted")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse got!")
         } else {
-            lastTimeLoggedIn = 0L
+            resetLastTimeLoggedInCount()
             Log.d("StudomatService", "getSamlResponse: Couldn't get SAMLResponse!")
             //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get SAMLResponse!"))
             throw Throwable("Couldn't get SAMLResponse!")
@@ -155,7 +165,7 @@ class StudomatService {
             Log.d("StudomatService", "sendSAMLToDecrypt: $samlResponseDecrypted")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse decrypted!")
         } else {
-            lastTimeLoggedIn = 0L
+            resetLastTimeLoggedInCount()
             Log.d("StudomatService", "sendSAMLToDecrypt: Couldn't decrypt SAMLResponse!")
             //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't decrypt SAMLResponse!"))
             throw Throwable("Couldn't decrypt SAMLResponse!")
@@ -178,7 +188,7 @@ class StudomatService {
             Log.d("StudomatService", "sendSAMLToISVU: SAMLResponse sent to ISVU!")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse sent to ISVU!")
         } else {
-            lastTimeLoggedIn = 0L
+            resetLastTimeLoggedInCount()
             Log.d("StudomatService", "sendSAMLToISVU: Couldn't send SAMLResponse to ISVU!")
             //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't send SAMLResponse to ISVU!"))
             throw Throwable("Couldn't send SAMLResponse to ISVU!")
@@ -193,16 +203,16 @@ class StudomatService {
         val response = client.newCall(request).execute()
         val body = response.body?.string() ?: ""
 
-        return if (response.code == 200) {
+        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
+        } else if (response.code == 200) {
             lastTimeLoggedIn = System.currentTimeMillis()
             Log.d("StudomatService", "getStudomatData: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
-        } else if (Jsoup.parse(body).title() == "Studomat - Prijava") {
-            lastTimeLoggedIn = 0L
-            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
         } else {
-            lastTimeLoggedIn = 0L
+            resetLastTimeLoggedInCount()
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
             NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get Studomat data!"))
         }
@@ -216,15 +226,15 @@ class StudomatService {
         val response = client.newCall(request).execute()
         val body = response.body?.string() ?: ""
 
-        return if (body != "") {
-            Log.d("StudomatService", "getUpisaneGodine: ${body.substring(0, 100)}")
-            NetworkServiceResult.StudomatResult.Success(body)
-        } else if (Jsoup.parse(body).title() == "Studomat - Prijava") {
-            lastTimeLoggedIn = 0L
+        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+            resetLastTimeLoggedInCount()
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
             NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
+        } else if (body != "") {
+            Log.d("StudomatService", "getUpisaneGodine: ${body.substring(0, 100)}")
+            NetworkServiceResult.StudomatResult.Success(body)
         } else {
-            lastTimeLoggedIn = 0L
+            resetLastTimeLoggedInCount()
             Log.d("StudomatService", "getUpisaneGodine: Couldn't get upisane godine data!")
             NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get upisane godine data!"))
         }
@@ -236,11 +246,15 @@ class StudomatService {
             .build()
         val response = client.newCall(request).execute()
         val body = response.body?.string() ?: ""
-        return if (response.isSuccessful) {
+        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
+        } else if (response.isSuccessful) {
             Log.d("StudomatService", "getTrenutnuGodinuData: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
         } else {
-            lastTimeLoggedIn = 0L
+            resetLastTimeLoggedInCount()
             Log.d("StudomatService", "getTrenutnuGodinuData: Couldn't get current year data!")
             NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get current year data!"))
         }

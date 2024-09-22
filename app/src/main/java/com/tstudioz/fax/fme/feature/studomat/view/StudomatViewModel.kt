@@ -70,7 +70,9 @@ class StudomatViewModel(
                     if (pulldownTriggered) {
                         isRefreshing.postValue(false)
                     }
-                    snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+                    if (!result.throwable.contains("Already logging in!")) {
+                        snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+                    }
                     loadedTxt.postValue("fetchingError")
                     false
                 }
