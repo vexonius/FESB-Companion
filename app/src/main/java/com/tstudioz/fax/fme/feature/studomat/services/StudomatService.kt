@@ -25,27 +25,28 @@ class StudomatService(private val client: OkHttpClient) {
 
     fun login(username: String, password: String): NetworkServiceResult.StudomatResult {
         try {
-            if ((System.currentTimeMillis() - lastTimeLoggedIn) > 3600000) {
-                if (!loggingIn) {
-                    loggingIn = true
-                    getSamlRequest()
-                    sendSamlResponseToAAIEDU()
-                    getSamlResponse(username, password)
-                    sendSAMLToDecrypt()
-                    sendSAMLToISVU()
-                    loggingIn = false
-                } else {
-                    return NetworkServiceResult.StudomatResult.Failure(Throwable("Already logging in!"))
-                }
-            }
-            return when (val result = getStudomatData()) {
-                is NetworkServiceResult.StudomatResult.Success -> {
-                    NetworkServiceResult.StudomatResult.Success("Logged in!")
-                }
+            if ((System.currentTimeMillis() - lastTimeLoggedIn) < 3600000) {
+                return NetworkServiceResult.StudomatResult.Success("Logged in!")
+            } else if (!loggingIn) {
+                loggingIn = true
+                getSamlRequest()
+                sendSamlResponseToAAIEDU()
+                getSamlResponse(username, password)
+                sendSAMLToDecrypt()
+                sendSAMLToISVU()
+                return when (getStudomatData()) {
+                    is NetworkServiceResult.StudomatResult.Success -> {
+                        loggingIn = false
+                        NetworkServiceResult.StudomatResult.Success("Finished logging in!")
+                    }
 
-                is NetworkServiceResult.StudomatResult.Failure -> {
-                    NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get Studomat data!"))
+                    is NetworkServiceResult.StudomatResult.Failure -> {
+                        loggingIn = false
+                        NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get Studomat data!"))
+                    }
                 }
+            } else {
+                return NetworkServiceResult.StudomatResult.Failure(Throwable("Already logging in!"))
             }
         } catch (e: Throwable) {
             loggingIn = false
