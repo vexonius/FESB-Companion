@@ -27,7 +27,7 @@ class StudomatViewModel(
     val isRefreshing = MutableLiveData(false)
 
     var subjectList = MutableLiveData<List<StudomatSubject>>(emptyList())
-    var loadedTxt = MutableLiveData("unset")
+    private var loadedTxt = MutableLiveData(StudomatState.UNSET)
     var student = MutableLiveData(Student())
     var generated = MutableLiveData("")
     var years = MutableLiveData<List<Year>>(emptyList())
@@ -37,11 +37,11 @@ class StudomatViewModel(
     val username = sharedPreferences.getString("username", "") ?: ""
     val password = sharedPreferences.getString("password", "") ?: ""
 
-    val loading = loadedTxt.map { it == "fetching" || it == "unset" }
+    val loading = loadedTxt.map { it == StudomatState.FETCHING || it == StudomatState.UNSET }
     val offline
         get() = !networkUtils.isNetworkAvailable()
 
-    val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
     }
 
@@ -59,7 +59,7 @@ class StudomatViewModel(
 
     suspend fun login(pulldownTriggered: Boolean = false): Boolean {
         if (networkUtils.isNetworkAvailable()) {
-            loadedTxt.postValue("fetching")
+            loadedTxt.postValue(StudomatState.FETCHING)
             return when (val result = repository.loginUser(username, password)) {
                 is StudomatRepositoryResult.LoginResult.Success -> {
                     student.postValue(result.data)
@@ -73,7 +73,7 @@ class StudomatViewModel(
                     if (!result.throwable.contains("Already logging in!")) {
                         snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
                     }
-                    loadedTxt.postValue("fetchingError")
+                    loadedTxt.postValue(StudomatState.FETCHING_ERROR)
                     false
                 }
             }
@@ -82,7 +82,7 @@ class StudomatViewModel(
                 isRefreshing.postValue(false)
             }
             snackbarHostState.showSnackbar("Nema interneta")
-            loadedTxt.postValue("fetchingError")
+            loadedTxt.postValue(StudomatState.FETCHING_ERROR)
             return false
         }
     }
@@ -91,7 +91,7 @@ class StudomatViewModel(
     fun initStudomat() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (!networkUtils.isNetworkAvailable()) {
-                loadedTxt.postValue("fetchingError")
+                loadedTxt.postValue(StudomatState.FETCHING_ERROR)
                 snackbarHostState.showSnackbar("Nema interneta")
                 return@launch
             } else {
@@ -101,11 +101,11 @@ class StudomatViewModel(
                         result.data.firstOrNull()?.let { getChosenYear(it) }
                         years.postValue(result.data)
                         selectedYear.postValue(result.data.firstOrNull())
-                        loadedTxt.postValue("fetchedNew")
+                        loadedTxt.postValue(StudomatState.FETCHED)
                     }
 
                     is StudomatRepositoryResult.YearsResult.Failure -> {
-                        loadedTxt.postValue("fetchingError")
+                        loadedTxt.postValue(StudomatState.FETCHING_ERROR)
                         snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
                     }
                 }
@@ -132,14 +132,14 @@ class StudomatViewModel(
                     if (!login(pulldownTriggered)) return@launch
                     when (val result = repository.getChosenYear(chosenYear)) {
                         is StudomatRepositoryResult.ChosenYearResult.Success -> {
-                            loadedTxt.postValue("fetchedNew")
+                            loadedTxt.postValue(StudomatState.FETCHED)
                             subjectList.postValue(result.data.first)
                             generated.postValue(result.data.second)
                         }
 
                         is StudomatRepositoryResult.ChosenYearResult.Failure -> {
                             snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
-                            loadedTxt.postValue("fetchingError")
+                            loadedTxt.postValue(StudomatState.FETCHING_ERROR)
                         }
                     }
                 }
@@ -148,5 +148,12 @@ class StudomatViewModel(
                 isRefreshing.postValue(false)
             }
         }
+    }
+
+    enum class StudomatState {
+        UNSET,
+        FETCHING,
+        FETCHED,
+        FETCHING_ERROR
     }
 }

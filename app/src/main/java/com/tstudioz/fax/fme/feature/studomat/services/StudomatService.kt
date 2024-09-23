@@ -1,34 +1,14 @@
 package com.tstudioz.fax.fme.feature.studomat.services
 
 import android.util.Log
+import com.franmontiel.persistentcookiejar.ClearableCookieJar
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import okhttp3.Cookie
-import okhttp3.CookieJar
 import okhttp3.FormBody
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 
-class StudomatService {
-    private val client: OkHttpClient = OkHttpClient.Builder().cookieJar(object : CookieJar {
-        private val cookieStore = HashMap<String, MutableList<Cookie>>()
-
-        override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-            if (cookieStore[url.host] == null)
-                cookieStore[url.host] = mutableListOf<Cookie>()
-            cookies.forEach { cookie ->
-                cookieStore[url.host]?.find { it.name == cookie.name }?.let {
-                    cookieStore[url.host]?.remove(it)
-                }
-                cookieStore[url.host]?.add(cookie)
-            }
-        }
-
-        override fun loadForRequest(url: HttpUrl): List<Cookie> {
-            return cookieStore[url.host] ?: ArrayList()
-        }
-    }).build()
+class StudomatService(private val client: OkHttpClient) {
 
     private var samlRequest = ""
     private var authState = ""
@@ -40,6 +20,7 @@ class StudomatService {
 
     private fun resetLastTimeLoggedInCount() {
         lastTimeLoggedIn = 0L
+        (client.cookieJar as ClearableCookieJar).clearSession()
     }
 
     fun login(username: String, password: String): NetworkServiceResult.StudomatResult {
@@ -218,7 +199,7 @@ class StudomatService {
         }
     }
 
-    fun getUpisaneGodine(): NetworkServiceResult.StudomatResult {
+    fun getYears(): NetworkServiceResult.StudomatResult {
 
         val request = Request.Builder()
             .url("https://www.isvu.hr/studomat/hr/studiranje/upisanegodine")
@@ -240,7 +221,7 @@ class StudomatService {
         }
     }
 
-    fun getTrenutnuGodinuData(href: String): NetworkServiceResult.StudomatResult {
+    fun getChosenYear(href: String): NetworkServiceResult.StudomatResult {
         val request = Request.Builder()
             .url("https://www.isvu.hr$href")
             .build()

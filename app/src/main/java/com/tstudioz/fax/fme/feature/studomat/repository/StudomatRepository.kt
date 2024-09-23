@@ -39,7 +39,7 @@ class StudomatRepository(
     }
 
     suspend fun getYears(): StudomatRepositoryResult.YearsResult {
-        return when (val result = studomatService.getUpisaneGodine()) {
+        return when (val result = studomatService.getYears()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetYears = parseYears(result.data)
                 studomatDao.insertYears(resultGetYears)
@@ -55,7 +55,7 @@ class StudomatRepository(
     }
 
     suspend fun getChosenYear(year: Year): StudomatRepositoryResult.ChosenYearResult {
-        return when (val data = studomatService.getTrenutnuGodinuData(year.href)) {
+        return when (val data = studomatService.getChosenYear(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetChosenYear = parseCurrentYear(data.data)
                 studomatDao.insert(resultGetChosenYear.first)

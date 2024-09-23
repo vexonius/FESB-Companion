@@ -47,7 +47,9 @@ import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 @Composable
 fun HomeCompose(studomatViewModel: StudomatViewModel) {
 
-    val subjectList = studomatViewModel.subjectList.observeAsState().value?.sortedBy { it.name }
+    val subjectList = studomatViewModel.subjectList.observeAsState().value
+        ?.sortedBy { it.name }
+        ?.sortedBy { it.semester }
     val loading = studomatViewModel.loading.observeAsState().value
     val snackbarHostState = remember { studomatViewModel.snackbarHostState }
     val isRefreshing = studomatViewModel.isRefreshing.observeAsState().value
