@@ -45,7 +45,8 @@ fun BottomSheetIksica(
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = { toggleShowItem(false) },
-        containerColor = MaterialTheme.colorScheme.surfaceVariant
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
         IksicaReceiptDetailed(receipt)
     }
@@ -55,7 +56,7 @@ fun BottomSheetIksica(
 fun IksicaReceiptDetailed(
     receipt: Receipt?
 ) {
-    LazyColumn(modifier = Modifier) {
+    LazyColumn {
         item {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -81,7 +82,7 @@ fun IksicaReceiptDetailed(
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp, 20.dp, 20.dp, 10.dp)
+                        .padding(15.dp)
                 ) {
                     Text(text = "Ukupno plaćeno: ", fontSize = 18.sp)
                     Text(
@@ -93,7 +94,7 @@ fun IksicaReceiptDetailed(
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp, 10.dp, 20.dp, 20.dp)
+                        .padding(15.dp)
                 ) {
                     Text(text = "Ukupno subvencionirano: ", fontSize = 18.sp)
                     Text(text = receipt?.subsidizedAmount.toString() + " €", fontSize = 18.sp)

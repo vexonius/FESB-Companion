@@ -8,7 +8,6 @@ import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaService
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaServiceInterface
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -17,6 +16,6 @@ val iksicaModule = module {
     single<IksicaRepositoryInterface> { IksicaRepository(get(), get()) }
     single<IksicaServiceInterface> { IksicaService(get())}
     single<IksicaDaoInterface> { IksicaDao(get()) }
-    viewModel { IksicaViewModel(androidApplication(), get(),get()) }
+    viewModel { IksicaViewModel( get(),get()) }
 }
 

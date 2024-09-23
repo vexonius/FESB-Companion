@@ -8,22 +8,23 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.feature.iksica.repository.Status
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
 class IksicaViewModel(
-    application: Application,
     private val repository: IksicaRepositoryInterface,
     private val sharedPreferences: SharedPreferences
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     val receipts = MutableLiveData<List<Receipt>>()
     val showItem = MutableLiveData<Boolean>()
@@ -38,17 +39,21 @@ class IksicaViewModel(
     val status = MutableLiveData(Status.UNSET)
     val receiptsStatus = MutableLiveData(Status.UNSET)
 
-    init {
-        loadReceipts()
-    }
-
     fun toggleShowItem(value: Boolean) {
         showItem.postValue(value)
     }
 
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+    }
+
+    init {
+        loadReceipts()
+    }
+
 
     private fun loadReceipts() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             try {
                 val data = repository.read()
                 receipts.postValue(data.first)
@@ -102,7 +107,7 @@ class IksicaViewModel(
     }
 
     fun getReceipts(isRefresh: Boolean = false) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             try {
                 if (isRefresh) {
                     isRefreshing.postValue(true)
@@ -148,7 +153,7 @@ class IksicaViewModel(
     }
 
     fun getReceiptDetails(receipt: Receipt) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (loggedIn.value == false) {
                 if (!loginIksica()) {
                     return@launch
