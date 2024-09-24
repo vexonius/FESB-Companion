@@ -11,7 +11,6 @@ import org.jsoup.Jsoup
 
 class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
 
-
     private var currentUrl: HttpUrl? = null
     private var authState = ""
     private var sAMLResponse = ""
@@ -117,7 +116,7 @@ class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
         return NetworkServiceResult.IksicaResult.Success(doc)
     }
 
-    override suspend fun getRacun(url: String): NetworkServiceResult.IksicaResult {
+    override suspend fun getReceipt(url: String): NetworkServiceResult.IksicaResult {
         val request = Request.Builder()
             .url("https://issp.srce.hr$url")
             .build()

@@ -144,28 +144,28 @@ class MainActivity : AppCompatActivity() {
         bar?.addTab(
             bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.iksica),
-                "Iksica",
+                getString(R.string.tab_iksica),
                 R.id.tab_iksica
             )
         )
         bar?.addTab(
             bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.attend),
-                "Prisutnost",
+                getString(R.string.tab_attendance),
                 R.id.tab_prisutnost
             )
         )
         bar?.addTab(
             bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.command_line),
-                "Home",
+                getString(R.string.tab_home),
                 R.id.tab_home
             )
         )
         bar?.addTab(
             bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.cal),
-                "Raspored",
+                getString(R.string.tab_timetable),
                 R.id.tab_raspored
             )
         )

@@ -82,7 +82,7 @@ class IksicaRepository(
     }
 
     override suspend fun getReceipt(url: String): IksicaResult.ReceiptResult {
-        return when (val result = iksicaService.getRacun(url)) {
+        return when (val result = iksicaService.getReceipt(url)) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 Log.d(TAG, "Receipt fetched")
                 IksicaResult.ReceiptResult.Success(parseDetaljeRacuna(result.data))

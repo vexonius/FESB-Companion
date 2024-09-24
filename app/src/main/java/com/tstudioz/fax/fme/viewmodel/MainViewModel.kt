@@ -30,11 +30,8 @@ import java.time.format.DateTimeFormatter
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 class MainViewModel(
-    private val userRepository: UserRepositoryInterface,
     private val timeTableRepository: TimeTableRepositoryInterface,
-    private val dbManager: DatabaseManagerInterface,
     private val sharedPreferences: SharedPreferences,
-    private val iksicaRepository: IksicaRepositoryInterface
 ) : ViewModel() {
 
     private val _showEvent = MutableLiveData<Boolean>(false)

@@ -20,6 +20,13 @@
     <string name="noNotes">Trenutno nema bilješki</string>
     <string name="attendance">Prisutnost</string>
 
+    //tabs
+    <string name="tab_iksica">Iksica</string>
+    <string name="tab_attendance">Prisutnost</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_timetable">Raspored</string>
+
+
     /* Shortcuts */
     <string name="unavailabe">Nedostupna radnja</string>
     <string name="check_timetable">Provjeri svoj raspored</string>

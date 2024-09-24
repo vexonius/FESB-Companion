@@ -8,7 +8,6 @@ import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface IksicaRepositoryInterface {
 
-
     suspend fun getAuthState(): NetworkServiceResult.IksicaResult
 
     suspend fun login(email: String, password: String): NetworkServiceResult.IksicaResult

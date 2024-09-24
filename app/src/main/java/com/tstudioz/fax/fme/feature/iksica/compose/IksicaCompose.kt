@@ -65,9 +65,8 @@ import kotlin.math.sin
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun IksicaCompose(
-    iksicaViewModel: IksicaViewModel,
-) {
+fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
+
     val status = iksicaViewModel.status.observeAsState().value
     val loginStatus = iksicaViewModel.loginStatus.observeAsState().value
     val receiptsStatus = iksicaViewModel.receiptsStatus.observeAsState().value
@@ -90,6 +89,9 @@ fun IksicaCompose(
                 BottomSheetIksica(iksicaViewModel.itemToShow) { iksicaViewModel.toggleShowItem(it) }
             }
         }) {
+        if (loginStatus != LoginStatus.SUCCESS) {
+            LinearProgressIndicator(Modifier.fillMaxWidth().zIndex(2f))
+        }
         Box {
             PullRefreshIndicator(
                 isRefreshing, pullRefreshState, Modifier
@@ -112,12 +114,7 @@ fun IksicaCompose(
                             iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString(),
                         ) { showPopup.value = true }
                     }
-                    if (loginStatus != LoginStatus.SUCCESS) {
-                        item {
-                            IksicaLoading(loginStatus ?: LoginStatus.UNSET)
-                        }
-                    }
-                    if (!list.isNullOrEmpty()) {
+                    if (list.isNotEmpty()) {
                         items(list) {
                             IksicaItem(it) {
                                 iksicaViewModel.getReceiptDetails(it)
@@ -233,17 +230,6 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
                     fontSize = 15.sp,
                 )
             })
-    }
-}
-
-@Composable
-fun IksicaLoading(loginStatus: LoginStatus) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = loginStatus.text)
-            Spacer(modifier = Modifier.height(6.dp))
-            LinearProgressIndicator(Modifier.fillMaxWidth())
-        }
     }
 }
 

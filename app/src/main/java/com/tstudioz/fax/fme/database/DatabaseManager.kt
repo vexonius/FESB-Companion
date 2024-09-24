@@ -1,9 +1,9 @@
 package com.tstudioz.fax.fme.database
 
 import com.tstudioz.fax.fme.database.models.*
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalanceRealm
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksicaRealm
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import io.realm.kotlin.RealmConfiguration
 
 class DatabaseManager: DatabaseManagerInterface {
@@ -16,9 +16,9 @@ class DatabaseManager: DatabaseManagerInterface {
                 AttendanceEntry::class,
                 Meni::class,
                 EventRealm::class,
-                IksicaBalanceRealm::class,
+                IksicaBalance::class,
                 ReceiptRealm::class,
-                StudentDataIksicaRealm::class))
+                StudentDataIksica::class))
             .name("default.realm")
             .schemaVersion(1)
             .encryptionKey("nekikljuckojicemopromjenitiubuducnostialisadjetujernedamisebolje".toByteArray())
