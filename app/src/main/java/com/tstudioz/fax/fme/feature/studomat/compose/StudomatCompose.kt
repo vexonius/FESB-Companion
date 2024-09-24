@@ -62,9 +62,10 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
     }
 
 
-    Scaffold(modifier = Modifier
-        .pullRefresh(pullRefreshState ?: rememberPullRefreshState(false, {}))
-        .padding(0.dp),
+    Scaffold(
+        modifier = Modifier
+            .pullRefresh(pullRefreshState ?: rememberPullRefreshState(false, {}))
+            .padding(0.dp),
         bottomBar = {
             if (studomatViewModel.offline) {
                 Row(

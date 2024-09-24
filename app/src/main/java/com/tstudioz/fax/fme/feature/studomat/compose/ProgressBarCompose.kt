@@ -17,8 +17,7 @@ import com.tstudioz.fax.fme.R
 @Composable
 fun ProgressBarCompose(passed: Int, total: Int) {
     Row(
-        Modifier
-            .fillMaxWidth(),
+        Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {

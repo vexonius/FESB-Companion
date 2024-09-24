@@ -27,7 +27,8 @@ private val clientStudomat: OkHttpClient = OkHttpClient.Builder().cookieJar(obje
         if (cookieStore[url.host] == null)
             cookieStore[url.host] = mutableListOf()
         cookies.forEach { cookie ->
-            cookieStore[url.host]?.find { it.name == cookie.name }
+            cookieStore[url.host]
+                ?.find { it.name == cookie.name }
                 ?.let { cookieStore[url.host]?.remove(it) }
             cookieStore[url.host]?.add(cookie)
         }
