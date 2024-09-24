@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -82,15 +83,12 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
     ) { innerPadding ->
 
         if (loading == true && isRefreshing == false) {
-            Row(
+            LinearProgressIndicator(
                 Modifier
-                    .fillMaxSize()
-                    .zIndex(1f),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircularIndicator()
-            }
+                    .fillMaxWidth()
+                    .zIndex(2f),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
 
         Box(
@@ -195,6 +193,18 @@ fun Dropdown(studomatViewModel: StudomatViewModel) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun StudomatLoading() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            LinearProgressIndicator(
+                Modifier
+                    .fillMaxWidth()
+                    .zIndex(2f))
         }
     }
 }
