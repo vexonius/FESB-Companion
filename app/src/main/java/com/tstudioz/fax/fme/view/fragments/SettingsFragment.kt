@@ -4,47 +4,37 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.webkit.CookieManager
-import android.webkit.CookieSyncManager
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
-import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
-import com.tstudioz.fax.fme.feature.login.view.LoginViewModel
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import io.realm.kotlin.Realm
-import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-@OptIn(InternalCoroutinesApi::class)
 class SettingsFragment : PreferenceFragmentCompat() {
     private var realm: Realm? = null
     private var btmDialog: BottomSheetDialog? = null
     private var korisnik: String? = null
-    private var editor: SharedPreferences.Editor? = null
     private val dbManager: DatabaseManagerInterface by inject()
-    private val loginViewModel: LoginViewModel by viewModel<LoginViewModel>()
     private val sharedPreferences: SharedPreferences by inject()
 
 
-    @OptIn(InternalCoroutinesApi::class)
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.app_prefrences)
 
@@ -61,20 +51,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             goToLoginScreen()
             true
         }
-        val weatherUnits = findPreference<Preference>("units") as CheckBoxPreference?
-        weatherUnits?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            editor = sharedPreferences.edit()
-            val units =
-                if (weatherUnits?.isChecked == true) { //ovo ne radi nista, ne primjeni se na weather fragment
-                    "&units=us"
-                } else {
-                    "&units=ca"
-                }
-            editor?.putString("weather_units", units)
-            editor?.apply()
-            editor?.commit()
-            true
-        }
         val prefFeedback = findPreference("feedback") as Preference?
         prefFeedback?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             sendFeedMail("[FEEDBACK] FESB Companion", "")
@@ -83,14 +59,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val prefBugreport = findPreference("bug_report") as Preference?
         prefBugreport?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             sendFeedMail("[BUG REPORT] FESB Companion", "")
-            true
-        }
-        val prefBeta = findPreference("betta_particp") as Preference?
-        prefBeta?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            sendFeedMail(
-                "[BETA] Prijava beta testera za FESB Companion",
-                "Slanjem ovog maila prihvaćam sudjelovanje u internom beta testiranju s ovom email adresom. Upozorenje: beta verzije znaju biti nestabilne i nepouzdane."
-            )
             true
         }
         val prefMvp = findPreference("mvp") as Preference?
@@ -150,18 +118,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun deleteWebViewCookies() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            CookieManager.getInstance().removeAllCookies(null)
-            CookieManager.getInstance().flush()
-        } else {
-            val cookieSyncMngr = CookieSyncManager.createInstance(activity)
-            cookieSyncMngr.startSync()
-            val cookieManager = CookieManager.getInstance()
-            cookieManager.removeAllCookie()
-            cookieManager.removeSessionCookie()
-            cookieSyncMngr.stopSync()
-            cookieSyncMngr.sync()
-        }
+        CookieManager.getInstance().removeAllCookies(null)
+        CookieManager.getInstance().flush()
     }
 
     private fun goToLoginScreen() {
@@ -172,20 +130,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private val buildVersion: String
         get() {
-            var ver = "undefined"
+            var version = "undefined"
             try {
-                val pInfo = activity?.packageName?.let {
+                val packageInfo = activity?.packageName?.let {
                     activity?.packageManager?.getPackageInfo(
                         it, 0
                     )
                 }
-                if (pInfo != null) {
-                    ver = pInfo.versionName
+                if (packageInfo != null) {
+                    version = packageInfo.versionName
                 }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
             }
-            return ver
+            return version
         }
 
     private fun displayLicensesAlertDialog() {
