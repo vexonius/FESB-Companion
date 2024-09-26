@@ -13,8 +13,6 @@ import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServi
 import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
 import com.tstudioz.fax.fme.models.util.parseWeatherDetails
 import com.tstudioz.fax.fme.weather.Current
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 class UserRepository(

@@ -1,0 +1,244 @@
+package com.tstudioz.fax.fme.feature.studomat.services
+
+import android.util.Log
+import com.franmontiel.persistentcookiejar.ClearableCookieJar
+import com.tstudioz.fax.fme.models.NetworkServiceResult
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.jsoup.Jsoup
+
+class StudomatService(private val client: OkHttpClient) {
+
+    private var samlRequest = ""
+    private var authState = ""
+    private var samlResponseEncrypted = ""
+    private var samlResponseDecrypted = ""
+    private var lastTimeLoggedIn = 0L
+
+    private var loggingIn = false
+
+    private fun resetLastTimeLoggedInCount() {
+        lastTimeLoggedIn = 0L
+        (client.cookieJar as ClearableCookieJar).clearSession()
+    }
+
+    fun login(username: String, password: String): NetworkServiceResult.StudomatResult {
+        try {
+            if ((System.currentTimeMillis() - lastTimeLoggedIn) < 3600000) {
+                return NetworkServiceResult.StudomatResult.Success("Logged in!")
+            } else if (!loggingIn) {
+                loggingIn = true
+                getSamlRequest()
+                sendSamlResponseToAAIEDU()
+                getSamlResponse(username, password)
+                sendSAMLToDecrypt()
+                sendSAMLToISVU()
+                return when (getStudomatData()) {
+                    is NetworkServiceResult.StudomatResult.Success -> {
+                        loggingIn = false
+                        NetworkServiceResult.StudomatResult.Success("Finished logging in!")
+                    }
+
+                    is NetworkServiceResult.StudomatResult.Failure -> {
+                        loggingIn = false
+                        NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get Studomat data!"))
+                    }
+                }
+            } else {
+                return NetworkServiceResult.StudomatResult.Failure(Throwable("Already logging in!"))
+            }
+        } catch (e: Throwable) {
+            loggingIn = false
+            return NetworkServiceResult.StudomatResult.Failure(e)
+        }
+    }
+
+    fun getSamlRequest(): NetworkServiceResult.StudomatResult {
+
+        val request = Request.Builder()
+            .url("https://www.isvu.hr/studomat/saml2/authenticate/isvu")
+            .build()
+
+        val response = client.newCall(request).execute()
+        val doc = response.body?.string()?.let { Jsoup.parse(it) }
+        samlRequest = doc?.selectFirst("input[name=SAMLRequest]")?.attr("value").toString()
+        return if (samlRequest != "") {
+            Log.d("StudomatService", "getSamlRequest: $samlRequest")
+            NetworkServiceResult.StudomatResult.Success("SAMLRequest got!")
+        } else {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getSamlRequest: Couldn't get SAMLRequest!")
+            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get SAMLRequest!"))
+            throw Throwable("Couldn't get SAMLRequest!")
+        }
+    }
+
+    fun sendSamlResponseToAAIEDU(): NetworkServiceResult.StudomatResult {
+        val formBody = FormBody.Builder()
+            .add("SAMLRequest", samlRequest)
+            .build()
+        val request = Request.Builder()
+            .url("https://login.aaiedu.hr/isvu/saml2/idp/SSOService.php")
+            .post(formBody)
+            .build()
+
+        val response = client.newCall(request).execute()
+        val doc = response.body?.string()?.let { Jsoup.parse(it) }
+
+        authState = doc?.selectFirst("form.login-form")?.attr("action")?.substringAfter("AuthState=").toString()
+        return if (response.isSuccessful && authState != "") {
+            Log.d("StudomatService", "sendSamlResponseToAAIEDU: $authState")
+            NetworkServiceResult.StudomatResult.Success("SAMLResponse sent to AAIEDU!")
+        } else {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "sendSamlResponseToAAIEDU: Couldn't send SAMLResponse to AAIEDU!")
+            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't send SAMLResponse to AAIEDU!"))
+            throw Throwable("Couldn't send SAMLResponse to AAIEDU!")
+        }
+    }
+
+    fun getSamlResponse(
+        username: String,
+        password: String
+    ): NetworkServiceResult.StudomatResult {
+
+        val formBody = FormBody.Builder()
+            .add("username", "$username@fesb.hr")
+            .add("password", password)
+            .add("AuthState", authState)
+            .add("Submit", "")
+            .build()
+        val request = Request.Builder()
+            .url("https://login.aaiedu.hr/sso/module.php/core/loginuserpass?AuthState=$authState")
+            .post(formBody)
+            .build()
+
+        val response = client.newCall(request).execute()
+        val doc = response.body?.string()?.let { Jsoup.parse(it) }
+        samlResponseEncrypted = doc?.selectFirst("input[name=SAMLResponse]")?.attr("value").toString()
+        return if (samlResponseEncrypted != "") {
+            Log.d("StudomatService", "getSamlResponse: $samlResponseEncrypted")
+            NetworkServiceResult.StudomatResult.Success("SAMLResponse got!")
+        } else {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getSamlResponse: Couldn't get SAMLResponse!")
+            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get SAMLResponse!"))
+            throw Throwable("Couldn't get SAMLResponse!")
+        }
+    }
+
+    fun sendSAMLToDecrypt(): NetworkServiceResult.StudomatResult {
+
+        val formBody = FormBody.Builder()
+            .add("SAMLResponse", samlResponseEncrypted)
+            .build()
+
+        val request = Request.Builder()
+            .url("https://login.aaiedu.hr/isvu/module.php/saml/sp/saml2-acs.php/default-sp")
+            .post(formBody)
+            .build()
+
+        val response = client.newCall(request).execute()
+        val doc = response.body?.string()?.let { Jsoup.parse(it) }
+        samlResponseDecrypted = doc?.selectFirst("input[name=SAMLResponse]")?.attr("value").toString()
+
+        return if (samlResponseDecrypted != "") {
+            Log.d("StudomatService", "sendSAMLToDecrypt: $samlResponseDecrypted")
+            NetworkServiceResult.StudomatResult.Success("SAMLResponse decrypted!")
+        } else {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "sendSAMLToDecrypt: Couldn't decrypt SAMLResponse!")
+            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't decrypt SAMLResponse!"))
+            throw Throwable("Couldn't decrypt SAMLResponse!")
+        }
+    }
+
+    fun sendSAMLToISVU(): NetworkServiceResult.StudomatResult {
+
+        val formBody = FormBody.Builder()
+            .add("SAMLResponse", samlResponseDecrypted)
+            .build()
+
+        val request = Request.Builder()
+            .url("https://www.isvu.hr/studomat/login/saml2/sso/isvu")
+            .post(formBody)
+            .build()
+
+        val response = client.newCall(request).execute()
+        return if (response.isSuccessful) {
+            Log.d("StudomatService", "sendSAMLToISVU: SAMLResponse sent to ISVU!")
+            NetworkServiceResult.StudomatResult.Success("SAMLResponse sent to ISVU!")
+        } else {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "sendSAMLToISVU: Couldn't send SAMLResponse to ISVU!")
+            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't send SAMLResponse to ISVU!"))
+            throw Throwable("Couldn't send SAMLResponse to ISVU!")
+        }
+    }
+
+    fun getStudomatData(): NetworkServiceResult.StudomatResult {
+
+        val request = Request.Builder()
+            .url("https://www.isvu.hr/studomat/hr/index")
+            .build()
+        val response = client.newCall(request).execute()
+        val body = response.body?.string() ?: ""
+
+        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
+        } else if (response.code == 200) {
+            lastTimeLoggedIn = System.currentTimeMillis()
+            Log.d("StudomatService", "getStudomatData: ${body.substring(0, 100)}")
+            NetworkServiceResult.StudomatResult.Success(body)
+        } else {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get Studomat data!"))
+        }
+    }
+
+    fun getYears(): NetworkServiceResult.StudomatResult {
+
+        val request = Request.Builder()
+            .url("https://www.isvu.hr/studomat/hr/studiranje/upisanegodine")
+            .build()
+        val response = client.newCall(request).execute()
+        val body = response.body?.string() ?: ""
+
+        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
+        } else if (body != "") {
+            Log.d("StudomatService", "getUpisaneGodine: ${body.substring(0, 100)}")
+            NetworkServiceResult.StudomatResult.Success(body)
+        } else {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getUpisaneGodine: Couldn't get upisane godine data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get upisane godine data!"))
+        }
+    }
+
+    fun getChosenYear(href: String): NetworkServiceResult.StudomatResult {
+        val request = Request.Builder()
+            .url("https://www.isvu.hr$href")
+            .build()
+        val response = client.newCall(request).execute()
+        val body = response.body?.string() ?: ""
+        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
+        } else if (response.isSuccessful) {
+            Log.d("StudomatService", "getTrenutnuGodinuData: ${body.substring(0, 100)}")
+            NetworkServiceResult.StudomatResult.Success(body)
+        } else {
+            resetLastTimeLoggedInCount()
+            Log.d("StudomatService", "getTrenutnuGodinuData: Couldn't get current year data!")
+            NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get current year data!"))
+        }
+    }
+}

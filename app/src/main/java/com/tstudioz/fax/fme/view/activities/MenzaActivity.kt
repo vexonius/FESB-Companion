@@ -30,6 +30,7 @@ class MenzaActivity : AppCompatActivity() {
 
     private val okHttpClient: OkHttpClient by inject()
     private val dbManager: DatabaseManagerInterface by inject()
+    private val networkUtils: NetworkUtils by inject()
     private var mRealm: Realm? = null
     private var nRealm: Realm? = null
     private var snack: Snackbar? = null
@@ -50,7 +51,7 @@ class MenzaActivity : AppCompatActivity() {
     }
 
     private fun checkConditions() {
-        if (NetworkUtils.isNetworkAvailable(this)) {
+        if (networkUtils.isNetworkAvailable()) {
             startParsing()
         } else {
             showSnacOffline()

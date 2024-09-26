@@ -29,13 +29,13 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
+import com.tstudioz.fax.fme.feature.studomat.view.StudomatFragment
 import com.tstudioz.fax.fme.models.data.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
-import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
@@ -47,7 +47,6 @@ import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 
@@ -57,6 +56,7 @@ class MainActivity : AppCompatActivity() {
 
     private val dbManager: DatabaseManagerInterface by inject()
     private val shPref: SharedPreferences by inject()
+    private val networkUtils: NetworkUtils by inject()
 
     private var realmLog: Realm? = null
     private var client: OkHttpClient? = null
@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
     private val attendanceFragment = AttendanceFragment()
+    private val studomatFragment = StudomatFragment()
     private var editor: SharedPreferences.Editor? = null
     private var binding: ActivityMainBinding? = null
     private val mainViewModel: MainViewModel by viewModel()
@@ -160,6 +161,13 @@ class MainActivity : AppCompatActivity() {
                 R.id.tab_raspored
             )
         )
+        bar?.addTab(
+            bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.studomat_icon),
+                "Studomat",
+                R.id.tab_studomat
+            )
+        )
         bar?.selectTabById(R.id.tab_home, true)
     }
 
@@ -195,6 +203,11 @@ class MainActivity : AppCompatActivity() {
                 supportActionBar?.title = "Raspored"
                 ft.replace(R.id.frame, timeTableFragment)
             }
+
+            R.id.tab_studomat -> {
+                supportActionBar?.title = "Studomat"
+                ft.replace(R.id.frame, studomatFragment)
+            }
         }
         ft.addToBackStack(null)
         ft.commit()
@@ -213,7 +226,7 @@ class MainActivity : AppCompatActivity() {
                 mainViewModel.showWeekChooseMenu()
             }
 
-            R.id.refreshTimetable -> if (NetworkUtils.isNetworkAvailable(this)) {
+            R.id.refreshTimetable -> if (networkUtils.isNetworkAvailable()) {
                 mojRaspored()
             } else {
                 showSnacOffline()
@@ -224,7 +237,7 @@ class MainActivity : AppCompatActivity() {
 
 
     fun mojRaspored() {
-        if (NetworkUtils.isNetworkAvailable(this)) {
+        if (networkUtils.isNetworkAvailable()) {
             val user = shPref.getString("username", "")?.let { User(it, "") }
 
             val now = LocalDate.now().plusDays(1)
