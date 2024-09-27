@@ -12,6 +12,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding
 import com.tstudioz.fax.fme.random.NetworkUtils
 import kotlinx.coroutines.InternalCoroutinesApi
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -21,6 +22,7 @@ class MenzaActivity : AppCompatActivity() {
     private var snack: Snackbar? = null
     private var binding: ActivityMenzaBinding? = null
     private val menzaViewModel: MenzaViewModel by viewModel()
+    private val networkUtils: NetworkUtils by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +42,7 @@ class MenzaActivity : AppCompatActivity() {
     }
 
     private fun checkConditionsAndFetch() {
-        if (NetworkUtils.isNetworkAvailable(this)) {
+        if (networkUtils.isNetworkAvailable()) {
             menzaViewModel.getMenza("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
         } else {
             menzaViewModel.readMenza()

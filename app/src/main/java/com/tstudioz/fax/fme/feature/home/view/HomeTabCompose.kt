@@ -429,7 +429,7 @@ fun NoteItem(
     ) {
         if (longClicked.value) {
             Image(
-                painter = painterResource(id = R.drawable.deletedelete),
+                painter = painterResource(id = R.drawable.trash_can_icon),
                 contentDescription = stringResource(id = R.string.delete_note_desc),
                 modifier = Modifier
                     .size(25.dp)

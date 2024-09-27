@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     private val dbManager: DatabaseManagerInterface by inject()
     private val shPref: SharedPreferences by inject()
+    private val networkUtils: NetworkUtils by inject()
 
     private var realmLog: Realm? = null
     private var snack: Snackbar? = null

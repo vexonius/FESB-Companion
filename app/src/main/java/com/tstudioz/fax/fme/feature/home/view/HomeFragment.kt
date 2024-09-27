@@ -17,6 +17,7 @@ import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.json.JSONException
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
@@ -27,6 +28,7 @@ class HomeFragment : Fragment() {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by activityViewModel()
     private val homeViewModel: HomeViewModel by viewModel()
+    private val networkUtils: NetworkUtils by inject()
 
     private var binding: TabHomeBinding? = null
     private var snack: Snackbar? = null
@@ -67,7 +69,7 @@ class HomeFragment : Fragment() {
 
     @Throws(IOException::class, JSONException::class)
     private fun fetchForcast() {
-        if (NetworkUtils.isNetworkAvailable(requireContext())) {
+        if (networkUtils.isNetworkAvailable()) {
             homeViewModel.getForecast(forecastUrl)
         } else {
             showSnac("Niste povezani")
