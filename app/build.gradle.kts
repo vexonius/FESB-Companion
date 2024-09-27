@@ -17,10 +17,20 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("./../keystore.jks")
+            storePassword = "E7?hAT@Y&AxK#"
+            keyAlias = "glavni_key"
+            keyPassword = "E7?hAT@Y&AxA#"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
 
         debug {
@@ -30,6 +40,7 @@ android {
             isDebuggable = true
         }
     }
+
     namespace = "com.tstudioz.fax.fme"
 
     compileOptions {
