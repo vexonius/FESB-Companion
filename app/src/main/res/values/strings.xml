@@ -25,6 +25,7 @@
     <string name="tab_attendance">Prisutnost</string>
     <string name="tab_home">Home</string>
     <string name="tab_timetable">Raspored</string>
+    <string name="tab_studomat">Studomat</string>
 
 
     /* Shortcuts */

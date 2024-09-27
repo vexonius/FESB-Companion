@@ -36,10 +36,8 @@ import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
-import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
 import com.tstudioz.fax.fme.feature.iksica.IksicaFragment
 import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
-import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.exceptions.RealmException
@@ -175,7 +173,7 @@ class MainActivity : AppCompatActivity() {
         bar?.addTab(
             bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.studomat_icon),
-                "Studomat",
+                getString(R.string.tab_studomat),
                 R.id.tab_studomat
             )
         )
