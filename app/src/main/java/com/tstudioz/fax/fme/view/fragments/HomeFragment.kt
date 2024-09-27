@@ -53,6 +53,7 @@ class HomeFragment : Fragment() {
 
     private val dbManager: DatabaseManagerInterface by inject()
     private val shPref: SharedPreferences by inject()
+    private val networkUtils: NetworkUtils by inject()
 
     private var binding: HomeTabBinding? = null
     private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=$LATITUDE&lon=$LONGITUDE"
@@ -101,7 +102,7 @@ class HomeFragment : Fragment() {
     @Throws(IOException::class, JSONException::class)
     private fun start() {
         try {
-            if (NetworkUtils.isNetworkAvailable(requireContext())) {
+            if (networkUtils.isNetworkAvailable()) {
                 lifecycleScope.launch { homeViewModel.getForecast(forecastUrl) }
                 homeViewModel.forecastGot.observe(viewLifecycleOwner) { forecastGot ->
                     if (forecastGot) {

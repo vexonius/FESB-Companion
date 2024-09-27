@@ -70,7 +70,7 @@ fun BottomInfoCompose(
             icon = R.drawable.time
         )
         BottomElement(
-            text = event.groups.split(",")[0],
+            text = event.groups.split(",").firstOrNull() ?: "",
             modifierText = Modifier.padding(10.dp, 10.dp, 0.dp, 5.dp),
             modifierRow = Modifier.padding(start = 15.dp, bottom = 10.dp),
             icon = R.drawable.group

@@ -4,7 +4,6 @@ import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.weather.Current
-import java.time.LocalDate
 
 interface UserRepositoryInterface {
 

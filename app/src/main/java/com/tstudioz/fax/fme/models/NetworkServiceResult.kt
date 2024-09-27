@@ -40,4 +40,9 @@ sealed class NetworkServiceResult {
         class Failure(val exception: Throwable) : WeatherResult()
     }
 
+    sealed class StudomatResult : NetworkServiceResult() {
+        data class Success(val data: String) : StudomatResult(){}
+        class Failure(val throwable: Throwable) : StudomatResult()
+    }
+
 }

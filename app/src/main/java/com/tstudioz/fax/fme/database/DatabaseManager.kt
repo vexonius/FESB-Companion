@@ -1,6 +1,8 @@
 package com.tstudioz.fax.fme.database
 
 import com.tstudioz.fax.fme.database.models.*
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
@@ -16,6 +18,8 @@ class DatabaseManager: DatabaseManagerInterface {
                 AttendanceEntry::class,
                 Meni::class,
                 EventRealm::class,
+                StudomatSubject::class,
+                Year::class,
                 IksicaBalance::class,
                 ReceiptRealm::class,
                 StudentDataIksica::class))

@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.Application
 import android.app.Application
 import com.tstudioz.fax.fme.feature.iksica.di.iksicaModule
 import com.tstudioz.fax.fme.feature.login.di.loginModule
+import com.tstudioz.fax.fme.feature.studomat.di.studomatModule
 import com.tstudioz.fax.fme.models.di.module
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.koin.androidContext
@@ -21,7 +22,7 @@ class FESBCompanion : Application() {
         startKoin {
             androidLogger(level = Level.ERROR)
             androidContext(this@FESBCompanion)
-            modules(module, loginModule, iksicaModule)
+            modules(module, loginModule, studomatModule, iksicaModule)
         }
     }
 
