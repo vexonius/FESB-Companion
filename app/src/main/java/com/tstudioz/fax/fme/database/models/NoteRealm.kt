@@ -8,6 +8,13 @@ import java.time.ZoneId
 import java.util.Date
 import java.util.UUID
 
+data class Note(
+    val id: String?,
+    val noteTekst: String?,
+    val dateCreated: LocalDateTime?,
+    var checked: Boolean?
+)
+
 open class NoteRealm : RealmObject {
 
     @PrimaryKey
@@ -19,13 +26,6 @@ open class NoteRealm : RealmObject {
     var checked: Boolean = false
 
 }
-
-data class Note(
-    val id: String?,
-    val noteTekst: String?,
-    val dateCreated: LocalDateTime?,
-    var checked: Boolean?
-)
 
 fun NoteRealm.toNote(): Note {
     return Note(

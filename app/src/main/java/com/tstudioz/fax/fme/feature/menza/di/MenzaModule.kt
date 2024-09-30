@@ -19,7 +19,7 @@ import org.koin.dsl.module
 
 @OptIn(InternalCoroutinesApi::class)
 val menzaModule = module {
-    single<MenzaServiceInterface> { MenzaService(get()) }
     single<MenzaDaoInterface> { MenzaDao(get()) }
+    single<MenzaServiceInterface> { MenzaService(get()) }
     viewModel { MenzaViewModel(androidApplication(), get()) }
 }

@@ -8,4 +8,5 @@ interface MenzaDaoInterface {
     suspend fun insert(classes: List<Meni> )
 
     suspend fun getCachedMenza(): List<Meni>
+
 }

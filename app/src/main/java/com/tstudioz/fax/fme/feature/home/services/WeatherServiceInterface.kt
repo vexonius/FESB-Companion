@@ -4,5 +4,5 @@ import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface WeatherServiceInterface {
 
-    suspend fun fetchWeatherDetails(url: String) : NetworkServiceResult.WeatherResult
+    suspend fun fetchWeatherDetails() : NetworkServiceResult.WeatherResult
 }

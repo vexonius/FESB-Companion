@@ -14,8 +14,8 @@ import org.koin.dsl.module
 
 @OptIn(InternalCoroutinesApi::class)
 val homeModule = module {
-    viewModel { HomeViewModel(androidApplication(), get(), get()) }
-    single<WeatherServiceInterface> { WeatherService(get()) }
-    single<NoteRepositoryInterface> { NoteRepository(get()) }
     single<NoteDaoInterface> { NoteDao(get()) }
+    single<NoteRepositoryInterface> { NoteRepository(get()) }
+    single<WeatherServiceInterface> { WeatherService(get()) }
+    viewModel { HomeViewModel(androidApplication(), get(), get()) }
 }

@@ -584,8 +584,8 @@ fun CardsCompose() {
         CardCompose(
             stringResource(id = R.string.ugovori_title),
             stringResource(id = R.string.ugovori_desc),
-            colorResource(id = R.color.stud_ug),
-            colorResource(id = R.color.stud_ug_2),
+            colorResource(id = R.color.green_blue),
+            colorResource(id = R.color.lust),
             onClick = {
                 val appPackageName = "com.ugovori.studentskiugovori"
                 val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)

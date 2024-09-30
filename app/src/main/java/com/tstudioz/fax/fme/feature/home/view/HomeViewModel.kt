@@ -33,10 +33,14 @@ class HomeViewModel(
     val forecastGot: LiveData<Boolean> = _forecastGot
     val notes: LiveData<List<Note>> = _notes
 
-    fun getForecast(url: String) {
+    init {
+        getNotes()
+    }
+
+    fun getForecast() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val weather = repository.fetchWeatherDetails(url)
+                val weather = repository.fetchWeatherDetails()
                 if (weather != null) {
                     val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
                     val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours

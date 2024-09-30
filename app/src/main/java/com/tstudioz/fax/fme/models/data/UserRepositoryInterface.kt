@@ -11,7 +11,7 @@ interface UserRepositoryInterface {
     suspend fun attemptLogin(user: User): User
     suspend fun fetchTimetable(user: String, startDate: String, endDate: String): List<Event>
     suspend fun insertTimeTable(classes: List<Event>)
-    suspend fun fetchWeatherDetails(url : String): WeatherFeature?
+    suspend fun fetchWeatherDetails(): WeatherFeature?
     suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceFetchResult
     suspend fun insertAttendance(attendance: List<AttendanceEntry>)
 

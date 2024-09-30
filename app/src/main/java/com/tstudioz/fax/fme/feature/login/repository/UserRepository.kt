@@ -43,8 +43,8 @@ class UserRepository(
         }
     }
 
-    override suspend fun fetchWeatherDetails(url: String): WeatherFeature? {
-        return when (val result = weatherNetworkService.fetchWeatherDetails(url)) {
+    override suspend fun fetchWeatherDetails(): WeatherFeature? {
+        return when (val result = weatherNetworkService.fetchWeatherDetails()) {
             is NetworkServiceResult.WeatherResult.Success -> {
                 val test = Json {
                     ignoreUnknownKeys = true

@@ -8,7 +8,6 @@ import okhttp3.Response
 class MenzaService(private val client: OkHttpClient) : MenzaServiceInterface {
 
     override suspend fun fetchMenza(url: String): NetworkServiceResult.MenzaResult {
-
         val request: Request = Request.Builder()
             .url(url)
             .get()

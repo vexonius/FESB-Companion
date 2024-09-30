@@ -57,14 +57,15 @@ class UserRepository(
         timeTableDao.insert(classes)
     }
 
-    override suspend fun fetchWeatherDetails(url : String): WeatherFeature? {
-        return when(val result = weatherNetworkService.fetchWeatherDetails(url)){
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
+
+    override suspend fun fetchWeatherDetails(): WeatherFeature? {
+        return when(val result = weatherNetworkService.fetchWeatherDetails()){
             is NetworkServiceResult.WeatherResult.Success -> {
-                val test = Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                }
-                test.decodeFromString<WeatherFeature>(result.data)
+                json.decodeFromString<WeatherFeature>(result.data)
             }
             is NetworkServiceResult.WeatherResult.Failure -> {
                 Log.e(TAG, "Timetable fetching error")

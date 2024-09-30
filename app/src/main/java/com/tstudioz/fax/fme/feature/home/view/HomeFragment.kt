@@ -16,11 +16,9 @@ import com.tstudioz.fax.fme.view.activities.MainActivity
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.json.JSONException
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.IOException
 
 @OptIn(InternalCoroutinesApi::class)
 class HomeFragment : Fragment() {
@@ -32,9 +30,7 @@ class HomeFragment : Fragment() {
 
     private var binding: TabHomeBinding? = null
     private var snack: Snackbar? = null
-    private val forecastUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact?" +
-            "lat=$mLatitude&" +
-            "lon=$mLongitude"
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
@@ -47,7 +43,6 @@ class HomeFragment : Fragment() {
         setHasOptionsMenu(true)
         fetchForcast()
 
-        homeViewModel.getNotes()
         binding!!.composeView.setContent {
             HomeTabCompose(
                 weather = homeViewModel.weatherDisplay,
@@ -63,26 +58,24 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
         setCyanStatusBarColor()
         (activity as MainActivity?)?.mojRaspored()
     }
 
-    @Throws(IOException::class, JSONException::class)
     private fun fetchForcast() {
         if (networkUtils.isNetworkAvailable()) {
-            homeViewModel.getForecast(forecastUrl)
+            homeViewModel.getForecast()
         } else {
             showSnac("Niste povezani")
         }
     }
 
     private fun setCyanStatusBarColor() {
-        (activity as AppCompatActivity?)?.supportActionBar
-            ?.setBackgroundDrawable(
-                ColorDrawable(ContextCompat.getColor(requireContext(), R.color.dark_cyan))
-            )
-        requireActivity().window.statusBarColor =
-            ContextCompat.getColor(requireContext(), R.color.darker_cyan)
+        (activity as AppCompatActivity?)
+            ?.supportActionBar
+            ?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(requireContext(), R.color.dark_cyan)))
+        requireActivity().window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.darker_cyan)
     }
 
     private fun showSnac(text: String) {
@@ -92,14 +85,10 @@ class HomeFragment : Fragment() {
     }
 
     override fun onStop() {
-        (activity as AppCompatActivity?)?.supportActionBar
+        super.onStop()
+        (activity as AppCompatActivity?)
+            ?.supportActionBar
             ?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(requireContext(), R.color.colorPrimary)))
         requireActivity().window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
-        super.onStop()
-    }
-
-    companion object {
-        private const val mLatitude = 43.511287
-        private const val mLongitude = 16.469252
     }
 }

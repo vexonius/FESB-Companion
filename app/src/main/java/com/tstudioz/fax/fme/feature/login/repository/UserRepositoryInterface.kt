@@ -9,7 +9,7 @@ import com.tstudioz.fax.fme.feature.home.WeatherFeature
 interface UserRepositoryInterface {
 
     suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult
-    suspend fun fetchWeatherDetails(url: String): WeatherFeature?
+    suspend fun fetchWeatherDetails(): WeatherFeature?
     suspend fun fetchMenzaDetails(url: String): MenzaResult
     suspend fun readMenza(): List<Meni>
 }
