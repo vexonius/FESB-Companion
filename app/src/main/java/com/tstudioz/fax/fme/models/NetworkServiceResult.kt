@@ -1,8 +1,7 @@
 package com.tstudioz.fax.fme.models
 
 import com.tstudioz.fax.fme.database.models.AttendanceEntry
-import com.tstudioz.fax.fme.database.models.Meni
-import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.database.models.User
 
 sealed class NetworkServiceResult {
 

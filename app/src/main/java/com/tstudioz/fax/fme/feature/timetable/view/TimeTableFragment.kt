@@ -26,11 +26,11 @@ class TimeTableFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = TabTimetableBinding.inflate(inflater, container, false)
-        val composeView = binding?.composeView!!
+        val composeView = binding?.composeView
 
         mainViewModel.showThisWeeksEvents()
 
-        composeView.setContent {
+        composeView?.setContent {
             AppTheme {
                 TimetableCompose(
                     showDay = mainViewModel.showDay,

@@ -2,8 +2,6 @@ package com.tstudioz.fax.fme.feature.menza.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Meni
-import com.tstudioz.fax.fme.database.models.NoteRealm
-import com.tstudioz.fax.fme.feature.menza.dao.interfaces.MenzaDaoInterface
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query

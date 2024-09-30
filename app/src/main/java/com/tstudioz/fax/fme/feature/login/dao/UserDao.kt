@@ -1,9 +1,8 @@
-package com.tstudioz.fax.fme.models.data
+package com.tstudioz.fax.fme.feature.login.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.query
 
 class UserDao(private val dbManager: DatabaseManagerInterface): UserDaoInterface {
 

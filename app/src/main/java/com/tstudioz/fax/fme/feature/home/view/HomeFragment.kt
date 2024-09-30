@@ -43,7 +43,7 @@ class HomeFragment : Fragment() {
         setHasOptionsMenu(true)
         fetchForcast()
 
-        binding!!.composeView.setContent {
+        binding?.composeView?.setContent {
             HomeTabCompose(
                 weather = homeViewModel.weatherDisplay,
                 notes = homeViewModel.notes,

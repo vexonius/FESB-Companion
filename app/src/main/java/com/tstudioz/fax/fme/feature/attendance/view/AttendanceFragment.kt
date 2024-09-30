@@ -51,7 +51,7 @@ class AttendanceFragment : Fragment(), KoinComponent {
             }
         }
 
-        binding!!.composeView.setContent {
+        binding?.composeView?.setContent {
             AttendanceCompose(attendanceItems = attendanceViewModel.attendanceList)
         }
         return binding?.root

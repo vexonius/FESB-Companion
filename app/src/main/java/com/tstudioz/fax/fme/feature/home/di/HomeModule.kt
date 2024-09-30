@@ -3,6 +3,8 @@ package com.tstudioz.fax.fme.feature.home.di
 import com.tstudioz.fax.fme.feature.home.dao.NoteDao
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepository
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
+import com.tstudioz.fax.fme.feature.home.repository.WeatherRepository
+import com.tstudioz.fax.fme.feature.home.repository.WeatherRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.services.WeatherService
 import com.tstudioz.fax.fme.feature.home.services.WeatherServiceInterface
 import com.tstudioz.fax.fme.feature.home.view.HomeViewModel
@@ -17,5 +19,6 @@ val homeModule = module {
     single<NoteDaoInterface> { NoteDao(get()) }
     single<NoteRepositoryInterface> { NoteRepository(get()) }
     single<WeatherServiceInterface> { WeatherService(get()) }
+    single<WeatherRepositoryInterface> { WeatherRepository(get()) }
     viewModel { HomeViewModel(androidApplication(), get(), get()) }
 }

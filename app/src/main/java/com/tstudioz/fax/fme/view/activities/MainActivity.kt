@@ -28,7 +28,7 @@ import com.tstudioz.fax.fme.feature.home.view.HomeFragment
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatFragment
-import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.database.models.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils

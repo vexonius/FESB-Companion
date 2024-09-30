@@ -7,16 +7,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
-import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.feature.timetable.view.MonthData
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
-import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.database.models.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -29,9 +28,7 @@ import java.time.format.DateTimeFormatter
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 class MainViewModel(
-    private val userRepository: UserRepositoryInterface,
     private val timeTableRepository: TimeTableRepositoryInterface,
-    private val dbManager: DatabaseManagerInterface,
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
@@ -71,9 +68,13 @@ class MainViewModel(
         )
     )
 
+    private val handler = CoroutineExceptionHandler { _, exception ->
+        Log.e("Error timetable", exception.toString())
+    }
+
     init {
         fetchTimetableInfo()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + handler) {
             _lessonsPerm.postValue(timeTableRepository.getCachedEvents())
         }
     }
@@ -85,12 +86,12 @@ class MainViewModel(
         shownWeekMonday: LocalDate
     ) {
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
-        val startDate = dateFormatter.format(startDate)
-        val endDate = dateFormatter.format(endDate)
+        val startDateFormated = dateFormatter.format(startDate)
+        val endDateFormated = dateFormatter.format(endDate)
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + handler) {
             try {
-                val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
+                val events = timeTableRepository.fetchTimetable(user.username, startDateFormated, endDateFormated)
                 _shownWeek.postValue(shownWeekMonday)
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
                 _lessonsToShow.postValue(events)
@@ -107,13 +108,13 @@ class MainViewModel(
         shownWeekMonday: LocalDate
     ) {
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
-        val startDate = dateFormatter.format(startDate)
-        val endDate = dateFormatter.format(endDate)
+        val startDateFormated = dateFormatter.format(startDate)
+        val endDateFormated = dateFormatter.format(endDate)
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + handler) {
             try {
                 println("started Fetching Timetable for user")
-                val events = timeTableRepository.fetchTimetable(user.username, startDate, endDate)
+                val events = timeTableRepository.fetchTimetable(user.username, startDateFormated, endDateFormated)
                 _shownWeek.postValue(shownWeekMonday)
                 sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
                 sharedPreferences[SPKey.LAST_FETCHED] =
@@ -132,7 +133,7 @@ class MainViewModel(
         startDate: String = (LocalDate.now().year - 1).toString() + "-8-1",
         endDate: String = (LocalDate.now().year + 1).toString() + "-8-1"
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + handler) {
             try {
                 val result = timeTableRepository.fetchTimeTableCalendar(startDate, endDate)
                 _periods.postValue(result)

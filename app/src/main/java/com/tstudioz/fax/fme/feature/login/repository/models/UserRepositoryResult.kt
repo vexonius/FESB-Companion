@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.feature.login.repository.models
 
-import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.database.models.User
 
 sealed class UserRepositoryResult {
 

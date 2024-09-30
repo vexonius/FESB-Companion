@@ -8,10 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.database.models.toNote
 import com.tstudioz.fax.fme.database.models.toNoteRealm
-import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.codeToDisplay
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
+import com.tstudioz.fax.fme.feature.home.repository.WeatherRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.weatherSymbolKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -22,8 +22,8 @@ import java.util.Locale
 @InternalCoroutinesApi
 class HomeViewModel(
     application: Application,
-    private val repository: UserRepositoryInterface,
-    private val noteRepository: NoteRepositoryInterface
+    private val noteRepository: NoteRepositoryInterface,
+    private val weatherRepository: WeatherRepositoryInterface
 ) : AndroidViewModel(application) {
 
     private var _forecastGot = MutableLiveData<Boolean>()
@@ -40,7 +40,7 @@ class HomeViewModel(
     fun getForecast() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val weather = repository.fetchWeatherDetails()
+                val weather = weatherRepository.fetchWeatherDetails()
                 if (weather != null) {
                     val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
                     val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
