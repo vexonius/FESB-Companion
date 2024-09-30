@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.home.view
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +14,7 @@ import com.tstudioz.fax.fme.feature.home.codeToDisplay
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.repository.WeatherRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.weatherSymbolKeys
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -33,12 +35,17 @@ class HomeViewModel(
     val forecastGot: LiveData<Boolean> = _forecastGot
     val notes: LiveData<List<Note>> = _notes
 
+    private val handler = CoroutineExceptionHandler { _, exception ->
+        Log.d("HomeViewModel", "Caught $exception")
+        _forecastGot.postValue(false)
+    }
+
     init {
         getNotes()
     }
 
     fun getForecast() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + handler) {
             try {
                 val weather = weatherRepository.fetchWeatherDetails()
                 if (weather != null) {
@@ -76,7 +83,7 @@ class HomeViewModel(
     }
 
     fun getNotes() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + handler) {
             val notes = noteRepository.getNotes()
             _notes.postValue(notes.map { it.toNote() })
         }
@@ -92,14 +99,14 @@ class HomeViewModel(
         else {
             _notes.value = _notes.value?.plus(note)
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + handler) {
             noteRepository.insert(note.toNoteRealm())
         }
     }
 
     fun delete(note: Note) {
         _notes.value = _notes.value?.minus(note)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + handler) {
             noteRepository.delete(note.toNoteRealm())
         }
     }
