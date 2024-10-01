@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.models.di
+package com.tstudioz.fax.fme.di
 
 import android.content.Context
 import android.content.SharedPreferences

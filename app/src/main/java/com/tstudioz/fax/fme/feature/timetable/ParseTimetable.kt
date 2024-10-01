@@ -5,8 +5,8 @@ import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Recurring
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.database.models.TimetableType
-import com.tstudioz.fax.fme.models.util.ColorDeserializer
-import com.tstudioz.fax.fme.models.util.LocalDateDeserializer
+import com.tstudioz.fax.fme.util.ColorDeserializer
+import com.tstudioz.fax.fme.util.LocalDateDeserializer
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.time.LocalDate

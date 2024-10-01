@@ -1,6 +1,6 @@
-package com.tstudioz.fax.fme.feature.login.repository
+package com.tstudioz.fax.fme.common.user
 
-import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
+import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
 
 interface UserRepositoryInterface {
 

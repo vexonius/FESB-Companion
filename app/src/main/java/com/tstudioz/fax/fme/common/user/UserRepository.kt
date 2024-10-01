@@ -1,13 +1,12 @@
-package com.tstudioz.fax.fme.feature.login.repository
+package com.tstudioz.fax.fme.common.user
 
 import android.content.SharedPreferences
-import android.util.Log
-import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
+import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
-import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
-import com.tstudioz.fax.fme.models.util.SPKey
+import com.tstudioz.fax.fme.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.util.SPKey
 
 class UserRepository(
     private val userService: UserServiceInterface,
@@ -26,7 +25,6 @@ class UserRepository(
             }
 
             is NetworkServiceResult.LoginResult.Failure -> {
-                Log.e(TAG, "User Login Failed!")
                 UserRepositoryResult.LoginResult.Failure(Throwable("User Login failed!"))
             }
         }

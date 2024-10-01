@@ -4,8 +4,8 @@ import com.tstudioz.fax.fme.feature.login.services.UserService
 import com.tstudioz.fax.fme.feature.login.view.LoginViewModel
 import com.tstudioz.fax.fme.feature.login.dao.UserDao
 import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
-import com.tstudioz.fax.fme.feature.login.repository.UserRepository
-import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
+import com.tstudioz.fax.fme.common.user.UserRepository
+import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.koin.androidApplication

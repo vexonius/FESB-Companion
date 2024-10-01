@@ -7,7 +7,7 @@ import com.tstudioz.fax.fme.feature.login.di.loginModule
 import com.tstudioz.fax.fme.feature.studomat.di.studomatModule
 import com.tstudioz.fax.fme.feature.menza.di.menzaModule
 import com.tstudioz.fax.fme.feature.timetable.di.timetableModule
-import com.tstudioz.fax.fme.models.di.module
+import com.tstudioz.fax.fme.di.module
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger

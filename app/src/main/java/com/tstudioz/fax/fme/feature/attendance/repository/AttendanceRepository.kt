@@ -5,7 +5,7 @@ import com.tstudioz.fax.fme.feature.attendance.ParseAttendance
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.database.models.User
+import com.tstudioz.fax.fme.common.user.models.User
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.feature.attendance.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.database.models.User
+import com.tstudioz.fax.fme.common.user.models.User
 import okhttp3.FormBody
 import okhttp3.FormBody.Builder
 import okhttp3.HttpUrl

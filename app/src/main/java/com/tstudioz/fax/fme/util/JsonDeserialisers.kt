@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.models.util
+package com.tstudioz.fax.fme.util
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
