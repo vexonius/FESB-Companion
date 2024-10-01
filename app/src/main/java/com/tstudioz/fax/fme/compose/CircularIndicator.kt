@@ -26,7 +26,7 @@ import com.tstudioz.fax.fme.R
 
 @Preview
 @Composable
-fun CircularIndicator( size: Dp = 45.dp) {
+fun CircularIndicator(size: Dp = 45.dp) {
     Row(
         Modifier
             .fillMaxSize()

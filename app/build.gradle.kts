@@ -13,18 +13,35 @@ android {
         applicationId = "com.tstudioz.fax.fme"
         minSdk = 26
         targetSdk = 34
-        versionCode = 21
-        versionName = "2.3.0 build #2307"
+        versionCode = 22
+        versionName = "3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("./../keystore.jks")
+            storePassword = "E7?hAT@Y&AxK#"
+            keyAlias = "glavni_key"
+            keyPassword = "E7?hAT@Y&AxA#"
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
+        }
+
+        debug {
+            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".debug"
+            isDebuggable = true
         }
     }
+
     namespace = "com.tstudioz.fax.fme"
 
     compileOptions {
@@ -34,7 +51,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
-        freeCompilerArgs = listOf("-Xdebug") // da ne bi bilo optimised out vars
     }
 
     viewBinding {
@@ -45,7 +61,7 @@ android {
     }
     buildFeatures {
         buildConfig = true
-        compose=true
+        compose = true
     }
 
     composeOptions {
@@ -81,7 +97,6 @@ dependencies {
     implementation("com.github.apl-devs:appintro:v4.2.2")
     implementation("com.orhanobut:hawk:2.0.1")
     testImplementation("junit:junit:4.13.2")
-    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.activity:activity-ktx:1.9.0")
 
@@ -99,7 +114,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation("androidx.compose.material3:material3-android:1.2.1")
-
+    implementation("androidx.compose.material:material:1.6.8")
     val composeVersion = "1.6.7"
 
     implementation("androidx.activity:activity-compose:1.9.0")

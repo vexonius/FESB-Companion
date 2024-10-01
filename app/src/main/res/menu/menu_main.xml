@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/chooseSchedule"
-        android:icon="@drawable/calendar_lines_pen_svgrepo_com"
+        android:icon="@drawable/timetable_date_select_icon"
         android:title="@string/change_week"
         app:showAsAction="always"
         android:visible="false"/>
