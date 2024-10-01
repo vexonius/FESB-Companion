@@ -18,16 +18,16 @@ class AttendanceRepository(
 ) : AttendanceRepositoryInterface {
 
     override suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceParseResult {
-        when (val list = attendanceService.fetchAttendance()) {
+        when (val list = attendanceService.fetchAllAttendance()) {
             is NetworkServiceResult.AttendanceFetchResult.Success -> {
                 val attendanceList = mutableListOf<List<AttendanceEntry>>()
 
                 val coroutines = parseAttendance.parseAttendList(list.data)
                     .map {
                         CoroutineScope(Dispatchers.IO).launch {
-                            when (val kolegijData = attendanceService.fetchClassAttendance(it.first.attr("href"))) {
+                            when (val classData = attendanceService.fetchAttendance(it.first.attr("href"))) {
                                 is NetworkServiceResult.AttendanceFetchResult.Success -> {
-                                    attendanceList.add(parseAttendance.parseAttendance(it.first, kolegijData.data, it.second))
+                                    attendanceList.add(parseAttendance.parseAttendance(it.first, classData.data, it.second))
                                 }
 
                                 is NetworkServiceResult.AttendanceFetchResult.Failure -> {

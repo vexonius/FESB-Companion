@@ -19,7 +19,11 @@ internal class FESBLoginInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val request: Request = chain.request()
 
+        cookieJar.clear()
         if (!cookieJar.isFESBTokenValid() && request.url.host.contains("fesb.unist.hr")) {
+            /**
+             * Running this as blocking as we're sure that this method will be run inside coroutine
+             */
             runBlocking { refreshSession() }
         }
 

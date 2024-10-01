@@ -6,8 +6,8 @@ import org.jsoup.nodes.Element
 
 interface AttendanceServiceInterface {
 
-     suspend fun fetchAttendance(): NetworkServiceResult.AttendanceFetchResult
+     suspend fun fetchAllAttendance(): NetworkServiceResult.AttendanceFetchResult
 
-     suspend fun fetchClassAttendance(id: String): NetworkServiceResult.AttendanceFetchResult
+     suspend fun fetchAttendance(classId: String): NetworkServiceResult.AttendanceFetchResult
 
 }

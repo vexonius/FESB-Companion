@@ -8,7 +8,7 @@ class AttendanceService(
     private val client: OkHttpClient,
 ) : AttendanceServiceInterface {
 
-    override suspend fun fetchAttendance(): NetworkServiceResult.AttendanceFetchResult {
+    override suspend fun fetchAllAttendance(): NetworkServiceResult.AttendanceFetchResult {
         val request: Request = Request.Builder()
             .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
             .get()
@@ -22,9 +22,9 @@ class AttendanceService(
         }
     }
 
-    override suspend fun fetchClassAttendance(id: String): NetworkServiceResult.AttendanceFetchResult {
+    override suspend fun fetchAttendance(classId: String): NetworkServiceResult.AttendanceFetchResult {
         val request: Request = Request.Builder()
-            .url("https://raspored.fesb.unist.hr${id}")
+            .url("https://raspored.fesb.unist.hr${classId}")
             .get()
             .build()
         val response = client.newCall(request).execute()
