@@ -4,10 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
-import com.franmontiel.persistentcookiejar.PersistentCookieJar
-import com.franmontiel.persistentcookiejar.cache.CookieCache
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
-import com.franmontiel.persistentcookiejar.persistence.CookiePersistor
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
@@ -15,10 +12,9 @@ import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDao
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepository
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
-import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceService
+import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
-import com.tstudioz.fax.fme.networking.clients.FESBPortalClient
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
 import com.tstudioz.fax.fme.networking.session.SessionDelegate

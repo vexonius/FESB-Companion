@@ -9,7 +9,6 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
-
 internal class FESBLoginInterceptor(
     private val cookieJar: MonsterCookieJar,
     private val userService: UserServiceInterface,
