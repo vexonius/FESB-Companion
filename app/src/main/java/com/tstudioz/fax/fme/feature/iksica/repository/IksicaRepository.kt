@@ -7,11 +7,11 @@ import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDaoInterface
+import com.tstudioz.fax.fme.feature.iksica.parseDetaljeRacuna
+import com.tstudioz.fax.fme.feature.iksica.parseRacuni
+import com.tstudioz.fax.fme.feature.iksica.parseStudentInfo
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.models.util.parseDetaljeRacuna
-import com.tstudioz.fax.fme.models.util.parseRacuni
-import com.tstudioz.fax.fme.models.util.parseStudentInfo
 
 
 class IksicaRepository(
