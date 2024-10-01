@@ -7,7 +7,13 @@
     android:background="@color/welcome2"
     tools:context="com.tstudioz.fax.fme.feature.menza.view.MenzaActivity">
 
-    <TextView
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </androidx.compose.ui.platform.ComposeView>
+
+   <!-- <TextView
         android:id="@+id/menza_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -69,6 +75,6 @@
         android:layout_centerInParent="true"
         android:visibility="visible"
         android:indeterminateTint="@color/white"
-        android:indeterminateTintMode="src_in"/>
+        android:indeterminateTintMode="src_in"/>-->
 
 </RelativeLayout>

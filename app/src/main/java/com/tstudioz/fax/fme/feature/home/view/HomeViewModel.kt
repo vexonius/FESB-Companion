@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.feature.home.view
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -28,6 +29,7 @@ class HomeViewModel(
     private val weatherRepository: WeatherRepositoryInterface
 ) : AndroidViewModel(application) {
 
+    val snackbarHostState: SnackbarHostState = SnackbarHostState()
     private var _forecastGot = MutableLiveData<Boolean>()
     private val _weatherDisplay = MutableLiveData<WeatherDisplay>()
     private val _notes = MutableLiveData<List<Note>>()

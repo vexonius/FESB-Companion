@@ -4,12 +4,14 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.databinding.ActivityMenzaBinding
+import com.tstudioz.fax.fme.feature.menza.MenzaCompose
 import com.tstudioz.fax.fme.random.NetworkUtils
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
@@ -30,7 +32,8 @@ class MenzaActivity : AppCompatActivity() {
         setContentView(binding?.root)
         setTextTypeface()
         checkConditionsAndFetch()
-        handleBackPress()
+        handleBackPress()/*
+        setContent { MenzaCompose(menzaViewModel.menza) }*/
     }
 
     private fun handleBackPress() {
@@ -47,26 +50,26 @@ class MenzaActivity : AppCompatActivity() {
         } else {
             menzaViewModel.readMenza()
             showSnac("Niste povezani (Prikazuje se stari meni)")
-            binding?.menzaProgress?.visibility = View.VISIBLE
+            //binding?.menzaProgress?.visibility = View.VISIBLE
         }
         menzaViewModel.menzaGot.observe(this) { menzaGot ->
             if (menzaGot) {
-                binding?.menzaProgress?.visibility = View.INVISIBLE
+                //binding?.menzaProgress?.visibility = View.INVISIBLE
                 showMenies()
             } else {
-                binding?.menzaProgress?.visibility = View.VISIBLE
+                //binding?.menzaProgress?.visibility = View.VISIBLE
             }
         }
         menzaViewModel.menzaError.observe(this) { menzaError ->
             if (menzaError) {
-                binding?.menzaProgress?.visibility = View.INVISIBLE
+                //binding?.menzaProgress?.visibility = View.INVISIBLE
                 showSnac("Greška prilikom dohvaćanja menija")
             }
         }
     }
 
     private fun showMenies() {
-        val results = menzaViewModel.menza.value
+        /*val results = menzaViewModel.menza.value
         if ((results?.isEmpty()) != null) {
             val adapter = MeniesAdapter(results)
             binding?.menzaRecyclerview?.layoutManager = LinearLayoutManager(this)
@@ -75,13 +78,13 @@ class MenzaActivity : AppCompatActivity() {
         } else {
             binding?.menzaRecyclerview?.visibility = View.INVISIBLE
             binding?.cookieHeaderRoot?.visibility = View.VISIBLE
-        }
+        }*/
     }
 
     private fun setTextTypeface() {
-        binding?.menzaTitle?.typeface = Typeface.createFromAsset(assets, "fonts/OpenSans-Bold.ttf")
+        /*binding?.menzaTitle?.typeface = Typeface.createFromAsset(assets, "fonts/OpenSans-Bold.ttf")
         binding?.cookieHeaderText?.typeface = Typeface.createFromAsset(assets, "fonts/OpenSans-Regular.ttf")
-    }
+    */}
 
     private fun showSnac(text: String) {
         snack = Snackbar.make(findViewById(R.id.menza_root), text, Snackbar.LENGTH_INDEFINITE)

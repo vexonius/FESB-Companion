@@ -10,7 +10,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.databinding.TabHomeBinding
+import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.activities.MainActivity
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
@@ -26,6 +28,7 @@ class HomeFragment : Fragment() {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by activityViewModel()
     private val homeViewModel: HomeViewModel by viewModel()
+    private val menzaViewModel: MenzaViewModel by inject()
     private val networkUtils: NetworkUtils by inject()
 
     private var binding: TabHomeBinding? = null
@@ -42,16 +45,20 @@ class HomeFragment : Fragment() {
 
         setHasOptionsMenu(true)
         fetchForcast()
+        menzaViewModel.getMenza("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
 
         binding?.composeView?.setContent {
-            HomeTabCompose(
-                weather = homeViewModel.weatherDisplay,
-                notes = homeViewModel.notes,
-                events = mainViewModel.lessonsPerm,
-                lastFetched = mainViewModel.lastFetched,
-                insertNote = homeViewModel::insert,
-                deleteNote = homeViewModel::delete
-            )
+            AppTheme{
+                HomeTabCompose(
+                    weather = homeViewModel.weatherDisplay,
+                    notes = homeViewModel.notes,
+                    events = mainViewModel.lessonsPerm,
+                    lastFetched = mainViewModel.lastFetched,
+                    insertNote = homeViewModel::insert,
+                    deleteNote = homeViewModel::delete,
+                    menza = menzaViewModel.menza,
+                )
+            }
         }
         return binding?.root
     }

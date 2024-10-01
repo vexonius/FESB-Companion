@@ -28,7 +28,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -66,9 +68,11 @@ import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.database.models.Meni
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.database.models.TimetableType
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
+import com.tstudioz.fax.fme.feature.menza.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.view.MenzaActivity
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -138,12 +142,15 @@ fun HomeTabComposePreview() {
             )
         ),
         insertNote = { },
-        deleteNote = { }
+        deleteNote = { },
+        menza = MutableLiveData(
+            listOf(Meni()))
     )
 }
 
 val sidePadding = 20.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTabCompose(
     weather: LiveData<WeatherDisplay>,
@@ -151,44 +158,54 @@ fun HomeTabCompose(
     lastFetched: LiveData<String>,
     events: LiveData<List<Event>>,
     insertNote: (note: Note) -> Unit,
-    deleteNote: (note: Note) -> Unit
+    deleteNote: (note: Note) -> Unit,
+    menza: LiveData<List<Meni>>,
 ) {
+    val menzaShow = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
     AppTheme {
-        Scaffold(Modifier.background(colorResource(id = R.color.dark_cyan))) { paddingValues ->
-            LazyColumn(
-                Modifier
-                    .padding(paddingValues)
-                    .wrapContentHeight()
-            ) {
-                item {
-                    WeatherCompose(
-                        weather.observeAsState().value ?: WeatherDisplay(
-                            location = "Split",
-                            temperature = 20.0,
-                            humidity = 0.00,
-                            wind = 0.00,
-                            precipChance = 0.0,
-                            icon = "_1d",
-                            summary = "Clear sky"
+        BottomSheetScaffold(
+            sheetPeekHeight = 0.dp,
+            sheetContent = {
+                if (menzaShow.value) {
+                    MenzaCompose(menza, menzaShow)
+                }
+            }) { paddingValues ->
+            Box{
+                LazyColumn(
+                    Modifier
+                        .padding(paddingValues)
+                        .wrapContentHeight()
+                ) {
+                    item {
+                        WeatherCompose(
+                            weather.observeAsState().value ?: WeatherDisplay(
+                                location = "Split",
+                                temperature = 20.0,
+                                humidity = 0.00,
+                                wind = 0.00,
+                                precipChance = 0.0,
+                                icon = "_1d",
+                                summary = "Clear sky"
+                            )
                         )
-                    )
+                    }
+                    item {
+                        NotesCompose(
+                            notes = notes.observeAsState().value ?: emptyList(),
+                            onClick = { openDialog.value = !openDialog.value },
+                            insertNote, deleteNote
+                        )
+                    }
+                    item {
+                        TodayTimetableCompose(
+                            lastFetched.observeAsState().value ?: "",
+                            events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
+                                ?: emptyList()
+                        )
+                    }
+                    item { CardsCompose(menzaShow) }
                 }
-                item {
-                    NotesCompose(
-                        notes = notes.observeAsState().value ?: emptyList(),
-                        onClick = { openDialog.value = !openDialog.value },
-                        insertNote, deleteNote
-                    )
-                }
-                item {
-                    TodayTimetableCompose(
-                        lastFetched.observeAsState().value ?: "",
-                        events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
-                            ?: emptyList()
-                    )
-                }
-                item { CardsCompose() }
             }
         }
     }
@@ -562,7 +579,7 @@ fun TimetableItem(event: Event) {
 }
 
 @Composable
-fun CardsCompose() {
+fun CardsCompose(menzaShow: MutableState<Boolean>) {
     Column(Modifier.padding(horizontal = sidePadding)) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -579,7 +596,7 @@ fun CardsCompose() {
             colorResource(id = R.color.welcome2),
             colorResource(id = R.color.welcome2),
             onClick = {
-                context.startActivity(Intent(context, MenzaActivity::class.java))
+                menzaShow.value = true
             })
         CardCompose(
             stringResource(id = R.string.ugovori_title),
