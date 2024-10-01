@@ -20,6 +20,14 @@
     <string name="noNotes">Trenutno nema bilješki</string>
     <string name="attendance">Prisutnost</string>
 
+    //tabs
+    <string name="tab_iksica">Iksica</string>
+    <string name="tab_attendance">Prisutnost</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_timetable">Raspored</string>
+    <string name="tab_studomat">Studomat</string>
+
+
     /* Shortcuts */
     <string name="unavailabe">Nedostupna radnja</string>
     <string name="check_timetable">Provjeri svoj raspored</string>
@@ -39,6 +47,7 @@
     <string name="home">Home</string>
     <string name="studomat">Studomat</string>
     <string name="change_week">Promjena tjedna</string>
+    <string name="iksica">Iksica</string>
 
     <string name="default_group">Jedna grupa</string>
     <string name="timetable_for">Raspored za</string>

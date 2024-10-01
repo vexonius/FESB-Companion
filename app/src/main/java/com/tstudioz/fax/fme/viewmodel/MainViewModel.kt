@@ -11,6 +11,7 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.feature.timetable.view.MonthData
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
+import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.models.data.User
@@ -29,10 +30,8 @@ import java.time.format.DateTimeFormatter
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 class MainViewModel(
-    private val userRepository: UserRepositoryInterface,
     private val timeTableRepository: TimeTableRepositoryInterface,
-    private val dbManager: DatabaseManagerInterface,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
 ) : ViewModel() {
 
     private val _showEvent = MutableLiveData<Boolean>(false)

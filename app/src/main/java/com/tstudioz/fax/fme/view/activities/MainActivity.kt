@@ -28,6 +28,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatFragment
 import com.tstudioz.fax.fme.models.data.User
@@ -35,7 +36,7 @@ import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.view.fragments.HomeFragment
-import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
+import com.tstudioz.fax.fme.feature.iksica.IksicaFragment
 import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity() {
     private var client: OkHttpClient? = null
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
+    private val iksicaFragment = IksicaFragment()
     private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
     private val attendanceFragment = AttendanceFragment()
@@ -142,29 +144,36 @@ class MainActivity : AppCompatActivity() {
 
         bar?.addTab(
             bar.createTab(
+                AppCompatResources.getDrawable(this, R.drawable.iksica),
+                getString(R.string.tab_iksica),
+                R.id.tab_iksica
+            )
+        )
+        bar?.addTab(
+            bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.attend),
-                "Prisutnost",
+                getString(R.string.tab_attendance),
                 R.id.tab_prisutnost
             )
         )
         bar?.addTab(
             bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.command_line),
-                "Home",
+                getString(R.string.tab_home),
                 R.id.tab_home
             )
         )
         bar?.addTab(
             bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.cal),
-                "Raspored",
+                getString(R.string.tab_timetable),
                 R.id.tab_raspored
             )
         )
         bar?.addTab(
             bar.createTab(
                 AppCompatResources.getDrawable(this, R.drawable.studomat_icon),
-                "Studomat",
+                getString(R.string.tab_studomat),
                 R.id.tab_studomat
             )
         )
@@ -189,6 +198,11 @@ class MainActivity : AppCompatActivity() {
         val ft = supportFragmentManager.beginTransaction()
         ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
         when (pos) {
+            R.id.tab_iksica -> {
+                supportActionBar?.title = "Iksica"
+                ft.replace(R.id.frame, iksicaFragment)
+            }
+
             R.id.tab_prisutnost -> {
                 supportActionBar?.title = "Prisutnost"
                 ft.replace(R.id.frame, attendanceFragment)

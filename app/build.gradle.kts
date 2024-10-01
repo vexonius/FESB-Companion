@@ -113,7 +113,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation("androidx.compose.material3:material3-android:1.2.1")
-
+    implementation("androidx.compose.material:material:1.6.8")
     val composeVersion = "1.6.7"
 
     implementation("androidx.activity:activity-compose:1.9.0")

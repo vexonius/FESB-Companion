@@ -13,15 +13,15 @@ import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDao
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepository
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
+import com.tstudioz.fax.fme.feature.attendance.services.AttendanceService
 import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
 import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
 import com.tstudioz.fax.fme.feature.timetable.repository.TimeTableRepository
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.feature.timetable.services.TimetableService
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.interfaces.WeatherNetworkInterface
-import com.tstudioz.fax.fme.feature.attendance.services.AttendanceService
-import com.tstudioz.fax.fme.feature.timetable.services.TimetableService
 import com.tstudioz.fax.fme.models.services.WeatherNetworkService
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import com.tstudioz.fax.fme.random.NetworkUtils
@@ -50,7 +50,7 @@ val module = module {
     single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
-    viewModel { MainViewModel(get(), get(), get(), get()) }
+    viewModel { MainViewModel(get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get()) }
     viewModel { AttendanceViewModel(get(), get()) }
 }
