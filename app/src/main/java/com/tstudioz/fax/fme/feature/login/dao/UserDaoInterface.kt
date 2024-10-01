@@ -6,4 +6,6 @@ interface UserDaoInterface {
 
     suspend fun insert(user: UserRealm)
 
+    suspend fun getUser(): UserRealm
+
 }

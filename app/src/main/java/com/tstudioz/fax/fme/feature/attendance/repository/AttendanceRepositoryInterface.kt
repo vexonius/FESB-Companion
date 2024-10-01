@@ -7,7 +7,9 @@ import com.tstudioz.fax.fme.common.user.models.User
 interface AttendanceRepositoryInterface {
 
     suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceParseResult
+
     suspend fun insertAttendance(attendance: List<AttendanceEntry>)
+
     suspend fun readAttendance(): List<List<AttendanceEntry>>
 
 }

@@ -1,46 +1,14 @@
 package com.tstudioz.fax.fme.feature.attendance.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.common.user.models.User
-import okhttp3.FormBody
-import okhttp3.FormBody.Builder
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.jsoup.nodes.Element
 
-class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInterface {
+class AttendanceService(
+    private val client: OkHttpClient,
+) : AttendanceServiceInterface {
 
-    override suspend fun loginAttendance(user: User): NetworkServiceResult.AttendanceFetchResult {
-
-        val url :HttpUrl = HttpUrl.Builder()
-            .scheme("https")
-            .host("korisnik.fesb.unist.hr")
-            .build()
-
-        if (!client.cookieJar.loadForRequest(url).any{it.name == "Fesb.AuthCookie"}) {
-            val formData: FormBody = Builder()
-                .add("Username", user.username)
-                .add("Password", user.password)
-                .add("IsRememberMeChecked", "true")
-                .build()
-            val rq: Request = Request.Builder()
-                .url("https://korisnik.fesb.unist.hr/prijava?returnUrl=https://raspored.fesb.unist.hr")
-                .post(formData)
-                .build()
-
-            val response = client.newCall(rq).execute()
-
-            return if (response.isSuccessful) {
-                NetworkServiceResult.AttendanceFetchResult.Success("Successfully logged in")
-            } else {
-                NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to login"))
-            }
-        }
-        return NetworkServiceResult.AttendanceFetchResult.Success("Already logged in")
-    }
-
-    override suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceFetchResult {
+    override suspend fun fetchAttendance(): NetworkServiceResult.AttendanceFetchResult {
         val request: Request = Request.Builder()
             .url("https://raspored.fesb.unist.hr/part/prisutnost/opcenito/tablica")
             .get()
@@ -52,18 +20,17 @@ class AttendanceService(private val client: OkHttpClient) : AttendanceServiceInt
         } else {
             NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance"))
         }
-
     }
 
-    override suspend fun getDetailedPrisutnost(element: Element): NetworkServiceResult.AttendanceFetchResult {
+    override suspend fun fetchClassAttendance(id: String): NetworkServiceResult.AttendanceFetchResult {
         val request: Request = Request.Builder()
-            .url("https://raspored.fesb.unist.hr${element.attr("href")}")
+            .url("https://raspored.fesb.unist.hr${id}")
             .get()
             .build()
         val response = client.newCall(request).execute()
-        if (response.isSuccessful) {
-            return NetworkServiceResult.AttendanceFetchResult.Success(response.body?.string() ?: "")
-        }
-        return NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance details"))
+
+        if (!response.isSuccessful) { return NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance details")) }
+
+        return NetworkServiceResult.AttendanceFetchResult.Success(response.body?.string() ?: "")
     }
 }

@@ -6,7 +6,6 @@ import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.common.user.models.User
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
@@ -19,32 +18,23 @@ class AttendanceRepository(
 ) : AttendanceRepositoryInterface {
 
     override suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceParseResult {
-        when (val result = attendanceService.loginAttendance(user)) {
-            is NetworkServiceResult.AttendanceFetchResult.Success -> {}
-
-            is NetworkServiceResult.AttendanceFetchResult.Failure -> {
-                return NetworkServiceResult.AttendanceParseResult.Failure(Throwable("Error while logging in"))
-            }
-        }
-
-        when (val list = attendanceService.fetchAttendance(user)) {
+        when (val list = attendanceService.fetchAttendance()) {
             is NetworkServiceResult.AttendanceFetchResult.Success -> {
                 val attendanceList = mutableListOf<List<AttendanceEntry>>()
-                val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-                    println("Caught exception $throwable in CoroutineExceptionHandler")
-                }
-                val coroutines = parseAttendance.parseAttendList(list.data as String).map {
-                    CoroutineScope(Dispatchers.IO).launch(exceptionHandler) {
-                        when (val kolegijData = attendanceService.getDetailedPrisutnost(it.first)) {
-                            is NetworkServiceResult.AttendanceFetchResult.Success -> {
-                                attendanceList.add(parseAttendance.parseAttendance(it.first, kolegijData.data as String, it.second))
-                            }
 
-                            is NetworkServiceResult.AttendanceFetchResult.Failure -> {
-                                throw Exception("Error while fetching attendance data")
+                val coroutines = parseAttendance.parseAttendList(list.data)
+                    .map {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            when (val kolegijData = attendanceService.fetchClassAttendance(it.first.attr("href"))) {
+                                is NetworkServiceResult.AttendanceFetchResult.Success -> {
+                                    attendanceList.add(parseAttendance.parseAttendance(it.first, kolegijData.data, it.second))
+                                }
+
+                                is NetworkServiceResult.AttendanceFetchResult.Failure -> {
+                                    throw Exception("Error while fetching attendance data")
+                                }
                             }
                         }
-                    }
                 }
                 coroutines.joinAll()
 
@@ -55,7 +45,9 @@ class AttendanceRepository(
                 } else {
                     insertAttendance(attendanceList.flatten())
                     NetworkServiceResult.AttendanceParseResult.Success(
-                        attendanceList.sortedBy { it.first().predmet }.sortedBy { it.first().semestar }
+                        attendanceList
+                            .sortedBy { it.first().predmet }
+                            .sortedBy { it.first().semestar }
                     )
                 }
             }

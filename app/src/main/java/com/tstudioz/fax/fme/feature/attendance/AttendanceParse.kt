@@ -34,7 +34,6 @@ class ParseAttendance{
         return attendanceForOneKolegij
     }
 
-
     fun parseAttendList(body: String): List<Pair<Element, Int>> {
         val doc = body.let { Jsoup.parse(it) }
         val attendanceUrls: MutableList<Pair<Element, Int>> = mutableListOf()
