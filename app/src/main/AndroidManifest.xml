@@ -11,9 +11,8 @@
     <application
         android:name=".Application.FESBCompanion"
         android:allowBackup="true"
-        android:icon="@drawable/icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="FESB Companion"
-        android:roundIcon="@drawable/icon"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
