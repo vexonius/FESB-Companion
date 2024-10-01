@@ -6,9 +6,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.view.fragments.SettingsFragment
 
-/**
- * Created by etino7 on 12/01/2018.
- */
+
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

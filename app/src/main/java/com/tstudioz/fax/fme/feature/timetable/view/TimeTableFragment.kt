@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.databinding.TimetableTabBinding
+import com.tstudioz.fax.fme.databinding.TabTimetableBinding
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -18,19 +18,19 @@ class TimeTableFragment : Fragment() {
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by activityViewModel()
-    private var binding: TimetableTabBinding? = null
+    private var binding: TabTimetableBinding? = null
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = TimetableTabBinding.inflate(inflater, container, false)
-        val composeView = binding?.composeView!!
+        binding = TabTimetableBinding.inflate(inflater, container, false)
+        val composeView = binding?.composeView
 
         mainViewModel.showThisWeeksEvents()
 
-        composeView.setContent {
+        composeView?.setContent {
             AppTheme {
                 TimetableCompose(
                     showDay = mainViewModel.showDay,

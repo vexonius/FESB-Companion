@@ -19,6 +19,7 @@
     <string name="todaysEvents">DANAŠNJA PREDAVANJA</string>
     <string name="noNotes">Trenutno nema bilješki</string>
     <string name="attendance">Prisutnost</string>
+    <string name="prehrana">PREHRANA</string>
 
     //tabs
     <string name="tab_iksica">Iksica</string>
@@ -60,6 +61,23 @@
     <string name="login_password">Lozinka</string>
     <string name="login_action_submit">Prijava</string>
 
+    <string name="weather_icon_desc">Ikona vremena</string>
+
+    <string name="notes">PODSJETNICI</string>
+
+    <string name="enter_note">Unesi podsjetnik</string>
+    <string name="add_note">Dodaj podsjetnik</string>
+    <string name="save_note">Spremi</string>
+    <string name="cancel_note">Odustani</string>
+
+    <string name="delete_note_desc">Izbriši</string>
+    <string name="checkmark_note_desc">Označi/odznači</string>
+
+    <string name="ugovori_title">Studentski Ugovori</string>
+    <string name="ugovori_desc">Pregledaj svoje ugovore</string>
+    <string name="menza_title">Menza</string>
+    <string name="menza_desc">Pregledaj dnevni jelovnik</string>
+
     // Compose Strings
 
     <string name="lastMonth">Prošli</string>
@@ -91,4 +109,8 @@
     <string name="exam_date">Datum ispitnog roka:</string>
 
 
+    <string name="weatherTemp">%1$.0f°</string>
+    <string name="weatherHumidity">%1$.1f%%</string>
+    <string name="weatherPrecipChance">%1$.1f mm</string>
+    <string name="weatherWind">%1$.1f km/h</string>
 </resources>

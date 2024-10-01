@@ -3,6 +3,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("io.realm.kotlin") version "1.16.0"
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 android {
@@ -131,6 +132,9 @@ dependencies {
 
     //choose calendar
     implementation("com.kizitonwose.calendar:compose:2.5.0")
+
+    //weather deserialise
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 }
 
 configurations.all {

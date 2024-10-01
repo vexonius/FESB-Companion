@@ -3,8 +3,6 @@ package com.tstudioz.fax.fme.view.activities
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Typeface
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,13 +10,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.webkit.WebView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -29,15 +24,15 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.Korisnik
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
+import com.tstudioz.fax.fme.feature.home.view.HomeFragment
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
+import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatFragment
-import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.database.models.User
 import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.models.util.SPKey
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.view.fragments.HomeFragment
 import com.tstudioz.fax.fme.feature.iksica.IksicaFragment
-import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.exceptions.RealmException
@@ -46,7 +41,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
-import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
@@ -60,7 +54,6 @@ class MainActivity : AppCompatActivity() {
     private val networkUtils: NetworkUtils by inject()
 
     private var realmLog: Realm? = null
-    private var client: OkHttpClient? = null
     private var snack: Snackbar? = null
     private var bottomSheet: BottomSheetDialog? = null
     private val iksicaFragment = IksicaFragment()
@@ -82,11 +75,8 @@ class MainActivity : AppCompatActivity() {
         setFragmentTabListener()
         testBottomBar()
         checkUser()
-
         isThereAction()
-
         checkVersion()
-        shouldShowGDPRDialog()
     }
 
     private fun isThereAction() {
@@ -296,19 +286,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun showShortcutView() {
         var shortPosition = 0
-
-        if (intent.action == "podsjetnik") {
-            val newIntent = Intent(this@MainActivity, NoteActivity::class.java)
-            newIntent.putExtra("mode", 2)
-            newIntent.putExtra("note_key", "")
-            startActivity(newIntent)
-        } else {
-            when (intent.action) {
-                "raspored" -> shortPosition = 1
-                "prisutnost" -> shortPosition = 2
-            }
-            beginFragTransaction(shortPosition)
+        when (intent.action) {
+            "raspored" -> shortPosition = 1
+            "prisutnost" -> shortPosition = 2
         }
+        beginFragTransaction(shortPosition)
     }
 
     private fun checkVersion() {
@@ -335,64 +317,5 @@ class MainActivity : AppCompatActivity() {
         bottomSheet?.setContentView(view)
         bottomSheet?.setCanceledOnTouchOutside(true)
         bottomSheet?.show()
-    }
-
-    private fun shouldShowGDPRDialog() {
-        val bool = shPref.getBoolean("GDPR_agreed", false)
-        if (bool == false) {
-            showGDPRCompliance()
-            editor = shPref.edit()
-            editor?.putBoolean("GDPR_agreed", true)
-            editor?.commit()
-        }
-    }
-
-    private fun showGDPRCompliance() {
-        val view = LayoutInflater.from(this).inflate(R.layout.gdpr_layout, null) as ConstraintLayout
-        val heading = view.findViewById<View>(R.id.terms_heading) as TextView
-        val desc = view.findViewById<View>(R.id.terms_text) as TextView
-        val typeBold = Typeface.createFromAsset(assets, "fonts/OpenSans-Bold.ttf")
-        val typeRegular = Typeface.createFromAsset(assets, "fonts/OpenSans-Regular.ttf")
-        val more = view.findViewById<View>(R.id.button_more) as TextView
-        val ok = view.findViewById<View>(R.id.button_ok) as TextView
-
-        heading.typeface = typeBold
-        desc.typeface = typeRegular
-        more.typeface = typeBold
-        ok.typeface = typeBold
-
-        more.setOnClickListener { view ->
-            try {
-                val builder = CustomTabsIntent.Builder()
-                val customTabsIntent =
-                    builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
-                        .build()
-                customTabsIntent.launchUrl(
-                    view.context, Uri.parse(
-                        "http://tstud.io/privacy"
-                    )
-                )
-            } catch (ex: Exception) {
-                Toast.makeText(
-                    view.context,
-                    "Ažurirajte Chrome preglednik za pregled web stranice",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
-        ok.setOnClickListener { bottomSheet?.dismiss() }
-        bottomSheet = BottomSheetDialog(this)
-        bottomSheet?.setCancelable(false)
-        bottomSheet?.setContentView(view)
-        bottomSheet?.setCanceledOnTouchOutside(false)
-        bottomSheet?.show()
-    }
-
-    public override fun onStop() {
-        super.onStop()
-        if (client != null) {
-            client?.dispatcher?.cancelAll()
-        }
     }
 }

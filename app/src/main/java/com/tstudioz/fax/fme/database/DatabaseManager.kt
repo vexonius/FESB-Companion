@@ -14,7 +14,7 @@ class DatabaseManager: DatabaseManagerInterface {
         return RealmConfiguration.Builder(
             setOf(
                 Korisnik::class,
-                Note::class,
+                NoteRealm::class,
                 AttendanceEntry::class,
                 Meni::class,
                 EventRealm::class,

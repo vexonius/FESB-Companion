@@ -43,13 +43,6 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".view.activities.NoteActivity"
-            android:label=""
-            android:parentActivityName=".view.activities.MainActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/AppTheme" />
-        <activity
             android:name=".view.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
@@ -63,7 +56,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/SettingsTheme" />
         <activity
-            android:name=".view.activities.MenzaActivity"
+            android:name=".feature.menza.view.MenzaActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Simple" />
     </application>

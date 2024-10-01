@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.models
 
 import com.tstudioz.fax.fme.database.models.AttendanceEntry
-import com.tstudioz.fax.fme.models.data.User
+import com.tstudioz.fax.fme.database.models.User
 
 sealed class NetworkServiceResult {
 
@@ -43,6 +43,11 @@ sealed class NetworkServiceResult {
     sealed class StudomatResult : NetworkServiceResult() {
         data class Success(val data: String) : StudomatResult(){}
         class Failure(val throwable: Throwable) : StudomatResult()
+    }
+
+    sealed class MenzaResult: NetworkServiceResult()  {
+        data class Success(val data: String): MenzaResult()
+        class Failure(exception: Throwable) : MenzaResult()
     }
 
 }

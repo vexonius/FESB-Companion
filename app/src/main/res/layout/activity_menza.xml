@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/welcome2"
-    tools:context="com.tstudioz.fax.fme.view.activities.MenzaActivity"
-    android:paddingBottom="48dp">
+    tools:context="com.tstudioz.fax.fme.feature.menza.view.MenzaActivity">
 
     <TextView
         android:id="@+id/menza_title"
