@@ -7,10 +7,11 @@ import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRep
 import com.tstudioz.fax.fme.feature.timetable.services.TimetableService
 import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
 import kotlinx.coroutines.InternalCoroutinesApi
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val timetableModule = module {
-    single<TimetableServiceInterface> { TimetableService(get()) }
+    single<TimetableServiceInterface> { TimetableService(get(named("FESBPortalClient"))) }
     single<TimeTableDaoInterface> { TimeTableDao(get()) }
     single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
 }

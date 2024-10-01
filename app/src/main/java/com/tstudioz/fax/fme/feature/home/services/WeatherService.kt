@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.home.services
 
-import com.tstudioz.fax.fme.feature.home.view.HomeFragment
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import okhttp3.OkHttpClient
 import okhttp3.Request

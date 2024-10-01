@@ -13,7 +13,7 @@ class DatabaseManager: DatabaseManagerInterface {
     override fun getDefaultConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder(
             setOf(
-                Korisnik::class,
+                UserRealm::class,
                 NoteRealm::class,
                 AttendanceEntry::class,
                 Meni::class,

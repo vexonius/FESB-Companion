@@ -11,10 +11,10 @@ import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.feature.timetable.view.MonthData
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.database.models.User
-import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
-import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
-import com.tstudioz.fax.fme.models.util.SPKey
+import com.tstudioz.fax.fme.common.user.models.User
+import com.tstudioz.fax.fme.util.PreferenceHelper.get
+import com.tstudioz.fax.fme.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.util.SPKey
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.models.util
+package com.tstudioz.fax.fme.util
 
 enum class SPKey {
 

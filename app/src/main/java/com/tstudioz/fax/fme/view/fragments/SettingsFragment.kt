@@ -25,8 +25,8 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.feature.login.view.LoginViewModel
-import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
-import com.tstudioz.fax.fme.models.util.SPKey
+import com.tstudioz.fax.fme.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.util.SPKey
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject

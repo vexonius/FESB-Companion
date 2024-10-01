@@ -6,11 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.feature.login.repository.UserRepositoryInterface
-import com.tstudioz.fax.fme.feature.login.repository.models.UserRepositoryResult
-import com.tstudioz.fax.fme.models.util.PreferenceHelper.get
-import com.tstudioz.fax.fme.models.util.PreferenceHelper.set
-import com.tstudioz.fax.fme.models.util.SPKey
+import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
+import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
+import com.tstudioz.fax.fme.util.PreferenceHelper.get
+import com.tstudioz.fax.fme.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.util.SPKey
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
