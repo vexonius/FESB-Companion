@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.compose
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,6 +46,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimetableType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,6 +55,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
 
@@ -139,20 +143,21 @@ private class EventDataModifier(
 private fun Modifier.eventData(positionedEvent: PositionedEvent) =
     this.then(EventDataModifier(positionedEvent))
 
-private val DayFormatter = DateTimeFormatter.ofPattern("E d.M.")
+private val DayFormatter = DateTimeFormatter.ofPattern("d")
 
 @Composable
-fun BasicDayHeader(
-    day: LocalDate,
-    modifier: Modifier = Modifier,
-) {
+fun BasicDayHeader(day: LocalDate) {
+    val title = day.dayOfWeek.getDisplayName(TextStyle.SHORT, java.util.Locale.getDefault())
+        .take(3)
+        .lowercase()
+        .replaceFirstChar { it.uppercase() } + " " + day.format(DayFormatter)
     Text(
-        text = day.format(DayFormatter).replaceFirstChar { day.format(DayFormatter)[0].uppercase() },
+        text =  title,
         textAlign = TextAlign.Center,
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        color = MaterialTheme.colorScheme.onSurface,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
 
@@ -203,7 +208,7 @@ fun BasicSidebarLabel(
         modifier = modifier
             .fillMaxHeight()
             .padding(vertical = 0.dp, horizontal = 8.dp),
-        color = MaterialTheme.colorScheme.onSurface,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 
 }
@@ -463,7 +468,7 @@ fun BasicSchedule(
     val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes / 60
-    val dividerColor = Color.DarkGray
+    val dividerColor = colorResource(R.color.colorPrimary)
     val positionedEvents =
         remember(events) { arrangeEvents(splitEvents(events.sortedBy(Event::start))).filter { it.end > minTime && it.start < maxTime } }
     Layout(
@@ -475,6 +480,7 @@ fun BasicSchedule(
             }
         },
         modifier = modifier
+            .padding(1.dp, 1.dp)
             .drawBehind {
                 val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
                 val firstHourOffsetMinutes =
@@ -483,6 +489,12 @@ fun BasicSchedule(
                         firstHour.plusHours(1)
                     )
                 val firstHourOffset = (firstHourOffsetMinutes / 60f) * hourHeight.toPx()
+                drawLine(
+                    dividerColor,
+                    start = Offset(0f, 0f),
+                    end = Offset(0f, size.height),
+                    strokeWidth = 1.dp.toPx()
+                )
                 repeat(numHours) {
                     drawLine(
                         dividerColor,
