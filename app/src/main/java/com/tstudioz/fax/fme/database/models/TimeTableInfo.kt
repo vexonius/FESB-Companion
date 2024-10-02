@@ -19,7 +19,7 @@ data class TimeTableInfo (
     @SerializedName("Category")
     var category: String = "",
     @SerializedName("ColorCode")
-    var colorCode: Long = 0xFF191C1D,
+    var colorCode: Long = 0x00FFFFFF,
     @SerializedName("IsWorking")
     var isWorking: Boolean = false,
 )

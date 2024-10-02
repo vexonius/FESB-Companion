@@ -88,18 +88,14 @@ fun BasicEvent(
 ) {
     val event = positionedEvent.event
     val topRadius =
-        if (positionedEvent.splitType == SplitType.Start || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
+        if (positionedEvent.splitType == SplitType.Start || positionedEvent.splitType == SplitType.Both) 0.dp else 8.dp
     val bottomRadius =
-        if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
-
+        if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 8.dp
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(
-                end = 2.dp,
-                bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 2.dp
-            )
+            .padding(2.dp)
             .clipToBounds()
             .background(
                 event.color,
@@ -110,37 +106,27 @@ fun BasicEvent(
                     bottomStart = bottomRadius,
                 )
             )
-            .padding(2.dp)
+            .padding(4.dp)
             .clickable { onClick(positionedEvent.event) }
     ) {
         Text(
-            text = event.shortName,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Clip,
-            textAlign = TextAlign.Center,
+            text = event.name,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth(),
         )
 
-        if (event.description != null) {
-            Text(
-                text = event.classroom,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-
         Text(
-            text = "${event.start.format(EventTimeFormatter)} - ${event.end.format(EventTimeFormatter)}",
+            text = event.classroom,
             style = MaterialTheme.typography.bodySmall,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            overflow = TextOverflow.Clip,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
         )
-
     }
 }
 
@@ -197,28 +183,26 @@ fun ScheduleHeader(
 @Preview(showBackground = true)
 @Composable
 fun ScheduleHeaderPreview() {
-
     ScheduleHeader(
         minDate = LocalDate.now(),
         maxDate = LocalDate.now().plusDays(5),
         dayWidth = 256.dp,
     )
-
 }
 
 private val HourFormatter = DateTimeFormatter.ofPattern("H")
 
 @Composable
-
 fun BasicSidebarLabel(
     time: LocalTime,
     modifier: Modifier = Modifier,
 ) {
     Text(
         text = time.format(HourFormatter),
+        textAlign = TextAlign.End,
         modifier = modifier
             .fillMaxHeight()
-            .padding(vertical = 0.dp, horizontal = 4.dp),
+            .padding(vertical = 0.dp, horizontal = 8.dp),
         color = MaterialTheme.colorScheme.onSurface,
     )
 
@@ -228,7 +212,6 @@ fun BasicSidebarLabel(
 @Composable
 fun BasicSidebarLabelPreview() {
     BasicSidebarLabel(time = LocalTime.NOON, Modifier.sizeIn(maxHeight = 64.dp))
-
 }
 
 @Composable
@@ -558,11 +541,10 @@ fun BasicSchedule(
 fun EventPreview(
     @PreviewParameter(EventsProvider::class) event: Event,
 ) {
-
     BasicEvent(
         PositionedEvent(
             event,
-            SplitType.None,
+            SplitType.Start,
             event.start.toLocalDate(),
             event.start.toLocalTime(),
             event.end.toLocalTime()
@@ -642,7 +624,7 @@ private val sampleEvents2 = listOf(
         id = "0",
         name = "Ponedjeljak",
         shortName = "P",
-        color = Color.Blue,
+        color = Color.Red,
         colorId = 2131099687,
         professor = "matko",
         eventType = TimetableType.OTHER,
@@ -656,7 +638,7 @@ private val sampleEvents2 = listOf(
         id = "532059",
         name = "Kriptografija i mrežna sigurnost",
         shortName = "KIMS",
-        color = Color.Blue,
+        color = Color.Yellow,
         colorId = 2131099687,
         professor = "Čagalj Mario",
         eventType = TimetableType.PREDAVANJE,
@@ -670,7 +652,7 @@ private val sampleEvents2 = listOf(
         id = "534198",
         name = "Metode optimizacije",
         shortName = "MO",
-        color = Color.Blue,
+        color = Color.Green,
         colorId = 2131100480,
         professor = "Bašić Martina",
         eventType = TimetableType.LABORATORIJSKA_VJEZBA,

@@ -8,7 +8,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-
 class LocalDateDeserializer : JsonDeserializer<LocalDate> {
     override fun deserialize(
         json: JsonElement?,
@@ -29,14 +28,13 @@ class ColorDeserializer : JsonDeserializer<Long> {
         context: JsonDeserializationContext?
     ): Long {
         return when (json?.asString) {
-            "White" -> 0xFF191C1D
             "Blue" -> 0xff0060ff
             "Yellow" -> 0xffe5c700
             "Orange" -> 0xffff6600
             "Purple" -> 0xffa200ff
             "Red" -> 0xffff0000
             "Green" -> 0xff0b9700
-            else -> 0xFF191C1D
+            else -> 0x00ffffff
         }
     }
 }
