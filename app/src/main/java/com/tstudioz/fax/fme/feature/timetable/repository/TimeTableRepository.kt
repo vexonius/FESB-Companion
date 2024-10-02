@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.timetable.repository
 
-import android.util.Log
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
@@ -18,7 +17,8 @@ class TimeTableRepository(
     override suspend fun fetchTimetable(
         user: String,
         startDate: String,
-        endDate: String
+        endDate: String,
+        shouldCache: Boolean
     ): List<Event> {
         val params: HashMap<String, String> = hashMapOf(
             "DataType" to "User",
@@ -27,10 +27,15 @@ class TimeTableRepository(
             "MaxDate" to endDate
         )
 
-        return when (val result = timetableService.fetchTimeTable(params = params)) {
-            is NetworkServiceResult.TimeTableResult.Success -> parseTimetable(result.data)
+        when (val result = timetableService.fetchTimeTable(params = params)) {
+            is NetworkServiceResult.TimeTableResult.Success -> {
+                val events = parseTimetable(result.data)
+
+                if (shouldCache) { insert(events) }
+
+                return events
+            }
             is NetworkServiceResult.TimeTableResult.Failure -> {
-                Log.e(TAG, "Timetable fetching error")
                 throw Exception("Timetable fetching error")
             }
         }
@@ -45,18 +50,17 @@ class TimeTableRepository(
         return when (val result = timetableService.fetchTimetableCalendar(params = params)) {
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetableInfo(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
-                Log.e(TAG, "TimetableInfo fetching error")
                 throw Exception("TimetableInfo fetching error")
             }
         }
     }
 
-    override suspend fun insert(classes: List<Event>) {
-        timeTableDao.insert(classes)
-    }
-
     override suspend fun getCachedEvents(): List<Event> {
         return timeTableDao.getCachedEvents()
+    }
+
+    private suspend fun insert(classes: List<Event>) {
+        timeTableDao.insert(classes)
     }
 
     companion object {

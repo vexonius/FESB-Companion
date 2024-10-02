@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.common.user
 
 import android.content.SharedPreferences
+import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -28,6 +29,11 @@ class UserRepository(
                 UserRepositoryResult.LoginResult.Failure(Throwable("User Login failed!"))
             }
         }
+    }
+
+    override suspend fun getCurrentUserName(): String {
+        val model = userDao.getUser()
+        return model.username
     }
 
     companion object {

@@ -33,26 +33,15 @@ class TimeTableFragment : Fragment() {
         composeView?.setContent {
             AppTheme {
                 TimetableCompose(
-                    showDay = mainViewModel.showDay,
                     showDayEvent = mainViewModel.showDayEvent,
                     shownWeekChooseMenu = mainViewModel.shownWeekChooseMenu,
                     lessonsToShow = mainViewModel.lessonsToShow,
                     shownWeek = mainViewModel.shownWeek,
                     periods = mainViewModel.periods,
                     monthData = mainViewModel.monthData,
-                    fetchUserTimetable = { startDate, endDate, shownWeek ->
-                        mainViewModel.fetchUserTimetable(
-                            startDate = startDate,
-                            endDate = endDate,
-                            shownWeekMonday = shownWeek
-                        )
-                    },
-                    showEvent = { event ->
-                        mainViewModel.showEvent(event)
-                    },
-                    showWeekChooseMenu = { show ->
-                        mainViewModel.showWeekChooseMenu(show)
-                    },
+                    fetchUserTimetable = { selectedDate -> mainViewModel.fetchUserTimetable(selectedDate) },
+                    showEvent = { mainViewModel.showEvent(it) },
+                    showWeekChooseMenu = { mainViewModel.showWeekChooseMenu(it) },
                 ) {
                     mainViewModel.hideEvent()
                 }

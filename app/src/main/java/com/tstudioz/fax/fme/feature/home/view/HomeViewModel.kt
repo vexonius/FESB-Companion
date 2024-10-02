@@ -20,7 +20,6 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-
 @InternalCoroutinesApi
 class HomeViewModel(
     application: Application,

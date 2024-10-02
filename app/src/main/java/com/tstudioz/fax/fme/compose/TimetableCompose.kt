@@ -53,23 +53,24 @@ import java.time.YearMonth
 fun TimetableCompose(mainViewModel: MainViewModel) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val event = mainViewModel.showDayEvent.observeAsState().value
 
     BottomSheetScaffold(
         sheetContent = {
-            if (mainViewModel.showDay.observeAsState(initial = false).value) {
+            event?.let {
                 ModalBottomSheet(
                     sheetState = sheetState,
                     onDismissRequest = { mainViewModel.hideEvent() },
-                    containerColor = mainViewModel.showDayEvent.observeAsState().value?.color ?: Color.Transparent,
+                    containerColor = mainViewModel.showDayEvent.observeAsState().value?.color
+                        ?: Color.Transparent,
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                     shape = RectangleShape
                 ) {
-                    mainViewModel.showDayEvent.observeAsState().value?.let {
-                        BottomInfoCompose(it)
-                    }
+                    BottomInfoCompose(it)
                 }
             }
+
             if (mainViewModel.shownWeekChooseMenu.observeAsState(initial = false).value) {
                 ModalBottomSheet(sheetState = sheetState,
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -141,14 +142,7 @@ fun TimetableCompose(mainViewModel: MainViewModel) {
                             }
                             Button(onClick = {
                                 selection?.let {
-                                    val start = it.date.dayOfWeek.value
-                                    val startDate = it.date.minusDays((start - 1).toLong())
-                                    val endDate = it.date.plusDays(7 - start.toLong())
-                                    mainViewModel.fetchUserTimetable(
-                                        startDate = startDate,
-                                        endDate = endDate,
-                                        shownWeekMonday = startDate
-                                    )
+                                    mainViewModel.fetchUserTimetable(it.date)
                                     coroutineScope.launch {
                                         sheetState.hide()
                                         delay(300)

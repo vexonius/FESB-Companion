@@ -45,25 +45,19 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 
-
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
 
-    private val dbManager: DatabaseManagerInterface by inject()
-    private val shPref: SharedPreferences by inject()
-    private val networkUtils: NetworkUtils by inject()
+    private val mainViewModel: MainViewModel by viewModel()
 
-    private var realmLog: Realm? = null
-    private var snack: Snackbar? = null
-    private var bottomSheet: BottomSheetDialog? = null
     private val iksicaFragment = IksicaFragment()
     private val homeFragment = HomeFragment()
     private val timeTableFragment = TimeTableFragment()
     private val attendanceFragment = AttendanceFragment()
     private val studomatFragment = StudomatFragment()
-    private var editor: SharedPreferences.Editor? = null
+
     private var binding: ActivityMainBinding? = null
-    private val mainViewModel: MainViewModel by viewModel()
+    private var snack: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,53 +66,14 @@ class MainActivity : AppCompatActivity() {
 
         onBack()
         setUpToolbar()
-        setFragmentTabListener()
-        testBottomBar()
-        checkUser()
+        createBottomBar()
+        setTabListener()
+        setDefaultScreen()
         isThereAction()
-        checkVersion()
-    }
-
-    private fun isThereAction() {
-        if (intent.action != null) {
-            showShortcutView()
-        } else {
-            setDefaultScreen()
-        }
-    }
-
-    private fun onBack() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-            }
-        })
     }
 
     private fun setDefaultScreen() {
-        beginFragTransaction(R.id.tab_home)
-    }
-
-    private fun checkUser() {
-        var userRealm: UserRealm? = null
-        realmLog = Realm.open(dbManager.getDefaultConfiguration())
-
-        try {
-            userRealm = realmLog?.query<UserRealm>()?.find()?.first()
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            invalidCreds()
-        } finally {
-            if (userRealm != null) {
-                editor = shPref.edit()
-                editor?.putString("username", userRealm.username)
-                editor?.putString("password", userRealm.password)
-                editor?.commit()
-            } else {
-                invalidCreds()
-            }
-            realmLog?.close()
-        }
+        selectTab(R.id.tab_home)
     }
 
     @SuppressLint("RestrictedApi")
@@ -129,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         actionbar?.elevation = 1.0f
     }
 
-    private fun testBottomBar() {
+    private fun createBottomBar() {
         val bar = binding?.bottomBar
 
         bar?.addTab(
@@ -170,10 +125,10 @@ class MainActivity : AppCompatActivity() {
         bar?.selectTabById(R.id.tab_home, true)
     }
 
-    private fun setFragmentTabListener() {
+    private fun setTabListener() {
         binding?.bottomBar?.setOnTabSelectListener(object : AnimatedBottomBar.OnTabSelectListener {
             override fun onTabSelected(lastIndex: Int, lastTab: Tab?, newIndex: Int, newTab: Tab) {
-                beginFragTransaction(newTab.id)
+                selectTab(newTab.id)
             }
 
             override fun onTabReselected(index: Int, tab: Tab) {
@@ -184,32 +139,32 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    fun beginFragTransaction(pos: Int) {
+    fun selectTab(index: Int) {
         val ft = supportFragmentManager.beginTransaction()
         ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
-        when (pos) {
+        when (index) {
             R.id.tab_iksica -> {
-                supportActionBar?.title = "Iksica"
+                supportActionBar?.title = getString(R.string.tab_iksica)
                 ft.replace(R.id.frame, iksicaFragment)
             }
 
             R.id.tab_prisutnost -> {
-                supportActionBar?.title = "Prisutnost"
+                supportActionBar?.title = getString(R.string.tab_attendance)
                 ft.replace(R.id.frame, attendanceFragment)
             }
 
             R.id.tab_home -> {
-                supportActionBar?.title = "FESB Companion"
+                supportActionBar?.title = getString(R.string.app_name)
                 ft.replace(R.id.frame, homeFragment)
             }
 
             R.id.tab_raspored -> {
-                supportActionBar?.title = "Raspored"
+                supportActionBar?.title = getString(R.string.tab_timetable)
                 ft.replace(R.id.frame, timeTableFragment)
             }
 
             R.id.tab_studomat -> {
-                supportActionBar?.title = "Studomat"
+                supportActionBar?.title = getString(R.string.tab_studomat)
                 ft.replace(R.id.frame, studomatFragment)
             }
         }
@@ -220,61 +175,37 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_main, menu)
+
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        super.onOptionsItemSelected(item)
+
         when (item.itemId) {
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.chooseSchedule -> {
-                mainViewModel.showWeekChooseMenu()
-            }
-
-            R.id.refreshTimetable -> if (networkUtils.isNetworkAvailable()) {
-                mojRaspored()
-            } else {
-                showSnacOffline()
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-
-    fun mojRaspored() {
-        if (networkUtils.isNetworkAvailable()) {
-            val user = shPref.getString("username", "")?.let { User(it, "") }
-
-            val now = LocalDate.now().plusDays(1)
-            val start = now.dayOfWeek.value
-            val startDate = now.plusDays((1 - start).toLong())
-            val endDate = now.plusDays(7 - start.toLong())
-
-            if (user != null) {
-                mainViewModel.fetchUserTimetableCurrentWeekAndSave(user, startDate, endDate, startDate)
-            }
-        } else {
-            showSnacOffline()
+            R.id.chooseSchedule -> mainViewModel.showWeekChooseMenu()
+            R.id.refreshTimetable -> mainViewModel.fetchUserTimetable()
         }
 
+        return true
     }
 
-    private fun invalidCreds() {
-        shPref[SPKey.LOGGED_IN] = false
-        Toast.makeText(this, "Potrebna je prijava!", Toast.LENGTH_SHORT).show()
-
-        realmLog = Realm.open(dbManager.getDefaultConfiguration())
-        try {
-            realmLog?.writeBlocking { this.deleteAll() }
-        } catch (ex: RealmException) {
-            Log.e("MainActivity", ex.toString())
-        } finally {
-            realmLog?.close()
+    private fun isThereAction() {
+        intent.action?.let {
+            showShortcutView()
         }
-        startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-        finish()
     }
 
-    private fun showSnacOffline() {
+    private fun onBack() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
+    }
+
+    private fun showSnackOffline() {
         snack = Snackbar.make(
             findViewById(R.id.coordinatorLayout), "Niste povezani",
             Snackbar.LENGTH_LONG
@@ -285,37 +216,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showShortcutView() {
-        var shortPosition = 0
         when (intent.action) {
-            "raspored" -> shortPosition = 1
-            "prisutnost" -> shortPosition = 2
-        }
-        beginFragTransaction(shortPosition)
-    }
-
-    private fun checkVersion() {
-        val staraVerzija = shPref.getInt("version_number", 14)
-        val trenutnaVerzija: Int = BuildConfig.VERSION_CODE
-
-        if (staraVerzija < trenutnaVerzija) {
-            showChangelog()
-            editor = shPref.edit()
-            editor?.putInt("version_number", trenutnaVerzija)
-            editor?.commit()
+            LaunchAction.TIMETABLE.name -> selectTab(1)
+            LaunchAction.ATTENDANCE.name -> selectTab(2)
         }
     }
 
-    private fun showChangelog() {
-        val view =
-            LayoutInflater.from(this).inflate(R.layout.licence_view, null) as NestedScrollView
-        val wv = view.findViewById<View>(R.id.webvju) as WebView
-
-        wv.loadUrl("file:///android_asset/changelog.html")
-
-        bottomSheet = BottomSheetDialog(this)
-        bottomSheet?.setCancelable(true)
-        bottomSheet?.setContentView(view)
-        bottomSheet?.setCanceledOnTouchOutside(true)
-        bottomSheet?.show()
-    }
 }

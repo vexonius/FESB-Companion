@@ -60,14 +60,13 @@ class HomeFragment : Fragment() {
         super.onResume()
 
         setCyanStatusBarColor()
-        (activity as MainActivity?)?.mojRaspored()
     }
 
     private fun fetchForcast() {
         if (networkUtils.isNetworkAvailable()) {
             homeViewModel.getForecast()
         } else {
-            showSnac("Niste povezani")
+            showSnack("Niste povezani")
         }
     }
 
@@ -78,7 +77,7 @@ class HomeFragment : Fragment() {
         requireActivity().window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.darker_cyan)
     }
 
-    private fun showSnac(text: String) {
+    private fun showSnack(text: String) {
         snack = Snackbar.make(requireActivity().findViewById(R.id.coordinatorLayout), text, Snackbar.LENGTH_LONG)
         snack?.view?.setBackgroundColor(ContextCompat.getColor(requireActivity(), R.color.red_nice))
         snack?.show()

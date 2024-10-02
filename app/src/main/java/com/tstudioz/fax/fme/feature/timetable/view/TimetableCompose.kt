@@ -55,24 +55,24 @@ import java.time.YearMonth
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableCompose(
-    showDay: LiveData<Boolean>,
-    showDayEvent: LiveData<Event>,
+    showDayEvent: LiveData<Event?>,
     shownWeekChooseMenu: LiveData<Boolean>,
     lessonsToShow: LiveData<List<Event>>,
     shownWeek: LiveData<LocalDate>,
     periods:  LiveData<List<TimeTableInfo>>,
     monthData: LiveData<MonthData>,
-    fetchUserTimetable: (LocalDate, LocalDate, LocalDate) -> Unit,
+    fetchUserTimetable: (LocalDate) -> Unit,
     showEvent: (Event) -> Unit,
     showWeekChooseMenu: (Boolean) -> Unit,
     hideEvent: () -> Unit
     ) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val event = showDayEvent.observeAsState().value
 
     BottomSheetScaffold(
         sheetContent = {
-            if (showDay.observeAsState(initial = false).value) {
+            event?.let {
                 ModalBottomSheet(
                     sheetState = sheetState,
                     onDismissRequest = { hideEvent() },
@@ -81,11 +81,10 @@ fun TimetableCompose(
                     dragHandle = { },
                     shape = RectangleShape
                 ) {
-                    showDayEvent.observeAsState().value?.let {
                         BottomInfoCompose(it)
                     }
                 }
-            }
+
             if (shownWeekChooseMenu.observeAsState(initial = false).value) {
                 ModalBottomSheet(sheetState = sheetState,
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -151,10 +150,7 @@ fun TimetableCompose(
                             }
                             Button(onClick = {
                                 selection?.let {
-                                    val start = it.date.dayOfWeek.value
-                                    val startDate = it.date.minusDays((start - 1).toLong())
-                                    val endDate = it.date.plusDays(7 - start.toLong())
-                                    fetchUserTimetable(startDate, endDate, startDate)
+                                    fetchUserTimetable(it.date)
                                     coroutineScope.launch {
                                         sheetState.hide()
                                         delay(300)

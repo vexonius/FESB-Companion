@@ -6,4 +6,6 @@ interface UserRepositoryInterface {
 
     suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult
 
+    suspend fun getCurrentUserName(): String
+
 }
