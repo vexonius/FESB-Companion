@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.databinding.TabTimetableBinding
-import com.tstudioz.fax.fme.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -17,7 +16,7 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 class TimeTableFragment : Fragment() {
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-    private val mainViewModel: MainViewModel by activityViewModel()
+    private val timetableViewModel: TimetableViewModel by activityViewModel()
     private var binding: TabTimetableBinding? = null
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
@@ -28,22 +27,22 @@ class TimeTableFragment : Fragment() {
         binding = TabTimetableBinding.inflate(inflater, container, false)
         val composeView = binding?.composeView
 
-        mainViewModel.showThisWeeksEvents()
+        timetableViewModel.showThisWeeksEvents()
 
         composeView?.setContent {
             AppTheme {
                 TimetableCompose(
-                    showDayEvent = mainViewModel.showDayEvent,
-                    shownWeekChooseMenu = mainViewModel.shownWeekChooseMenu,
-                    lessonsToShow = mainViewModel.lessonsToShow,
-                    shownWeek = mainViewModel.shownWeek,
-                    periods = mainViewModel.periods,
-                    monthData = mainViewModel.monthData,
-                    fetchUserTimetable = { selectedDate -> mainViewModel.fetchUserTimetable(selectedDate) },
-                    showEvent = { mainViewModel.showEvent(it) },
-                    showWeekChooseMenu = { mainViewModel.showWeekChooseMenu(it) },
+                    showDayEvent = timetableViewModel.showDayEvent,
+                    shownWeekChooseMenu = timetableViewModel.shownWeekChooseMenu,
+                    lessonsToShow = timetableViewModel.lessonsToShow,
+                    shownWeek = timetableViewModel.shownWeek,
+                    periods = timetableViewModel.periods,
+                    monthData = timetableViewModel.monthData,
+                    fetchUserTimetable = { selectedDate -> timetableViewModel.fetchUserTimetable(selectedDate) },
+                    showEvent = { timetableViewModel.showEvent(it) },
+                    showWeekChooseMenu = { timetableViewModel.showWeekChooseMenu(it) },
                 ) {
-                    mainViewModel.hideEvent()
+                    timetableViewModel.hideEvent()
                 }
             }
         }

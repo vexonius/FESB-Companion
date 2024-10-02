@@ -2,53 +2,32 @@ package com.tstudioz.fax.fme.view.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.webkit.WebView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import androidx.core.widget.NestedScrollView
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
-import com.tstudioz.fax.fme.BuildConfig
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.UserRealm
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
 import com.tstudioz.fax.fme.feature.home.view.HomeFragment
-import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatFragment
-import com.tstudioz.fax.fme.common.user.models.User
-import com.tstudioz.fax.fme.util.PreferenceHelper.set
-import com.tstudioz.fax.fme.util.SPKey
-import com.tstudioz.fax.fme.random.NetworkUtils
 import com.tstudioz.fax.fme.feature.iksica.IksicaFragment
-import com.tstudioz.fax.fme.viewmodel.MainViewModel
-import io.realm.kotlin.Realm
-import io.realm.kotlin.exceptions.RealmException
-import io.realm.kotlin.ext.query
+import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import nl.joery.animatedbottombar.AnimatedBottomBar.Tab
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.time.LocalDate
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainActivity : AppCompatActivity() {
 
-    private val mainViewModel: MainViewModel by viewModel()
+    private val timetableViewModel: TimetableViewModel by viewModel()
 
     private val iksicaFragment = IksicaFragment()
     private val homeFragment = HomeFragment()
@@ -133,7 +112,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onTabReselected(index: Int, tab: Tab) {
                 if (tab.id == R.id.tab_raspored) {
-                    mainViewModel.showWeekChooseMenu()
+                    timetableViewModel.showWeekChooseMenu()
                 }
             }
         })
@@ -184,8 +163,8 @@ class MainActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.chooseSchedule -> mainViewModel.showWeekChooseMenu()
-            R.id.refreshTimetable -> mainViewModel.fetchUserTimetable()
+            R.id.chooseSchedule -> timetableViewModel.showWeekChooseMenu()
+            R.id.refreshTimetable -> timetableViewModel.fetchUserTimetable()
         }
 
         return true

@@ -20,7 +20,7 @@ import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
 import com.tstudioz.fax.fme.networking.session.SessionDelegate
 import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.viewmodel.MainViewModel
+import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.Interceptor
@@ -45,7 +45,7 @@ val module = module {
     single<AttendanceDaoInterface> { AttendanceDao(get()) }
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
-    viewModel { MainViewModel(get(), get(), get()) }
+    viewModel { TimetableViewModel(get(), get(), get()) }
     viewModel { AttendanceViewModel(get(), get()) }
 }
 

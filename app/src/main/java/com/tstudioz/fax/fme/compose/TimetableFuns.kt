@@ -120,7 +120,7 @@ fun BasicEvent(
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Start,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().weight(1f, fill = false),
         )
 
         Text(
@@ -129,7 +129,7 @@ fun BasicEvent(
             maxLines = 1,
             overflow = TextOverflow.Clip,
             textAlign = TextAlign.Start,
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp).weight(1f),
         )
     }
 }

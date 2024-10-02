@@ -14,12 +14,18 @@ class TimeTableRepository(
     private val timeTableDao: TimeTableDaoInterface
 ) : TimeTableRepositoryInterface {
 
+    override var lastFetched = 0L
+
     override suspend fun fetchTimetable(
         user: String,
         startDate: String,
         endDate: String,
         shouldCache: Boolean
     ): List<Event> {
+        if (shouldCache && !lastFetched.hasPassedMoreThan(60)) {
+            return getCachedEvents()
+        }
+
         val params: HashMap<String, String> = hashMapOf(
             "DataType" to "User",
             "DataId" to user,
@@ -31,7 +37,10 @@ class TimeTableRepository(
             is NetworkServiceResult.TimeTableResult.Success -> {
                 val events = parseTimetable(result.data)
 
-                if (shouldCache) { insert(events) }
+                if (shouldCache) {
+                    insert(events)
+                    lastFetched = System.currentTimeMillis()
+                }
 
                 return events
             }
@@ -67,4 +76,8 @@ class TimeTableRepository(
         private val TAG = this.javaClass.canonicalName
     }
 
+}
+
+private fun Long.hasPassedMoreThan(seconds: Long): Boolean {
+    return this + seconds * 1000 < System.currentTimeMillis()
 }
