@@ -154,6 +154,7 @@ fun BasicDayHeader(day: LocalDate) {
     Text(
         text =  title,
         textAlign = TextAlign.Center,
+        fontWeight = FontWeight.Medium,
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
@@ -175,7 +176,10 @@ fun ScheduleHeader(
     modifier: Modifier = Modifier,
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
 ) {
-    Row(modifier = modifier) {
+    Row(
+        modifier = modifier
+            .background(color = colorResource(R.color.colorPrimary))
+    ) {
         val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
         repeat(numDays) { i ->
             Box(modifier = Modifier.width(dayWidth)) {
@@ -411,6 +415,7 @@ fun Schedule(
                 dayWidth = dayWidth,
                 dayHeader = dayHeader,
                 modifier = Modifier
+                    .background(color = colorResource(R.color.colorPrimary))
                     .padding(start = with(LocalDensity.current) { sidebarWidth.toDp() })
                     .horizontalScroll(horizontalScrollState)
                     .onGloballyPositioned { headerHeight = it.size.height }
