@@ -1,11 +1,11 @@
 package com.tstudioz.fax.fme.feature.menza.dao
 
-import com.tstudioz.fax.fme.database.models.Meni
+import com.tstudioz.fax.fme.feature.menza.models.Menza
 
 interface MenzaDaoInterface {
 
-    suspend fun insert(classes: List<Meni>)
+    suspend fun insert(classes: Menza?)
 
-    suspend fun getCachedMenza(): List<Meni>
+    suspend fun getCachedMenza(): Menza?
 
 }

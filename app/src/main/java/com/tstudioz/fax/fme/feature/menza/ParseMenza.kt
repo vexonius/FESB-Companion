@@ -1,48 +1,78 @@
 package com.tstudioz.fax.fme.feature.menza
 
 import android.util.Log
-import com.google.gson.JsonArray
-import com.tstudioz.fax.fme.database.models.Meni
-import org.json.JSONObject
+import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
+import com.tstudioz.fax.fme.feature.menza.models.Menu
+import com.tstudioz.fax.fme.feature.menza.models.Menza
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
-fun parseMenza(json: String?): MutableList<Meni>? {
-    val menies = mutableListOf<Meni>()
 
+fun runMenza(json: String): Menza? {
     try {
-        val jsonResponse = json?.let { JSONObject(it) }
-        val array = jsonResponse?.getJSONArray("values")
-
-        for (j in 0..(array?.length() ?: 0)) {
-            try {
-                val itemsArray = array?.getJSONArray(j)
-                if (itemsArray?.getString(0) == "R-MENI") {
-                    val meni = Meni()
-                    meni.id = itemsArray.getString(0)
-                    meni.type = itemsArray.getString(1)
-                    meni.jelo1 = itemsArray.getString(2)
-                    meni.jelo2 = itemsArray.getString(3)
-                    meni.jelo3 = itemsArray.getString(4)
-                    meni.jelo4 = itemsArray.getString(5)
-                    meni.desert = itemsArray.getString(6)
-                    meni.cijena = itemsArray.getString(7)
-                    menies.add(meni)
-                } else if(itemsArray?.getString(0) == "R-JELO PO IZBORU") {
-                    val izborniMeni = Meni()
-                    izborniMeni.id = itemsArray.getString(0)
-                    izborniMeni.jelo1 = itemsArray.getString(1)?.split(Regex("(?=\\d)"))?.firstOrNull()
-                    izborniMeni.cijena = itemsArray.getString(1)?.split(" ")?.lastOrNull()
-                    menies.add(izborniMeni)
-                }
-            } catch (ex: Exception) {
-                Log.d("Menza activity", ex.toString())
-                //return null
+        val values = Json.parseToJsonElement(json).jsonObject["values"]?.jsonArray?.map { listItems ->
+            listItems.jsonArray.map { string ->
+                string.jsonPrimitive.content
             }
         }
 
-    } catch (ex: Exception) {
-        ex.message?.let { Log.d("MenzaActivity", it) }
-        return null
+        val menza = Menza(
+            name = values?.get(0)?.get(2) ?: "",
+            datePosted = values?.get(0)?.get(3) ?: "",
+            dateFetched = values?.get(0)?.get(4) ?: "",
+            menies = mutableListOf(),
+            meniesSpecial = mutableListOf()
+        )
+        values?.forEach {
+            if (it.isEmpty()) {
+                return@forEach
+            } else if (it[0].contains("MENI") && it.size == 8) {
+                val price = checkAndFixPrice(it[7])
+                val meni = Menu(
+                    type = it[0],
+                    mealTime = mealTimeTest(it[0]),
+                    name = it[1],
+                    soupOrTea = it[2],
+                    mainCourse = it[3],
+                    sideDish = it[4],
+                    salad = it[5],
+                    dessert = it[6],
+                    price = price
+                )
+                menza.menies.add(meni)
+            } else if (it[0].contains("JELO PO IZBORU") && it.size == 2) {
+                val name = it[1].split(Regex(" (?=\\d)")).firstOrNull() ?: ""
+                val price = checkAndFixPrice(it[1].split(" ").lastOrNull() ?: "")
+                menza.meniesSpecial.add(
+                    MeniSpecial(
+                        type = it[0],
+                        mealTime = mealTimeTest(it[0]),
+                        meal = name,
+                        price = price
+                    )
+                )
+            }
+        }
+        return menza
+    } catch (e: Exception) {
+        Log.d("MenzaParse", e.toString())
     }
-
-    return menies
+    return null
 }
+
+fun checkAndFixPrice(pricee: String): String {
+    var price = pricee
+    if (!Regex("^[0-9,]+$").matches(price)) {
+        price = ""
+    }
+    when (price.substringAfter(",", "xxxx").length) {
+        1 -> price += "0"
+        0 -> price += "00"
+        else -> {}
+    }
+    return price
+}
+
+fun mealTimeTest(title: String) = if (title[0] == 'R') "RUČAK" else if (title[0] == 'V') "VEČERA" else ""

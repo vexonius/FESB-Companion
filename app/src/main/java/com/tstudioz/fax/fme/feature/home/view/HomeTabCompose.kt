@@ -34,7 +34,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -68,12 +67,11 @@ import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.Meni
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.database.models.TimetableType
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
 import com.tstudioz.fax.fme.feature.menza.MenzaCompose
-import com.tstudioz.fax.fme.feature.menza.view.MenzaActivity
+import com.tstudioz.fax.fme.feature.menza.models.Menza
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -143,8 +141,7 @@ fun HomeTabComposePreview() {
         ),
         insertNote = { },
         deleteNote = { },
-        menza = MutableLiveData(
-            listOf(Meni()))
+        menza = MutableLiveData(Menza("Menza", "14.6.2024", "14.6.2024", mutableListOf(),mutableListOf()))
     )
 }
 
@@ -159,7 +156,7 @@ fun HomeTabCompose(
     events: LiveData<List<Event>>,
     insertNote: (note: Note) -> Unit,
     deleteNote: (note: Note) -> Unit,
-    menza: LiveData<List<Meni>>,
+    menza: LiveData<Menza?>,
 ) {
     val menzaShow = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }

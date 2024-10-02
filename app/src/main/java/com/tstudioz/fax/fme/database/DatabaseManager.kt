@@ -6,6 +6,7 @@ import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.menza.models.MenzaRealm
 import io.realm.kotlin.RealmConfiguration
 
 class DatabaseManager: DatabaseManagerInterface {
@@ -16,7 +17,7 @@ class DatabaseManager: DatabaseManagerInterface {
                 Korisnik::class,
                 NoteRealm::class,
                 AttendanceEntry::class,
-                Meni::class,
+                MenzaRealm::class,
                 EventRealm::class,
                 StudomatSubject::class,
                 Year::class,

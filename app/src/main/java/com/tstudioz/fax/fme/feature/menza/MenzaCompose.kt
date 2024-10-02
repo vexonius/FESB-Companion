@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.feature.menza
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,14 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.models.Meni
+import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
+import com.tstudioz.fax.fme.feature.menza.models.Menu
+import com.tstudioz.fax.fme.feature.menza.models.Menza
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenzaCompose(meni: LiveData<List<Meni>>, menzaShow: MutableState<Boolean>) {
+fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
     val menies = meni.observeAsState().value
-    val meniesMenies = menies?.filter { it.id == "R-MENI" }
-    val meniesChoose = menies?.filter { it.id == "R-JELO PO IZBORU" }
     val sheetState = rememberModalBottomSheetState()
     ModalBottomSheet(
         sheetState = sheetState,
@@ -53,12 +54,12 @@ fun MenzaCompose(meni: LiveData<List<Meni>>, menzaShow: MutableState<Boolean>) {
             }
         }
     ) {
-        MenzaBottomSheet(meniesMenies, meniesChoose)
+        MenzaBottomSheet(menies)
     }
 }
 
 @Composable
-fun MenzaBottomSheet(menies: List<Meni>?, meniesChoose: List<Meni>?) {
+fun MenzaBottomSheet(menies: Menza?) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -67,16 +68,16 @@ fun MenzaBottomSheet(menies: List<Meni>?, meniesChoose: List<Meni>?) {
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        menies?.forEach {
+        menies?.menies?.filter { it.mealTime == "RUČAK" }?.forEach {
             MeniCompose(it)
         }
-        MeniComposeChoose(meniesChoose ?: emptyList())
+        menies?.meniesSpecial?.let { MeniComposeChoose(it) }
 
     }
 }
 
 @Composable
-fun MeniCompose(meni: Meni) {
+fun MeniCompose(meni: Menu) {
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
@@ -86,18 +87,18 @@ fun MeniCompose(meni: Meni) {
             .fillMaxWidth()
     ) {
         Text(
-            text = meni.type ?: "",
+            text = meni.name,
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 10.dp)
         )
-        MeniText(meni.jelo1 ?: "")
-        MeniText(meni.jelo2 ?: "")
-        MeniText(meni.jelo3 ?: "")
-        MeniText(meni.jelo4 ?: "")
-        MeniText(meni.desert ?: "", false)
+        MeniText(meni.soupOrTea)
+        MeniText(meni.mainCourse)
+        MeniText(meni.sideDish)
+        MeniText(meni.salad)
+        MeniText(meni.dessert, false)
         Text(
-            text = meni.cijena ?: "",
+            text = meni.price,
             fontSize = 20.sp,
             textAlign = TextAlign.End,
             modifier = Modifier
@@ -109,7 +110,7 @@ fun MeniCompose(meni: Meni) {
 }
 
 @Composable
-fun MeniComposeChoose(meni: List<Meni>) {
+fun MeniComposeChoose(meni: MutableList<MeniSpecial>) {
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
@@ -119,21 +120,25 @@ fun MeniComposeChoose(meni: List<Meni>) {
             .fillMaxWidth()
     ) {
         Text(
-            text = "JELA PO IZBORU" ,
+            text = "JELA PO IZBORU",
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 10.dp)
         )
         meni.forEach {
-            MeniText(it.jelo1 ?: "", false)
-            Text(
-                text = it.cijena ?: "",
-                fontSize = 20.sp,
-                textAlign = TextAlign.End,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp)
-            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp)
+            ) {
+                Text(
+                    text = it.meal,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = it.price,
+                    fontSize = 16.sp
+                )
+            }
             HorizontalDivider()
         }
     }
@@ -148,6 +153,8 @@ fun MeniText(text: String, divider: Boolean = true) {
             fontSize = 16.sp,
             modifier = Modifier.padding(vertical = 5.dp)
         )
-        if (divider){ HorizontalDivider() }
+        if (divider) {
+            HorizontalDivider()
+        }
     }
 }
