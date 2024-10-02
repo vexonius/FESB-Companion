@@ -180,13 +180,11 @@ fun TimetableCompose(
                 events = mapped,
                 minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
                 maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
-                else if (eventAfter8PM) LocalTime.of(21, 0)
-                else LocalTime.of(20, 0),
+                    else if (eventAfter8PM) LocalTime.of(21, 0)
+                    else LocalTime.of(20, 0),
                 minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
                 maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
-                onClick = { event ->
-                    showEvent(event)
-                }
+                onClick = { showEvent(it) }
             )
 
         }
@@ -230,7 +228,7 @@ fun Day(
             .aspectRatio(1f)
             .padding(0.dp, 3.dp)
             .border(
-                width = if (isSelected) 1.dp else 1.dp,
+                width = 1.dp,
                 color = if (isSelected) selectedItemColor else (dayColor ?: MaterialTheme.colorScheme.background),
             )
             .background(color = (dayColor ?: MaterialTheme.colorScheme.background))
