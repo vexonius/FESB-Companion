@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
@@ -10,6 +11,7 @@ import org.jsoup.Jsoup
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 enum class LoginStatus(val text: String) {
@@ -84,21 +86,21 @@ fun parseRacuni(doc: String): List<Receipt> {
         if (cols.size >= 6) {
             racuni.add(
                 Receipt(
-                    cols[0].text(),
-                    LocalDate.parse(cols[1].text(), DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-                    cols[1].text(),
-                    cols[2].text(),
+                    cols[0].text() ?: "",
+                    LocalDate.parse(cols[1].text(), DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.getDefault())) ?: LocalDate.MIN,
+                    cols[1].text() ?: "",
+                    cols[2].text() ?: "",
                     cols[3].text().toDoubleOrNull() ?: 0.0,
                     cols[4].text().toDoubleOrNull() ?: 0.0,
                     ((cols[3].text().toDoubleOrNull() ?: 0.0) - (cols[4].text().toDoubleOrNull() ?: 0.0)) ?: 0.0,
-                    cols[5].text(),
+                    cols[5].text() ?: "",
                     cols[6].selectFirst("a")?.attr("href") ?: ""
                 )
             )
         }
     }
     return racuni
-        .sortedByDescending { LocalTime.parse(it.time) }
+        .sortedByDescending { LocalTime.parse(it.time, DateTimeFormatter.ofPattern("H:mm", Locale.getDefault())) ?: LocalTime.MIN}
         .sortedByDescending { it.date }
 }
 
@@ -109,7 +111,7 @@ fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {
     rows?.forEach { row ->
         val cols = row.select("td")
         val item = ReceiptItem(
-            cols[0].text(),
+            cols[0].text() ?: "",
             cols[1].text().toIntOrNull() ?: 0,
             cols[2].text().replace(",", ".").toDoubleOrNull() ?: 0.0,
             cols[3].text().replace(",", ".").toDoubleOrNull() ?: 0.0,
