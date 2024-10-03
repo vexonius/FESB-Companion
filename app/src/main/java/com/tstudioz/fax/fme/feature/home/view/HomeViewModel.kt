@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
@@ -40,13 +41,12 @@ class HomeViewModel(
     private var _forecastGot = MutableLiveData<Boolean>()
     private val _weatherDisplay = MutableLiveData<WeatherDisplay>()
     private val _notes = MutableLiveData<List<Note>>()
-    private val _events = MutableLiveData<List<Event>>()
     private val _lastFetched = MutableLiveData<String>()
 
     val weatherDisplay: LiveData<WeatherDisplay> = _weatherDisplay
     val forecastGot: LiveData<Boolean> = _forecastGot
     val notes: LiveData<List<Note>> = _notes
-    val events: LiveData<List<Event>> = _events
+    val events: LiveData<List<Event>> = timeTableRepository.events.asLiveData()
     val lastFetched: LiveData<String> = _lastFetched
 
     private val handler = CoroutineExceptionHandler { _, exception ->
@@ -55,7 +55,6 @@ class HomeViewModel(
 
     init {
         getNotes()
-        getCachedEvents()
     }
 
     fun getForecast() {
@@ -135,12 +134,6 @@ class HomeViewModel(
         }
     }
 
-    private fun getCachedEvents() {
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            _events.postValue(timeTableRepository.getCachedEvents())
-        }
-    }
-
     private fun fetchDailyTimetable(
         startDate: LocalDate,
         endDate: LocalDate
@@ -151,8 +144,7 @@ class HomeViewModel(
 
         viewModelScope.launch(Dispatchers.IO + handler) {
             val username = userRepository.getCurrentUserName()
-            val events = timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, true)
-            _events.postValue(events)
+            timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, true)
         }
     }
 }

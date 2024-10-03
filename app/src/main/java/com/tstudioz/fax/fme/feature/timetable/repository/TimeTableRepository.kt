@@ -8,13 +8,26 @@ import com.tstudioz.fax.fme.feature.timetable.parseTimetableInfo
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 class TimeTableRepository(
     private val timetableService: TimetableServiceInterface,
     private val timeTableDao: TimeTableDaoInterface
 ) : TimeTableRepositoryInterface {
 
-    override var lastFetched = 0L
+    private val _events: MutableSharedFlow<List<Event>> = MutableSharedFlow(1)
+    override val events: SharedFlow<List<Event>> = _events.asSharedFlow()
+
+    override val lastFetched: Long = 0L
+
+    init {
+        observeEventsFromCache()
+    }
 
     override suspend fun fetchTimetable(
         user: String,
@@ -22,10 +35,6 @@ class TimeTableRepository(
         endDate: String,
         shouldCache: Boolean
     ): List<Event> {
-        if (shouldCache && !lastFetched.hasPassedMoreThan(60)) {
-            return getCachedEvents()
-        }
-
         val params: HashMap<String, String> = hashMapOf(
             "DataType" to "User",
             "DataId" to user,
@@ -39,7 +48,6 @@ class TimeTableRepository(
 
                 if (shouldCache) {
                     insert(events)
-                    lastFetched = System.currentTimeMillis()
                 }
 
                 return events
@@ -65,7 +73,15 @@ class TimeTableRepository(
     }
 
     override suspend fun getCachedEvents(): List<Event> {
-        return timeTableDao.getCachedEvents()
+        return timeTableDao.getEvents()
+    }
+
+    private fun observeEventsFromCache() {
+        CoroutineScope(Dispatchers.IO).launch {
+            timeTableDao.getEventsAsync().collect {
+                _events.emit(it)
+            }
+        }
     }
 
     private suspend fun insert(classes: List<Event>) {

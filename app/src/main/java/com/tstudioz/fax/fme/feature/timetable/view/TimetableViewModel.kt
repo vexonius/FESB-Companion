@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
@@ -28,19 +29,22 @@ class TimetableViewModel(
 ) : ViewModel() {
 
     private val _currentEventShown = MutableLiveData<Event?>(null)
-    private val _events = MutableLiveData<List<Event>>(emptyList())
+    val currentEventShown: LiveData<Event?> = _currentEventShown
+
+    private var _events = MutableLiveData<List<Event>>(emptyList())
+    var events: LiveData<List<Event>> = timeTableRepository.events.asLiveData()
+
     private val _periods = MutableLiveData<List<TimeTableInfo>>(emptyList())
+    val periods: LiveData<List<TimeTableInfo>> = _periods
+
     private val _mondayOfSelectedWeek: MutableLiveData<LocalDate> = MutableLiveData<LocalDate>().apply {
         val date = LocalDate.now()
         value = date.minusDays(((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()))
     }
-    private val _showWeekChooseMenu = MutableLiveData(false)
-
-    val showDayEvent: LiveData<Event?> = _currentEventShown
-    val events: LiveData<List<Event>> = _events
-    val periods: LiveData<List<TimeTableInfo>> = _periods
-    val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
     val mondayOfSelectedWeek: LiveData<LocalDate> = _mondayOfSelectedWeek
+
+    private val _showWeekChooseMenu = MutableLiveData(false)
+    val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
 
     val monthData = MutableLiveData(
         MonthData(
@@ -56,7 +60,6 @@ class TimetableViewModel(
     }
 
     init {
-        getCachedEvents()
         fetchUserTimetable()
         fetchTimetableAgenda()
     }
@@ -81,6 +84,8 @@ class TimetableViewModel(
         shownWeekMonday: LocalDate,
         shouldCache: Boolean = false
     ) {
+        events = _events
+
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
         val startDateFormated = dateFormatter.format(startDate)
         val endDateFormated = dateFormatter.format(endDate)
@@ -93,13 +98,6 @@ class TimetableViewModel(
         }
     }
 
-    private fun getCachedEvents() {
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            val cachedItems = timeTableRepository.getCachedEvents()
-            _events.postValue(cachedItems)
-        }
-    }
-
     private fun fetchTimetableAgenda(
         startDate: String = (LocalDate.now().year - 1).toString() + "-8-1",
         endDate: String = (LocalDate.now().year + 1).toString() + "-8-1"
@@ -108,10 +106,6 @@ class TimetableViewModel(
             val result = timeTableRepository.fetchTimeTableCalendar(startDate, endDate)
             _periods.postValue(result)
         }
-    }
-
-    fun showThisWeeksEvents() {
-        fetchUserTimetable()
     }
 
     fun showWeekChooseMenu(value: Boolean = true) {

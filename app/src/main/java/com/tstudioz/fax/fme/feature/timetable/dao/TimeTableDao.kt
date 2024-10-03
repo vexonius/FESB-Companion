@@ -9,6 +9,15 @@ import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterfa
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.ResultsChange
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class TimeTableDao(private val dbManager: DatabaseManagerInterface) : TimeTableDaoInterface {
 
@@ -24,9 +33,19 @@ class TimeTableDao(private val dbManager: DatabaseManagerInterface) : TimeTableD
         }
     }
 
-    override suspend fun getCachedEvents(): List<Event> {
+    override suspend fun getEvents(): List<Event> {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
         return realm.query<EventRealm>().find().map { fromRealmObject(it) }
+    }
+
+    override suspend fun getEventsAsync(): Flow<List<Event>> {
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
+        val events = realm.query(EventRealm::class)
+
+        return  events
+            .asFlow()
+            .map { it.list }
+            .map { results -> results.map { fromRealmObject(it) } }
     }
 
 }
