@@ -3,21 +3,21 @@
     <item
         android:id="@+id/tab_iksica"
         android:icon="@drawable/iksica"
-        android:title="@string/iksica" />
+        android:title="@string/tab_iksica" />
     <item
         android:id="@+id/tab_home"
         android:icon="@drawable/command_line"
-        android:title="@string/home" />
+        android:title="@string/tab_home" />
     <item
         android:id="@+id/tab_prisutnost"
         android:icon="@drawable/attend"
-        android:title="@string/attendance" />
+        android:title="@string/tab_attendance" />
     <item
         android:id="@+id/tab_raspored"
         android:icon="@drawable/cal"
-        android:title="@string/timetable" />
+        android:title="@string/tab_timetable" />
     <item
         android:id="@+id/tab_studomat"
         android:icon="@drawable/cal"
-        android:title="@string/studomat" />
+        android:title="@string/tab_studomat" />
 </menu>
