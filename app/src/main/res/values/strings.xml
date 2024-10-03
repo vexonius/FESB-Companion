@@ -113,4 +113,9 @@
     <string name="weatherHumidity">%1$.1f%%</string>
     <string name="weatherPrecipChance">%1$.1f mm</string>
     <string name="weatherWind">%1$.1f km/h</string>
+
+    //Menza
+    <string name="meni_price">%1$s €</string>
+    <string name="JELA_PO_IZBORU">JELA PO IZBORU</string>
+    <string name="menza_no_data">Nije postavljen jelovnik za današnji dan.</string>
 </resources>

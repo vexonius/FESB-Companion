@@ -45,10 +45,9 @@ class HomeFragment : Fragment() {
 
         setHasOptionsMenu(true)
         fetchForcast()
-        menzaViewModel.getMenza("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
 
         binding?.composeView?.setContent {
-            AppTheme{
+            AppTheme {
                 HomeTabCompose(
                     weather = homeViewModel.weatherDisplay,
                     notes = homeViewModel.notes,
@@ -65,6 +64,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        menzaViewModel.getMenza("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
 
         setCyanStatusBarColor()
         (activity as MainActivity?)?.mojRaspored()

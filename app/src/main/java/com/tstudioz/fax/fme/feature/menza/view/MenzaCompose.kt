@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,16 +36,19 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
 import com.tstudioz.fax.fme.feature.menza.models.Menu
 import com.tstudioz.fax.fme.feature.menza.models.Menza
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
     val menies = meni.observeAsState().value
     val sheetState = rememberModalBottomSheetState()
+
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = { menzaShow.value = false },
-        containerColor = colorResource(id = R.color.welcome2),
+        containerColor = colorResource(id = R.color.greenHighlight),
         contentColor = MaterialTheme.colorScheme.inverseOnSurface,
         dragHandle = {
             Column(
@@ -53,11 +57,17 @@ fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
                     .padding(10.dp)
                     .fillMaxWidth()
             ) {
-                Text(text = "Menza", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(
+                    text = stringResource(id = R.string.menza_title),
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
     ) {
-        if (menies?.dateFetched == menies?.datePosted) {
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+        if (menies?.dateFetched == menies?.datePosted && today == menies?.dateFetched) {
             MenzaBottomSheet(menies)
         } else {
             Box(
@@ -67,7 +77,7 @@ fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
                     .background(Color.White, RoundedCornerShape(15.dp))
             ) {
                 Text(
-                    text = "Nije postavljen jelovnik za današnji dan.",
+                    text = stringResource(id = R.string.menza_no_data),
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -132,7 +142,7 @@ fun MeniCompose(meni: Menu) {
     MeniText(meni.salad)
     MeniText(meni.dessert, false)
     Text(
-        text = meni.price + " eur",
+        text = stringResource(id = R.string.meni_price, meni.price),
         fontSize = 20.sp,
         textAlign = TextAlign.End,
         modifier = Modifier
@@ -144,7 +154,7 @@ fun MeniCompose(meni: Menu) {
 @Composable
 fun MeniComposeChoose(meni: List<MeniSpecial>) {
     Text(
-        text = "JELA PO IZBORU",
+        text = stringResource(id = R.string.JELA_PO_IZBORU),
         fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(vertical = 10.dp)
@@ -162,7 +172,7 @@ fun MeniComposeChoose(meni: List<MeniSpecial>) {
                 modifier = Modifier.weight(0.8f)
             )
             Text(
-                text = it.price + " eur",
+                text = stringResource(id = R.string.meni_price, it.price),
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
                 modifier = Modifier.weight(0.2f)

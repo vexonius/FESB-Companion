@@ -46,7 +46,7 @@ class MenzaViewModel(
         }
     }
 
-    fun readMenza() {
+    private fun readMenza() {
         viewModelScope.launch(Dispatchers.IO + handler) {
             _menza.postValue(repository.readMenza())
         }

@@ -83,68 +83,6 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-@Preview
-@Composable
-fun HomeTabComposePreview() {
-    HomeTabCompose(
-        weather = MutableLiveData(
-            WeatherDisplay(
-                location = "Split",
-                temperature = 20.0,
-                humidity = 56.5,
-                wind = 5.1,
-                precipChance = 0.0,
-                icon = "_21d",
-                summary = "Clear sky"
-            )
-        ),
-        notes = MutableLiveData(
-            listOf(
-                Note(
-                    id = "1",
-                    noteTekst = "Ovo je bilješka",
-                    dateCreated = LocalDateTime.now(),
-                    checked = false
-                )
-            )
-        ),
-        lastFetched = MutableLiveData("22:29:31 14.6.2024"),
-        events = MutableLiveData(
-            listOf(
-                Event(
-                    id = "1",
-                    name = "JEZICI I PREVODITELJI",
-                    shortName = "JIP",
-                    colorId = R.color.blue_nice,
-                    professor = "prof. dr. sc. Ivan Meštrović",
-                    eventType = TimetableType.KOLOKVIJ,
-                    groups = "1. grupa",
-                    classroom = "B525",
-                    start = LocalDateTime.now(),
-                    end = LocalDateTime.now().plusHours(3),
-                    description = "Predavanje iz kolegija Jezici i prevoditelji"
-                ),
-                Event(
-                    id = "2",
-                    name = "PREVODITELJI",
-                    shortName = "JIP",
-                    colorId = R.color.purple_nice,
-                    professor = "prof. dr. sc. Ivan Meštrović",
-                    eventType = TimetableType.ISPIT,
-                    groups = "1. grupa",
-                    classroom = "B5",
-                    start = LocalDateTime.now(),
-                    end = LocalDateTime.now().plusHours(2),
-                    description = "Predavanje iz kolegija Jezici i prevoditelji"
-                )
-            )
-        ),
-        insertNote = { },
-        deleteNote = { },
-        menza = MutableLiveData(Menza("Menza", "14.6.2024", "14.6.2024", mutableListOf(),mutableListOf()))
-    )
-}
-
 val sidePadding = 20.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -176,13 +114,13 @@ fun HomeTabCompose(
                     item {
                         WeatherCompose(
                             weather.observeAsState().value ?: WeatherDisplay(
-                                location = "Split",
+                                location = "",
                                 temperature = 20.0,
                                 humidity = 0.00,
                                 wind = 0.00,
                                 precipChance = 0.0,
                                 icon = "_1d",
-                                summary = "Clear sky"
+                                summary = ""
                             )
                         )
                     }
