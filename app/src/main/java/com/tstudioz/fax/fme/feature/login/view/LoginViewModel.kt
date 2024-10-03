@@ -40,8 +40,8 @@ class LoginViewModel(
     }
 
     fun tryUserLogin() {
-        var username = username.value?.trim()
-        val password = password.value?.trim()
+        var username = username.value
+        val password = password.value
 
         if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
             errorMessage.postValue(application.getString(R.string.login_error_empty_credentials))

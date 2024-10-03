@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
-    <changeTransform android:duration="@android:integer/config_shortAnimTime"
-        android:interpolator="@android:interpolator/accelerate_cubic"/>
-    <changeBounds android:duration="@android:integer/config_shortAnimTime"
-        android:interpolator="@android:interpolator/linear"/>
-</transitionSet>
