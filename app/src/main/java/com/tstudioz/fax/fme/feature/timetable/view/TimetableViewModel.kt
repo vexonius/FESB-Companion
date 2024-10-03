@@ -71,6 +71,7 @@ class TimetableViewModel(
     fun fetchUserTimetable(date: LocalDate) {
         val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
         val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
+        _mondayOfSelectedWeek.value = startDate
         fetchUserTimetable(startDate, endDate, startDate)
     }
 

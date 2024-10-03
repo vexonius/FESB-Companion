@@ -23,8 +23,11 @@ class UserService(private val client: OkHttpClient) : UserServiceInterface {
             .build()
 
         val response = client.newCall(request).execute()
+        val url = response.request.url
 
-        return if (response.request.url == targetUrl) {
+        response.close()
+
+        return if (url == targetUrl) {
             NetworkServiceResult.LoginResult.Success(User(username, password))}
         else {
             NetworkServiceResult.LoginResult.Failure(Throwable("Error during login"))}
