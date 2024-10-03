@@ -13,7 +13,7 @@ class ParseAttendance{
         body: String,
         semester: Int
     ): List<AttendanceEntry> {
-        val attendanceForOneKolegij = mutableListOf<AttendanceEntry>()
+        val attendanceForOneSemester = mutableListOf<AttendanceEntry>()
         Jsoup.parse(body).select(".courseCategories div.courseCategory").forEach { kat ->
             val mAttendanceEntry = AttendanceEntry()
             mAttendanceEntry.semestar = semester
@@ -28,10 +28,10 @@ class ParseAttendance{
                         "${mAttendanceEntry.vrsta}${mAttendanceEntry.required}${mAttendanceEntry.total}${mAttendanceEntry.semestar}").toByteArray()
             )
                 .toString()
-            attendanceForOneKolegij.add(mAttendanceEntry)
+            attendanceForOneSemester.add(mAttendanceEntry)
         }
 
-        return attendanceForOneKolegij
+        return attendanceForOneSemester
     }
 
     fun parseAttendList(body: String): List<Pair<Element, Int>> {
@@ -43,7 +43,7 @@ class ParseAttendance{
             attendanceUrls.addAll(
                 doc.select("div.semster.summer div.body.clearfix a").map { element -> Pair(element, 2) })
         } catch (ex: Exception) {
-            ex.message?.let { Log.d("Exception pris", it) }
+            ex.message?.let { Log.d("Parsing Attendance data failed.", it) }
             ex.printStackTrace()
         }
         return attendanceUrls
