@@ -15,8 +15,10 @@ class MenzaService(private val client: OkHttpClient) : MenzaServiceInterface {
 
         val response: Response = client.newCall(request).execute()
         val data = response.body?.string()
+        val isSuccessful = response.isSuccessful
+        response.close()
 
-        return if (!response.isSuccessful || data.isNullOrEmpty()) {
+        return if (isSuccessful || data.isNullOrEmpty()) {
             NetworkServiceResult.MenzaResult.Failure(Throwable("Failed to fetch menza details."))
         } else {
             NetworkServiceResult.MenzaResult.Success(data)

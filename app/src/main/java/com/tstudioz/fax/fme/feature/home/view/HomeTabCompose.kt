@@ -70,7 +70,7 @@ import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.database.models.TimetableType
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
-import com.tstudioz.fax.fme.feature.menza.MenzaCompose
+import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -168,11 +168,10 @@ fun HomeTabCompose(
                     MenzaCompose(menza, menzaShow)
                 }
             }) { paddingValues ->
-            Box{
+            Box(modifier = Modifier.fillMaxHeight()){
                 LazyColumn(
                     Modifier
                         .padding(paddingValues)
-                        .wrapContentHeight()
                 ) {
                     item {
                         WeatherCompose(

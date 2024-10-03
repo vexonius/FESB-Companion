@@ -10,9 +10,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 
-fun runMenza(json: String): Menza? {
+fun parseMenza(jsonString: String): Menza? {
     try {
-        val values = Json.parseToJsonElement(json).jsonObject["values"]?.jsonArray?.map { listItems ->
+        val values = Json.parseToJsonElement(jsonString).jsonObject["values"]?.jsonArray?.map { listItems ->
             listItems.jsonArray.map { string ->
                 string.jsonPrimitive.content
             }
