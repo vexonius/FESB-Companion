@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.menza.view
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,16 +22,11 @@ class MenzaViewModel(
     private val repository: MenzaRepositoryInterface
 ) : AndroidViewModel(application) {
 
-    private var _menzaGot = MutableLiveData(false)
     private var _menza: MutableLiveData<Menza?> = MutableLiveData()
-    private val _menzaError: MutableLiveData<Boolean> = MutableLiveData()
-
-    val menzaGot: LiveData<Boolean> = _menzaGot
     val menza: LiveData<Menza?> = _menza
-    val menzaError: LiveData<Boolean> = _menzaError
 
     private val handler = CoroutineExceptionHandler { _, exception ->
-        _menzaError.postValue(true)
+        Log.d("MenzaViewModel", "CoroutineExceptionHandler got $exception")
     }
 
     init{
@@ -42,14 +38,9 @@ class MenzaViewModel(
             when (val menza = repository.fetchMenzaDetails(url)) {
                 is MenzaResult.Success -> {
                     _menza.postValue(menza.data)
-                    _menzaGot.postValue(true)
                 }
 
                 is MenzaResult.Failure -> {
-                    _menzaGot.postValue(false)
-                    _menzaError.postValue(true)
-                    delay(300)
-                    _menzaError.postValue(false)
                 }
             }
         }
@@ -58,7 +49,6 @@ class MenzaViewModel(
     fun readMenza() {
         viewModelScope.launch(Dispatchers.IO + handler) {
             _menza.postValue(repository.readMenza())
-            _menzaGot.postValue(true)
         }
     }
 }
