@@ -5,7 +5,6 @@ import com.tstudioz.fax.fme.feature.attendance.ParseAttendance
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.common.user.models.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
@@ -17,7 +16,7 @@ class AttendanceRepository(
     private val parseAttendance: ParseAttendance = ParseAttendance()
 ) : AttendanceRepositoryInterface {
 
-    override suspend fun fetchAttendance(user: User): NetworkServiceResult.AttendanceParseResult {
+    override suspend fun fetchAttendance(): NetworkServiceResult.AttendanceParseResult {
         when (val list = attendanceService.fetchAllAttendance()) {
             is NetworkServiceResult.AttendanceFetchResult.Success -> {
                 val attendanceList = mutableListOf<List<AttendanceEntry>>()
@@ -46,8 +45,8 @@ class AttendanceRepository(
                     insertAttendance(attendanceList.flatten())
                     NetworkServiceResult.AttendanceParseResult.Success(
                         attendanceList
-                            .sortedBy { it.first().predmet }
-                            .sortedBy { it.first().semestar }
+                            .sortedBy { it.first().`class` }
+                            .sortedBy { it.first().semester }
                     )
                 }
             }

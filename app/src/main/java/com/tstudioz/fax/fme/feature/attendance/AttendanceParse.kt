@@ -16,16 +16,16 @@ class ParseAttendance{
         val attendanceForOneSemester = mutableListOf<AttendanceEntry>()
         Jsoup.parse(body).select(".courseCategories div.courseCategory").forEach { kat ->
             val mAttendanceEntry = AttendanceEntry()
-            mAttendanceEntry.semestar = semester
-            mAttendanceEntry.predmet = element.select(".cellContent").first()?.text()
-            mAttendanceEntry.vrsta = kat.getElementsByClass("name").first()?.text()
+            mAttendanceEntry.semester = semester
+            mAttendanceEntry.`class` = element.select(".cellContent").first()?.text()
+            mAttendanceEntry.type = kat.getElementsByClass("name").first()?.text()
             mAttendanceEntry.attended = kat.select(".attended > span.num").first()?.text()?.toInt() ?: 99
             mAttendanceEntry.absent = kat.select(".absent > span.num").first()?.text()?.toInt() ?: 99
             mAttendanceEntry.required = kat.select(".required-attendance > span").first()?.text()
             mAttendanceEntry.total = (mAttendanceEntry.required?.split("od")?.last()?.trim() ?: "99").toInt()
             mAttendanceEntry.id = UUID.nameUUIDFromBytes(
-                ("${mAttendanceEntry.attended}${mAttendanceEntry.absent}${mAttendanceEntry.predmet}" +
-                        "${mAttendanceEntry.vrsta}${mAttendanceEntry.required}${mAttendanceEntry.total}${mAttendanceEntry.semestar}").toByteArray()
+                ("${mAttendanceEntry.attended}${mAttendanceEntry.absent}${mAttendanceEntry.`class`}" +
+                        "${mAttendanceEntry.type}${mAttendanceEntry.required}${mAttendanceEntry.total}${mAttendanceEntry.semester}").toByteArray()
             )
                 .toString()
             attendanceForOneSemester.add(mAttendanceEntry)

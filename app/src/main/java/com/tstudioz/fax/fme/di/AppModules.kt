@@ -8,19 +8,12 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDao
-import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
-import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepository
-import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
-import com.tstudioz.fax.fme.feature.attendance.services.AttendanceService
-import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
-import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
+import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
 import com.tstudioz.fax.fme.networking.session.SessionDelegate
 import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.Interceptor
@@ -41,12 +34,8 @@ val module = module {
     single<OkHttpClient>(named("FESBPortalClient")) { provideFESBPortalClient(get(), get()) }
     single<SessionDelegateInterface> { SessionDelegate(get()) }
     single<DatabaseManagerInterface> { DatabaseManager() }
-    single<AttendanceServiceInterface> { AttendanceService(get(named("FESBPortalClient"))) }
-    single<AttendanceDaoInterface> { AttendanceDao(get()) }
-    single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
     viewModel { TimetableViewModel(get(), get()) }
-    viewModel { AttendanceViewModel(get(), get()) }
 }
 
 fun provideOkHttpClient(monsterCookieJar: MonsterCookieJar) : OkHttpClient {

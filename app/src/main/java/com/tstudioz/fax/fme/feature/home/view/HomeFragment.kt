@@ -12,11 +12,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.databinding.TabHomeBinding
 import com.tstudioz.fax.fme.random.NetworkUtils
-import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(InternalCoroutinesApi::class)

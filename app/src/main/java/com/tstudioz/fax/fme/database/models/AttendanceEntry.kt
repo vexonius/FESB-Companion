@@ -7,13 +7,13 @@ open class AttendanceEntry : RealmObject {
 
     @PrimaryKey
     var id: String? = null
-    var predmet: String? = null
-    var vrsta: String? = null
+    var `class`: String? = null
+    var type: String? = null
     var link: String? = null
     var attended = 0
     var absent = 0
     var required: String? = null
-    var semestar = 0
+    var semester = 0
     var total = 0
 
 }
