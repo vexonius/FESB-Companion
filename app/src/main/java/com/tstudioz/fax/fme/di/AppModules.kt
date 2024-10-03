@@ -45,7 +45,7 @@ val module = module {
     single<AttendanceDaoInterface> { AttendanceDao(get()) }
     single<AttendanceRepositoryInterface> { AttendanceRepository(get(), get()) }
     single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
-    viewModel { TimetableViewModel(get(), get(), get()) }
+    viewModel { TimetableViewModel(get(), get()) }
     viewModel { AttendanceViewModel(get(), get()) }
 }
 

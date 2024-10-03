@@ -34,8 +34,8 @@ class TimeTableFragment : Fragment() {
                 TimetableCompose(
                     showDayEvent = timetableViewModel.showDayEvent,
                     shownWeekChooseMenu = timetableViewModel.shownWeekChooseMenu,
-                    lessonsToShow = timetableViewModel.lessonsToShow,
-                    shownWeek = timetableViewModel.shownWeek,
+                    lessonsToShow = timetableViewModel.events,
+                    shownWeek = timetableViewModel.mondayOfSelectedWeek,
                     periods = timetableViewModel.periods,
                     monthData = timetableViewModel.monthData,
                     fetchUserTimetable = { selectedDate -> timetableViewModel.fetchUserTimetable(selectedDate) },

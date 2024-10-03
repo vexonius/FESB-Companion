@@ -51,12 +51,11 @@ class HomeViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("HomeViewModel", "Caught $exception")
-        _forecastGot.postValue(false)
     }
 
     init {
         getNotes()
-        fetchDailyTimetable()
+        getCachedEvents()
     }
 
     fun getForecast() {
@@ -97,13 +96,6 @@ class HomeViewModel(
         }
     }
 
-    fun getNotes() {
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            val notes = noteRepository.getNotes()
-            _notes.postValue(notes.map { it.toNote() })
-        }
-    }
-
     fun insert(note: Note) {
         if (_notes.value?.any { it.id == note.id } == true)
             _notes.value?.map {
@@ -136,10 +128,22 @@ class HomeViewModel(
             .toString()
     }
 
+    private fun getNotes() {
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            val notes = noteRepository.getNotes()
+            _notes.postValue(notes.map { it.toNote() })
+        }
+    }
+
+    private fun getCachedEvents() {
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            _events.postValue(timeTableRepository.getCachedEvents())
+        }
+    }
+
     private fun fetchDailyTimetable(
         startDate: LocalDate,
-        endDate: LocalDate,
-        shouldCache: Boolean = false
+        endDate: LocalDate
     ) {
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
         val startDateFormated = dateFormatter.format(startDate)
@@ -147,7 +151,7 @@ class HomeViewModel(
 
         viewModelScope.launch(Dispatchers.IO + handler) {
             val username = userRepository.getCurrentUserName()
-            val events = timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, shouldCache)
+            val events = timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, true)
             _events.postValue(events)
         }
     }

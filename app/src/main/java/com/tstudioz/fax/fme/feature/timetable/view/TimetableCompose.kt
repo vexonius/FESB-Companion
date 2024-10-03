@@ -82,7 +82,7 @@ fun TimetableCompose(
                 ModalBottomSheet(
                     sheetState = sheetState,
                     onDismissRequest = { hideEvent() },
-                    containerColor = showDayEvent.observeAsState().value?.color ?: Color.Transparent,
+                    containerColor = event.color,
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                     shape = RectangleShape
@@ -132,11 +132,7 @@ fun TimetableCompose(
                         Spacer(modifier = Modifier.padding(0.dp, 5.dp))
                         HorizontalCalendar(state = state, dayContent = { day ->
                             Day(day, isSelected = selection == day, periods = periods.value ?: emptyList()) { clicked ->
-                                selection = if (clicked == selection) {
-                                    null
-                                } else {
-                                    clicked
-                                }
+                                selection = if (clicked == selection) { null } else { clicked }
                             }
                         })
                         Row(

@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.timetable.view
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,8 +10,6 @@ import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.util.PreferenceHelper.set
-import com.tstudioz.fax.fme.util.SPKey
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,21 +24,23 @@ import java.time.format.DateTimeFormatter
 @InternalCoroutinesApi
 class TimetableViewModel(
     private val timeTableRepository: TimeTableRepositoryInterface,
-    private val sharedPreferences: SharedPreferences,
     private val userRepository: UserRepositoryInterface
 ) : ViewModel() {
 
     private val _currentEventShown = MutableLiveData<Event?>(null)
-    private val _lessonsToShow = MutableLiveData<List<Event>>(emptyList())
+    private val _events = MutableLiveData<List<Event>>(emptyList())
     private val _periods = MutableLiveData<List<TimeTableInfo>>(emptyList())
-    private val _shownWeek = MutableLiveData(LocalDate.now())
+    private val _mondayOfSelectedWeek: MutableLiveData<LocalDate> = MutableLiveData<LocalDate>().apply {
+        val date = LocalDate.now()
+        value = date.minusDays(((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()))
+    }
     private val _showWeekChooseMenu = MutableLiveData(false)
 
     val showDayEvent: LiveData<Event?> = _currentEventShown
-    val lessonsToShow: LiveData<List<Event>> = _lessonsToShow
+    val events: LiveData<List<Event>> = _events
     val periods: LiveData<List<TimeTableInfo>> = _periods
-    val shownWeek: LiveData<LocalDate> = _shownWeek
     val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
+    val mondayOfSelectedWeek: LiveData<LocalDate> = _mondayOfSelectedWeek
 
     val monthData = MutableLiveData(
         MonthData(
@@ -88,16 +87,15 @@ class TimetableViewModel(
         viewModelScope.launch(Dispatchers.IO + handler) {
             val username = userRepository.getCurrentUserName()
             val events = timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, shouldCache)
-            _shownWeek.postValue(shownWeekMonday)
-            sharedPreferences[SPKey.SHOWN_WEEK] = shownWeekMonday.toString()
-            _lessonsToShow.postValue(events)
+            _mondayOfSelectedWeek.postValue(shownWeekMonday)
+            _events.postValue(events)
         }
     }
 
     private fun getCachedEvents() {
         viewModelScope.launch(Dispatchers.IO + handler) {
             val cachedItems = timeTableRepository.getCachedEvents()
-            _lessonsToShow.postValue(cachedItems)
+            _events.postValue(cachedItems)
         }
     }
 
