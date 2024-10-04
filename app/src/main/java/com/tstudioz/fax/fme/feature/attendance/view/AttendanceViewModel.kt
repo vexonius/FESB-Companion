@@ -58,7 +58,7 @@ class AttendanceViewModel(
     }
 
     private fun loadFromDb() {
-        viewModelScope.launch(context = Dispatchers.IO) {
+        viewModelScope.launch(context = Dispatchers.IO + handler) {
             _attendanceList.postValue(repository.readAttendance())
             _shouldShow.postValue(true)
         }

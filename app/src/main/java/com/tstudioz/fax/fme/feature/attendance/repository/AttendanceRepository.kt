@@ -30,7 +30,9 @@ class AttendanceRepository(
                                 }
 
                                 is NetworkServiceResult.AttendanceFetchResult.Failure -> {
-                                    throw Exception("Error while fetching attendance data")
+                                    NetworkServiceResult.AttendanceParseResult.Failure(
+                                         Throwable("Error while fetching attendance data")
+                                    )
                                 }
                             }
                         }

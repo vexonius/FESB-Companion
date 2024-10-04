@@ -35,7 +35,7 @@ class AttendanceService(
         val data = response.body?.string() ?: ""
         response.close()
 
-        if (success) { return NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance details")) }
+        if (!success) { return NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance details")) }
 
         return NetworkServiceResult.AttendanceFetchResult.Success(data)
     }
