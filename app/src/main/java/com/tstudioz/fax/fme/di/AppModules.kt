@@ -8,6 +8,7 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
+import com.tstudioz.fax.fme.feature.settings.SettingsViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
@@ -36,6 +37,7 @@ val module = module {
     single<DatabaseManagerInterface> { DatabaseManager() }
     single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
     viewModel { TimetableViewModel(get(), get()) }
+    viewModel{SettingsViewModel(get(), get())}
 }
 
 fun provideOkHttpClient(monsterCookieJar: MonsterCookieJar) : OkHttpClient {

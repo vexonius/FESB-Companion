@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.view.fragments
+package com.tstudioz.fax.fme.feature.settings
 
 import android.content.Intent
 import android.content.SharedPreferences

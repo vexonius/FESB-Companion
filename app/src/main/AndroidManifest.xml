@@ -46,7 +46,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".view.activities.SettingsActivity"
+            android:name=".feature.settings.SettingsActivity"
             android:label="Postavke"
             android:parentActivityName=".view.activities.MainActivity"
             android:screenOrientation="portrait"

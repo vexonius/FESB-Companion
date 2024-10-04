@@ -1,20 +1,25 @@
-package com.tstudioz.fax.fme.view.activities
+package com.tstudioz.fax.fme.feature.settings
 
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import com.tstudioz.fax.fme.view.fragments.SettingsFragment
 
 
 class SettingsActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sf = SettingsFragment()
+        /*val sf = SettingsFragment()
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(android.R.id.content, sf)
         ft.addToBackStack(null)
-        ft.commit()
+        ft.commit()*/
+        setContent {
+            SettingsCompose()
+        }
+
         onBack()
     }
 
