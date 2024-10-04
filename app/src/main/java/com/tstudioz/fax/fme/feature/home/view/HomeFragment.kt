@@ -28,7 +28,7 @@ class HomeFragment : Fragment() {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val mainViewModel: MainViewModel by activityViewModel()
     private val homeViewModel: HomeViewModel by viewModel()
-    private val menzaViewModel: MenzaViewModel by inject()
+    private val menzaViewModel: MenzaViewModel by viewModel()
     private val networkUtils: NetworkUtils by inject()
 
     private var binding: TabHomeBinding? = null
