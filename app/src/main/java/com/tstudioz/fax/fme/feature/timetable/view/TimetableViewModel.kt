@@ -84,17 +84,16 @@ class TimetableViewModel(
         shownWeekMonday: LocalDate,
         shouldCache: Boolean = false
     ) {
-        events = _events
-
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
         val startDateFormated = dateFormatter.format(startDate)
         val endDateFormated = dateFormatter.format(endDate)
 
         viewModelScope.launch(Dispatchers.IO + handler) {
             val username = userRepository.getCurrentUserName()
-            val events = timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, shouldCache)
+            val items = timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, shouldCache)
             _mondayOfSelectedWeek.postValue(shownWeekMonday)
-            _events.postValue(events)
+            events = _events
+            _events.postValue(items)
         }
     }
 
