@@ -123,6 +123,7 @@ dependencies {
 
     //weather deserialise
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("com.google.code.gson:gson:2.11.0")
 }
 
 configurations.all {
