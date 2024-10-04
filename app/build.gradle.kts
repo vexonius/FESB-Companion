@@ -9,7 +9,6 @@ plugins {
 android {
     compileSdk = 34
     defaultConfig {
-        multiDexEnabled = true
         applicationId = "com.tstudioz.fax.fme"
         minSdk = 26
         targetSdk = 34
@@ -76,15 +75,10 @@ dependencies {
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
     implementation("androidx.compose.material3:material3-android:1.2.1")
 
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
-    implementation("com.facebook.shimmer:shimmer:0.5.0")
-    implementation("io.coil-kt:coil:2.5.0")
     implementation("nl.joery.animatedbottombar:library:1.1.0")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.preference:preference:1.2.1")
     implementation("androidx.legacy:legacy-preference-v14:1.0.0")
     implementation("androidx.browser:browser:1.8.0")
@@ -93,15 +87,10 @@ dependencies {
     implementation("com.github.doctoror.particlesdrawable:library:2.0.2")
     implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("io.github.lizhangqu:coreprogress:1.0.2")
-    implementation("com.github.apl-devs:appintro:v4.2.2")
-    implementation("com.orhanobut:hawk:2.0.1")
     testImplementation("junit:junit:4.13.2")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.activity:activity-ktx:1.9.0")
 
-    val multidexVersion = "2.0.1"
-    implementation("androidx.multidex:multidex:$multidexVersion")
 
     val lifecycleVersion = "2.8.0"
     implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion")
@@ -121,7 +110,6 @@ dependencies {
 
     //compose livedata state
     implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     //EncryptedSharedPreferences
     implementation("androidx.security:security-crypto:1.0.0")
