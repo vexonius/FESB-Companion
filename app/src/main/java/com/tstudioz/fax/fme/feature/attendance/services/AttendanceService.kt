@@ -14,9 +14,12 @@ class AttendanceService(
             .get()
             .build()
         val response = client.newCall(request).execute()
+        val success = response.isSuccessful
+        val data = response.body?.string() ?: ""
+        response.close()
 
-        return if (response.isSuccessful) {
-            NetworkServiceResult.AttendanceFetchResult.Success(response.body?.string() ?: "")
+        return if (success) {
+            NetworkServiceResult.AttendanceFetchResult.Success(data)
         } else {
             NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance"))
         }
@@ -28,9 +31,12 @@ class AttendanceService(
             .get()
             .build()
         val response = client.newCall(request).execute()
+        val success = response.isSuccessful
+        val data = response.body?.string() ?: ""
+        response.close()
 
-        if (!response.isSuccessful) { return NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance details")) }
+        if (!success) { return NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance details")) }
 
-        return NetworkServiceResult.AttendanceFetchResult.Success(response.body?.string() ?: "")
+        return NetworkServiceResult.AttendanceFetchResult.Success(data)
     }
 }
