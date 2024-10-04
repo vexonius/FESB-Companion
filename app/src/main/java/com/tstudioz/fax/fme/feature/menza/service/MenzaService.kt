@@ -7,9 +7,9 @@ import okhttp3.Response
 
 class MenzaService(private val client: OkHttpClient) : MenzaServiceInterface {
 
-    override suspend fun fetchMenza(url: String): NetworkServiceResult.MenzaResult {
+    override suspend fun fetchMenza(): NetworkServiceResult.MenzaResult {
         val request: Request = Request.Builder()
-            .url(url)
+            .url("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
             .get()
             .build()
 

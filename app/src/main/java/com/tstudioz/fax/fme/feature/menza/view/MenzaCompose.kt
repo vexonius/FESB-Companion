@@ -154,7 +154,7 @@ fun MeniCompose(meni: Menu) {
 @Composable
 fun MeniComposeChoose(meni: List<MeniSpecial>) {
     Text(
-        text = stringResource(id = R.string.JELA_PO_IZBORU),
+        text = stringResource(id = R.string.meals_by_choice),
         fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(vertical = 10.dp)

@@ -53,9 +53,9 @@ class HomeFragment : Fragment() {
                     notes = homeViewModel.notes,
                     events = mainViewModel.lessonsPerm,
                     lastFetched = mainViewModel.lastFetched,
+                    menza = menzaViewModel.menza,
                     insertNote = homeViewModel::insert,
                     deleteNote = homeViewModel::delete,
-                    menza = menzaViewModel.menza,
                 )
             }
         }
@@ -64,7 +64,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        menzaViewModel.getMenza("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
+        menzaViewModel.getMenza()
 
         setCyanStatusBarColor()
         (activity as MainActivity?)?.mojRaspored()

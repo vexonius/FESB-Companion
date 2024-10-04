@@ -5,7 +5,7 @@ import com.tstudioz.fax.fme.feature.menza.models.Menza
 
 interface MenzaRepositoryInterface {
 
-    suspend fun fetchMenzaDetails(url: String): MenzaResult
+    suspend fun fetchMenzaDetails(): MenzaResult
 
     suspend fun readMenza(): Menza?
 

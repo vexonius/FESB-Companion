@@ -12,8 +12,8 @@ class MenzaRepository(
     private val menzaNetworkService: MenzaServiceInterface,
     private val menzaDao: MenzaDaoInterface,
 ) : MenzaRepositoryInterface {
-    override suspend fun fetchMenzaDetails(url: String): MenzaResult {
-        return when (val result = menzaNetworkService.fetchMenza(url)) {
+    override suspend fun fetchMenzaDetails(): MenzaResult {
+        return when (val result = menzaNetworkService.fetchMenza()) {
             is NetworkServiceResult.MenzaResult.Success -> {
                 val parsed = parseMenza(result.data)
                 if (parsed != null) {

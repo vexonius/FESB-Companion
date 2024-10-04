@@ -58,17 +58,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
-import com.tstudioz.fax.fme.database.models.TimetableType
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
 import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.models.Menza
@@ -92,9 +89,9 @@ fun HomeTabCompose(
     notes: LiveData<List<Note>>,
     lastFetched: LiveData<String>,
     events: LiveData<List<Event>>,
+    menza: LiveData<Menza?>,
     insertNote: (note: Note) -> Unit,
     deleteNote: (note: Note) -> Unit,
-    menza: LiveData<Menza?>,
 ) {
     val menzaShow = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
@@ -128,7 +125,8 @@ fun HomeTabCompose(
                         NotesCompose(
                             notes = notes.observeAsState().value ?: emptyList(),
                             onClick = { openDialog.value = !openDialog.value },
-                            insertNote, deleteNote
+                            insertNote,
+                            deleteNote
                         )
                     }
                     item {
@@ -187,7 +185,7 @@ fun WeatherCompose(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = String.format(Locale.US, stringResource(R.string.weatherTemp), weather.temperature),
+                    text = String.format(Locale.US, stringResource(R.string.weather_temp), weather.temperature),
                     fontSize = 64.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -201,7 +199,7 @@ fun WeatherCompose(
                         WeatherItem(
                             text = String.format(
                                 Locale.US,
-                                stringResource(R.string.weatherWind),
+                                stringResource(R.string.weather_wind),
                                 weather.wind
                             ), id = R.drawable.wind
                         )
@@ -210,7 +208,7 @@ fun WeatherCompose(
                         WeatherItem(
                             text = String.format(
                                 Locale.US,
-                                stringResource(R.string.weatherHumidity),
+                                stringResource(R.string.weather_humidity),
                                 weather.humidity
                             ), id = R.drawable.vlaga
                         )
@@ -219,7 +217,7 @@ fun WeatherCompose(
                         WeatherItem(
                             text = String.format(
                                 Locale.US,
-                                stringResource(R.string.weatherPrecipChance),
+                                stringResource(R.string.weather_precip_chance),
                                 weather.precipChance
                             ), id = R.drawable.oborine
                         )

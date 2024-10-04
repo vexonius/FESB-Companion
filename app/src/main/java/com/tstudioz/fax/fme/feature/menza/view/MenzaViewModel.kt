@@ -12,7 +12,6 @@ import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -33,9 +32,9 @@ class MenzaViewModel(
         readMenza()
     }
 
-    fun getMenza(url: String) {
+    fun getMenza() {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            when (val menza = repository.fetchMenzaDetails(url)) {
+            when (val menza = repository.fetchMenzaDetails()) {
                 is MenzaResult.Success -> {
                     _menza.postValue(menza.data)
                 }

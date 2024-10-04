@@ -4,6 +4,6 @@ import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface MenzaServiceInterface {
 
-    suspend fun fetchMenza(url: String) : NetworkServiceResult.MenzaResult
+    suspend fun fetchMenza() : NetworkServiceResult.MenzaResult
 
 }
