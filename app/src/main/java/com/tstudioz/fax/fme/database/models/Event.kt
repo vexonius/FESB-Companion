@@ -26,6 +26,25 @@ data class Event(
     val studyCode: String = "",
 )
 
+open class EventRealm : RealmObject {
+    @PrimaryKey
+    var id: String? = null
+    var name: String? = null
+    var shortName: String? = null
+    var colorId: Int? = null
+    var professor: String? = null
+    var eventType: String? = null
+    var groups: String? = null
+    var classroom: String? = null
+    var start: String? = null
+    var end: String? = null
+    var description: String? = null
+    var recurring: Boolean? = null
+    var recurringType: String? = null
+    var recurringUntil: String? = null
+    var studyCode: String? = null
+}
+
 enum class Recurring {
     ONCE, WEEKLY, EVERY_TWO_WEEKS, MONTHLY, UNDEFINED
 }
@@ -74,26 +93,6 @@ fun fromRealmObject(eventRealm: EventRealm): Event {
         recurringUntil = eventRealm.recurringUntil ?: "",
         studyCode = eventRealm.studyCode ?: ""
     )
-}
-
-
-open class EventRealm : RealmObject {
-    @PrimaryKey
-    var id: String? = null
-    var name: String? = null
-    var shortName: String? = null
-    var colorId: Int? = null
-    var professor: String? = null
-    var eventType: String? = null
-    var groups: String? = null
-    var classroom: String? = null
-    var start: String? = null
-    var end: String? = null
-    var description: String? = null
-    var recurring: Boolean? = null
-    var recurringType: String? = null
-    var recurringUntil: String? = null
-    var studyCode: String? = null
 }
 
 enum class TimetableType(val type: String, val color: Int) {

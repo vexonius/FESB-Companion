@@ -16,15 +16,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
-
+import org.koin.core.component.inject
 
 @OptIn(InternalCoroutinesApi::class)
 class AttendanceFragment : Fragment(), KoinComponent {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val attendanceViewModel: AttendanceViewModel by viewModel() // TODO: Bad code, fix this later
+    private val attendanceViewModel: AttendanceViewModel by viewModel()
+    private val networkUtils: NetworkUtils by inject()
 
-    private var snack: Snackbar? = null
     private var binding: PrisutnostTabBinding? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -37,7 +37,7 @@ class AttendanceFragment : Fragment(), KoinComponent {
         setHasOptionsMenu(true)
         binding = PrisutnostTabBinding.inflate(inflater, container, false)
 
-        if (NetworkUtils.isNetworkAvailable(requireContext())) {
+        if (networkUtils.isNetworkAvailable()) {
             attendanceViewModel.fetchAttendance()
         } else {
             showSnack(getString(R.string.attendance_offline))
@@ -49,9 +49,10 @@ class AttendanceFragment : Fragment(), KoinComponent {
             }
         }
 
-        binding!!.composeView.setContent {
-            AttendanceCompose(attendanceItems = attendanceViewModel.attendanceList)
+        binding?.composeView?.setContent {
+            AttendanceCompose(attendanceViewModel.attendanceList)
         }
+
         return binding?.root
     }
 
@@ -72,10 +73,4 @@ class AttendanceFragment : Fragment(), KoinComponent {
         snack.show()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (snack != null) {
-            snack?.dismiss()
-        }
-    }
 }

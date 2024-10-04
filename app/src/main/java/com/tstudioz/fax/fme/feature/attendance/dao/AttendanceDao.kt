@@ -21,9 +21,9 @@ class AttendanceDao(private val dbManager: DatabaseManagerInterface) : Attendanc
     override suspend fun read(): List<List<AttendanceEntry>> {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
         val result = realm.query(AttendanceEntry::class).find()
-        val grouped = result.groupBy { it.predmet }.values.toList()
+        val grouped = result.groupBy { it.`class` }.values.toList()
 
-        return grouped.sortedBy { it.first().predmet }.sortedBy { it.first().semestar }
+        return grouped.sortedBy { it.first().`class` }.sortedBy { it.first().semester }
     }
 
 }

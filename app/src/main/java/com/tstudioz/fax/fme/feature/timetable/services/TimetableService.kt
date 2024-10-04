@@ -27,8 +27,11 @@ class TimetableService(private val client: OkHttpClient) : TimetableServiceInter
 
         val response: Response = client.newCall(request).execute()
         val value = response.body?.string()
+        val success = response.isSuccessful
 
-        if (!response.isSuccessful || value.isNullOrEmpty()) {
+        response.close()
+
+        if (!success || value.isNullOrEmpty()) {
             return NetworkServiceResult.TimeTableResult.Failure(Throwable("Failed to fetch schedule"))
         }
 
@@ -51,8 +54,11 @@ class TimetableService(private val client: OkHttpClient) : TimetableServiceInter
 
         val response: Response = client.newCall(request).execute()
         val value = response.body?.string()
+        val success = response.isSuccessful
 
-        if (!response.isSuccessful || value.isNullOrEmpty()) {
+        response.close()
+
+        if (!success || value.isNullOrEmpty()) {
             return NetworkServiceResult.TimeTableResult.Failure(Throwable("Failed to fetch schedule"))
         }
 

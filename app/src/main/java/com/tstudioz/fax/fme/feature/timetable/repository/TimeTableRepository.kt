@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.timetable.repository
 
-import android.util.Log
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
@@ -9,16 +8,32 @@ import com.tstudioz.fax.fme.feature.timetable.parseTimetableInfo
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.feature.timetable.services.interfaces.TimetableServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 class TimeTableRepository(
     private val timetableService: TimetableServiceInterface,
     private val timeTableDao: TimeTableDaoInterface
 ) : TimeTableRepositoryInterface {
 
+    private val _events: MutableSharedFlow<List<Event>> = MutableSharedFlow(1)
+    override val events: SharedFlow<List<Event>> = _events.asSharedFlow()
+
+    override val lastFetched: Long = 0L
+
+    init {
+        observeEventsFromCache()
+    }
+
     override suspend fun fetchTimetable(
         user: String,
         startDate: String,
-        endDate: String
+        endDate: String,
+        shouldCache: Boolean
     ): List<Event> {
         val params: HashMap<String, String> = hashMapOf(
             "DataType" to "User",
@@ -27,10 +42,17 @@ class TimeTableRepository(
             "MaxDate" to endDate
         )
 
-        return when (val result = timetableService.fetchTimeTable(params = params)) {
-            is NetworkServiceResult.TimeTableResult.Success -> parseTimetable(result.data)
+        when (val result = timetableService.fetchTimeTable(params = params)) {
+            is NetworkServiceResult.TimeTableResult.Success -> {
+                val events = parseTimetable(result.data)
+
+                if (shouldCache) {
+                    insert(events)
+                }
+
+                return events
+            }
             is NetworkServiceResult.TimeTableResult.Failure -> {
-                Log.e(TAG, "Timetable fetching error")
                 throw Exception("Timetable fetching error")
             }
         }
@@ -45,22 +67,33 @@ class TimeTableRepository(
         return when (val result = timetableService.fetchTimetableCalendar(params = params)) {
             is NetworkServiceResult.TimeTableResult.Success -> parseTimetableInfo(result.data)
             is NetworkServiceResult.TimeTableResult.Failure -> {
-                Log.e(TAG, "TimetableInfo fetching error")
                 throw Exception("TimetableInfo fetching error")
             }
         }
     }
 
-    override suspend fun insert(classes: List<Event>) {
-        timeTableDao.insert(classes)
+    override suspend fun getCachedEvents(): List<Event> {
+        return timeTableDao.getEvents()
     }
 
-    override suspend fun getCachedEvents(): List<Event> {
-        return timeTableDao.getCachedEvents()
+    private fun observeEventsFromCache() {
+        CoroutineScope(Dispatchers.IO).launch {
+            timeTableDao.getEventsAsync().collect {
+                _events.emit(it)
+            }
+        }
+    }
+
+    private suspend fun insert(classes: List<Event>) {
+        timeTableDao.insert(classes)
     }
 
     companion object {
         private val TAG = this.javaClass.canonicalName
     }
 
+}
+
+private fun Long.hasPassedMoreThan(seconds: Long): Boolean {
+    return this + seconds * 1000 < System.currentTimeMillis()
 }

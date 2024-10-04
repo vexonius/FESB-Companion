@@ -2,19 +2,13 @@
 <resources>
     <color name="colorPrimary">#263238</color>
     <color name="colorPrimaryDark">#1e262a</color>
-    <color name="deepBlue">#00C4FF</color>
     <color name="colorAccent">#00C4FF</color>
-    <color name="home_color">#ffffff</color>
     <color name="white">#ffffff</color>
     <color name="_20white">#70ffffff</color>
-    <color name="_10white">#26FFFFFF</color>
-    <color name="_5white">#0affffff</color>
-    <color name="_70white">#aeffffff</color>
-    <color name="left_color">#006735</color>
-    <color name="right_color">#263238</color>
-    <color name="my_color">#1d1d1d</color>
     <color name="dark_cyan">#0097a7</color>
     <color name="darker_cyan">#00838f</color>
+    <color name="green_blue">#0f5eb4</color>
+    <color name="lust">#e1141b</color>
 
 
     //bottomNavigation
@@ -30,25 +24,16 @@
     <color name="purple_nice">#BA68C8</color>
     <color name="grey_nice">#757575</color>
     <color name="purple_dark">#7B1FA2</color>
-    <color name="generic">#00c4c2</color>
 
     //Boje adapter itema
-    <color name="silver">#7e7e7e</color>
 
-    <color name="grey_new">#9a9a9a</color>
     <color name="almost_white">#cecece</color>
     <color name="black">#000000</color>
 
-    <array name="rainbow">
-        <item>@color/colorAccent</item>
-        <item>@color/red_nice</item>
-        <item>@color/_5white</item>
-    </array>
-
     <!-- Screens background color-->
-    <color name="welcome1">#f64c73</color>
     <color name="welcome2">#20d2bb</color>
-    <color name="welcome3">#3395ff</color>
-    <color name="welcome4">#c873f4</color>
+
+    <color name="Endeavour">#0052a3</color>
+    <color name="passGreen">#02b010</color>
 
 </resources>

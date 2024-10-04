@@ -11,9 +11,8 @@
     <application
         android:name=".Application.FESBCompanion"
         android:allowBackup="true"
-        android:icon="@drawable/icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="FESB Companion"
-        android:roundIcon="@drawable/icon"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
@@ -43,19 +42,9 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".view.activities.NoteActivity"
-            android:label=""
-            android:parentActivityName=".view.activities.MainActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/AppTheme" />
-        <activity
             android:name=".view.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity
-            android:name=".view.activities.Welcome"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".view.activities.SettingsActivity"
             android:label="Postavke"
@@ -63,7 +52,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/SettingsTheme" />
         <activity
-            android:name=".view.activities.MenzaActivity"
+            android:name=".feature.menza.view.MenzaActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Simple" />
     </application>

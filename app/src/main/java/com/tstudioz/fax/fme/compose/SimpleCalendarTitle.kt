@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -50,11 +49,9 @@ fun SimpleCalendarTitle(
             modifier = Modifier
                 .weight(1f)
                 .testTag("MonthTitle"),
-            text = currentMonth.month.getDisplayName(
-                TextStyle.FULL_STANDALONE,
-                Locale.getDefault()
-            ).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-                    + " " + currentMonth.year.toString(),
+            text = currentMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                + " " + currentMonth.year.toString(),
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,

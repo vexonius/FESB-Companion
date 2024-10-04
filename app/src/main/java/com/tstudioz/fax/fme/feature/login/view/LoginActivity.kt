@@ -14,7 +14,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.databinding.ActivityLoginBinding
 import com.tstudioz.fax.fme.view.activities.MainActivity
-import com.tstudioz.fax.fme.view.activities.Welcome
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -30,8 +29,8 @@ class LoginActivity : AppCompatActivity() {
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         val view: View = binding.root
+
         setContentView(view)
-        firstTimeWelcomeShowcase()
         isUserLoggedIn()
         observeInputFields()
         loadBlueButton()
@@ -59,14 +58,6 @@ class LoginActivity : AppCompatActivity() {
                 showErrorSnack(message)
                 binding.progressLogin.visibility = View.INVISIBLE
                 binding.loginButton.visibility = View.VISIBLE
-            }
-        }
-    }
-
-    private fun firstTimeWelcomeShowcase() {
-        loginViewModel.firstTimeInApp.observe(this) { firstTime ->
-            if (firstTime) {
-                startActivity(Intent(this@LoginActivity, Welcome::class.java))
             }
         }
     }
