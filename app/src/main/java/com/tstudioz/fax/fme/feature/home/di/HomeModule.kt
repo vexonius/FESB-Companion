@@ -20,5 +20,5 @@ val homeModule = module {
     single<NoteRepositoryInterface> { NoteRepository(get()) }
     single<WeatherServiceInterface> { WeatherService(get()) }
     single<WeatherRepositoryInterface> { WeatherRepository(get()) }
-    viewModel { HomeViewModel(androidApplication(), get(), get()) }
+    viewModel { HomeViewModel(androidApplication(), get(), get(), get(), get()) }
 }

@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.compose
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,6 +46,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimetableType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,6 +55,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
 
@@ -88,18 +92,14 @@ fun BasicEvent(
 ) {
     val event = positionedEvent.event
     val topRadius =
-        if (positionedEvent.splitType == SplitType.Start || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
+        if (positionedEvent.splitType == SplitType.Start || positionedEvent.splitType == SplitType.Both) 0.dp else 8.dp
     val bottomRadius =
-        if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
-
+        if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 8.dp
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(
-                end = 2.dp,
-                bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 2.dp
-            )
+            .padding(2.dp)
             .clipToBounds()
             .background(
                 event.color,
@@ -110,37 +110,27 @@ fun BasicEvent(
                     bottomStart = bottomRadius,
                 )
             )
-            .padding(2.dp)
+            .padding(4.dp)
             .clickable { onClick(positionedEvent.event) }
     ) {
         Text(
-            text = event.shortName,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Clip,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth(),
+            text = event.name,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.fillMaxWidth().weight(1f, fill = false),
         )
-
-        if (event.description != null) {
-            Text(
-                text = event.classroom,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
 
         Text(
-            text = "${event.start.format(EventTimeFormatter)} - ${event.end.format(EventTimeFormatter)}",
+            text = event.classroom,
             style = MaterialTheme.typography.bodySmall,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            overflow = TextOverflow.Clip,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp).weight(1f),
         )
-
     }
 }
 
@@ -153,20 +143,22 @@ private class EventDataModifier(
 private fun Modifier.eventData(positionedEvent: PositionedEvent) =
     this.then(EventDataModifier(positionedEvent))
 
-private val DayFormatter = DateTimeFormatter.ofPattern("E d.M.")
+private val DayFormatter = DateTimeFormatter.ofPattern("d")
 
 @Composable
-fun BasicDayHeader(
-    day: LocalDate,
-    modifier: Modifier = Modifier,
-) {
+fun BasicDayHeader(day: LocalDate) {
+    val title = day.dayOfWeek.getDisplayName(TextStyle.SHORT, java.util.Locale.getDefault())
+        .take(3)
+        .lowercase()
+        .replaceFirstChar { it.uppercase() } + " " + day.format(DayFormatter)
     Text(
-        text = day.format(DayFormatter).replaceFirstChar { day.format(DayFormatter)[0].uppercase() },
+        text =  title,
         textAlign = TextAlign.Center,
-        modifier = modifier
+        fontWeight = FontWeight.Medium,
+        modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        color = MaterialTheme.colorScheme.onSurface,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
 
@@ -184,7 +176,10 @@ fun ScheduleHeader(
     modifier: Modifier = Modifier,
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
 ) {
-    Row(modifier = modifier) {
+    Row(
+        modifier = modifier
+            .background(color = colorResource(R.color.colorPrimary))
+    ) {
         val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
         repeat(numDays) { i ->
             Box(modifier = Modifier.width(dayWidth)) {
@@ -197,29 +192,27 @@ fun ScheduleHeader(
 @Preview(showBackground = true)
 @Composable
 fun ScheduleHeaderPreview() {
-
     ScheduleHeader(
         minDate = LocalDate.now(),
         maxDate = LocalDate.now().plusDays(5),
         dayWidth = 256.dp,
     )
-
 }
 
 private val HourFormatter = DateTimeFormatter.ofPattern("H")
 
 @Composable
-
 fun BasicSidebarLabel(
     time: LocalTime,
     modifier: Modifier = Modifier,
 ) {
     Text(
         text = time.format(HourFormatter),
+        textAlign = TextAlign.End,
         modifier = modifier
             .fillMaxHeight()
-            .padding(vertical = 0.dp, horizontal = 4.dp),
-        color = MaterialTheme.colorScheme.onSurface,
+            .padding(vertical = 0.dp, horizontal = 8.dp),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 
 }
@@ -228,7 +221,6 @@ fun BasicSidebarLabel(
 @Composable
 fun BasicSidebarLabelPreview() {
     BasicSidebarLabel(time = LocalTime.NOON, Modifier.sizeIn(maxHeight = 64.dp))
-
 }
 
 @Composable
@@ -423,6 +415,7 @@ fun Schedule(
                 dayWidth = dayWidth,
                 dayHeader = dayHeader,
                 modifier = Modifier
+                    .background(color = colorResource(R.color.colorPrimary))
                     .padding(start = with(LocalDensity.current) { sidebarWidth.toDp() })
                     .horizontalScroll(horizontalScrollState)
                     .onGloballyPositioned { headerHeight = it.size.height }
@@ -480,7 +473,7 @@ fun BasicSchedule(
     val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes / 60
-    val dividerColor = Color.DarkGray
+    val dividerColor = colorResource(R.color.colorPrimary)
     val positionedEvents =
         remember(events) { arrangeEvents(splitEvents(events.sortedBy(Event::start))).filter { it.end > minTime && it.start < maxTime } }
     Layout(
@@ -492,6 +485,7 @@ fun BasicSchedule(
             }
         },
         modifier = modifier
+            .padding(1.dp, 1.dp)
             .drawBehind {
                 val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
                 val firstHourOffsetMinutes =
@@ -500,6 +494,12 @@ fun BasicSchedule(
                         firstHour.plusHours(1)
                     )
                 val firstHourOffset = (firstHourOffsetMinutes / 60f) * hourHeight.toPx()
+                drawLine(
+                    dividerColor,
+                    start = Offset(0f, 0f),
+                    end = Offset(0f, size.height),
+                    strokeWidth = 1.dp.toPx()
+                )
                 repeat(numHours) {
                     drawLine(
                         dividerColor,
@@ -558,11 +558,10 @@ fun BasicSchedule(
 fun EventPreview(
     @PreviewParameter(EventsProvider::class) event: Event,
 ) {
-
     BasicEvent(
         PositionedEvent(
             event,
-            SplitType.None,
+            SplitType.Start,
             event.start.toLocalDate(),
             event.start.toLocalTime(),
             event.end.toLocalTime()
@@ -642,7 +641,7 @@ private val sampleEvents2 = listOf(
         id = "0",
         name = "Ponedjeljak",
         shortName = "P",
-        color = Color.Blue,
+        color = Color.Red,
         colorId = 2131099687,
         professor = "matko",
         eventType = TimetableType.OTHER,
@@ -656,7 +655,7 @@ private val sampleEvents2 = listOf(
         id = "532059",
         name = "Kriptografija i mrežna sigurnost",
         shortName = "KIMS",
-        color = Color.Blue,
+        color = Color.Yellow,
         colorId = 2131099687,
         professor = "Čagalj Mario",
         eventType = TimetableType.PREDAVANJE,
@@ -670,7 +669,7 @@ private val sampleEvents2 = listOf(
         id = "534198",
         name = "Metode optimizacije",
         shortName = "MO",
-        color = Color.Blue,
+        color = Color.Green,
         colorId = 2131100480,
         professor = "Bašić Martina",
         eventType = TimetableType.LABORATORIJSKA_VJEZBA,
