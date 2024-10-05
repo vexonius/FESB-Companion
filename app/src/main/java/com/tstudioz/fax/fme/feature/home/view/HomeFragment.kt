@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.databinding.TabHomeBinding
+import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
 import com.tstudioz.fax.fme.random.NetworkUtils
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.android.inject
@@ -20,6 +21,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class HomeFragment : Fragment() {
 
     private val homeViewModel: HomeViewModel by viewModel()
+    private val menzaViewModel: MenzaViewModel by viewModel()
     private val networkUtils: NetworkUtils by inject()
 
     private var binding: TabHomeBinding? = null
@@ -41,6 +43,7 @@ class HomeFragment : Fragment() {
                 notes = homeViewModel.notes,
                 events = homeViewModel.events,
                 lastFetched = homeViewModel.lastFetched,
+                menza = menzaViewModel.menza,
                 insertNote = homeViewModel::insert,
                 deleteNote = homeViewModel::delete
             )
@@ -50,6 +53,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        menzaViewModel.getMenza()
 
         setCyanStatusBarColor()
         homeViewModel.fetchDailyTimetable()
