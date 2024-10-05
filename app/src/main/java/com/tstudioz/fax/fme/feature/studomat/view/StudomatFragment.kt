@@ -14,7 +14,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.feature.studomat.compose.HomeCompose
+import com.tstudioz.fax.fme.feature.studomat.compose.StudomatCompose
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -43,7 +43,7 @@ class StudomatFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                AppTheme { HomeCompose(studomatViewModel) }
+                AppTheme { StudomatCompose(studomatViewModel) }
             }
             setViewCompositionStrategy(
                 ViewCompositionStrategy.DisposeOnLifecycleDestroyed(

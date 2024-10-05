@@ -39,7 +39,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,14 +64,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
-import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.models.Menza
+import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
+import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
+import kotlinx.coroutines.InternalCoroutinesApi
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -82,19 +90,42 @@ import kotlin.math.sin
 
 val sidePadding = 20.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class)
 @Composable
 fun HomeTabCompose(
-    weather: LiveData<WeatherDisplay>,
-    notes: LiveData<List<Note>>,
-    lastFetched: LiveData<String>,
-    events: LiveData<List<Event>>,
-    menza: LiveData<Menza?>,
-    insertNote: (note: Note) -> Unit,
-    deleteNote: (note: Note) -> Unit,
+    homeViewModel: HomeViewModel = koinViewModel(),
+    menzaViewModel: MenzaViewModel = koinViewModel()
 ) {
+
+    val weather: LiveData<WeatherDisplay> = homeViewModel.weatherDisplay
+    val notes: LiveData<List<Note>> = homeViewModel.notes
+    val lastFetched: LiveData<String> = homeViewModel.lastFetched
+    val events: LiveData<List<Event>> = homeViewModel.events
+    val menza: LiveData<Menza?> = menzaViewModel.menza
+    val insertNote: (note: Note) -> Unit = homeViewModel::insert
+    val deleteNote: (note: Note) -> Unit = homeViewModel::delete
     val menzaShow = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        // Do something with your state
+        // You may want to use DisposableEffect or other alternatives
+        // instead of LaunchedEffect
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {}
+            Lifecycle.State.INITIALIZED -> {}
+            Lifecycle.State.CREATED -> {}
+            Lifecycle.State.STARTED -> {}
+            Lifecycle.State.RESUMED -> {
+                homeViewModel.fetchDailyTimetable()
+                menzaViewModel.getMenza()
+            }
+        }
+    }
+
     AppTheme {
         BottomSheetScaffold(
             sheetPeekHeight = 0.dp,
@@ -103,7 +134,7 @@ fun HomeTabCompose(
                     MenzaCompose(menza, menzaShow)
                 }
             }) { paddingValues ->
-            Box(modifier = Modifier.fillMaxHeight()){
+            Box(modifier = Modifier.fillMaxHeight()) {
                 LazyColumn(
                     Modifier
                         .padding(paddingValues)

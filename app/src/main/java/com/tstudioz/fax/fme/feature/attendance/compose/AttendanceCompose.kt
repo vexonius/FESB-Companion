@@ -11,19 +11,45 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.AttendanceEntry
+import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
 
+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun AttendanceCompose(attendanceItems: LiveData<List<List<AttendanceEntry>>>) {
+fun AttendanceCompose(attendanceViewModel: AttendanceViewModel) {
 
-    val items = attendanceItems.observeAsState().value?.sortedBy { it.first().semester }
+    val items = attendanceViewModel.attendanceList.observeAsState().value?.sortedBy { it.first().semester }
         ?: emptyList()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        // Do something with your state
+        // You may want to use DisposableEffect or other alternatives
+        // instead of LaunchedEffect
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {}
+            Lifecycle.State.INITIALIZED -> {}
+            Lifecycle.State.CREATED -> {}
+            Lifecycle.State.STARTED -> {}
+            Lifecycle.State.RESUMED -> {
+                attendanceViewModel.fetchAttendance()
+            }
+        }
+    }
 
     AppTheme {
         if (items.isEmpty()) {

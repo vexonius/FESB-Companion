@@ -46,15 +46,18 @@ class StudomatViewModel(
     }
 
     init {
-        runBlocking { loadData() }
+        loadData()
+        initStudomat()
     }
 
-    suspend fun loadData() {
-        val yearsRealm = repository.readYears().sortedByDescending { it.title }
-        val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
-        years.postValue(yearsRealm)
-        subjectList.postValue(latestYearSubjects)
-        generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
+    private fun loadData() {
+        runBlocking {
+            val yearsRealm = repository.readYears().sortedByDescending { it.title }
+            val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
+            years.postValue(yearsRealm)
+            subjectList.postValue(latestYearSubjects)
+            generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
+        }
     }
 
     suspend fun login(pulldownTriggered: Boolean = false): Boolean {

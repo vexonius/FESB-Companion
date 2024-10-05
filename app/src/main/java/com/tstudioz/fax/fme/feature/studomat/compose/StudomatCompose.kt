@@ -41,12 +41,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.compose.CircularIndicator
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeCompose(studomatViewModel: StudomatViewModel) {
+fun StudomatCompose(studomatViewModel: StudomatViewModel) {
 
     val subjectList = studomatViewModel.subjectList.observeAsState().value
         ?.sortedBy { it.name }

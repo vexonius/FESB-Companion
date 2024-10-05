@@ -19,10 +19,12 @@ import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.repository.WeatherRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.weatherSymbolKeys
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.random.NetworkUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -38,6 +40,8 @@ class HomeViewModel(
     private val timeTableRepository: TimeTableRepositoryInterface,
     private val userRepository: UserRepositoryInterface
 ) : AndroidViewModel(application) {
+
+    private val networkUtils : NetworkUtils by inject(NetworkUtils::class.java)
 
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
     private var _forecastGot = MutableLiveData<Boolean>()
@@ -57,6 +61,11 @@ class HomeViewModel(
 
     init {
         getNotes()
+        if (networkUtils.isNetworkAvailable()) {
+            getForecast()
+        } else {
+            viewModelScope.launch{ snackbarHostState.showSnackbar("Niste povezani") }
+        }
     }
 
     fun getForecast() {

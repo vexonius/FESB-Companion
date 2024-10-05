@@ -6,17 +6,19 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.MainCompose
 import com.tstudioz.fax.fme.databinding.ActivityMainBinding
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
 import com.tstudioz.fax.fme.feature.home.view.HomeFragment
-import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
-import com.tstudioz.fax.fme.feature.studomat.view.StudomatFragment
 import com.tstudioz.fax.fme.feature.iksica.IksicaFragment
+import com.tstudioz.fax.fme.feature.studomat.view.StudomatFragment
+import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -40,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        /*binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
         onBack()
@@ -49,6 +51,10 @@ class MainActivity : AppCompatActivity() {
         setTabListener()
         setDefaultScreen()
         isThereAction()
+        */
+        setContent {
+            MainCompose()
+        }
     }
 
     private fun setDefaultScreen() {
