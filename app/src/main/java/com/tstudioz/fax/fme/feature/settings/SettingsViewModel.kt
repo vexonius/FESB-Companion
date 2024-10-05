@@ -68,7 +68,7 @@ class SettingsViewModel(
         val version = getBuildVersion(context)
         ShareCompat.IntentBuilder.from(context as android.app.Activity)
             .setType("message/rfc822")
-            .addEmailTo("info@tstud.io")
+            .addEmailTo("support@fesbcompanion.xyz")
             .setSubject("$title v$version")
             .setText(body)
             .setChooserTitle("Pošalji email pomoću...")
