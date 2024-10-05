@@ -25,18 +25,22 @@ import com.tstudioz.fax.fme.database.models.AttendanceEntry
 fun AttendanceItem(attendanceItem: AttendanceEntry) {
 
     val percent = attendanceItem.attended.toFloat() / attendanceItem.total.toFloat()
+    val type = (attendanceItem.type ?: "").replaceFirstChar { it.uppercase() }
     ListItem(
         headlineContent = {
-            Text(
-                (attendanceItem.vrsta ?: "").replaceFirstChar { it.uppercase() })
+            Text(type)
         },
         supportingContent = {
             Column {
                 LinearProgressIndicator(
-                    progress = { percent }, modifier = Modifier.padding(top = 8.dp)
+                    progress = { percent },
+                    modifier = Modifier.padding(top = 8.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text((stringResource(R.string.attendance_required, attendanceItem.required ?: "")), fontSize = 12.sp)
+                Text(
+                    (stringResource(R.string.attendance_required, attendanceItem.required ?: "")),
+                    fontSize = 12.sp
+                )
             }
         },
         trailingContent = {

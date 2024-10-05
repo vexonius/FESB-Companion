@@ -49,11 +49,9 @@ fun SimpleCalendarTitle(
             modifier = Modifier
                 .weight(1f)
                 .testTag("MonthTitle"),
-            text = currentMonth.month.getDisplayName(
-                TextStyle.FULL_STANDALONE,
-                Locale.getDefault()
-            ).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-                    + " " + currentMonth.year.toString(),
+            text = currentMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                + " " + currentMonth.year.toString(),
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,

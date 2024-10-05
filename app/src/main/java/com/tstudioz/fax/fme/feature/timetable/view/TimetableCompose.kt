@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,10 +29,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -48,6 +53,7 @@ import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jsoup.internal.StringUtil.padding
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
@@ -55,37 +61,36 @@ import java.time.YearMonth
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableCompose(
-    showDay: LiveData<Boolean>,
-    showDayEvent: LiveData<Event>,
+    showDayEvent: LiveData<Event?>,
     shownWeekChooseMenu: LiveData<Boolean>,
     lessonsToShow: LiveData<List<Event>>,
     shownWeek: LiveData<LocalDate>,
     periods:  LiveData<List<TimeTableInfo>>,
     monthData: LiveData<MonthData>,
-    fetchUserTimetable: (LocalDate, LocalDate, LocalDate) -> Unit,
+    fetchUserTimetable: (LocalDate) -> Unit,
     showEvent: (Event) -> Unit,
     showWeekChooseMenu: (Boolean) -> Unit,
     hideEvent: () -> Unit
     ) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val event = showDayEvent.observeAsState().value
 
     BottomSheetScaffold(
         sheetContent = {
-            if (showDay.observeAsState(initial = false).value) {
+            event?.let {
                 ModalBottomSheet(
                     sheetState = sheetState,
                     onDismissRequest = { hideEvent() },
-                    containerColor = showDayEvent.observeAsState().value?.color ?: Color.Transparent,
+                    containerColor = event.color,
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                     shape = RectangleShape
                 ) {
-                    showDayEvent.observeAsState().value?.let {
-                        BottomInfoCompose(it)
-                    }
+                    BottomInfoCompose(it)
+                  }
                 }
-            }
+
             if (shownWeekChooseMenu.observeAsState(initial = false).value) {
                 ModalBottomSheet(sheetState = sheetState,
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -127,34 +132,28 @@ fun TimetableCompose(
                         Spacer(modifier = Modifier.padding(0.dp, 5.dp))
                         HorizontalCalendar(state = state, dayContent = { day ->
                             Day(day, isSelected = selection == day, periods = periods.value ?: emptyList()) { clicked ->
-                                selection = if (clicked == selection) {
-                                    null
-                                } else {
-                                    clicked
-                                }
+                                selection = if (clicked == selection) { null } else { clicked }
                             }
                         })
                         Row(
-                            horizontalArrangement = Arrangement.SpaceAround,
+                            horizontalArrangement = Arrangement.End,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(0.dp, 5.dp)
+                                .padding(24.dp, 16.dp)
                         ) {
-                            Button(onClick = {
+                            TextButton(
+                                onClick = {
                                 coroutineScope.launch {
                                     sheetState.hide()
                                     delay(300)
                                     showWeekChooseMenu(false)
                                 }
                             }) {
-                                Text(text = stringResource(id = R.string.cancelChoosingWeek))
+                                Text(text = stringResource(id = R.string.cancelChoosingWeek), color = Color.Gray)
                             }
-                            Button(onClick = {
+                            TextButton(onClick = {
                                 selection?.let {
-                                    val start = it.date.dayOfWeek.value
-                                    val startDate = it.date.minusDays((start - 1).toLong())
-                                    val endDate = it.date.plusDays(7 - start.toLong())
-                                    fetchUserTimetable(startDate, endDate, startDate)
+                                    fetchUserTimetable(it.date)
                                     coroutineScope.launch {
                                         sheetState.hide()
                                         delay(300)
@@ -184,13 +183,11 @@ fun TimetableCompose(
                 events = mapped,
                 minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
                 maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
-                else if (eventAfter8PM) LocalTime.of(21, 0)
-                else LocalTime.of(20, 0),
+                    else if (eventAfter8PM) LocalTime.of(21, 0)
+                    else LocalTime.of(20, 0),
                 minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
                 maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
-                onClick = { event ->
-                    showEvent(event)
-                }
+                onClick = { showEvent(it) }
             )
 
         }
@@ -232,18 +229,20 @@ fun Day(
     Column(
         modifier = Modifier
             .aspectRatio(1f)
-            .padding(0.dp, 3.dp)
-            .border(
-                width = if (isSelected) 1.dp else 1.dp,
-                color = if (isSelected) selectedItemColor else (dayColor ?: MaterialTheme.colorScheme.background),
+            .background(
+                shape = CircleShape,
+                color = dayColor ?: Color.Transparent
             )
-            .background(color = (dayColor ?: MaterialTheme.colorScheme.background))
+            .clip(CircleShape)
+            .border(2.dp, if (isSelected) Color.White else Color.Transparent, CircleShape)
+            .padding(8.dp)
             .clickable { onClick(day) },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = day.date.dayOfMonth.toString(),
+            fontWeight = FontWeight.Medium,
             color = textColor,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )

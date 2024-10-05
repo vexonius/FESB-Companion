@@ -22,38 +22,49 @@ import com.tstudioz.fax.fme.database.models.AttendanceEntry
 @Composable
 fun AttendanceCompose(attendanceItems: LiveData<List<List<AttendanceEntry>>>) {
 
+    val items = attendanceItems.observeAsState().value?.sortedBy { it.first().semester }
+        ?: emptyList()
+
     AppTheme {
-        if (attendanceItems.observeAsState().value?.isEmpty() == true) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.width(64.dp)
-                )
-            }
+        if (items.isEmpty()) {
+            EmptyView()
         } else {
-            val items = attendanceItems.observeAsState().value ?: emptyList()
-            items.sortedBy { it.first().semestar }
-            LazyColumn {
-                items(items.size) { index ->
-                    ListItem(headlineContent = {
-                        Text(
-                            text = items[index].first().predmet ?: ""
-                        )
-                    },
-                        supportingContent = {
-                            Column {
-                                (items[index]).forEach {
-                                    AttendanceItem(it)
-                                }
-                            }
+            CreateAttendanceListView(items)
+        }
+    }
+}
+
+@Composable
+fun EmptyView() {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.width(64.dp)
+        )
+    }
+}
+
+@Composable
+fun CreateAttendanceListView(items: List<List<AttendanceEntry>>) {
+    LazyColumn {
+        items(items.size) { index ->
+            ListItem(headlineContent = {
+                Text(
+                    text = items[index].first().`class` ?: ""
+                )
+            },
+                supportingContent = {
+                    Column {
+                        (items[index]).forEach {
+                            AttendanceItem(it)
                         }
-                    )
-                    Divider(modifier = Modifier.padding(4.dp))
+                    }
                 }
-            }
+            )
+            Divider(modifier = Modifier.padding(4.dp))
         }
     }
 }
