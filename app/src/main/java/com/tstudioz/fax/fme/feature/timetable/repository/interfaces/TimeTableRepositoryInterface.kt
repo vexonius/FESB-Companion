@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.SharedFlow
 
 interface TimeTableRepositoryInterface {
 
-    val lastFetched: Long
-
     val events: SharedFlow<List<Event>>
 
     suspend fun fetchTimetable(user: String, startDate: String, endDate: String, shouldCache: Boolean): List<Event>

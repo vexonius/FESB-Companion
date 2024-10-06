@@ -24,9 +24,12 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.time.DurationUnit
@@ -47,16 +50,15 @@ class HomeViewModel(
     private var _forecastGot = MutableLiveData<Boolean>()
     private val _weatherDisplay = MutableLiveData<WeatherDisplay>()
     private val _notes = MutableLiveData<List<Note>>()
-    private val _lastFetched = MutableLiveData<String>()
 
     val weatherDisplay: LiveData<WeatherDisplay> = _weatherDisplay
     val forecastGot: LiveData<Boolean> = _forecastGot
     val notes: LiveData<List<Note>> = _notes
     val events: LiveData<List<Event>> = timeTableRepository.events.asLiveData()
-    val lastFetched: LiveData<String> = _lastFetched
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("HomeViewModel", "Caught $exception")
+        runBlocking{ snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
@@ -115,7 +117,7 @@ class HomeViewModel(
                 }
             }
         else {
-            _notes.value = _notes.value?.plus(note)
+            _notes.postValue(_notes.value?.plus(note))
         }
         viewModelScope.launch(Dispatchers.IO + handler) {
             noteRepository.insert(note.toNoteRealm())
@@ -123,7 +125,7 @@ class HomeViewModel(
     }
 
     fun delete(note: Note) {
-        _notes.value = _notes.value?.minus(note)
+        _notes.postValue(_notes.value?.minus(note))
         viewModelScope.launch(Dispatchers.IO + handler) {
             noteRepository.delete(note.toNoteRealm())
         }
@@ -134,9 +136,6 @@ class HomeViewModel(
         val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
         val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
         fetchDailyTimetable(startDate, endDate)
-        _lastFetched.value = (System.currentTimeMillis() - timeTableRepository.lastFetched)
-            .toDuration(DurationUnit.MILLISECONDS)
-            .toString()
     }
 
     private fun getNotes() {

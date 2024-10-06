@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.navigation
 
-import android.content.Intent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -81,7 +82,15 @@ fun MainNavHost(
             )
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = Home, modifier = Modifier.padding(innerPadding)) {
+        NavHost(navController = navController, startDestination = Home, modifier = Modifier.padding(innerPadding),
+            enterTransition = {
+                // you can change whatever you want transition
+                EnterTransition.None
+            },
+            exitTransition = {
+                // you can change whatever you want transition
+                ExitTransition.None
+            }) {
             composable<Iksica> {
                 IksicaCompose(iksicaViewModel)
             }

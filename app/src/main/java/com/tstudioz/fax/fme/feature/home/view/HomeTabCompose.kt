@@ -100,7 +100,6 @@ fun HomeTabCompose(
 
     val weather: LiveData<WeatherDisplay> = homeViewModel.weatherDisplay
     val notes: LiveData<List<Note>> = homeViewModel.notes
-    val lastFetched: LiveData<String> = homeViewModel.lastFetched
     val events: LiveData<List<Event>> = homeViewModel.events
     val menza: LiveData<Menza?> = menzaViewModel.menza
     val insertNote: (note: Note) -> Unit = homeViewModel::insert
@@ -166,7 +165,6 @@ fun HomeTabCompose(
                     }
                     item {
                         TodayTimetableCompose(
-                            lastFetched.observeAsState().value ?: "",
                             events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
                                 ?: emptyList()
                         )
@@ -453,7 +451,6 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
 
 @Composable
 fun TodayTimetableCompose(
-    lastFetched: String,
     events: List<Event>
 ) {
     Column(
@@ -468,14 +465,6 @@ fun TodayTimetableCompose(
             Text(
                 text = stringResource(id = R.string.todaysEvents),
                 fontSize = 13.sp,
-                modifier = Modifier.weight(.6f, false),
-                color = colorResource(id = R.color.shady_blue)
-            )
-            Text(
-                text = lastFetched,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 10.sp,
-                modifier = Modifier.weight(.4f, false),
                 color = colorResource(id = R.color.shady_blue)
             )
         }

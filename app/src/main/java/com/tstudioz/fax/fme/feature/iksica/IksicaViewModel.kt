@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @InternalCoroutinesApi
 class IksicaViewModel(
@@ -41,6 +42,7 @@ class IksicaViewModel(
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
+        runBlocking{ snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {

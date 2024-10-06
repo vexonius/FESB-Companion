@@ -43,6 +43,7 @@ class StudomatViewModel(
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
+        runBlocking { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
@@ -51,7 +52,7 @@ class StudomatViewModel(
     }
 
     private fun loadData() {
-        runBlocking {
+        runBlocking(Dispatchers.IO + coroutineExceptionHandler) {
             val yearsRealm = repository.readYears().sortedByDescending { it.title }
             val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
             years.postValue(yearsRealm)

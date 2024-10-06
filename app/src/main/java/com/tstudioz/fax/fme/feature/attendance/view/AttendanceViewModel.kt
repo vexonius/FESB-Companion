@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 
 @ExperimentalCoroutinesApi
@@ -24,6 +25,8 @@ class AttendanceViewModel(
 ) : ViewModel() {
 
     val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
+
+    var lastFetch = 0L
 
     private var _error = MutableLiveData(false)
     val error: LiveData<Boolean> = _error
@@ -35,7 +38,8 @@ class AttendanceViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error attendance", exception.toString())
-        _error.value = true
+        runBlocking{ snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        _error.postValue(true)
     }
 
     init {
@@ -50,9 +54,18 @@ class AttendanceViewModel(
         }
     }
 
+    private fun has60SecondsPassed(): Boolean {
+        return System.currentTimeMillis() - lastFetch > 100
+    }
+
     fun fetchAttendance() {
         viewModelScope.launch(context = Dispatchers.IO + handler) {
             if (networkUtils.isNetworkAvailable()) {
+                if (!has60SecondsPassed()) {
+                    return@launch
+                } else {
+                    lastFetch = System.currentTimeMillis()
+                }
                 when (val attendance = repository.fetchAttendance()) {
                     is NetworkServiceResult.AttendanceParseResult.Success -> {
                         val data = attendance.data

@@ -16,6 +16,7 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -70,11 +71,13 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
     val showEvent = { it: Event -> timetableViewModel.showEvent(it) }
     val showWeekChooseMenu = { it: Boolean -> timetableViewModel.showWeekChooseMenu(it) }
     val hideEvent = { timetableViewModel.hideEvent() }
+    val snackbarHostState = timetableViewModel.snackbarHostState
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val event = showDayEvent.observeAsState().value
 
     BottomSheetScaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         sheetContent = {
             event?.let {
                 ModalBottomSheet(

@@ -57,10 +57,10 @@ fun AttendanceCompose(attendanceViewModel: AttendanceViewModel) {
     }
 
     AppTheme {
-        if (items.isEmpty()) {
-            EmptyView()
-        } else {
+        if (items.isNotEmpty()) {
             CreateAttendanceListView(items, snackbarHostState)
+        } else {
+            EmptyView()
         }
     }
 }
@@ -80,7 +80,7 @@ fun EmptyView() {
 
 @Composable
 fun CreateAttendanceListView(items: List<List<AttendanceEntry>>, snackbarHostState: SnackbarHostState) {
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }){
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
         LazyColumn(Modifier.padding(it)) {
             items(items.size) { index ->
                 ListItem(headlineContent = {
