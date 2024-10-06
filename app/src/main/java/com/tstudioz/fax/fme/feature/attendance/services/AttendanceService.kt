@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.attendance.services
 
-import android.util.Log
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -35,7 +34,6 @@ class AttendanceService(
         val success = response.isSuccessful
         val data = response.body?.string() ?: ""
         response.close()
-        Log.d("AttendanceService", "Attendance data fetched$success")
 
         if (!success) { return NetworkServiceResult.AttendanceFetchResult.Failure(Throwable("Failed to fetch attendance details")) }
 

@@ -6,11 +6,9 @@ import com.tstudioz.fax.fme.feature.attendance.ParseAttendance
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
-import java.util.concurrent.ConcurrentLinkedQueue
 
 class AttendanceRepository(
     private val attendanceService: AttendanceServiceInterface,
@@ -23,25 +21,24 @@ class AttendanceRepository(
             is NetworkServiceResult.AttendanceFetchResult.Success -> {
 
                 val attendanceList: List<List<AttendanceEntry>> = runBlocking {
-                    parseAttendance.parseAttendList(list.data)
-                        .map {
-                            async {
-                                Log.d("AttendanceRepository", "Fetching attendance for ${it.first.text()}")
-                                when (val classData = attendanceService.fetchAttendance(it.first.attr("href"))) {
-                                    is NetworkServiceResult.AttendanceFetchResult.Success -> {
-                                        parseAttendance.parseAttendance(
-                                            it.first,
-                                            classData.data,
-                                            it.second
-                                        )
-                                    }
+                    parseAttendance.parseAttendList(list.data).map {
+                        async {
+                            Log.d("AttendanceRepository", "Fetching attendance for ${it.first.text()}")
+                            when (val classData = attendanceService.fetchAttendance(it.first.attr("href"))) {
+                                is NetworkServiceResult.AttendanceFetchResult.Success -> {
+                                    parseAttendance.parseAttendance(
+                                        it.first,
+                                        classData.data,
+                                        it.second
+                                    )
+                                }
 
-                                    is NetworkServiceResult.AttendanceFetchResult.Failure -> {
-                                        emptyList()
-                                    }
+                                is NetworkServiceResult.AttendanceFetchResult.Failure -> {
+                                    emptyList()
                                 }
                             }
                         }
+                    }
                 }.awaitAll()
 
                 return if (attendanceList.isEmpty()) {

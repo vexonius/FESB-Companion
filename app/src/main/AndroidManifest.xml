@@ -7,7 +7,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.gms.permission.ACTIVITY_RECOGNITION" />
-
+    <queries>
+        <package android:name="com.ugovori.studentskiugovori" />
+    </queries>
     <application
         android:name=".Application.FESBCompanion"
         android:allowBackup="true"
