@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.timetable.view
 
 import android.util.Log
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,6 +28,8 @@ class TimetableViewModel(
     private val timeTableRepository: TimeTableRepositoryInterface,
     private val userRepository: UserRepositoryInterface
 ) : ViewModel() {
+
+    val snackbarHostState = SnackbarHostState()
 
     private val _currentEventShown = MutableLiveData<Event?>(null)
     val currentEventShown: LiveData<Event?> = _currentEventShown
@@ -57,6 +60,7 @@ class TimetableViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error timetable", exception.toString())
+        viewModelScope.launch(Dispatchers.IO) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
@@ -108,7 +112,9 @@ class TimetableViewModel(
     }
 
     fun showWeekChooseMenu(value: Boolean = true) {
-        _showWeekChooseMenu.postValue(value)
+        viewModelScope.launch(context = Dispatchers.IO + handler) {
+            _showWeekChooseMenu.postValue(value)
+        }
     }
 
     fun showEvent(event: Event) {

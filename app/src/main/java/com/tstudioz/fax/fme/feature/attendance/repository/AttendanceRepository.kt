@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.attendance.repository
 
+import android.util.Log
 import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.ParseAttendance
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
@@ -9,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class AttendanceRepository(
     private val attendanceService: AttendanceServiceInterface,
@@ -19,7 +21,7 @@ class AttendanceRepository(
     override suspend fun fetchAttendance(): NetworkServiceResult.AttendanceParseResult {
         when (val list = attendanceService.fetchAllAttendance()) {
             is NetworkServiceResult.AttendanceFetchResult.Success -> {
-                val attendanceList = mutableListOf<List<AttendanceEntry>>()
+                val attendanceList = ConcurrentLinkedQueue<List<AttendanceEntry>>()
 
                 val coroutines = parseAttendance.parseAttendList(list.data)
                     .map {
@@ -45,6 +47,7 @@ class AttendanceRepository(
                     )
                 } else {
                     insertAttendance(attendanceList.flatten())
+                    Log.d("AttendanceRepository", "Attendance data fetched and inserted")
                     NetworkServiceResult.AttendanceParseResult.Success(
                         attendanceList
                             .sortedBy { it.first().`class` }

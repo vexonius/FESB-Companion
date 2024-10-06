@@ -44,17 +44,14 @@
         <activity
             android:name=".view.activities.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".view.activities.SettingsActivity"
             android:label="Postavke"
             android:parentActivityName=".view.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SettingsTheme" />
-        <activity
-            android:name=".feature.menza.view.MenzaActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Simple" />
     </application>
 
 </manifest>

@@ -56,6 +56,8 @@ class LoginViewModel(
             when (repository.attemptLogin(username, password)) {
                 is UserRepositoryResult.LoginResult.Success -> {
                     loggedIn.postValue(true)
+                    sharedPreferences.edit().putString("username", username).apply()
+                    sharedPreferences.edit().putString("password", password).apply()
                 }
 
                 is UserRepositoryResult.LoginResult.Failure -> {

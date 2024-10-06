@@ -11,7 +11,7 @@ import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
-import com.tstudioz.fax.fme.random.NetworkUtils
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import io.realm.kotlin.internal.platform.runBlocking
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers

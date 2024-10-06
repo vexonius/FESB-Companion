@@ -9,12 +9,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,6 +39,7 @@ fun AttendanceCompose(attendanceViewModel: AttendanceViewModel) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+    val snackbarHostState = remember { attendanceViewModel.snackbarHostState }
 
     LaunchedEffect(lifecycleState) {
         // Do something with your state
@@ -55,7 +60,7 @@ fun AttendanceCompose(attendanceViewModel: AttendanceViewModel) {
         if (items.isEmpty()) {
             EmptyView()
         } else {
-            CreateAttendanceListView(items)
+            CreateAttendanceListView(items, snackbarHostState)
         }
     }
 }
@@ -74,23 +79,25 @@ fun EmptyView() {
 }
 
 @Composable
-fun CreateAttendanceListView(items: List<List<AttendanceEntry>>) {
-    LazyColumn {
-        items(items.size) { index ->
-            ListItem(headlineContent = {
-                Text(
-                    text = items[index].first().`class` ?: ""
-                )
-            },
-                supportingContent = {
-                    Column {
-                        (items[index]).forEach {
-                            AttendanceItem(it)
+fun CreateAttendanceListView(items: List<List<AttendanceEntry>>, snackbarHostState: SnackbarHostState) {
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }){
+        LazyColumn(Modifier.padding(it)) {
+            items(items.size) { index ->
+                ListItem(headlineContent = {
+                    Text(
+                        text = items[index].first().`class` ?: ""
+                    )
+                },
+                    supportingContent = {
+                        Column {
+                            (items[index]).forEach {
+                                AttendanceItem(it)
+                            }
                         }
                     }
-                }
-            )
-            Divider(modifier = Modifier.padding(4.dp))
+                )
+                Divider(modifier = Modifier.padding(4.dp))
+            }
         }
     }
 }

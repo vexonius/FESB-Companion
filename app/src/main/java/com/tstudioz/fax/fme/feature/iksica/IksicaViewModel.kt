@@ -1,13 +1,9 @@
 package com.tstudioz.fax.fme.feature.iksica
 
-import android.app.Application
 import android.content.SharedPreferences
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
@@ -23,7 +19,7 @@ import kotlinx.coroutines.launch
 @InternalCoroutinesApi
 class IksicaViewModel(
     private val repository: IksicaRepositoryInterface,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
 ) : ViewModel() {
 
     val receipts = MutableLiveData<List<Receipt>>()
@@ -99,6 +95,7 @@ class IksicaViewModel(
         } catch (e: Exception) {
             loggedIn.postValue(false)
             loginStatus.postValue(LoginStatus.FAILURE)
+            isRefreshing.postValue(false)
             e.printStackTrace()
             snackbarHostState.currentSnackbarData?.dismiss()
             snackbarHostState.showSnackbar("Greška prilikom prijave: " + e.message, duration = SnackbarDuration.Short)

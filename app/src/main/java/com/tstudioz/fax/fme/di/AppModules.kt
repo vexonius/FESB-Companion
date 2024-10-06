@@ -13,7 +13,7 @@ import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
 import com.tstudioz.fax.fme.networking.session.SessionDelegate
 import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
-import com.tstudioz.fax.fme.random.NetworkUtils
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.Interceptor

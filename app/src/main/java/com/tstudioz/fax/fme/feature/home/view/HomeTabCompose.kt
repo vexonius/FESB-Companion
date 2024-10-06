@@ -34,6 +34,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -106,6 +107,8 @@ fun HomeTabCompose(
     val deleteNote: (note: Note) -> Unit = homeViewModel::delete
     val menzaShow = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
+    val snackbarHostState = remember { homeViewModel.snackbarHostState }
+
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
@@ -128,6 +131,7 @@ fun HomeTabCompose(
 
     AppTheme {
         BottomSheetScaffold(
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             sheetPeekHeight = 0.dp,
             sheetContent = {
                 if (menzaShow.value) {
