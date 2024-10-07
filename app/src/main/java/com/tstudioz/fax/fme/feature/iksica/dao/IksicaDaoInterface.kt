@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica.dao
 
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaModel
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 
@@ -10,5 +11,5 @@ interface IksicaDaoInterface {
 
     suspend fun insert(iksicaBalance: IksicaBalance, studentData: StudentData)
 
-    suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentData?>
+    suspend fun read(): IksicaModel
 }

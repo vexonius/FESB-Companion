@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.feature.iksica.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaModel
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
@@ -41,7 +42,7 @@ class IksicaDao(private val dbManager: DatabaseManagerInterface) : IksicaDaoInte
         }
     }
 
-    override suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentData?> {
+    override suspend fun read(): IksicaModel {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
         val receipts = realm.query<ReceiptRealm>().find().map { it.fromRealmObject() }
             .sortedByDescending { LocalTime.parse(it.time) }
@@ -49,7 +50,7 @@ class IksicaDao(private val dbManager: DatabaseManagerInterface) : IksicaDaoInte
         val iksicaBalance = realm.query<IksicaBalance>().find().firstOrNull()
         val studentData = realm.query<StudentData>().find().firstOrNull()
 
-        return Triple(receipts, iksicaBalance, studentData)
+        return IksicaModel(iksicaBalance, studentData, receipts)
     }
 
 }

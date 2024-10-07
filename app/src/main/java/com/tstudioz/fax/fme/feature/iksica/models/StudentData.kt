@@ -12,5 +12,20 @@ class StudentData(
     var rightsFrom: String,
     var rightsTo: String
 ) : RealmObject {
+
     constructor() : this("", "", 0.0, "", "", "", "", "")
+
+    companion object {
+        val empty = StudentData(
+            nameSurname = "",
+            rightsLevel = "",
+            dailySupport = 0.0,
+            oib = "",
+            jmbag = "",
+            iksicaNumber = "",
+            rightsFrom = "",
+            rightsTo = ""
+        )
+    }
 }
+

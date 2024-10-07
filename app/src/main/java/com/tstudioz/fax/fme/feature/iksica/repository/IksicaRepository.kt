@@ -7,12 +7,12 @@ import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDaoInterface
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaModel
 import com.tstudioz.fax.fme.feature.iksica.parseDetaljeRacuna
 import com.tstudioz.fax.fme.feature.iksica.parseRacuni
 import com.tstudioz.fax.fme.feature.iksica.parseStudentInfo
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-
 
 class IksicaRepository(
     private val iksicaService: IksicaServiceInterface,
@@ -22,7 +22,10 @@ class IksicaRepository(
     override suspend fun getStudentInfo(): Pair<IksicaBalance, StudentData> {
         when (val result = iksicaService.getStudentInfo()) {
             is NetworkServiceResult.IksicaResult.Success -> {
-                return parseStudentInfo(result.data)
+                val data = parseStudentInfo(result.data)
+                insert(data.first, data.second)
+
+                return data
             }
 
             is NetworkServiceResult.IksicaResult.Failure -> {
@@ -79,7 +82,7 @@ class IksicaRepository(
         iksicaDao.insert(iksicaBalance, studentData)
     }
 
-    override suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentData?> {
+    override suspend fun read(): IksicaModel {
         return iksicaDao.read()
     }
 

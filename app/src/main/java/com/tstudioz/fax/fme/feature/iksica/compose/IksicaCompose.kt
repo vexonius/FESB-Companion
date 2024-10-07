@@ -57,20 +57,23 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-@OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(
+    InternalCoroutinesApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    val status = iksicaViewModel.status.observeAsState().value
-    val receiptsStatus = iksicaViewModel.receiptsStatus.observeAsState().value
     val itemToShow = iksicaViewModel.itemToShow.observeAsState().value
     val isRefreshing = iksicaViewModel.isRefreshing.observeAsState(false).value
     val studentName = iksicaViewModel.studentData.observeAsState().value?.nameSurname ?: ""
     val cardNumber = iksicaViewModel.studentData.observeAsState().value?.iksicaNumber ?: ""
-    val cardBalance = iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
+    val cardBalance = iksicaViewModel.iksicaBalance.observeAsState().value?.balance ?: 0.0
+    val studentData = iksicaViewModel.studentData.observeAsState().value ?: StudentData.empty
 
     val list = iksicaViewModel.receipts.observeAsState().value ?: emptyList()
 
@@ -99,73 +102,53 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     .align(Alignment.TopCenter)
                     .zIndex(2f)
             )
-            if ((status == IksicaViewState.LOADING) && !isRefreshing) {
-                CircularIndicator()
-            }
-            if (list.isNotEmpty()){
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                if (list.isNotEmpty()) {
                     item {
-                        ElevatedCardIksica(studentName, cardNumber, cardBalance) {
+                        ElevatedCardIksica(studentName, cardNumber, cardBalance.toString()) {
                             showPopup.value = true
                         }
                     }
-                    if (list.isNotEmpty()) {
-                        items(list) {
-                            IksicaItem(it) {
-                                iksicaViewModel.getReceiptDetails(it)
-                            }
+                    items(list) {
+                        IksicaItem(it) {
+                            iksicaViewModel.getReceiptDetails(it)
                         }
                     }
-                    if (receiptsStatus == IksicaViewState.EMPTY) {
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(20.dp),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Nema računa u zadnjih 30 dana",
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                )
-                            }
-                        }
+                } else {
+                    item {
+                        EmptyIksicaView()
                     }
-                }
-            } else {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularIndicator()
                 }
             }
         }
-        PopupBox(
-            showPopup = showPopup.value,
-            onClickOutside = { showPopup.value = !showPopup.value }
-        ) {
-            CardIksicaPopupContent(
-                studentData = iksicaViewModel.studentData.observeAsState().value ?: StudentData(
-                    nameSurname = "",
-                    rightsLevel = "",
-                    dailySupport = 0.0,
-                    oib = "",
-                    jmbag = "",
-                    iksicaNumber = "",
-                    rightsFrom = "",
-                    rightsTo = ""
-                ),
-                iksicaBalance = iksicaViewModel.iksicaBalance.observeAsState().value?.balance ?: 0.0
-            )
-
-        }
     }
+    PopupBox(
+        showPopup = showPopup.value,
+        onClickOutside = { showPopup.value = !showPopup.value }
+    ) {
+        CardIksicaPopupContent(studentData = studentData, iksicaBalance = cardBalance)
+    }
+
+}
+
+@Composable
+fun EmptyIksicaView() {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Nema računa u zadnjih 30 dana",
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+    }
+
 }
 
 @Composable
@@ -199,7 +182,10 @@ fun PopupBox(
                     Box(
                         Modifier
                             .wrapContentSize(align = Alignment.Center)
-                            .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(10.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                                shape = RoundedCornerShape(10.dp)
+                            )
                             .clip(RoundedCornerShape(4.dp)),
                         contentAlignment = Alignment.Center
                     ) {
@@ -232,7 +218,11 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
 }
 
 
-fun Modifier.angledGradientBackground(colors: List<Color>, degrees: Float, halfHalf: Boolean = false) =
+fun Modifier.angledGradientBackground(
+    colors: List<Color>,
+    degrees: Float,
+    halfHalf: Boolean = false
+) =
     drawBehind {
         var deg2 = degrees
 
@@ -255,15 +245,19 @@ fun Modifier.angledGradientBackground(colors: List<Color>, degrees: Float, halfH
             in 0f..gamma, in (2 * PI - gamma)..2 * PI -> {
                 x / cos(alpha)
             }
+
             in gamma..(PI - gamma).toFloat() -> {
                 y / sin(alpha)
             }
+
             in (PI - gamma)..(PI + gamma) -> {
                 x / -cos(alpha)
             }
+
             in (PI + gamma)..(2 * PI - gamma) -> {
                 y / -sin(alpha)
             }
+
             else -> hypot(x, y)
         }
 

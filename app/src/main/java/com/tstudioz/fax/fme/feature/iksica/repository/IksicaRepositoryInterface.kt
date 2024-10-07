@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica.repository
 
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaModel
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
@@ -17,6 +18,6 @@ interface IksicaRepositoryInterface {
 
     suspend fun insert(iksicaBalance: IksicaBalance, studentData: StudentData)
 
-    suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentData?>
+    suspend fun read(): IksicaModel
 
 }

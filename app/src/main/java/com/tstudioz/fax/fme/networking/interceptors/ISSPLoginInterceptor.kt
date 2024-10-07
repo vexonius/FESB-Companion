@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.networking.interceptors
 
+import android.util.Log
 import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaLoginServiceInterface
 import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
