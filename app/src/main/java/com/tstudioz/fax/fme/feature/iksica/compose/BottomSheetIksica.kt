@@ -165,7 +165,7 @@ fun IksicaItemPreview() {
             subsidizedAmount = 0.27,
             paidAmount = 0.55,
             authorised = "Autorizacija",
-            href = "https://www.google.com",
+            url = "https://www.google.com",
             date = LocalDate.now()
         )
     ) {}
@@ -202,7 +202,7 @@ fun IksicaReceiptDetailedPreview() {
                 subsidizedAmount = 0.27,
                 paidAmount = 0.55,
                 authorised = "Autorizacija",
-                href = "https://www.google.com",
+                url = "https://www.google.com",
                 date = LocalDate.now()
             )
         )

@@ -1,20 +1,16 @@
 package com.tstudioz.fax.fme.feature.iksica
 
-import android.app.Application
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
-import com.tstudioz.fax.fme.feature.iksica.repository.Status
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -26,167 +22,79 @@ class IksicaViewModel(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    val receipts = MutableLiveData<List<Receipt>>()
-    val showItem = MutableLiveData<Boolean>()
-    val itemToShow = MutableLiveData<Receipt>()
-    val isRefreshing = MutableLiveData(false)
-    val snackbarHostState = SnackbarHostState()
+    val _receipts = MutableLiveData<List<Receipt>>(emptyList())
+    val _showItem = MutableLiveData(false)
+    val _itemToShow = MutableLiveData<Receipt>()
+    val _isRefreshing = MutableLiveData(false)
+    val _snackbarHostState = SnackbarHostState()
 
     private val loggedIn = MutableLiveData(false)
     val loginStatus = MutableLiveData(LoginStatus.UNSET)
     val iksicaBalance = MutableLiveData<IksicaBalance>()
     val studentDataIksica = MutableLiveData<StudentDataIksica>()
-    val status = MutableLiveData(Status.UNSET)
-    val receiptsStatus = MutableLiveData(Status.UNSET)
+    val status = MutableLiveData(IksicaViewState.INITIAL)
+    val receiptsStatus = MutableLiveData(IksicaViewState.INITIAL)
 
     fun toggleShowItem(value: Boolean) {
-        showItem.postValue(value)
+        _showItem.postValue(value)
     }
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        throwable.printStackTrace()
+        Log.e("Iksica", throwable.message.toString())
     }
 
     init {
         loadReceipts()
+        getReceipts()
     }
-
 
     private fun loadReceipts() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            try {
-                val data = repository.read()
-                receipts.postValue(data.first)
-                iksicaBalance.postValue(data.second)
-                studentDataIksica.postValue(data.third)
-            } catch (e: Exception) {
-                snackbarHostState.currentSnackbarData?.dismiss()
-                snackbarHostState.showSnackbar("Pogreška: " + e.message, duration = SnackbarDuration.Short)
-                e.printStackTrace()
-            }
-            loginIksica()
-        }
-        loggedIn.observeOnce {
-            if (it) {
-                getReceipts(isRefresh = false)
-            }
+            val info = repository.getStudentInfo()
+            Log.d("Iksica data", info.toString())
         }
     }
 
-    private fun displayStatus(status: LoginStatus) {
-        loginStatus.postValue(status)
-    }
-
-    private suspend fun loginIksica(): Boolean {
-        if (loginStatus.value != LoginStatus.UNSET && loginStatus.value != LoginStatus.FAILURE) {
-            return false
-        }
-        val email = (sharedPreferences.getString("username", "") ?: "") + "@fesb.hr"
-        val password = sharedPreferences.getString("password", "") ?: ""
-        try {
-            displayStatus(LoginStatus.AUTH_STATE)
-            repository.getAuthState()
-            displayStatus(LoginStatus.LOGIN)
-            repository.login(email, password)
-            displayStatus(LoginStatus.ASP_NET_SESSION)
-            val (iksicaBal, studentDataIks) = repository.getAspNetSessionSAML()
-            iksicaBalance.postValue(iksicaBal)
-            studentDataIksica.postValue(studentDataIks)
-            repository.insert(iksicaBal, studentDataIks)
-            displayStatus(LoginStatus.SUCCESS)
-            loggedIn.postValue(true)
-            return true
-        } catch (e: Exception) {
-            loggedIn.postValue(false)
-            loginStatus.postValue(LoginStatus.FAILURE)
-            e.printStackTrace()
-            snackbarHostState.currentSnackbarData?.dismiss()
-            snackbarHostState.showSnackbar("Greška prilikom prijave: " + e.message, duration = SnackbarDuration.Short)
-            return false
-        }
-    }
-
-    fun getReceipts(isRefresh: Boolean = false) {
+    fun getReceipts() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            try {
-                if (isRefresh) {
-                    isRefreshing.postValue(true)
-                }
-                if (loggedIn.value == false) {
-                    if (!loginIksica()) {
-                        return@launch
-                    }
-                }
-                when (val receiptsNew = repository.getReceipts(studentDataIksica.value?.oib ?: "")) {
-                    is IksicaResult.ReceiptsResult.Success -> {
-                        receiptsStatus.postValue(Status.FETCHED)
-                        if (receiptsNew.data.isEmpty()) {
-                            receiptsStatus.postValue(Status.EMPTY)
-                        }
-                        receipts.postValue(receiptsNew.data)
-                        repository.insert(receiptsNew.data)
-                    }
+            val info = repository.getStudentInfo()
+            val oib = info.second.oib
 
-                    is IksicaResult.ReceiptsResult.Failure -> {
-                        snackbarHostState.currentSnackbarData?.dismiss()
-                        if (receiptsNew.throwable.message?.contains("Not logged in", false) == true) {
-                            loggedIn.postValue(false)
-                            loginStatus.postValue(LoginStatus.UNSET)
-                        }
-                        snackbarHostState.currentSnackbarData?.dismiss()
-                        snackbarHostState.showSnackbar(
-                            "Greška prilikom dohvaćanja liste računa",
-                            duration = SnackbarDuration.Short
-                        )
-                    }
+            when (val receipts = repository.getReceipts(oib)) {
+                is IksicaResult.ReceiptsResult.Success -> {
+                    if (receipts.data.isEmpty()) { receiptsStatus.postValue(IksicaViewState.EMPTY) }
+
+                    _receipts.postValue(receipts.data)
+                    receiptsStatus.postValue(IksicaViewState.SUCCESS)
                 }
-            } catch (e: Exception) {
-                snackbarHostState.currentSnackbarData?.dismiss()
-                snackbarHostState.showSnackbar(e.message ?: "Pogreška", duration = SnackbarDuration.Short)
-                e.printStackTrace()
-            } finally {
-                if (isRefresh) {
-                    isRefreshing.postValue(false)
+
+                is IksicaResult.ReceiptsResult.Failure -> {
+                    _snackbarHostState.showSnackbar(
+                        "Greška prilikom dohvaćanja liste računa",
+                         duration = SnackbarDuration.Short
+                    )
                 }
             }
         }
-    }
 
-    fun getReceiptDetails(receipt: Receipt) {
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            if (loggedIn.value == false) {
-                if (!loginIksica()) {
-                    return@launch
-                }
-            }
-            try {
-                status.postValue(Status.FETCHING)
-                when (val details = repository.getReceipt(receipt.href)) {
+        fun getReceiptDetails(receipt: Receipt) {
+            viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+                status.postValue(IksicaViewState.LOADING)
+                when (val details = repository.getReceipt(receipt.url)) {
                     is IksicaResult.ReceiptResult.Success -> {
-                        status.postValue(Status.FETCHED)
-                        showItem.postValue(true)
-                        itemToShow.postValue(receipt.copy(receiptDetails = details.data))
+                        status.postValue(IksicaViewState.SUCCESS)
+                        _itemToShow.postValue(receipt.copy(receiptDetails = details.data))
                     }
 
                     is IksicaResult.ReceiptResult.Failure -> {
-                        status.postValue(Status.FETCHING_ERROR)
-                        snackbarHostState.currentSnackbarData?.dismiss()
-                        if (details.throwable.message?.contains("Not logged in", false) == true) {
-                            loggedIn.postValue(false)
-                            loginStatus.postValue(LoginStatus.UNSET)
-                        }
-                        snackbarHostState.showSnackbar(
+                        status.postValue(IksicaViewState.ERROR)
+                        _snackbarHostState.showSnackbar(
                             "Greška prilikom dohvaćanja detalja računa",
                             duration = SnackbarDuration.Short
                         )
                     }
                 }
-            } catch (e: Exception) {
-                snackbarHostState.currentSnackbarData?.dismiss()
-                snackbarHostState.showSnackbar(e.message ?: "Pogreška", duration = SnackbarDuration.Short)
-                e.printStackTrace()
             }
         }
     }
 }
-

@@ -50,10 +50,10 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.compose.CircularIndicator
 import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
+import com.tstudioz.fax.fme.feature.iksica.IksicaViewState
 import com.tstudioz.fax.fme.feature.iksica.LoginStatus
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
-import com.tstudioz.fax.fme.feature.iksica.repository.Status
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
 import kotlin.math.PI
@@ -98,7 +98,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     .align(Alignment.TopCenter)
                     .zIndex(2f)
             )
-            if ((status == Status.FETCHING) && !isRefreshing) {
+            if ((status == IksicaViewState.LOADING) && !isRefreshing) {
                 CircularIndicator()
             }
             val list = iksicaViewModel.receipts.observeAsState().value
@@ -117,11 +117,11 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     if (list.isNotEmpty()) {
                         items(list) {
                             IksicaItem(it) {
-                                iksicaViewModel.getReceiptDetails(it)
+                                iksicaViewModel.getReceiptDetails()
                             }
                         }
                     }
-                    if (receiptsStatus == Status.EMPTY) {
+                    if (receiptsStatus == IksicaViewState.EMPTY) {
                         item {
                             Row(
                                 modifier = Modifier

@@ -22,7 +22,6 @@ class IksicaRepository(
     override suspend fun getStudentInfo(): Pair<IksicaBalance, StudentDataIksica> {
         when (val result = iksicaService.getStudentInfo()) {
             is NetworkServiceResult.IksicaResult.Success -> {
-                Log.d(TAG, "AspNetSessionSAML fetched")
                 return parseStudentInfo(result.data)
             }
 
@@ -34,10 +33,12 @@ class IksicaRepository(
     }
 
     override suspend fun getReceipts(oib: String): IksicaResult.ReceiptsResult {
-        return when (val result = iksicaService.getReceipts(oib)) {
+        when (val result = iksicaService.getReceipts(oib)) {
             is NetworkServiceResult.IksicaResult.Success -> {
-                Log.d(TAG, "Recepts fetched")
-                IksicaResult.ReceiptsResult.Success(parseRacuni(result.data))
+                val receiptsList = parseRacuni(result.data)
+                insert(receiptsList)
+
+                return IksicaResult.ReceiptsResult.Success(receiptsList)
             }
 
             is NetworkServiceResult.IksicaResult.Failure -> {
@@ -48,6 +49,7 @@ class IksicaRepository(
                 if (result.throwable.message?.contains("Not logged in", false) == true) {
                     return IksicaResult.ReceiptsResult.Failure(Throwable("Not logged in"))
                 }
+
                 return IksicaResult.ReceiptsResult.Failure(Throwable("Receipts fetching error: " + result.throwable.message))
             }
         }
@@ -56,7 +58,6 @@ class IksicaRepository(
     override suspend fun getReceipt(url: String): IksicaResult.ReceiptResult {
         return when (val result = iksicaService.getReceipt(url)) {
             is NetworkServiceResult.IksicaResult.Success -> {
-                Log.d(TAG, "Receipt fetched")
                 IksicaResult.ReceiptResult.Success(parseDetaljeRacuna(result.data))
             }
 
@@ -82,13 +83,4 @@ class IksicaRepository(
         return iksicaDao.read()
     }
 
-}
-
-enum class Status {
-    FETCHING,
-    FETCHED,
-    FETCHED_NEW,
-    FETCHING_ERROR,
-    EMPTY,
-    UNSET
 }
