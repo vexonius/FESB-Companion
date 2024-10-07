@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.attendance.repository
 
+import android.util.Log
 import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.ParseAttendance
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
@@ -7,8 +8,11 @@ import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterfa
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class AttendanceRepository(
     private val attendanceService: AttendanceServiceInterface,
@@ -19,27 +23,28 @@ class AttendanceRepository(
     override suspend fun fetchAttendance(): NetworkServiceResult.AttendanceParseResult {
         when (val list = attendanceService.fetchAllAttendance()) {
             is NetworkServiceResult.AttendanceFetchResult.Success -> {
-                val attendanceList = mutableListOf<List<AttendanceEntry>>()
-
-                val coroutines = parseAttendance.parseAttendList(list.data)
-                    .map {
-                        CoroutineScope(Dispatchers.IO).launch {
+                val attendanceList: List<List<AttendanceEntry>> = runBlocking {
+                    parseAttendance.parseAttendList(list.data).map {
+                        async {
+                            Log.d("AttendanceRepository", "Fetching attendance for ${it.first.text()}")
                             when (val classData = attendanceService.fetchAttendance(it.first.attr("href"))) {
                                 is NetworkServiceResult.AttendanceFetchResult.Success -> {
-                                    attendanceList.add(parseAttendance.parseAttendance(it.first, classData.data, it.second))
+                                    parseAttendance.parseAttendance(
+                                        it.first,
+                                        classData.data,
+                                        it.second
+                                    )
                                 }
 
                                 is NetworkServiceResult.AttendanceFetchResult.Failure -> {
-                                    NetworkServiceResult.AttendanceParseResult.Failure(
-                                         Throwable("Error while fetching attendance data")
-                                    )
+                                    emptyList()
                                 }
                             }
                         }
-                }
-                coroutines.joinAll()
+                    }
+                }.awaitAll()
 
-                return if (coroutines.any { it.isCancelled }) {
+                return if (attendanceList.isEmpty()) {
                     NetworkServiceResult.AttendanceParseResult.Failure(
                         Throwable("Error while fetching attendance data")
                     )
