@@ -41,9 +41,9 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun MainCompose() {
+fun MainCompose(startDestination: Any) {
     val navController = rememberNavController()
-    AppTheme { MainNavHost(navController = navController) }
+    AppTheme { MainNavHost(navController = navController, startDestination = startDestination ) }
 }
 
 val topLevelRoutes = listOf(
@@ -58,6 +58,7 @@ val topLevelRoutes = listOf(
 @Composable
 fun MainNavHost(
     navController: NavHostController,
+    startDestination:Any,
     iksicaViewModel: IksicaViewModel = koinViewModel(),
     studomatViewModel: StudomatViewModel = koinViewModel(),
     homeViewModel: HomeViewModel = koinViewModel(),
@@ -82,7 +83,7 @@ fun MainNavHost(
             )
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = Home, modifier = Modifier.padding(innerPadding),
+        NavHost(navController = navController, startDestination = startDestination, modifier = Modifier.padding(innerPadding),
             enterTransition = {
                 // you can change whatever you want transition
                 EnterTransition.None
