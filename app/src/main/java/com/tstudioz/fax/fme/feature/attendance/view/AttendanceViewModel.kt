@@ -55,7 +55,7 @@ class AttendanceViewModel(
     }
 
     private fun has60SecondsPassed(): Boolean {
-        return System.currentTimeMillis() - lastFetch > 100
+        return System.currentTimeMillis() - lastFetch > 60000
     }
 
     fun fetchAttendance() {
