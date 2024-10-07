@@ -4,15 +4,10 @@ import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
 import com.tstudioz.fax.fme.feature.iksica.IksicaResult
-import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface IksicaRepositoryInterface {
 
-    suspend fun getAuthState(): NetworkServiceResult.IksicaResult
-
-    suspend fun login(email: String, password: String): NetworkServiceResult.IksicaResult
-
-    suspend fun getAspNetSessionSAML(): Pair<IksicaBalance, StudentDataIksica>
+    suspend fun getStudentInfo(): Pair<IksicaBalance, StudentDataIksica>
 
     suspend fun getReceipts(oib:String): IksicaResult.ReceiptsResult
 

@@ -19,36 +19,8 @@ class IksicaRepository(
     private val iksicaDao: IksicaDaoInterface,
 ) : IksicaRepositoryInterface {
 
-    override suspend fun getAuthState(): NetworkServiceResult.IksicaResult {
-        return when (val result = iksicaService.getAuthState()) {
-            is NetworkServiceResult.IksicaResult.Success -> {
-                Log.d(TAG, "AuthState fetched")
-                result
-            }
-
-            is NetworkServiceResult.IksicaResult.Failure -> {
-                Log.e(TAG, result.throwable.message ?: "AuthState fetching error")
-                throw Exception(result.throwable.message ?: "AuthState fetching error")
-            }
-        }
-    }
-
-    override suspend fun login(email: String, password: String): NetworkServiceResult.IksicaResult {
-        return when (val result = iksicaService.login(email, password)) {
-            is NetworkServiceResult.IksicaResult.Success -> {
-                Log.d(TAG, "Login success")
-                result
-            }
-
-            is NetworkServiceResult.IksicaResult.Failure -> {
-                Log.e(TAG, result.throwable.message ?: "Login error")
-                throw Exception(result.throwable.message ?: "Login error")
-            }
-        }
-    }
-
-    override suspend fun getAspNetSessionSAML(): Pair<IksicaBalance, StudentDataIksica> {
-        when (val result = iksicaService.getAspNetSessionSAML()) {
+    override suspend fun getStudentInfo(): Pair<IksicaBalance, StudentDataIksica> {
+        when (val result = iksicaService.getStudentInfo()) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 Log.d(TAG, "AspNetSessionSAML fetched")
                 return parseStudentInfo(result.data)

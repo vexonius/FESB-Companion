@@ -1,25 +1,24 @@
 package com.tstudioz.fax.fme.networking.interceptors
 
+import com.tstudioz.fax.fme.common.user.models.User
+import com.tstudioz.fax.fme.feature.iksica.services.IksicaLoginServiceInterface
 import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
-import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import java.io.IOException
 
-class FESBLoginInterceptor(
+class ISSPLoginInterceptor(
     private val cookieJar: MonsterCookieJar,
-    private val userService: UserServiceInterface,
+    private val iksicaLoginService: IksicaLoginServiceInterface,
     private val userDao: UserDaoInterface
 ) : Interceptor {
 
-    @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request: Request = chain.request()
 
-        if (!cookieJar.isFESBTokenValid() && request.url.host.contains("fesb.unist.hr")) {
+        if (!cookieJar.isISSPTokenValid() && request.url.pathSegments.contains("student")) {
             /**
              * Running this as blocking as we're sure that this method will be run inside coroutine
              */
@@ -31,9 +30,12 @@ class FESBLoginInterceptor(
         return response
     }
 
-    private suspend fun refreshSession() {
-        val user = userDao.getUser()
-        userService.loginUser(user.username, user.password)
+    private suspend fun refreshSession(){
+        val realmModel = userDao.getUser()
+        val user = User(realmModel.username, realmModel.password)
+        iksicaLoginService.getAuthState()
+        iksicaLoginService.login(user.email, user.password)
+        iksicaLoginService.getAspNetSessionSAML()
     }
 
 }

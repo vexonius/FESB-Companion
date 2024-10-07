@@ -20,9 +20,18 @@ class MonsterCookieJar(
         return authCookies.isNotEmpty()
     }
 
+    fun isISSPTokenValid(): Boolean {
+        val cookies = loadForRequest(UserService.targetUrl)
+        val authCookies = cookies
+            .filter { it.name == authCookieISSP }
+
+        return authCookies.isNotEmpty()
+    }
+
     companion object {
 
         const val authCookieFESB = "Fesb.AuthCookie"
+        const val authCookieISSP = "ssoSimpleSAMLSessionID"
 
     }
 

@@ -11,6 +11,7 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
+import com.tstudioz.fax.fme.networking.interceptors.ISSPLoginInterceptor
 import com.tstudioz.fax.fme.networking.session.SessionDelegate
 import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
 import com.tstudioz.fax.fme.random.NetworkUtils
@@ -29,9 +30,9 @@ import java.util.concurrent.TimeUnit
 val module = module {
     single { NetworkUtils(androidContext()) }
     single { MonsterCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(androidContext())) }
-    single<Interceptor> { FESBLoginInterceptor(get(), get(), get()) }
+    single<FESBLoginInterceptor>(named("FESBInterceptor")) { FESBLoginInterceptor(get(), get(), get()) }
     single<OkHttpClient> { provideOkHttpClient(get()) }
-    single<OkHttpClient>(named("FESBPortalClient")) { provideFESBPortalClient(get(), get()) }
+    single<OkHttpClient>(named("FESBPortalClient")) { provideFESBPortalClient(get(),get(named("FESBInterceptor"))) }
     single<SessionDelegateInterface> { SessionDelegate(get()) }
     single<DatabaseManagerInterface> { DatabaseManager() }
     single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
@@ -46,11 +47,14 @@ fun provideOkHttpClient(monsterCookieJar: MonsterCookieJar) : OkHttpClient {
             .build()
 }
 
-fun provideFESBPortalClient(monsterCookieJar: MonsterCookieJar, FESBLoginInterceptor: Interceptor) : OkHttpClient {
+fun provideFESBPortalClient(
+    monsterCookieJar: MonsterCookieJar,
+    interceptor: FESBLoginInterceptor,
+) : OkHttpClient {
     return OkHttpClient.Builder()
         .callTimeout(15, TimeUnit.SECONDS)
         .connectTimeout(15, TimeUnit.SECONDS)
-        .addInterceptor(FESBLoginInterceptor)
+        .addInterceptor(interceptor)
         .cookieJar(monsterCookieJar)
         .build()
 }
