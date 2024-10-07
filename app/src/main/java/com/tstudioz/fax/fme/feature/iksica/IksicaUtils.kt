@@ -1,43 +1,16 @@
 package com.tstudioz.fax.fme.feature.iksica
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import org.jsoup.Jsoup
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-
-enum class LoginStatus(val text: String) {
-    UNSET("Setting up..."),
-    AUTH_STATE("Getting AuthState..."),
-    LOGIN("Logging in..."),
-    ASP_NET_SESSION("Getting ASP.NET Session..."),
-    SUCCESS("Parsing Data..."),
-    FAILURE("Failure")
-}
-
-fun <T> LiveData<T>.observeOnce(observer: (T) -> Unit) {
-    observeForever(object : Observer<T> {
-        override fun onChanged(value: T) {
-            if (value is Boolean && value) {
-                removeObserver(this)
-            } else if (value !is Boolean) {
-                removeObserver(this)
-            }
-            observer(value)
-        }
-    })
-}
-
-
-fun parseStudentInfo(body: String): Pair<IksicaBalance, StudentDataIksica> {
+fun parseStudentInfo(body: String): Pair<IksicaBalance, StudentData> {
     val doc = Jsoup.parse(body)
 
     val image = doc.selectFirst(".slikastud")?.attr("src")
@@ -64,7 +37,7 @@ fun parseStudentInfo(body: String): Pair<IksicaBalance, StudentDataIksica> {
         balance.toDoubleOrNull() ?: 0.0,
         spentToday.toDoubleOrNull() ?: 0.0,
     )
-    val studentData = StudentDataIksica(
+    val studentData = StudentData(
         nameSurname = user ?: "",
         rightsLevel = rightsLevel,
         dailySupport = dailySupport.toDoubleOrNull() ?: 0.0,

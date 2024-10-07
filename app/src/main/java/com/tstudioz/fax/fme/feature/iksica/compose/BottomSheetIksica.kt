@@ -37,14 +37,13 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetIksica(
-    itemToShow: MutableLiveData<Receipt>,
-    toggleShowItem: (Boolean) -> Unit,
+    receipt: Receipt?,
+    toggleShowItem: () -> Unit,
 ) {
-    val receipt = itemToShow.observeAsState().value
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     ModalBottomSheet(
         sheetState = sheetState,
-        onDismissRequest = { toggleShowItem(false) },
+        onDismissRequest = { toggleShowItem() },
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
     ) {

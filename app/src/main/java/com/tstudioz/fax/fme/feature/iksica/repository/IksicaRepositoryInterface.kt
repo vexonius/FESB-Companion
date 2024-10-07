@@ -2,12 +2,12 @@ package com.tstudioz.fax.fme.feature.iksica.repository
 
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
-import com.tstudioz.fax.fme.feature.iksica.IksicaResult
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 
 interface IksicaRepositoryInterface {
 
-    suspend fun getStudentInfo(): Pair<IksicaBalance, StudentDataIksica>
+    suspend fun getStudentInfo(): Pair<IksicaBalance, StudentData>
 
     suspend fun getReceipts(oib:String): IksicaResult.ReceiptsResult
 
@@ -15,8 +15,8 @@ interface IksicaRepositoryInterface {
 
     suspend fun insert(receipts: List<Receipt>)
 
-    suspend fun insert(iksicaBalance: IksicaBalance, studentDataIksica: StudentDataIksica)
+    suspend fun insert(iksicaBalance: IksicaBalance, studentData: StudentData)
 
-    suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentDataIksica?>
+    suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentData?>
 
 }

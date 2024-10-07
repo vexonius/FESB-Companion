@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.iksica
+package com.tstudioz.fax.fme.feature.iksica.view
 
 enum class IksicaViewState {
     INITIAL,

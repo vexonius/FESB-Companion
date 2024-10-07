@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.iksica
+package com.tstudioz.fax.fme.feature.iksica.view
 
 import android.os.Bundle
 import android.view.LayoutInflater

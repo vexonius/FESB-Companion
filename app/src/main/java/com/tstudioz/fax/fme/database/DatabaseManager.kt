@@ -5,7 +5,7 @@ import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import io.realm.kotlin.RealmConfiguration
 
 class DatabaseManager: DatabaseManagerInterface {
@@ -22,7 +22,7 @@ class DatabaseManager: DatabaseManagerInterface {
                 Year::class,
                 IksicaBalance::class,
                 ReceiptRealm::class,
-                StudentDataIksica::class))
+                StudentData::class))
             .name("default.realm")
             .schemaVersion(1)
             .encryptionKey("nekikljuckojicemopromjenitiubuducnostialisadjetujernedamisebolje".toByteArray())

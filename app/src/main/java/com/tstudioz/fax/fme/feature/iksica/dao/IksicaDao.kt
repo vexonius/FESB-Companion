@@ -4,7 +4,7 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.models.fromRealmObject
 import com.tstudioz.fax.fme.feature.iksica.models.toRealmObject
 import io.realm.kotlin.Realm
@@ -27,7 +27,7 @@ class IksicaDao(private val dbManager: DatabaseManagerInterface) : IksicaDaoInte
         }
     }
 
-    override suspend fun insert(iksicaBalance: IksicaBalance, studentDataIksica: StudentDataIksica) {
+    override suspend fun insert(iksicaBalance: IksicaBalance, studentData: StudentData) {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         realm.write {
@@ -35,21 +35,21 @@ class IksicaDao(private val dbManager: DatabaseManagerInterface) : IksicaDaoInte
             this.delete(oldIksicaBalance)
             this.copyToRealm(iksicaBalance, updatePolicy = UpdatePolicy.ALL)
 
-            val oldStudentDataIksica = this.query<StudentDataIksica>().find()
-            this.delete(oldStudentDataIksica)
-            this.copyToRealm(studentDataIksica, updatePolicy = UpdatePolicy.ALL)
+            val oldStudentData = this.query<StudentData>().find()
+            this.delete(oldStudentData)
+            this.copyToRealm(studentData, updatePolicy = UpdatePolicy.ALL)
         }
     }
 
-    override suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentDataIksica?> {
+    override suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentData?> {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
         val receipts = realm.query<ReceiptRealm>().find().map { it.fromRealmObject() }
             .sortedByDescending { LocalTime.parse(it.time) }
             .sortedByDescending { it.date }
         val iksicaBalance = realm.query<IksicaBalance>().find().firstOrNull()
-        val studentDataIksica = realm.query<StudentDataIksica>().find().firstOrNull()
+        val studentData = realm.query<StudentData>().find().firstOrNull()
 
-        return Triple(receipts, iksicaBalance, studentDataIksica)
+        return Triple(receipts, iksicaBalance, studentData)
     }
 
 }

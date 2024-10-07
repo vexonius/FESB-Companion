@@ -6,10 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +19,6 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -49,11 +45,10 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.compose.CircularIndicator
-import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
-import com.tstudioz.fax.fme.feature.iksica.IksicaViewState
-import com.tstudioz.fax.fme.feature.iksica.LoginStatus
+import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
+import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
 import kotlin.math.PI
@@ -62,21 +57,28 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-
 @OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
-    val status = iksicaViewModel.status.observeAsState().value
-    val loginStatus = iksicaViewModel.loginStatus.observeAsState().value
-    val receiptsStatus = iksicaViewModel.receiptsStatus.observeAsState().value
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    val status = iksicaViewModel.status.observeAsState().value
+    val receiptsStatus = iksicaViewModel.receiptsStatus.observeAsState().value
+    val itemToShow = iksicaViewModel.itemToShow.observeAsState().value
     val isRefreshing = iksicaViewModel.isRefreshing.observeAsState(false).value
-    val pullRefreshState = rememberPullRefreshState(isRefreshing, {
-        iksicaViewModel.getReceipts(true)
-    })
+    val studentName = iksicaViewModel.studentData.observeAsState().value?.nameSurname ?: ""
+    val cardNumber = iksicaViewModel.studentData.observeAsState().value?.iksicaNumber ?: ""
+    val cardBalance = iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString()
+
+    val list = iksicaViewModel.receipts.observeAsState().value ?: emptyList()
+
     val showPopup = remember { mutableStateOf(false) }
+
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, {
+        iksicaViewModel.getReceipts()
+    })
 
     BottomSheetScaffold(sheetPeekHeight = 0.dp,
         modifier = Modifier
@@ -85,39 +87,35 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         scaffoldState = scaffoldState,
         snackbarHost = { SnackbarHost(hostState = iksicaViewModel.snackbarHostState) },
         sheetContent = {
-            if (iksicaViewModel.showItem.observeAsState(initial = false).value) {
-                BottomSheetIksica(iksicaViewModel.itemToShow) { iksicaViewModel.toggleShowItem(it) }
+            itemToShow.let {
+                BottomSheetIksica(it) { iksicaViewModel.hideReceiptDetails() }
             }
         }) {
-        if (loginStatus != LoginStatus.SUCCESS) {
-            LinearProgressIndicator(Modifier.fillMaxWidth().zIndex(2f))
-        }
         Box {
             PullRefreshIndicator(
-                isRefreshing, pullRefreshState, Modifier
+                isRefreshing,
+                pullRefreshState,
+                Modifier
                     .align(Alignment.TopCenter)
                     .zIndex(2f)
             )
             if ((status == IksicaViewState.LOADING) && !isRefreshing) {
                 CircularIndicator()
             }
-            val list = iksicaViewModel.receipts.observeAsState().value
-            if (iksicaViewModel.iksicaBalance.observeAsState().value != null && list != null){
+            if (list.isNotEmpty()){
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
                     item {
-                        ElevatedCardIksica(
-                            iksicaViewModel.studentDataIksica.observeAsState().value?.nameSurname ?: "",
-                            iksicaViewModel.studentDataIksica.observeAsState().value?.iksicaNumber ?: "",
-                            iksicaViewModel.iksicaBalance.observeAsState().value?.balance.toString(),
-                        ) { showPopup.value = true }
+                        ElevatedCardIksica(studentName, cardNumber, cardBalance) {
+                            showPopup.value = true
+                        }
                     }
                     if (list.isNotEmpty()) {
                         items(list) {
                             IksicaItem(it) {
-                                iksicaViewModel.getReceiptDetails()
+                                iksicaViewModel.getReceiptDetails(it)
                             }
                         }
                     }
@@ -153,7 +151,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             onClickOutside = { showPopup.value = !showPopup.value }
         ) {
             CardIksicaPopupContent(
-                studentDataIksica = iksicaViewModel.studentDataIksica.observeAsState().value ?: StudentDataIksica(
+                studentData = iksicaViewModel.studentData.observeAsState().value ?: StudentData(
                     nameSurname = "",
                     rightsLevel = "",
                     dailySupport = 0.0,

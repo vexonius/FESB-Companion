@@ -4,8 +4,8 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
-import com.tstudioz.fax.fme.feature.iksica.IksicaResult
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDaoInterface
 import com.tstudioz.fax.fme.feature.iksica.parseDetaljeRacuna
 import com.tstudioz.fax.fme.feature.iksica.parseRacuni
@@ -19,7 +19,7 @@ class IksicaRepository(
     private val iksicaDao: IksicaDaoInterface,
 ) : IksicaRepositoryInterface {
 
-    override suspend fun getStudentInfo(): Pair<IksicaBalance, StudentDataIksica> {
+    override suspend fun getStudentInfo(): Pair<IksicaBalance, StudentData> {
         when (val result = iksicaService.getStudentInfo()) {
             is NetworkServiceResult.IksicaResult.Success -> {
                 return parseStudentInfo(result.data)
@@ -75,11 +75,11 @@ class IksicaRepository(
         iksicaDao.insert(receipts)
     }
 
-    override suspend fun insert(iksicaBalance: IksicaBalance, studentDataIksica: StudentDataIksica) {
-        iksicaDao.insert(iksicaBalance, studentDataIksica)
+    override suspend fun insert(iksicaBalance: IksicaBalance, studentData: StudentData) {
+        iksicaDao.insert(iksicaBalance, studentData)
     }
 
-    override suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentDataIksica?> {
+    override suspend fun read(): Triple<List<Receipt>, IksicaBalance?, StudentData?> {
         return iksicaDao.read()
     }
 

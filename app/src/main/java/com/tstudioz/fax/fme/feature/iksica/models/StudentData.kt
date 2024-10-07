@@ -2,7 +2,7 @@ package com.tstudioz.fax.fme.feature.iksica.models
 
 import io.realm.kotlin.types.RealmObject
 
-class StudentDataIksica(
+class StudentData(
     var nameSurname: String,
     var rightsLevel: String,
     var dailySupport: Double,

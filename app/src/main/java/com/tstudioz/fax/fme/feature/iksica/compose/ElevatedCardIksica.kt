@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 
 @Preview
 @Composable
@@ -105,7 +105,7 @@ fun ElevatedCardIksica(
 
 @Composable
 fun CardIksicaPopupContent(
-    studentDataIksica: StudentDataIksica,
+    studentData: StudentData,
     iksicaBalance: Double
 ) {
     Column(
@@ -114,14 +114,14 @@ fun CardIksicaPopupContent(
             .background(MaterialTheme.colorScheme.background)
             .width(300.dp)
     ) {
-        CardIksicaPopupRow(leftText = "Ime", rightText = studentDataIksica.nameSurname)
-        CardIksicaPopupRow(leftText = "Razina prava", rightText = studentDataIksica.rightsLevel)
-        CardIksicaPopupRow(leftText = "Dnevna potpora", rightText = studentDataIksica.dailySupport.toString())
-        CardIksicaPopupRow(leftText = "OIB", rightText = studentDataIksica.oib)
-        CardIksicaPopupRow(leftText = "JMBAG", rightText = studentDataIksica.jmbag)
-        CardIksicaPopupRow(leftText = "Broj iksice", rightText = studentDataIksica.iksicaNumber)
-        CardIksicaPopupRow(leftText = "Prava od", rightText = studentDataIksica.rightsFrom)
-        CardIksicaPopupRow(leftText = "Prava do", rightText = studentDataIksica.rightsTo)
+        CardIksicaPopupRow(leftText = "Ime", rightText = studentData.nameSurname)
+        CardIksicaPopupRow(leftText = "Razina prava", rightText = studentData.rightsLevel)
+        CardIksicaPopupRow(leftText = "Dnevna potpora", rightText = studentData.dailySupport.toString())
+        CardIksicaPopupRow(leftText = "OIB", rightText = studentData.oib)
+        CardIksicaPopupRow(leftText = "JMBAG", rightText = studentData.jmbag)
+        CardIksicaPopupRow(leftText = "Broj iksice", rightText = studentData.iksicaNumber)
+        CardIksicaPopupRow(leftText = "Prava od", rightText = studentData.rightsFrom)
+        CardIksicaPopupRow(leftText = "Prava do", rightText = studentData.rightsTo)
         CardIksicaPopupRow(leftText = "Stanje iksice", rightText = iksicaBalance.toString(), divider = false)
     }
 }
