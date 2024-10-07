@@ -19,7 +19,6 @@ class AttendanceRepository(
     override suspend fun fetchAttendance(): NetworkServiceResult.AttendanceParseResult {
         when (val list = attendanceService.fetchAllAttendance()) {
             is NetworkServiceResult.AttendanceFetchResult.Success -> {
-
                 val attendanceList: List<List<AttendanceEntry>> = runBlocking {
                     parseAttendance.parseAttendList(list.data).map {
                         async {
