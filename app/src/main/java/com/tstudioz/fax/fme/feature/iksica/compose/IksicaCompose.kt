@@ -76,12 +76,24 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val studentData = iksicaViewModel.studentData.observeAsState().value ?: StudentData.empty
 
     val list = iksicaViewModel.receipts.observeAsState().value ?: emptyList()
+    val viewState = iksicaViewModel.viewState.observeAsState().value ?: IksicaViewState.Loading
 
     val showPopup = remember { mutableStateOf(false) }
 
     val pullRefreshState = rememberPullRefreshState(isRefreshing, {
         iksicaViewModel.getReceipts()
     })
+
+//    Insted of using multiple live data vars to observe state, with viewState model,
+//    developer can design UI based on specific state that screen is in
+//
+//    when (viewState) {
+//        is IksicaViewState.Initial -> {}
+//        is IksicaViewState.Loading -> {}
+//        is IksicaViewState.Success -> {}
+//        is IksicaViewState.Error -> {}
+//        is IksicaViewState.Empty -> {}
+//    }
 
     BottomSheetScaffold(sheetPeekHeight = 0.dp,
         modifier = Modifier
@@ -90,7 +102,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         scaffoldState = scaffoldState,
         snackbarHost = { SnackbarHost(hostState = iksicaViewModel.snackbarHostState) },
         sheetContent = {
-            itemToShow.let {
+            itemToShow?.let {
                 BottomSheetIksica(it) { iksicaViewModel.hideReceiptDetails() }
             }
         }) {

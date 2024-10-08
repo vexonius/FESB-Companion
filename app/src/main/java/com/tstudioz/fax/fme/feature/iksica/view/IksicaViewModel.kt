@@ -37,6 +37,9 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     val _studentData = MutableLiveData<StudentData?>(null)
     val studentData: LiveData<StudentData?> = _studentData
 
+    val _viewState = MutableLiveData<IksicaViewState>(IksicaViewState.Initial)
+    val viewState: LiveData<IksicaViewState> = _viewState
+
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
     }
@@ -47,6 +50,7 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     }
 
     private fun loadReceiptsFromCache() {
+        _viewState.value = IksicaViewState.Loading
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             val model = repository.read()
             _receipts.postValue(model.receipts)
@@ -65,10 +69,10 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
 
             when (val receipts = repository.getReceipts(oib)) {
                 is IksicaResult.ReceiptsResult.Success -> {
-                    if (receipts.data.isEmpty()) {
-                    }
+                    if (receipts.data.isEmpty()) { _viewState.postValue(IksicaViewState.Empty) }
 
                     _receipts.postValue(receipts.data)
+                    _viewState.postValue(IksicaViewState.Success(receipts.data))
                 }
 
                 is IksicaResult.ReceiptsResult.Failure -> {
@@ -82,7 +86,10 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     }
 
     fun getReceiptDetails(receipt: Receipt?) {
-        if (receipt == null) { return }
+        if (receipt == null) {
+            hideReceiptDetails()
+            return
+        }
 
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             when (val details = repository.getReceipt(receipt.url)) {
