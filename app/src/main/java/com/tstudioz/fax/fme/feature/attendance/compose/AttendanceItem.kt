@@ -1,19 +1,14 @@
 package com.tstudioz.fax.fme.feature.attendance.compose
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -37,7 +32,11 @@ fun AttendanceItem(attendanceItem: AttendanceEntry) {
         supportingContent = {
             Column {
                 Spacer(modifier = Modifier.height(8.dp))
-                AttendanceProgressBar(attendanceItem)
+                AttendanceProgressBar(
+                    total = attendanceItem.total,
+                    attended = attendanceItem.attended,
+                    absent = attendanceItem.absent
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     (stringResource(R.string.attendance_required, attendanceItem.required ?: "")),
@@ -52,12 +51,15 @@ fun AttendanceItem(attendanceItem: AttendanceEntry) {
 }
 
 @Composable
-fun AttendanceProgressBar(attendanceItem: AttendanceEntry, thickness: Dp = 5.dp, spacing: Dp = 3.dp) {
-    val total = attendanceItem.total
-    val attended = attendanceItem.attended
-    val absent = attendanceItem.absent
-    val green = colorResource(id = R.color.fresh_green)
-    val red = colorResource(id = R.color.dusty_rose)
+fun AttendanceProgressBar(
+    total: Int,
+    attended: Int,
+    absent: Int,
+    thickness: Dp = 5.dp,
+    spacing: Dp = 3.dp
+) {
+    val green = colorResource(id = R.color.vibrant_green)
+    val red = colorResource(id = R.color.rosso_corsa)
     Row {
         Canvas(
             Modifier
@@ -77,28 +79,6 @@ fun AttendanceProgressBar(attendanceItem: AttendanceEntry, thickness: Dp = 5.dp,
                 )
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun AttendanceItem2() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .background(color = androidx.compose.ui.graphics.Color.White)
-            .padding(16.dp)
-    ) {
-        Column {
-            Text("Laboratorijske vježbe")
-            LinearProgressIndicator(
-                progress = { 0.5f }, modifier = Modifier.padding(top = 8.dp)
-            )
-            Text("Obavezno 10/10", modifier = Modifier.padding(top = 8.dp))
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Text("9/10")
     }
 }
 
