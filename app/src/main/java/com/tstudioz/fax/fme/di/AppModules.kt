@@ -37,7 +37,7 @@ val module = module {
     single<DatabaseManagerInterface> { DatabaseManager() }
     single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
     viewModel { TimetableViewModel(get(), get()) }
-    viewModel{SettingsViewModel(get(), get())}
+    viewModel{SettingsViewModel(get(), get(), get())}
 }
 
 fun provideOkHttpClient(monsterCookieJar: MonsterCookieJar) : OkHttpClient {

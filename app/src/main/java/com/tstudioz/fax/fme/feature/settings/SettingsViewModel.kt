@@ -16,7 +16,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.common.user.UserRepository
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
+import com.tstudioz.fax.fme.feature.login.services.UserService
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.util.SPKey
@@ -26,18 +28,14 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val sharedPreferences: SharedPreferences,
-    private val dbManager: DatabaseManagerInterface
+    private val dbManager: DatabaseManagerInterface,
+    val userRepository: UserRepository
 ) : ViewModel() {
 
     var realm: Realm? = null
 
     fun getLoggedInUser(): String? {
-        return try {
-            sharedPreferences.getString("username", "")
-        } catch (e: Exception) {
-            e.message?.let { e.printStackTrace() }
-            null
-        }
+        return userRepository.getCurrentUserName()
     }
 
     fun deleteRealmAndSharedPrefs() {

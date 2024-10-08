@@ -18,6 +18,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
@@ -75,16 +76,13 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel()) {
                     supportText = viewModel.getBuildVersion(context)
                 )
                 SettingsItem(
-                    title = "Developer",
-                    supportText = "Tino Emer @ tstud.io",
-                    onClick = {
-                        viewModel.launchCustomTab(context, "http://tstud.io/")
-                    }
+                    title = "Developeri",
+                    supportText = "Tino Emer i Stipe Jurković"
                 )
                 SettingsItem(
                     title = "Privatnost podataka",
                     onClick = {
-                        viewModel.launchCustomTab(context, "http://tstud.io/privacy")
+                        viewModel.launchCustomTab(context, "https://privacy.etino.dev/")
                     }
                 )
                 SettingsItem(
@@ -116,6 +114,7 @@ fun CategoryTitle(title: String) {
                 text = title,
                 modifier = Modifier.padding(start = leftPadding),
                 color = colorResource(id = R.color.blue_nice),
+                fontSize = 17.sp,
                 fontWeight = FontWeight.Bold
             )
         }
