@@ -16,31 +16,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.common.user.UserRepository
+import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.feature.login.services.UserService
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.util.SPKey
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class SettingsViewModel(
     private val sharedPreferences: SharedPreferences,
     private val dbManager: DatabaseManagerInterface,
-    val userRepository: UserRepository
+    val userRepository: UserRepositoryInterface
 ) : ViewModel() {
 
     var realm: Realm? = null
 
-    fun getLoggedInUser(): String? {
-        return userRepository.getCurrentUserName()
+    fun getLoggedInUser(): String {
+        return runBlocking {
+            userRepository.getCurrentUserName()
+        }
     }
 
     fun deleteRealmAndSharedPrefs() {
         viewModelScope.launch(Dispatchers.IO) {
-            sharedPreferences[SPKey.LOGGED_IN] = false
+            sharedPreferences.edit().clear().apply()
             realm = Realm.open(dbManager.getDefaultConfiguration())
 
             try {
@@ -49,11 +51,6 @@ class SettingsViewModel(
                 realm?.close()
             }
         }
-    }
-
-    fun deleteWebViewCookies() {
-        CookieManager.getInstance().removeAllCookies(null)
-        CookieManager.getInstance().flush()
     }
 
     fun goToLoginScreen(context: Context) {

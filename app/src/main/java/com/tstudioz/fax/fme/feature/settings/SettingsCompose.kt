@@ -37,13 +37,12 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel()) {
                 modifier = Modifier.padding(it)
             ) {
                 CategoryTitle(title = "KORISNIK")
-                val korisnik = viewModel.getLoggedInUser() ?: "Nepoznat korisnik"
+                val korisnik = viewModel.getLoggedInUser()
                 SettingsItem(
                     title = "Odjava",
                     supportText = "Prijavljeni ste kao $korisnik",
                     onClick = {
                         viewModel.deleteRealmAndSharedPrefs()
-                        viewModel.deleteWebViewCookies()
                         viewModel.goToLoginScreen(context)
                     }
                 )
