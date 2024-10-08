@@ -28,11 +28,12 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -57,19 +58,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
-import com.tstudioz.fax.fme.database.models.TimetableType
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
-import com.tstudioz.fax.fme.feature.menza.view.MenzaActivity
+import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
+import com.tstudioz.fax.fme.feature.menza.models.Menza
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -81,114 +80,64 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-@Preview
-@Composable
-fun HomeTabComposePreview() {
-    HomeTabCompose(
-        weather = MutableLiveData(
-            WeatherDisplay(
-                location = "Split",
-                temperature = 20.0,
-                humidity = 56.5,
-                wind = 5.1,
-                precipChance = 0.0,
-                icon = "_21d",
-                summary = "Clear sky"
-            )
-        ),
-        notes = MutableLiveData(
-            listOf(
-                Note(
-                    id = "1",
-                    noteTekst = "Ovo je bilješka",
-                    dateCreated = LocalDateTime.now(),
-                    checked = false
-                )
-            )
-        ),
-        lastFetched = MutableLiveData("22:29:31 14.6.2024"),
-        events = MutableLiveData(
-            listOf(
-                Event(
-                    id = "1",
-                    name = "JEZICI I PREVODITELJI",
-                    shortName = "JIP",
-                    colorId = R.color.blue_nice,
-                    professor = "prof. dr. sc. Ivan Meštrović",
-                    eventType = TimetableType.KOLOKVIJ,
-                    groups = "1. grupa",
-                    classroom = "B525",
-                    start = LocalDateTime.now(),
-                    end = LocalDateTime.now().plusHours(3),
-                    description = "Predavanje iz kolegija Jezici i prevoditelji"
-                ),
-                Event(
-                    id = "2",
-                    name = "PREVODITELJI",
-                    shortName = "JIP",
-                    colorId = R.color.purple_nice,
-                    professor = "prof. dr. sc. Ivan Meštrović",
-                    eventType = TimetableType.ISPIT,
-                    groups = "1. grupa",
-                    classroom = "B5",
-                    start = LocalDateTime.now(),
-                    end = LocalDateTime.now().plusHours(2),
-                    description = "Predavanje iz kolegija Jezici i prevoditelji"
-                )
-            )
-        ),
-        insertNote = { },
-        deleteNote = { }
-    )
-}
-
 val sidePadding = 20.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTabCompose(
     weather: LiveData<WeatherDisplay>,
     notes: LiveData<List<Note>>,
     lastFetched: LiveData<String>,
     events: LiveData<List<Event>>,
+    menza: LiveData<Menza?>,
     insertNote: (note: Note) -> Unit,
-    deleteNote: (note: Note) -> Unit
+    deleteNote: (note: Note) -> Unit,
 ) {
+    val menzaShow = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
     AppTheme {
-        Scaffold(Modifier.background(colorResource(id = R.color.dark_cyan))) { paddingValues ->
-            LazyColumn(
-                Modifier
-                    .padding(paddingValues)
-                    .wrapContentHeight()
-            ) {
-                item {
-                    WeatherCompose(
-                        weather.observeAsState().value ?: WeatherDisplay(
-                            location = "Split",
-                            temperature = 20.0,
-                            humidity = 0.00,
-                            wind = 0.00,
-                            precipChance = 0.0,
-                            icon = "_1d",
-                            summary = "Clear sky"
+        BottomSheetScaffold(
+            sheetPeekHeight = 0.dp,
+            sheetContent = {
+                if (menzaShow.value) {
+                    MenzaCompose(menza, menzaShow)
+                }
+            }) { paddingValues ->
+            Box(modifier = Modifier.fillMaxHeight()){
+                LazyColumn(
+                    Modifier
+                        .padding(paddingValues)
+                ) {
+                    item {
+                        WeatherCompose(
+                            weather.observeAsState().value ?: WeatherDisplay(
+                                location = "",
+                                temperature = 20.0,
+                                humidity = 0.00,
+                                wind = 0.00,
+                                precipChance = 0.0,
+                                icon = "_1d",
+                                summary = ""
+                            )
                         )
-                    )
+                    }
+                    item {
+                        NotesCompose(
+                            notes = notes.observeAsState().value ?: emptyList(),
+                            onClick = { openDialog.value = !openDialog.value },
+                            insertNote,
+                            deleteNote
+                        )
+                    }
+                    item {
+                        TodayTimetableCompose(
+                            lastFetched.observeAsState().value ?: "",
+                            events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
+                                ?: emptyList()
+                        )
+                    }
+                    item { CardsCompose(menzaShow) }
                 }
-                item {
-                    NotesCompose(
-                        notes = notes.observeAsState().value ?: emptyList(),
-                        onClick = { openDialog.value = !openDialog.value },
-                        insertNote, deleteNote
-                    )
-                }
-                item {
-                    TodayTimetableCompose(
-                        lastFetched.observeAsState().value ?: "",
-                        events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
-                            ?: emptyList()
-                    )
-                }
-                item { CardsCompose() }
             }
         }
     }
@@ -236,7 +185,7 @@ fun WeatherCompose(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = String.format(Locale.US, stringResource(R.string.weatherTemp), weather.temperature),
+                    text = String.format(Locale.US, stringResource(R.string.weather_temp), weather.temperature),
                     fontSize = 64.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -250,7 +199,7 @@ fun WeatherCompose(
                         WeatherItem(
                             text = String.format(
                                 Locale.US,
-                                stringResource(R.string.weatherWind),
+                                stringResource(R.string.weather_wind),
                                 weather.wind
                             ), id = R.drawable.wind
                         )
@@ -259,7 +208,7 @@ fun WeatherCompose(
                         WeatherItem(
                             text = String.format(
                                 Locale.US,
-                                stringResource(R.string.weatherHumidity),
+                                stringResource(R.string.weather_humidity),
                                 weather.humidity
                             ), id = R.drawable.vlaga
                         )
@@ -268,7 +217,7 @@ fun WeatherCompose(
                         WeatherItem(
                             text = String.format(
                                 Locale.US,
-                                stringResource(R.string.weatherPrecipChance),
+                                stringResource(R.string.weather_precip_chance),
                                 weather.precipChance
                             ), id = R.drawable.oborine
                         )
@@ -562,7 +511,7 @@ fun TimetableItem(event: Event) {
 }
 
 @Composable
-fun CardsCompose() {
+fun CardsCompose(menzaShow: MutableState<Boolean>) {
     Column(Modifier.padding(horizontal = sidePadding)) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -579,7 +528,7 @@ fun CardsCompose() {
             colorResource(id = R.color.welcome2),
             colorResource(id = R.color.welcome2),
             onClick = {
-                context.startActivity(Intent(context, MenzaActivity::class.java))
+                menzaShow.value = true
             })
         CardCompose(
             stringResource(id = R.string.ugovori_title),

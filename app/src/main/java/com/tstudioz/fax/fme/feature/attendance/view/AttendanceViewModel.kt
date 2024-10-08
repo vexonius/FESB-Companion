@@ -34,8 +34,8 @@ class AttendanceViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error timetable", exception.toString())
-        _shouldShow.value = false
-        _error.value = true
+        _shouldShow.postValue(false)
+        _error.postValue(true)
     }
 
     init {

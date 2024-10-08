@@ -25,7 +25,7 @@ fun ProgressBarCompose(passed: Int, total: Int) {
             LinearProgressIndicator(
                 progress = { passed.toFloat() / total.toFloat() },
                 modifier = Modifier.wrapContentWidth(),
-                color = colorResource(id = R.color.Endeavour),
+                color = colorResource(id = R.color.endeavour),
             )
             Text(
                 text = "$passed/$total",

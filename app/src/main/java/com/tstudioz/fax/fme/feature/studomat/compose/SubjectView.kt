@@ -51,7 +51,7 @@ fun SubjectView(subject: StudomatSubject) {
         ) {
             Column(
                 Modifier
-                    .background(color = colorResource(id = R.color.Endeavour))
+                    .background(color = colorResource(id = R.color.endeavour))
                     .padding(4.dp, 2.dp, 4.dp, 2.dp)
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
@@ -107,7 +107,7 @@ fun PredmetText(text: String, value: String, isTitle: Boolean = false, isPassed:
                 Modifier
                     .wrapContentSize()
                     .clip(RoundedCornerShape(12.dp, 0.dp, 0.dp, 12.dp))
-                    .background(colorResource(id = R.color.passGreen))
+                    .background(colorResource(id = R.color.pass_green))
                     .padding(8.dp, 8.dp, 16.dp, 8.dp)
             } else {
                 Modifier
