@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.common.user
 
 import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
+import com.tstudioz.fax.fme.database.models.UserRealm
 
 interface UserRepositoryInterface {
 
@@ -8,4 +9,6 @@ interface UserRepositoryInterface {
 
     suspend fun getCurrentUserName(): String
 
-}
+    suspend fun getCurrentUser(): UserRealm
+
+    }
