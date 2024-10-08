@@ -52,7 +52,7 @@ class LoginViewModel(
             username = username.substringBefore("@")
         }
 
-        viewModelScope.launch(Dispatchers.IO + handler) {
+        viewModelScope.launch(Dispatchers.IO) {
             when (repository.attemptLogin(username, password)) {
                 is UserRepositoryResult.LoginResult.Success -> {
                     loggedIn.postValue(true)
