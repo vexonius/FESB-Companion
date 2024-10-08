@@ -80,8 +80,13 @@
     <string name="exam_date">Datum ispitnog roka:</string>
 
 
-    <string name="weatherTemp">%1$.0f°</string>
-    <string name="weatherHumidity">%1$.1f%%</string>
-    <string name="weatherPrecipChance">%1$.1f mm</string>
-    <string name="weatherWind">%1$.1f km/h</string>
+    <string name="weather_temp">%1$.0f°</string>
+    <string name="weather_humidity">%1$.1f%%</string>
+    <string name="weather_precip_chance">%1$.1f mm</string>
+    <string name="weather_wind">%1$.1f km/h</string>
+
+    //Menza
+    <string name="meni_price">%1$s €</string>
+    <string name="meals_by_choice">JELA PO IZBORU</string>
+    <string name="menza_no_data">Nije postavljen jelovnik za današnji dan.</string>
 </resources>

@@ -33,7 +33,9 @@
     <!-- Screens background color-->
     <color name="welcome2">#20d2bb</color>
 
-    <color name="Endeavour">#0052a3</color>
-    <color name="passGreen">#02b010</color>
+    <color name="endeavour">#0052a3</color>
+    <color name="pass_green">#02b010</color>
+    <color name="greenHighlight">#20d2bb</color>
+    <color name="ic_launcher_background">#34434C</color>
 
 </resources>
