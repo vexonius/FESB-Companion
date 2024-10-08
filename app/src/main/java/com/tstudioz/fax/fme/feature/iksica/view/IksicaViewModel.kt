@@ -7,8 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
@@ -25,8 +25,8 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     val _receipts = MutableLiveData<List<Receipt>>(emptyList())
     val receipts: LiveData<List<Receipt>> = _receipts
 
-    val _itemToShow = MutableLiveData<Receipt?>(null)
-    val itemToShow: LiveData<Receipt?> = _itemToShow
+    val _receiptSelected = MutableLiveData<IksicaReceiptState>(IksicaReceiptState.None)
+    val receiptSelected: LiveData<IksicaReceiptState> = _receiptSelected
 
     val _isRefreshing = MutableLiveData(false)
     val isRefreshing: LiveData<Boolean> = _isRefreshing
@@ -50,17 +50,23 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     }
 
     private fun loadReceiptsFromCache() {
-        _viewState.value = IksicaViewState.Loading
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            _viewState.postValue(IksicaViewState.Loading)
             val model = repository.read()
             _receipts.postValue(model.receipts)
             _studentData.postValue(model.studentData)
             _iksicaBalance.postValue(model.balance)
+            if (model.receipts.isEmpty()) {
+                _viewState.postValue(IksicaViewState.Empty)
+            } else {
+                _viewState.postValue(IksicaViewState.Success(model.receipts))
+            }
         }
     }
 
     fun getReceipts() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            _viewState.postValue(IksicaViewState.Fetching)
             val info = repository.getStudentInfo()
             val oib = info.second.oib
 
@@ -69,13 +75,16 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
 
             when (val receipts = repository.getReceipts(oib)) {
                 is IksicaResult.ReceiptsResult.Success -> {
-                    if (receipts.data.isEmpty()) { _viewState.postValue(IksicaViewState.Empty) }
-
-                    _receipts.postValue(receipts.data)
-                    _viewState.postValue(IksicaViewState.Success(receipts.data))
+                    if (receipts.data.isEmpty()) {
+                        _viewState.postValue(IksicaViewState.Empty)
+                    } else {
+                        _receipts.postValue(receipts.data)
+                        _viewState.postValue(IksicaViewState.Success(receipts.data))
+                    }
                 }
 
                 is IksicaResult.ReceiptsResult.Failure -> {
+                    _viewState.postValue(IksicaViewState.FetchFailed)
                     snackbarHostState.showSnackbar(
                         "Greška prilikom dohvaćanja liste računa",
                         duration = SnackbarDuration.Short
@@ -90,14 +99,15 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
             hideReceiptDetails()
             return
         }
-
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            _receiptSelected.postValue(IksicaReceiptState.Loading)
             when (val details = repository.getReceipt(receipt.url)) {
                 is IksicaResult.ReceiptResult.Success -> {
-                    _itemToShow.postValue(receipt.copy(receiptDetails = details.data))
+                    _receiptSelected.postValue(IksicaReceiptState.Success(receipt.copy(receiptDetails = details.data)))
                 }
 
                 is IksicaResult.ReceiptResult.Failure -> {
+                    _receiptSelected.postValue(IksicaReceiptState.Error(details.throwable.message.toString()))
                     snackbarHostState.showSnackbar(
                         "Greška prilikom dohvaćanja detalja računa",
                         duration = SnackbarDuration.Short
@@ -108,6 +118,6 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     }
 
     fun hideReceiptDetails() {
-        _itemToShow.value = null
+        _receiptSelected.postValue(IksicaReceiptState.None)
     }
 }
