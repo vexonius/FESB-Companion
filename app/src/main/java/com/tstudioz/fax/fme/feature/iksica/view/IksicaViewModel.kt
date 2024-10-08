@@ -28,10 +28,7 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     val _receiptSelected = MutableLiveData<IksicaReceiptState>(IksicaReceiptState.None)
     val receiptSelected: LiveData<IksicaReceiptState> = _receiptSelected
 
-    val _isRefreshing = MutableLiveData(false)
-    val isRefreshing: LiveData<Boolean> = _isRefreshing
-
-    val _iksicaBalance = MutableLiveData<IksicaBalance?>(null)
+    val _iksicaBalance = MutableLiveData<IksicaBalance?>(null) // spojit ovo
     val iksicaBalance: LiveData<IksicaBalance?> = _iksicaBalance
 
     val _studentData = MutableLiveData<StudentData?>(null)
@@ -52,11 +49,11 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     private fun loadReceiptsFromCache() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             _viewState.postValue(IksicaViewState.Loading)
-            val model = repository.read()
-            _receipts.postValue(model.receipts)
+            val model = repository.getCache()
+            _receipts.postValue(model.receipts) // combine these in the future
             _studentData.postValue(model.studentData)
             _iksicaBalance.postValue(model.balance)
-            if (model.receipts.isEmpty()) {
+            if (model.receipts.isEmpty() || model.balance == null || model.studentData == null) {
                 _viewState.postValue(IksicaViewState.Empty)
             } else {
                 _viewState.postValue(IksicaViewState.Success(model.receipts))
@@ -84,7 +81,7 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
                 }
 
                 is IksicaResult.ReceiptsResult.Failure -> {
-                    _viewState.postValue(IksicaViewState.FetchFailed)
+                    _viewState.postValue(IksicaViewState.FetchingError)
                     snackbarHostState.showSnackbar(
                         "Greška prilikom dohvaćanja liste računa",
                         duration = SnackbarDuration.Short
@@ -100,7 +97,7 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
             return
         }
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _receiptSelected.postValue(IksicaReceiptState.Loading)
+            _receiptSelected.postValue(IksicaReceiptState.Fetching)
             when (val details = repository.getReceipt(receipt.url)) {
                 is IksicaResult.ReceiptResult.Success -> {
                     _receiptSelected.postValue(IksicaReceiptState.Success(receipt.copy(receiptDetails = details.data)))

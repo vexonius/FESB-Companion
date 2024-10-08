@@ -82,7 +82,7 @@ class IksicaRepository(
         iksicaDao.insert(iksicaBalance, studentData)
     }
 
-    override suspend fun read(): IksicaModel {
+    override suspend fun getCache(): IksicaModel {
         return iksicaDao.read()
     }
 

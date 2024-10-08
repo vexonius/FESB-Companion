@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
+import com.tstudioz.fax.fme.compose.CircularIndicator
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -73,7 +74,6 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val receiptSelected = iksicaViewModel.receiptSelected.observeAsState().value
-    val isRefreshing = iksicaViewModel.isRefreshing.observeAsState(false).value
     val studentName = iksicaViewModel.studentData.observeAsState().value?.nameSurname ?: ""
     val cardNumber = iksicaViewModel.studentData.observeAsState().value?.iksicaNumber ?: ""
     val cardBalance = iksicaViewModel.iksicaBalance.observeAsState().value?.balance ?: 0.0
@@ -81,23 +81,13 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
     val list = iksicaViewModel.receipts.observeAsState().value ?: emptyList()
     val viewState = iksicaViewModel.viewState.observeAsState().value ?: IksicaViewState.Loading
+    val isRefreshing = viewState == IksicaViewState.Fetching
 
     val showPopup = remember { mutableStateOf(false) }
 
     val pullRefreshState = rememberPullRefreshState(isRefreshing, {
         iksicaViewModel.getReceipts()
     })
-
-//    Insted of using multiple live data vars to observe state, with viewState model,
-//    developer can design UI based on specific state that screen is in
-//
-//    when (viewState) {
-//        is IksicaViewState.Initial -> {}
-//        is IksicaViewState.Loading -> {}
-//        is IksicaViewState.Success -> {}
-//        is IksicaViewState.Error -> {}
-//        is IksicaViewState.Empty -> {}
-//    }
 
     BottomSheetScaffold(sheetPeekHeight = 0.dp,
         modifier = Modifier
@@ -116,12 +106,18 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         }) {
         Box {
             PullRefreshIndicator(
-                isRefreshing,
-                pullRefreshState,
+                isRefreshing, pullRefreshState,
                 Modifier
                     .align(Alignment.TopCenter)
                     .zIndex(2f)
             )
+            when (receiptSelected) {
+                is IksicaReceiptState.Fetching -> {
+                    CircularIndicator()
+                }
+
+                else -> {}
+            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -180,19 +176,17 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                         }
                     }
 
-                    is IksicaViewState.FetchFailed -> {
-                        if (cardBalance != 0.0 && cardNumber.isNotEmpty() && studentName.isNotEmpty()) {
+                    is IksicaViewState.FetchingError -> {
+                        if (cardBalance != 0.0 || cardNumber.isNotEmpty() || studentName.isNotEmpty()) {
                             item {
                                 ElevatedCardIksica(studentName, cardNumber, cardBalance.toString()) {
                                     showPopup.value = true
                                 }
                             }
                         }
-                        if (list.isNotEmpty()) {
-                            items(list) {
-                                IksicaItem(it) {
-                                    iksicaViewModel.getReceiptDetails(it)
-                                }
+                        items(list) {
+                            IksicaItem(it) {
+                                iksicaViewModel.getReceiptDetails(it)
                             }
                         }
                         if (list.isEmpty()) {
