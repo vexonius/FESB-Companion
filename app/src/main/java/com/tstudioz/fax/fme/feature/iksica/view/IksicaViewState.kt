@@ -5,7 +5,15 @@ import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 sealed class IksicaViewState {
     data object Initial : IksicaViewState()
     data object Loading : IksicaViewState()
+    data object Fetching : IksicaViewState()
+    data object FetchingError : IksicaViewState()
     data object Empty : IksicaViewState()
     data class Success(val data: List<Receipt>) : IksicaViewState()
-    data class Error(val message: String) : IksicaViewState()
+}
+
+sealed class IksicaReceiptState {
+    data object None : IksicaReceiptState()
+    data object Fetching : IksicaReceiptState()
+    data class Success(val data: Receipt) : IksicaReceiptState()
+    data class Error(val message: String) : IksicaReceiptState()
 }

@@ -18,6 +18,6 @@ interface IksicaRepositoryInterface {
 
     suspend fun insert(iksicaBalance: IksicaBalance, studentData: StudentData)
 
-    suspend fun read(): IksicaModel
+    suspend fun getCache(): IksicaModel
 
 }

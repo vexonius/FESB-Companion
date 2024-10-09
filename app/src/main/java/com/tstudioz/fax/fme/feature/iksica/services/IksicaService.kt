@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
@@ -77,4 +78,15 @@ class IksicaService(private val client: OkHttpClient) : IksicaServiceInterface {
         return NetworkServiceResult.IksicaResult.Success(doc)
     }
 
+    companion object {
+        private const val SCHEME = "https"
+
+        val targetUrl = HttpUrl.Builder()
+            .scheme(SCHEME)
+            .host("issp.srce.hr")
+            .build()
+
+    }
 }
+
+

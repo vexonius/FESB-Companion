@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +22,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -45,10 +49,11 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.compose.CircularIndicator
-import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
-import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
+import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
+import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
+import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
 import kotlin.math.PI
@@ -68,8 +73,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    val itemToShow = iksicaViewModel.itemToShow.observeAsState().value
-    val isRefreshing = iksicaViewModel.isRefreshing.observeAsState(false).value
+    val receiptSelected = iksicaViewModel.receiptSelected.observeAsState().value
     val studentName = iksicaViewModel.studentData.observeAsState().value?.nameSurname ?: ""
     val cardNumber = iksicaViewModel.studentData.observeAsState().value?.iksicaNumber ?: ""
     val cardBalance = iksicaViewModel.iksicaBalance.observeAsState().value?.balance ?: 0.0
@@ -77,23 +81,13 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
     val list = iksicaViewModel.receipts.observeAsState().value ?: emptyList()
     val viewState = iksicaViewModel.viewState.observeAsState().value ?: IksicaViewState.Loading
+    val isRefreshing = viewState == IksicaViewState.Fetching
 
     val showPopup = remember { mutableStateOf(false) }
 
     val pullRefreshState = rememberPullRefreshState(isRefreshing, {
         iksicaViewModel.getReceipts()
     })
-
-//    Insted of using multiple live data vars to observe state, with viewState model,
-//    developer can design UI based on specific state that screen is in
-//
-//    when (viewState) {
-//        is IksicaViewState.Initial -> {}
-//        is IksicaViewState.Loading -> {}
-//        is IksicaViewState.Success -> {}
-//        is IksicaViewState.Error -> {}
-//        is IksicaViewState.Empty -> {}
-//    }
 
     BottomSheetScaffold(sheetPeekHeight = 0.dp,
         modifier = Modifier
@@ -102,41 +96,119 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         scaffoldState = scaffoldState,
         snackbarHost = { SnackbarHost(hostState = iksicaViewModel.snackbarHostState) },
         sheetContent = {
-            itemToShow?.let {
-                BottomSheetIksica(it) { iksicaViewModel.hideReceiptDetails() }
+            when (receiptSelected) {
+                is IksicaReceiptState.Success -> {
+                    BottomSheetIksica(receiptSelected.data) { iksicaViewModel.hideReceiptDetails() }
+                }
+
+                else -> {}
             }
         }) {
         Box {
             PullRefreshIndicator(
-                isRefreshing,
-                pullRefreshState,
+                isRefreshing, pullRefreshState,
                 Modifier
                     .align(Alignment.TopCenter)
                     .zIndex(2f)
             )
+            when (receiptSelected) {
+                is IksicaReceiptState.Fetching -> {
+                    CircularIndicator()
+                }
+
+                else -> {}
+            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                if (list.isNotEmpty()) {
-                    item {
-                        ElevatedCardIksica(studentName, cardNumber, cardBalance.toString()) {
-                            showPopup.value = true
+                when (viewState) {
+                    is IksicaViewState.Loading, is IksicaViewState.Fetching -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.background)
+                            )
+                            LinearProgressIndicator(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(4.dp)
+                                    .zIndex(1f)
+                            )
                         }
                     }
-                    items(list) {
-                        IksicaItem(it) {
-                            iksicaViewModel.getReceiptDetails(it)
+
+                    else -> {
+                        item { Spacer(modifier = Modifier.height(4.dp)) }
+                    }
+                }
+                when (viewState) {
+                    is IksicaViewState.Success -> {
+                        item {
+                            ElevatedCardIksica(studentName, cardNumber, cardBalance.toString()) {
+                                showPopup.value = true
+                            }
+                        }
+                        items(list) {
+                            IksicaItem(it) {
+                                iksicaViewModel.getReceiptDetails(it)
+                            }
                         }
                     }
-                } else {
-                    item {
-                        EmptyIksicaView()
+
+                    is IksicaViewState.Fetching -> {
+                        if (list.isNotEmpty()) {
+                            item {
+                                ElevatedCardIksica(studentName, cardNumber, cardBalance.toString()) {
+                                    showPopup.value = true
+                                }
+                            }
+                            items(list) {
+                                IksicaItem(it) {
+                                    iksicaViewModel.getReceiptDetails(it)
+                                }
+                            }
+                        } else {
+                            item {
+                                EmptyIksicaView("Učitavanje...")
+                            }
+                        }
                     }
+
+                    is IksicaViewState.FetchingError -> {
+                        if (cardBalance != 0.0 || cardNumber.isNotEmpty() || studentName.isNotEmpty()) {
+                            item {
+                                ElevatedCardIksica(studentName, cardNumber, cardBalance.toString()) {
+                                    showPopup.value = true
+                                }
+                            }
+                        }
+                        items(list) {
+                            IksicaItem(it) {
+                                iksicaViewModel.getReceiptDetails(it)
+                            }
+                        }
+                        if (list.isEmpty()) {
+                            item {
+                                EmptyIksicaView("Greška prilikom dohvaćanja računa")
+                            }
+                        }
+                    }
+
+
+                    is IksicaViewState.Empty -> {
+                        item {
+                            EmptyIksicaView("Nema računa u zadnjih 30 dana")
+                        }
+                    }
+
+                    else -> {}
                 }
             }
         }
     }
+
     PopupBox(
         showPopup = showPopup.value,
         onClickOutside = { showPopup.value = !showPopup.value }
@@ -147,7 +219,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 }
 
 @Composable
-fun EmptyIksicaView() {
+fun EmptyIksicaView(text: String) {
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -156,11 +228,10 @@ fun EmptyIksicaView() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Nema računa u zadnjih 30 dana",
+            text = text,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
     }
-
 }
 
 @Composable
