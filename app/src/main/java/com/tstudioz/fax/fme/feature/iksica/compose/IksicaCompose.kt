@@ -42,12 +42,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.CircularIndicator
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
@@ -125,11 +127,6 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                 when (viewState) {
                     is IksicaViewState.Loading, is IksicaViewState.Fetching -> {
                         item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(MaterialTheme.colorScheme.background)
-                            )
                             LinearProgressIndicator(
                                 Modifier
                                     .fillMaxWidth()
@@ -144,9 +141,14 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     }
                 }
                 when (viewState) {
+                    is IksicaViewState.Initial->{
+                        item {
+                            EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
+                        }
+                    }
                     is IksicaViewState.Success -> {
                         item {
-                            ElevatedCardIksica(studentName, cardNumber, cardBalance.toString()) {
+                            ElevatedCardIksica(studentName, cardNumber, cardBalance) {
                                 showPopup.value = true
                             }
                         }
@@ -160,7 +162,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     is IksicaViewState.Fetching -> {
                         if (list.isNotEmpty()) {
                             item {
-                                ElevatedCardIksica(studentName, cardNumber, cardBalance.toString()) {
+                                ElevatedCardIksica(studentName, cardNumber, cardBalance) {
                                     showPopup.value = true
                                 }
                             }
@@ -171,7 +173,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             }
                         } else {
                             item {
-                                EmptyIksicaView("Učitavanje...")
+                                EmptyIksicaView(stringResource(id = R.string.iksica_loading))
                             }
                         }
                     }
@@ -179,7 +181,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     is IksicaViewState.FetchingError -> {
                         if (cardBalance != 0.0 || cardNumber.isNotEmpty() || studentName.isNotEmpty()) {
                             item {
-                                ElevatedCardIksica(studentName, cardNumber, cardBalance.toString()) {
+                                ElevatedCardIksica(studentName, cardNumber, cardBalance) {
                                     showPopup.value = true
                                 }
                             }
@@ -191,15 +193,22 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                         }
                         if (list.isEmpty()) {
                             item {
-                                EmptyIksicaView("Greška prilikom dohvaćanja računa")
+                                EmptyIksicaView(stringResource(id = R.string.iksica_loading_error))
                             }
                         }
                     }
 
 
                     is IksicaViewState.Empty -> {
+                        if (cardBalance != 0.0 || cardNumber.isNotEmpty() || studentName.isNotEmpty()) {
+                            item {
+                                ElevatedCardIksica(studentName, cardNumber, cardBalance) {
+                                    showPopup.value = true
+                                }
+                            }
+                        }
                         item {
-                            EmptyIksicaView("Nema računa u zadnjih 30 dana")
+                            EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
                         }
                     }
 

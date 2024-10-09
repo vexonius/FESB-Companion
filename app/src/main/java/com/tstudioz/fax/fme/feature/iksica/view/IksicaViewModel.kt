@@ -54,7 +54,7 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
             _studentData.postValue(model.studentData)
             _iksicaBalance.postValue(model.balance)
             if (model.receipts.isEmpty() || model.balance == null || model.studentData == null) {
-                _viewState.postValue(IksicaViewState.Empty)
+                _viewState.postValue(IksicaViewState.Initial)
             } else {
                 _viewState.postValue(IksicaViewState.Success(model.receipts))
             }

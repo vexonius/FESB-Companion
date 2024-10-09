@@ -20,18 +20,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
+import java.util.Locale
 
 @Preview
 @Composable
 fun ElevatedCardIksica(
     name: String = "Ime Prezime",
     iksicaNumber: String = "0000000000000000000",
-    balance: String = "0.00",
+    balance: Double = 0.00,
     onClick: () -> Unit = {}
 ) {
     Box(
@@ -93,7 +97,9 @@ fun ElevatedCardIksica(
                     .fillMaxSize()
             ) {
                 Text(
-                    text = "$balance €",
+                    text = stringResource(
+                        id = R.string.iksica_balance, String.format(Locale.US, "%.2f", balance)
+                    ),
                     fontSize = 25.sp,
                     lineHeight = 25.sp,
                     fontWeight = FontWeight.Bold
@@ -108,21 +114,31 @@ fun CardIksicaPopupContent(
     studentData: StudentData,
     iksicaBalance: Double
 ) {
-    Column(
-        Modifier
-            .padding(15.dp)
-            .background(MaterialTheme.colorScheme.background)
-            .width(300.dp)
-    ) {
-        CardIksicaPopupRow(leftText = "Ime", rightText = studentData.nameSurname)
-        CardIksicaPopupRow(leftText = "Razina prava", rightText = studentData.rightsLevel)
-        CardIksicaPopupRow(leftText = "Dnevna potpora", rightText = studentData.dailySupport.toString())
-        CardIksicaPopupRow(leftText = "OIB", rightText = studentData.oib)
-        CardIksicaPopupRow(leftText = "JMBAG", rightText = studentData.jmbag)
-        CardIksicaPopupRow(leftText = "Broj iksice", rightText = studentData.iksicaNumber)
-        CardIksicaPopupRow(leftText = "Prava od", rightText = studentData.rightsFrom)
-        CardIksicaPopupRow(leftText = "Prava do", rightText = studentData.rightsTo)
-        CardIksicaPopupRow(leftText = "Stanje iksice", rightText = iksicaBalance.toString(), divider = false)
+    AppTheme {
+        Column(
+            Modifier
+                .padding(15.dp)
+                .background(MaterialTheme.colorScheme.background)
+                .width(300.dp)
+        ) {
+            CardIksicaPopupRow(leftText = "Ime", rightText = studentData.nameSurname)
+            CardIksicaPopupRow(leftText = "Razina prava", rightText = studentData.rightsLevel)
+            CardIksicaPopupRow(
+                leftText = "Dnevna potpora", rightText = stringResource(
+                    id = R.string.iksica_balance, String.format(Locale.US, "%.2f", studentData.dailySupport)
+                )
+            )
+            CardIksicaPopupRow(leftText = "OIB", rightText = studentData.oib)
+            CardIksicaPopupRow(leftText = "JMBAG", rightText = studentData.jmbag)
+            CardIksicaPopupRow(leftText = "Broj iksice", rightText = studentData.iksicaNumber)
+            CardIksicaPopupRow(leftText = "Prava od", rightText = studentData.rightsFrom)
+            CardIksicaPopupRow(leftText = "Prava do", rightText = studentData.rightsTo)
+            CardIksicaPopupRow(
+                leftText = "Stanje iksice", rightText = stringResource(
+                    id = R.string.iksica_balance, String.format(Locale.US, "%.2f", iksicaBalance)
+                ), divider = false
+            )
+        }
     }
 }
 
@@ -139,8 +155,8 @@ fun CardIksicaPopupRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = leftText)
-        Text(text = rightText)
+        Text(text = leftText, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = rightText, color = MaterialTheme.colorScheme.onSurface)
     }
     if (divider) {
         HorizontalDivider(
