@@ -20,7 +20,6 @@ class DatabaseManager: DatabaseManagerInterface {
                 EventRealm::class,
                 StudomatSubject::class,
                 Year::class,
-                IksicaBalance::class,
                 ReceiptRealm::class,
                 StudentDataRealm::class))
             .name("default.realm")

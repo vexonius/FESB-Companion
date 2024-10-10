@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.iksica.repository
 
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaModel
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
