@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
@@ -22,19 +21,12 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
 
     val snackbarHostState = SnackbarHostState()
 
-    val _receipts = MutableLiveData<List<Receipt>>(emptyList())
-    val receipts: LiveData<List<Receipt>> = _receipts
+    private val _studentData = MutableLiveData<StudentData?>(null)
 
-    val _receiptSelected = MutableLiveData<IksicaReceiptState>(IksicaReceiptState.None)
+    private val _receiptSelected = MutableLiveData<IksicaReceiptState>(IksicaReceiptState.None)
     val receiptSelected: LiveData<IksicaReceiptState> = _receiptSelected
 
-    val _iksicaBalance = MutableLiveData<IksicaBalance?>(null) // spojit ovo
-    val iksicaBalance: LiveData<IksicaBalance?> = _iksicaBalance
-
-    val _studentData = MutableLiveData<StudentData?>(null)
-    val studentData: LiveData<StudentData?> = _studentData
-
-    val _viewState = MutableLiveData<IksicaViewState>(IksicaViewState.Initial)
+    private val _viewState = MutableLiveData<IksicaViewState>(IksicaViewState.Initial)
     val viewState: LiveData<IksicaViewState> = _viewState
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -49,38 +41,22 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     private fun loadReceiptsFromCache() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             _viewState.postValue(IksicaViewState.Loading)
-            val model = repository.getCache()
-            _receipts.postValue(model.receipts) // combine these in the future
-            _studentData.postValue(model.studentData)
-            _iksicaBalance.postValue(model.balance)
-            if (model.receipts.isEmpty() || model.balance == null || model.studentData == null) {
-                _viewState.postValue(IksicaViewState.Initial)
-            } else {
-                _viewState.postValue(IksicaViewState.Success(model.receipts))
-            }
+            val model = repository.getCache() ?: return@launch
+
+            _viewState.postValue(IksicaViewState.Success(model))
+            _studentData.postValue(model)
         }
     }
 
     fun getReceipts() {
+        _studentData.value?.let { _viewState.value = IksicaViewState.Fetching(it) }
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _viewState.postValue(IksicaViewState.Fetching)
-            val info = repository.getStudentInfo()
-            val oib = info.second.oib
-
-            _iksicaBalance.postValue(info.first)
-            _studentData.postValue(info.second)
-
-            when (val receipts = repository.getReceipts(oib)) {
-                is IksicaResult.ReceiptsResult.Success -> {
-                    if (receipts.data.isEmpty()) {
-                        _viewState.postValue(IksicaViewState.Empty)
-                    } else {
-                        _receipts.postValue(receipts.data)
-                        _viewState.postValue(IksicaViewState.Success(receipts.data))
-                    }
+            when (val result = repository.getCardDataAndReceipts()) {
+                is IksicaResult.CardAndReceiptsResult.Success -> {
+                    _viewState.postValue(IksicaViewState.Success(result.data))
                 }
 
-                is IksicaResult.ReceiptsResult.Failure -> {
+                is IksicaResult.CardAndReceiptsResult.Failure -> {
                     _viewState.postValue(IksicaViewState.FetchingError)
                     snackbarHostState.showSnackbar(
                         "Greška prilikom dohvaćanja liste računa",
