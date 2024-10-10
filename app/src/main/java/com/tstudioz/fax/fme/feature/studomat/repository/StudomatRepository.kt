@@ -19,14 +19,14 @@ class StudomatRepository(
 ) {
 
     suspend fun loginUser(
-        username: String,
+        email: String,
         password: String
     ): StudomatRepositoryResult.LoginResult {
 
-        if (username == "" || password == "") {
+        if (email == "" || password == "") {
             return StudomatRepositoryResult.LoginResult.Failure("Username or password is empty")
         }
-        return when (val result = studomatService.login(username, password)) {
+        return when (val result = studomatService.login(email, password)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 Log.d("StudomatRepository", "loginUser: ${result.data}")
                 StudomatRepositoryResult.LoginResult.Success(parseStudent(result.data))

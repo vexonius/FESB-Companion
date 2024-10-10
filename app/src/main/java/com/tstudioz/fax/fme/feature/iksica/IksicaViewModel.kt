@@ -10,6 +10,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
+import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
@@ -23,7 +25,7 @@ import kotlinx.coroutines.launch
 @InternalCoroutinesApi
 class IksicaViewModel(
     private val repository: IksicaRepositoryInterface,
-    private val sharedPreferences: SharedPreferences
+    private val userRepository: UserRepositoryInterface
 ) : ViewModel() {
 
     val receipts = MutableLiveData<List<Receipt>>()
@@ -81,8 +83,10 @@ class IksicaViewModel(
         if (loginStatus.value != LoginStatus.UNSET && loginStatus.value != LoginStatus.FAILURE) {
             return false
         }
-        val email = (sharedPreferences.getString("username", "") ?: "") + "@fesb.hr"
-        val password = sharedPreferences.getString("password", "") ?: ""
+        val user = User(userRepository.getCurrentUser())
+        val email = user.email
+        val password = user.password
+
         try {
             displayStatus(LoginStatus.AUTH_STATE)
             repository.getAuthState()
