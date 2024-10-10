@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
+import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
@@ -82,8 +83,8 @@ class IksicaViewModel(
         if (loginStatus.value != LoginStatus.UNSET && loginStatus.value != LoginStatus.FAILURE) {
             return false
         }
-        val user = userRepository.getCurrentUser()
-        val email = user.username + "@fesb.hr"
+        val user = User(userRepository.getCurrentUser())
+        val email = user.email
         val password = user.password
 
         try {
