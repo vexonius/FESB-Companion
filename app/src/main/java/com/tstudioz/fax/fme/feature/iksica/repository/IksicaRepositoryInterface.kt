@@ -1,23 +1,19 @@
 package com.tstudioz.fax.fme.feature.iksica.repository
 
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaModel
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentData
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 
 interface IksicaRepositoryInterface {
 
-    suspend fun getStudentInfo(): Pair<IksicaBalance, StudentData>
-
-    suspend fun getReceipts(oib:String): IksicaResult.ReceiptsResult
+    suspend fun getCardDataAndReceipts(): IksicaResult.CardAndReceiptsResult
 
     suspend fun getReceipt(url: String): IksicaResult.ReceiptResult
 
-    suspend fun insert(receipts: List<Receipt>)
+    suspend fun insert(model: StudentData)
 
-    suspend fun insert(iksicaBalance: IksicaBalance, studentData: StudentData)
-
-    suspend fun getCache(): IksicaModel
+    suspend fun getCache(): StudentData?
 
 }

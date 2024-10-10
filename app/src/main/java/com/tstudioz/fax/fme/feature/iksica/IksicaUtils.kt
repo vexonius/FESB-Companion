@@ -1,16 +1,16 @@
 package com.tstudioz.fax.fme.feature.iksica
 
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
+import io.realm.kotlin.ext.realmListOf
 import org.jsoup.Jsoup
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-fun parseStudentInfo(body: String): Pair<IksicaBalance, StudentData> {
+fun parseStudentInfo(body: String): StudentData {
     val doc = Jsoup.parse(body)
 
     val image = doc.selectFirst(".slikastud")?.attr("src")
@@ -33,21 +33,22 @@ fun parseStudentInfo(body: String): Pair<IksicaBalance, StudentData> {
         doc.selectFirst("p:contains(DNEVNA POTPORA)")
             ?.parent()?.lastElementChild()?.text()
             ?.substringBefore(" €").toString().replace(",", ".")
-    val iksicaBalance = IksicaBalance(
-        balance.toDoubleOrNull() ?: 0.0,
-        spentToday.toDoubleOrNull() ?: 0.0,
-    )
+
     val studentData = StudentData(
+        imageUrl = image,
         nameSurname = user ?: "",
         rightsLevel = rightsLevel,
         dailySupport = dailySupport.toDoubleOrNull() ?: 0.0,
         oib = oib ?: "",
         jmbag = jmbag ?: "",
-        iksicaNumber = number ?: "",
+        cardNumber = number ?: "",
         rightsFrom = rightsFrom ?: "",
-        rightsTo = rightsTo ?: ""
+        rightsTo = rightsTo ?: "",
+        balance = balance.toDoubleOrNull() ?: 0.0,
+        spentToday = spentToday.toDoubleOrNull() ?: 0.0,
+        receipts = realmListOf()
     )
-    return Pair(iksicaBalance, studentData)
+    return studentData
 }
 
 fun parseRacuni(doc: String): List<Receipt> {

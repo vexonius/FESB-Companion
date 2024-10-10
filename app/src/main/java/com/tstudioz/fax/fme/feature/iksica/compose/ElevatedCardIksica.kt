@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.feature.iksica.models.StudentData
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import java.util.Locale
 
 @Preview
@@ -111,7 +111,7 @@ fun ElevatedCardIksica(
 
 @Composable
 fun CardIksicaPopupContent(
-    studentData: StudentData,
+    studentData: StudentDataRealm,
     iksicaBalance: Double
 ) {
     AppTheme {
@@ -130,7 +130,7 @@ fun CardIksicaPopupContent(
             )
             CardIksicaPopupRow(leftText = "OIB", rightText = studentData.oib)
             CardIksicaPopupRow(leftText = "JMBAG", rightText = studentData.jmbag)
-            CardIksicaPopupRow(leftText = "Broj iksice", rightText = studentData.iksicaNumber)
+            CardIksicaPopupRow(leftText = "Broj iksice", rightText = studentData.cardNumber)
             CardIksicaPopupRow(leftText = "Prava od", rightText = studentData.rightsFrom)
             CardIksicaPopupRow(leftText = "Prava do", rightText = studentData.rightsTo)
             CardIksicaPopupRow(

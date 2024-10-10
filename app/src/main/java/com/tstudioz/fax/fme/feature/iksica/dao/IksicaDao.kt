@@ -1,56 +1,27 @@
 package com.tstudioz.fax.fme.feature.iksica.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaModel
-import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
-import com.tstudioz.fax.fme.feature.iksica.models.StudentData
-import com.tstudioz.fax.fme.feature.iksica.models.fromRealmObject
-import com.tstudioz.fax.fme.feature.iksica.models.toRealmObject
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import java.time.LocalTime
 
 class IksicaDao(private val dbManager: DatabaseManagerInterface) : IksicaDaoInterface {
 
-
-    override suspend fun insert(receipts: List<Receipt>) {
+    override suspend fun insert(studentData: StudentDataRealm) {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         realm.write {
-            val oldReceipts = this.query<ReceiptRealm>().find()
-            this.delete(oldReceipts)
-            receipts.forEach {
-                this.copyToRealm(it.toRealmObject(), updatePolicy = UpdatePolicy.ALL)
-            }
+            delete(StudentDataRealm::class)
+            copyToRealm(studentData, updatePolicy = UpdatePolicy.ALL)
         }
     }
 
-    override suspend fun insert(iksicaBalance: IksicaBalance, studentData: StudentData) {
+    override suspend fun read(): StudentDataRealm? {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
+        val model = realm.query<StudentDataRealm>().find().firstOrNull()
 
-        realm.write {
-            val oldIksicaBalance = this.query<IksicaBalance>().find()
-            this.delete(oldIksicaBalance)
-            this.copyToRealm(iksicaBalance, updatePolicy = UpdatePolicy.ALL)
-
-            val oldStudentData = this.query<StudentData>().find()
-            this.delete(oldStudentData)
-            this.copyToRealm(studentData, updatePolicy = UpdatePolicy.ALL)
-        }
-    }
-
-    override suspend fun read(): IksicaModel {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-        val receipts = realm.query<ReceiptRealm>().find().map { it.fromRealmObject() }
-            .sortedByDescending { LocalTime.parse(it.time) }
-            .sortedByDescending { it.date }
-        val iksicaBalance = realm.query<IksicaBalance>().find().firstOrNull()
-        val studentData = realm.query<StudentData>().find().firstOrNull()
-
-        return IksicaModel(iksicaBalance, studentData, receipts)
+        return model
     }
 
 }

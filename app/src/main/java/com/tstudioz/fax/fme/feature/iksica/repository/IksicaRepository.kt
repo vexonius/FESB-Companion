@@ -2,12 +2,9 @@ package com.tstudioz.fax.fme.feature.iksica.repository
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
-import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDaoInterface
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaModel
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.parseDetaljeRacuna
 import com.tstudioz.fax.fme.feature.iksica.parseRacuni
 import com.tstudioz.fax.fme.feature.iksica.parseStudentInfo
@@ -19,41 +16,22 @@ class IksicaRepository(
     private val iksicaDao: IksicaDaoInterface,
 ) : IksicaRepositoryInterface {
 
-    override suspend fun getStudentInfo(): Pair<IksicaBalance, StudentData> {
-        when (val result = iksicaService.getStudentInfo()) {
-            is NetworkServiceResult.IksicaResult.Success -> {
-                val data = parseStudentInfo(result.data)
-                insert(data.first, data.second)
+    override suspend fun getCardDataAndReceipts(): IksicaResult.CardAndReceiptsResult {
+        val studentInfo = getStudentInfo()
+        val oib = studentInfo.oib
 
-                return data
+        when(val receiptsResult = getReceipts(oib)) {
+            is IksicaResult.ReceiptsResult.Success -> {
+                val receipts = receiptsResult.data
+                val studentData = studentInfo.with(receipts)
+
+                insert(studentData)
+
+                return IksicaResult.CardAndReceiptsResult.Success(studentData)
             }
 
-            is NetworkServiceResult.IksicaResult.Failure -> {
-                Log.e(TAG, result.throwable.message ?: "AspNetSessionSAML fetching error")
-                throw Exception(result.throwable.message ?: "AspNetSessionSAML fetching error")
-            }
-        }
-    }
-
-    override suspend fun getReceipts(oib: String): IksicaResult.ReceiptsResult {
-        when (val result = iksicaService.getReceipts(oib)) {
-            is NetworkServiceResult.IksicaResult.Success -> {
-                val receiptsList = parseRacuni(result.data)
-                insert(receiptsList)
-
-                return IksicaResult.ReceiptsResult.Success(receiptsList)
-            }
-
-            is NetworkServiceResult.IksicaResult.Failure -> {
-                Log.e(TAG, "Receipts fetching error")
-                if (result.throwable.message?.contains("nema računa u zadnjih 30 dana", false) == true) {
-                    return IksicaResult.ReceiptsResult.Success(emptyList())
-                }
-                if (result.throwable.message?.contains("Not logged in", false) == true) {
-                    return IksicaResult.ReceiptsResult.Failure(Throwable("Not logged in"))
-                }
-
-                return IksicaResult.ReceiptsResult.Failure(Throwable("Receipts fetching error: " + result.throwable.message))
+            is IksicaResult.ReceiptsResult.Failure -> {
+                return IksicaResult.CardAndReceiptsResult.Failure(receiptsResult.throwable)
             }
         }
     }
@@ -74,16 +52,51 @@ class IksicaRepository(
         }
     }
 
-    override suspend fun insert(receipts: List<Receipt>) {
-        iksicaDao.insert(receipts)
+    override suspend fun insert(model: StudentData) {
+        iksicaDao.insert(model.toRealmModel())
     }
 
-    override suspend fun insert(iksicaBalance: IksicaBalance, studentData: StudentData) {
-        iksicaDao.insert(iksicaBalance, studentData)
+    override suspend fun getCache(): StudentData? {
+        val model = iksicaDao.read() ?: return null
+
+        return StudentData(model)
     }
 
-    override suspend fun getCache(): IksicaModel {
-        return iksicaDao.read()
+    private suspend fun getStudentInfo(): StudentData {
+        when (val result = iksicaService.getStudentInfo()) {
+            is NetworkServiceResult.IksicaResult.Success -> {
+                val data = parseStudentInfo(result.data)
+
+                return data
+            }
+
+            is NetworkServiceResult.IksicaResult.Failure -> {
+                Log.e(TAG, result.throwable.message ?: "AspNetSessionSAML fetching error")
+                throw Exception(result.throwable.message ?: "AspNetSessionSAML fetching error")
+            }
+        }
+    }
+
+    private suspend fun getReceipts(oib: String): IksicaResult.ReceiptsResult {
+        when (val result = iksicaService.getReceipts(oib)) {
+            is NetworkServiceResult.IksicaResult.Success -> {
+                val receiptsList = parseRacuni(result.data)
+
+                return IksicaResult.ReceiptsResult.Success(receiptsList)
+            }
+
+            is NetworkServiceResult.IksicaResult.Failure -> {
+                Log.e(TAG, "Receipts fetching error")
+                if (result.throwable.message?.contains("nema računa u zadnjih 30 dana", false) == true) {
+                    return IksicaResult.ReceiptsResult.Success(emptyList())
+                }
+                if (result.throwable.message?.contains("Not logged in", false) == true) {
+                    return IksicaResult.ReceiptsResult.Failure(Throwable("Not logged in"))
+                }
+
+                return IksicaResult.ReceiptsResult.Failure(Throwable("Receipts fetching error: " + result.throwable.message))
+            }
+        }
     }
 
 }
