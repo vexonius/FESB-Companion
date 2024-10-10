@@ -42,7 +42,6 @@ class HomeFragment : Fragment() {
                 weather = homeViewModel.weatherDisplay,
                 notes = homeViewModel.notes,
                 events = homeViewModel.events,
-                lastFetched = homeViewModel.lastFetched,
                 menza = menzaViewModel.menza,
                 insertNote = homeViewModel::insert,
                 deleteNote = homeViewModel::delete
