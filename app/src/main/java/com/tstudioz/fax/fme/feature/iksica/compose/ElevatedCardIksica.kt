@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import java.util.Locale
 
@@ -110,10 +111,7 @@ fun ElevatedCardIksica(
 }
 
 @Composable
-fun CardIksicaPopupContent(
-    studentData: StudentDataRealm,
-    iksicaBalance: Double
-) {
+fun CardIksicaPopupContent(model: StudentData) {
     AppTheme {
         Column(
             Modifier
@@ -121,21 +119,21 @@ fun CardIksicaPopupContent(
                 .background(MaterialTheme.colorScheme.background)
                 .width(300.dp)
         ) {
-            CardIksicaPopupRow(leftText = "Ime", rightText = studentData.nameSurname)
-            CardIksicaPopupRow(leftText = "Razina prava", rightText = studentData.rightsLevel)
+            CardIksicaPopupRow(leftText = stringResource(R.string.name_label), rightText = model.nameSurname)
+            CardIksicaPopupRow(leftText = stringResource(R.string.rights_level_label), rightText = model.rightsLevel)
             CardIksicaPopupRow(
-                leftText = "Dnevna potpora", rightText = stringResource(
-                    id = R.string.iksica_balance, String.format(Locale.US, "%.2f", studentData.dailySupport)
+                leftText = stringResource(R.string.daily_support_label), rightText = stringResource(
+                    id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", model.dailySupport)
                 )
             )
-            CardIksicaPopupRow(leftText = "OIB", rightText = studentData.oib)
-            CardIksicaPopupRow(leftText = "JMBAG", rightText = studentData.jmbag)
-            CardIksicaPopupRow(leftText = "Broj iksice", rightText = studentData.cardNumber)
-            CardIksicaPopupRow(leftText = "Prava od", rightText = studentData.rightsFrom)
-            CardIksicaPopupRow(leftText = "Prava do", rightText = studentData.rightsTo)
+            CardIksicaPopupRow(leftText = stringResource(R.string.oib_label), rightText = model.oib)
+            CardIksicaPopupRow(leftText = stringResource(R.string.jmbag_label), rightText = model.jmbag)
+            CardIksicaPopupRow(leftText = stringResource(R.string.card_number_label), rightText = model.cardNumber)
+            CardIksicaPopupRow(leftText = stringResource(R.string.rights_from_label), rightText = model.rightsFrom)
+            CardIksicaPopupRow(leftText = stringResource(R.string.right_until_label), rightText = model.rightsTo)
             CardIksicaPopupRow(
-                leftText = "Stanje iksice", rightText = stringResource(
-                    id = R.string.iksica_balance, String.format(Locale.US, "%.2f", iksicaBalance)
+                leftText = stringResource(R.string.card_balance_label), rightText = stringResource(
+                    id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", model.balance)
                 ), divider = false
             )
         }
