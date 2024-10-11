@@ -42,7 +42,6 @@ class SettingsViewModel(
 
     fun logout(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            //sharedPreferences.edit().clear().apply()
             sharedPreferences[SPKey.LOGGED_IN] = false
             sharedPreferences[SPKey.FIRST_TIME] = true
             sharedPreferences.edit().remove("gen").apply()
