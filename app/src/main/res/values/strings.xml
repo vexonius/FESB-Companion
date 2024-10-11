@@ -89,4 +89,20 @@
     <string name="meni_price">%1$s €</string>
     <string name="meals_by_choice">JELA PO IZBORU</string>
     <string name="menza_no_data">Nije postavljen jelovnik za današnji dan.</string>
+
+    //Iksica
+    <string name="iksica_no_data">Nema podataka</string>
+    <string name="iksica_loading">Učitavanje…</string>
+    <string name="iksica_balance">%1$s €</string>
+    <string name="iksica_loading_error">Greška prilikom dohvaćanja računa</string>
+    <string name="iksica_no_receipts">Nema računa u zadnjih 30 dana</string>
+    <string name="name_label">Ime</string>
+    <string name="rights_level_label">Razina prava</string>
+    <string name="daily_support_label">Dnevna potpora</string>
+    <string name="oib_label">OIB</string>
+    <string name="jmbag_label">JMBAG</string>
+    <string name="card_number_label">Broj iksice</string>
+    <string name="rights_from_label">Prava od</string>
+    <string name="right_until_label">Prava do</string>
+    <string name="card_balance_label">Stanje iksice</string>
 </resources>

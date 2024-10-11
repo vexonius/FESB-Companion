@@ -70,7 +70,7 @@ android {
 
 dependencies {
 
-    val koinVersion = "3.5.6"
+    val koinVersion = "3.6.0-Beta5"
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
     implementation("androidx.compose.material3:material3-android:1.2.1")
@@ -102,7 +102,6 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-    implementation("androidx.compose.material3:material3-android:1.2.1")
     implementation("androidx.compose.material:material:1.6.8")
     val composeVersion = "1.6.7"
 

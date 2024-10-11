@@ -1,7 +1,4 @@
-package com.tstudioz.fax.fme.feature.iksica
-
-import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
+package com.tstudioz.fax.fme.feature.iksica.models
 
 sealed class IksicaResult {
 
@@ -13,6 +10,11 @@ sealed class IksicaResult {
     sealed class ReceiptsResult : IksicaResult() {
         data class Success(val data: List<Receipt>) : ReceiptsResult()
         class Failure(val throwable: Throwable) : ReceiptsResult()
+    }
+
+    sealed class CardAndReceiptsResult : IksicaResult() {
+        data class Success(val data: StudentData) : CardAndReceiptsResult()
+        class Failure(val throwable: Throwable) : CardAndReceiptsResult()
     }
 
 }

@@ -16,7 +16,7 @@ import com.tstudioz.fax.fme.feature.attendance.view.AttendanceFragment
 import com.tstudioz.fax.fme.feature.home.view.HomeFragment
 import com.tstudioz.fax.fme.feature.timetable.view.TimeTableFragment
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatFragment
-import com.tstudioz.fax.fme.feature.iksica.IksicaFragment
+import com.tstudioz.fax.fme.feature.iksica.view.IksicaFragment
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi

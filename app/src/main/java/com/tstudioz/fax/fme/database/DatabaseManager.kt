@@ -3,13 +3,12 @@ package com.tstudioz.fax.fme.database
 import com.tstudioz.fax.fme.database.models.*
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaBalance
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataIksica
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import com.tstudioz.fax.fme.feature.menza.models.MenzaRealm
 import io.realm.kotlin.RealmConfiguration
 
-class DatabaseManager: DatabaseManagerInterface {
+class DatabaseManager(private val keystoreManager: KeystoreManagerInterface): DatabaseManagerInterface {
 
     override fun getDefaultConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder(
@@ -21,12 +20,11 @@ class DatabaseManager: DatabaseManagerInterface {
                 EventRealm::class,
                 StudomatSubject::class,
                 Year::class,
-                IksicaBalance::class,
                 ReceiptRealm::class,
-                StudentDataIksica::class))
+                StudentDataRealm::class))
             .name("default.realm")
             .schemaVersion(1)
-            .encryptionKey("nekikljuckojicemopromjenitiubuducnostialisadjetujernedamisebolje".toByteArray())
+            .encryptionKey(keystoreManager.getOrCreateEncryptionKey())
             .deleteRealmIfMigrationNeeded()
             .build()
     }
