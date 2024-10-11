@@ -8,7 +8,7 @@ import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import com.tstudioz.fax.fme.feature.menza.models.MenzaRealm
 import io.realm.kotlin.RealmConfiguration
 
-class DatabaseManager: DatabaseManagerInterface {
+class DatabaseManager(private val keystoreManager: KeystoreManagerInterface): DatabaseManagerInterface {
 
     override fun getDefaultConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder(
@@ -24,7 +24,7 @@ class DatabaseManager: DatabaseManagerInterface {
                 StudentDataRealm::class))
             .name("default.realm")
             .schemaVersion(1)
-            .encryptionKey("nekikljuckojicemopromjenitiubuducnostialisadjetujernedamisebolje".toByteArray())
+            .encryptionKey(keystoreManager.getOrCreateEncryptionKey())
             .deleteRealmIfMigrationNeeded()
             .build()
     }
