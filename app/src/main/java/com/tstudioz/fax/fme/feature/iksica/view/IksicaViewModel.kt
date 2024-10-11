@@ -22,6 +22,7 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     val snackbarHostState = SnackbarHostState()
 
     private val _studentData = MutableLiveData<StudentData?>(null)
+    val studentData: LiveData<StudentData?> = _studentData
 
     private val _receiptSelected = MutableLiveData<IksicaReceiptState>(IksicaReceiptState.None)
     val receiptSelected: LiveData<IksicaReceiptState> = _receiptSelected

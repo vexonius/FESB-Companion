@@ -6,14 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -22,7 +18,6 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -52,7 +47,6 @@ import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.CircularIndicator
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
@@ -76,14 +70,10 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val receiptSelected = iksicaViewModel.receiptSelected.observeAsState().value
-    val studentName = iksicaViewModel.studentData.observeAsState().value?.nameSurname ?: ""
-    val cardNumber = iksicaViewModel.studentData.observeAsState().value?.iksicaNumber ?: ""
-    val cardBalance = iksicaViewModel.iksicaBalance.observeAsState().value?.balance ?: 0.0
-    val studentData = iksicaViewModel.studentData.observeAsState().value ?: StudentData.empty
+    val studentData = iksicaViewModel.studentData.observeAsState().value
 
-    val list = iksicaViewModel.receipts.observeAsState().value ?: emptyList()
     val viewState = iksicaViewModel.viewState.observeAsState().value ?: IksicaViewState.Loading
-    val isRefreshing = viewState == IksicaViewState.Fetching
+    val isRefreshing = viewState is IksicaViewState.Fetching
 
     val showPopup = remember { mutableStateOf(false) }
 
@@ -91,127 +81,62 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         iksicaViewModel.getReceipts()
     })
 
-    BottomSheetScaffold(sheetPeekHeight = 0.dp,
+    BottomSheetScaffold(
+        sheetPeekHeight = 0.dp,
         modifier = Modifier
             .pullRefresh(pullRefreshState)
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         scaffoldState = scaffoldState,
         snackbarHost = { SnackbarHost(hostState = iksicaViewModel.snackbarHostState) },
         sheetContent = {
-            when (receiptSelected) {
-                is IksicaReceiptState.Success -> {
-                    BottomSheetIksica(receiptSelected.data) { iksicaViewModel.hideReceiptDetails() }
-                }
-
-                else -> {}
+            if (receiptSelected is IksicaReceiptState.Success) {
+                BottomSheetIksica(receiptSelected.data) { iksicaViewModel.hideReceiptDetails() }
             }
         }) {
         Box {
             PullRefreshIndicator(
-                isRefreshing, pullRefreshState,
+                isRefreshing,
+                pullRefreshState,
                 Modifier
                     .align(Alignment.TopCenter)
                     .zIndex(2f)
             )
-            when (receiptSelected) {
-                is IksicaReceiptState.Fetching -> {
-                    CircularIndicator()
-                }
 
-                else -> {}
+            if (isRefreshing) {
+                CircularIndicator()
             }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                when (viewState) {
-                    is IksicaViewState.Loading, is IksicaViewState.Fetching -> {
-                        item {
-                            LinearProgressIndicator(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .height(4.dp)
-                                    .zIndex(1f)
-                            )
-                        }
-                    }
 
-                    else -> {
-                        item { Spacer(modifier = Modifier.height(4.dp)) }
-                    }
-                }
-                when (viewState) {
-                    is IksicaViewState.Initial->{
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                when(viewState) {
+                    is IksicaViewState.Initial, is IksicaViewState.Empty -> {
                         item {
                             EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
                         }
                     }
                     is IksicaViewState.Success -> {
                         item {
-                            ElevatedCardIksica(studentName, cardNumber, cardBalance) {
+                            ElevatedCardIksica(viewState.data.nameSurname, viewState.data.cardNumber, viewState.data.balance) {
                                 showPopup.value = true
                             }
                         }
-                        items(list) {
-                            IksicaItem(it) {
-                                iksicaViewModel.getReceiptDetails(it)
+
+                        if (viewState.data.receipts.isEmpty()) {
+                            item {
+                                EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
                             }
                         }
-                    }
 
-                    is IksicaViewState.Fetching -> {
-                        if (list.isNotEmpty()) {
-                            item {
-                                ElevatedCardIksica(studentName, cardNumber, cardBalance) {
-                                    showPopup.value = true
-                                }
-                            }
-                            items(list) {
+                        viewState.data.receipts.map {
+                            item(it) {
                                 IksicaItem(it) {
                                     iksicaViewModel.getReceiptDetails(it)
                                 }
                             }
-                        } else {
-                            item {
-                                EmptyIksicaView(stringResource(id = R.string.iksica_loading))
-                            }
                         }
                     }
-
                     is IksicaViewState.FetchingError -> {
-                        if (cardBalance != 0.0 || cardNumber.isNotEmpty() || studentName.isNotEmpty()) {
-                            item {
-                                ElevatedCardIksica(studentName, cardNumber, cardBalance) {
-                                    showPopup.value = true
-                                }
-                            }
-                        }
-                        items(list) {
-                            IksicaItem(it) {
-                                iksicaViewModel.getReceiptDetails(it)
-                            }
-                        }
-                        if (list.isEmpty()) {
-                            item {
-                                EmptyIksicaView(stringResource(id = R.string.iksica_loading_error))
-                            }
-                        }
+
                     }
-
-
-                    is IksicaViewState.Empty -> {
-                        if (cardBalance != 0.0 || cardNumber.isNotEmpty() || studentName.isNotEmpty()) {
-                            item {
-                                ElevatedCardIksica(studentName, cardNumber, cardBalance) {
-                                    showPopup.value = true
-                                }
-                            }
-                        }
-                        item {
-                            EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
-                        }
-                    }
-
                     else -> {}
                 }
             }
@@ -222,9 +147,10 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         showPopup = showPopup.value,
         onClickOutside = { showPopup.value = !showPopup.value }
     ) {
-        CardIksicaPopupContent(studentData = studentData, iksicaBalance = cardBalance)
+        if (studentData != null) {
+            CardIksicaPopupContent(studentData)
+        }
     }
-
 }
 
 @Composable
@@ -308,7 +234,6 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
             })
     }
 }
-
 
 fun Modifier.angledGradientBackground(
     colors: List<Color>,
