@@ -53,7 +53,9 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             when (val result = repository.getCardDataAndReceipts()) {
                 is IksicaResult.CardAndReceiptsResult.Success -> {
-                    _viewState.postValue(IksicaViewState.Success(result.data))
+                    val model = result.data
+                    _viewState.postValue(IksicaViewState.Success(model))
+                    _studentData.postValue(model)
                 }
 
                 is IksicaResult.CardAndReceiptsResult.Failure -> {
