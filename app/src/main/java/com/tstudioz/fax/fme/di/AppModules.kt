@@ -10,6 +10,8 @@ import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.KeystoreManager
 import com.tstudioz.fax.fme.database.KeystoreManagerInterface
+import com.tstudioz.fax.fme.feature.settings.SettingsDao
+import com.tstudioz.fax.fme.feature.settings.SettingsViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
@@ -18,6 +20,7 @@ import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
 import com.tstudioz.fax.fme.random.NetworkUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -28,6 +31,7 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalCoroutinesApi::class)
 @InternalCoroutinesApi
 val module = module {
+    single { SettingsDao(get()) }
     single { NetworkUtils(androidContext()) }
     single { MonsterCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(androidContext())) }
     single<FESBLoginInterceptor>(named("FESBInterceptor")) { FESBLoginInterceptor(get(), get(), get()) }
@@ -36,16 +40,17 @@ val module = module {
     single<SessionDelegateInterface> { SessionDelegate(get()) }
     single<KeystoreManagerInterface> { KeystoreManager(get()) }
     single<DatabaseManagerInterface> { DatabaseManager(get()) }
-    single <SharedPreferences> { encryptedSharedPreferences(androidContext()) }
+    single<SharedPreferences> { encryptedSharedPreferences(androidContext()) }
     viewModel { TimetableViewModel(get(), get()) }
+    viewModel { SettingsViewModel(get(), get(), get(), get()) }
 }
 
-fun provideOkHttpClient(monsterCookieJar: MonsterCookieJar) : OkHttpClient {
+fun provideOkHttpClient(monsterCookieJar: MonsterCookieJar): OkHttpClient {
     return OkHttpClient.Builder()
-            .callTimeout(15, TimeUnit.SECONDS)
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .cookieJar(monsterCookieJar)
-            .build()
+        .callTimeout(15, TimeUnit.SECONDS)
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .cookieJar(monsterCookieJar)
+        .build()
 }
 
 fun provideFESBPortalClient(
