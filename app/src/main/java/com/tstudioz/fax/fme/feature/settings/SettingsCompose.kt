@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Observer
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import org.koin.androidx.compose.koinViewModel
@@ -36,6 +37,10 @@ val listItemStartPadding = 16.dp
 @Composable
 fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel()) {
     val context = LocalContext.current
+
+    viewModel.intentEvent.observeForever(Observer {
+        context.startActivity(it)
+    })
 
     AppTheme {
         BottomSheetScaffold(
@@ -92,14 +97,14 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel()) {
                     title = stringResource(id = R.string.send_feedback),
                     supportText = stringResource(id = R.string.help_improve_app),
                     onClick = {
-                        viewModel.sendFeedbackEmail(context, R.string.feedback_email_subject)
+                        viewModel.sendFeedbackEmail(R.string.feedback_email_subject)
                     }
                 )
                 SettingsItem(
                     title = stringResource(id = R.string.report_bug),
                     supportText = stringResource(id = R.string.help_stabilize_app),
                     onClick = {
-                        viewModel.sendFeedbackEmail(context, R.string.report_bug_email_subject)
+                        viewModel.sendFeedbackEmail(R.string.report_bug_email_subject)
                     }
                 )
                 CategoryTitle(title = stringResource(id = R.string.about_app))
