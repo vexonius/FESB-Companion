@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -78,7 +77,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val studentData = iksicaViewModel.studentData.observeAsState().value
 
     val viewState = iksicaViewModel.viewState.observeAsState().value ?: IksicaViewState.Loading
-    val isRefreshing = viewState is IksicaViewState.Fetching
+    val isRefreshing = viewState is IksicaViewState.Fetching || viewState is IksicaViewState.Loading
 
     val showPopup = remember { mutableStateOf(false) }
 
@@ -113,16 +112,6 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
                         }
                     }
-                    is IksicaViewState.Loading -> {
-                        item {
-                            LinearProgressIndicator(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .height(4.dp)
-                                    .zIndex(1f)
-                            )
-                        }
-                    }
                     is IksicaViewState.Success, is IksicaViewState.Fetching -> {
                         val model: StudentData = (viewState as? IksicaViewState.Success)?.data
                             ?: (viewState as? IksicaViewState.Fetching)?.data ?: return@LazyColumn
@@ -145,6 +134,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             }
                         }
                     }
+                    else -> {}
                 }
             }
         }

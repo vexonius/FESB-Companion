@@ -36,7 +36,6 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
 
     init {
         loadReceiptsFromCache()
-        getReceipts()
     }
 
     private fun loadReceiptsFromCache() {
@@ -58,7 +57,6 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
                 }
 
                 is IksicaResult.CardAndReceiptsResult.Failure -> {
-                    _viewState.postValue(IksicaViewState.FetchingError)
                     snackbarHostState.showSnackbar(
                         "Greška prilikom dohvaćanja liste računa",
                         duration = SnackbarDuration.Short

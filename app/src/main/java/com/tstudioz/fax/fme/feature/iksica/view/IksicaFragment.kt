@@ -39,6 +39,12 @@ class IksicaFragment : Fragment() {
         return binding?.root
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        iksicaViewModel.getReceipts()
+    }
+
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.refreshTimetable).setVisible(false)
         menu.findItem(R.id.chooseSchedule).setVisible(false)
