@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.common.user.UserRepository
 import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -19,7 +20,7 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 class AttendanceViewModel(
-    private val repository: AttendanceRepositoryInterface,
+    private val repository: AttendanceRepositoryInterface
 ) : ViewModel() {
 
     private var _shouldShow = MutableLiveData(true)

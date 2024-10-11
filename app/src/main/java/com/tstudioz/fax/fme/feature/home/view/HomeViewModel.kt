@@ -40,16 +40,12 @@ class HomeViewModel(
 ) : AndroidViewModel(application) {
 
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
-    private var _forecastGot = MutableLiveData<Boolean>()
     private val _weatherDisplay = MutableLiveData<WeatherDisplay>()
     private val _notes = MutableLiveData<List<Note>>()
-    private val _lastFetched = MutableLiveData<String>()
 
     val weatherDisplay: LiveData<WeatherDisplay> = _weatherDisplay
-    val forecastGot: LiveData<Boolean> = _forecastGot
     val notes: LiveData<List<Note>> = _notes
     val events: LiveData<List<Event>> = timeTableRepository.events.asLiveData()
-    val lastFetched: LiveData<String> = _lastFetched
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("HomeViewModel", "Caught $exception")
@@ -86,13 +82,9 @@ class HomeViewModel(
                             summary ?: ""
                         )
                     )
-                    _forecastGot.postValue(true)
-                } else {
-                    _forecastGot.postValue(false)
                 }
-            }
-            catch (e: Exception) {
-                _forecastGot.postValue(false)
+            } catch (e: Exception) {
+                Log.d("HomeViewModel", "Caught $e")
             }
         }
     }
@@ -124,9 +116,6 @@ class HomeViewModel(
         val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
         val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
         fetchDailyTimetable(startDate, endDate)
-        _lastFetched.value = (System.currentTimeMillis() - timeTableRepository.lastFetched)
-            .toDuration(DurationUnit.MILLISECONDS)
-            .toString()
     }
 
     private fun getNotes() {

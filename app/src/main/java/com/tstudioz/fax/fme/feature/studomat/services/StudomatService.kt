@@ -23,7 +23,7 @@ class StudomatService(private val client: OkHttpClient) {
         (client.cookieJar as ClearableCookieJar).clearSession()
     }
 
-    fun login(username: String, password: String): NetworkServiceResult.StudomatResult {
+    fun login(email: String, password: String): NetworkServiceResult.StudomatResult {
         try {
             if ((System.currentTimeMillis() - lastTimeLoggedIn) < 3600000) {
                 return NetworkServiceResult.StudomatResult.Success("Logged in!")
@@ -31,7 +31,7 @@ class StudomatService(private val client: OkHttpClient) {
                 loggingIn = true
                 getSamlRequest()
                 sendSamlResponseToAAIEDU()
-                getSamlResponse(username, password)
+                getSamlResponse(email, password)
                 sendSAMLToDecrypt()
                 sendSAMLToISVU()
                 return when (getStudomatData()) {
@@ -54,7 +54,7 @@ class StudomatService(private val client: OkHttpClient) {
         }
     }
 
-    fun getSamlRequest(): NetworkServiceResult.StudomatResult {
+    private fun getSamlRequest(): NetworkServiceResult.StudomatResult {
 
         val request = Request.Builder()
             .url("https://www.isvu.hr/studomat/saml2/authenticate/isvu")
@@ -74,7 +74,7 @@ class StudomatService(private val client: OkHttpClient) {
         }
     }
 
-    fun sendSamlResponseToAAIEDU(): NetworkServiceResult.StudomatResult {
+    private fun sendSamlResponseToAAIEDU(): NetworkServiceResult.StudomatResult {
         val formBody = FormBody.Builder()
             .add("SAMLRequest", samlRequest)
             .build()
@@ -98,13 +98,13 @@ class StudomatService(private val client: OkHttpClient) {
         }
     }
 
-    fun getSamlResponse(
-        username: String,
+    private fun getSamlResponse(
+        email: String,
         password: String
     ): NetworkServiceResult.StudomatResult {
 
         val formBody = FormBody.Builder()
-            .add("username", "$username@fesb.hr")
+            .add("username", email)
             .add("password", password)
             .add("AuthState", authState)
             .add("Submit", "")
@@ -128,7 +128,7 @@ class StudomatService(private val client: OkHttpClient) {
         }
     }
 
-    fun sendSAMLToDecrypt(): NetworkServiceResult.StudomatResult {
+    private fun sendSAMLToDecrypt(): NetworkServiceResult.StudomatResult {
 
         val formBody = FormBody.Builder()
             .add("SAMLResponse", samlResponseEncrypted)
@@ -154,7 +154,7 @@ class StudomatService(private val client: OkHttpClient) {
         }
     }
 
-    fun sendSAMLToISVU(): NetworkServiceResult.StudomatResult {
+    private fun sendSAMLToISVU(): NetworkServiceResult.StudomatResult {
 
         val formBody = FormBody.Builder()
             .add("SAMLResponse", samlResponseDecrypted)
@@ -177,7 +177,7 @@ class StudomatService(private val client: OkHttpClient) {
         }
     }
 
-    fun getStudomatData(): NetworkServiceResult.StudomatResult {
+    private fun getStudomatData(): NetworkServiceResult.StudomatResult {
 
         val request = Request.Builder()
             .url("https://www.isvu.hr/studomat/hr/index")

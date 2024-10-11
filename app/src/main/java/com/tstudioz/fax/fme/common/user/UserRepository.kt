@@ -1,8 +1,8 @@
 package com.tstudioz.fax.fme.common.user
 
 import android.content.SharedPreferences
-import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
+import com.tstudioz.fax.fme.database.models.UserRealm
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
@@ -34,6 +34,10 @@ class UserRepository(
     override suspend fun getCurrentUserName(): String {
         val model = userDao.getUser()
         return model.username
+    }
+
+    override suspend fun getCurrentUser(): UserRealm {
+        return userDao.getUser()
     }
 
     companion object {

@@ -15,7 +15,7 @@ data class Receipt(
     val subsidizedAmount: Double,
     val paidAmount: Double,
     val authorised: String,
-    val href: String,
+    val url: String,
     var receiptDetails: List<ReceiptItem>? = null
 )
 
@@ -30,7 +30,7 @@ fun Receipt.toRealmObject(): ReceiptRealm {
         subsidizedAmount = receipt.subsidizedAmount
         paidAmount = receipt.paidAmount
         authorised = receipt.authorised
-        href = receipt.href
+        href = receipt.url
     }
     return rlm
 }
@@ -46,7 +46,7 @@ fun ReceiptRealm.fromRealmObject(): Receipt {
         subsidizedAmount = receiptRealm.subsidizedAmount ?: 0.0,
         paidAmount = receiptRealm.paidAmount ?: 0.0,
         authorised = receiptRealm.authorised ?: "",
-        href = receiptRealm.href ?: ""
+        url = receiptRealm.href ?: ""
     )
 }
 

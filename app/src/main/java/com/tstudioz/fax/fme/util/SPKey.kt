@@ -5,6 +5,7 @@ enum class SPKey {
     LOGGED_IN,
     FIRST_TIME,
     SHOWN_WEEK,
-    LAST_FETCHED
+    LAST_FETCHED,
+    KEY
 
 }

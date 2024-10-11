@@ -37,14 +37,13 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetIksica(
-    itemToShow: MutableLiveData<Receipt>,
-    toggleShowItem: (Boolean) -> Unit,
+    receipt: Receipt?,
+    toggleShowItem: () -> Unit,
 ) {
-    val receipt = itemToShow.observeAsState().value
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     ModalBottomSheet(
         sheetState = sheetState,
-        onDismissRequest = { toggleShowItem(false) },
+        onDismissRequest = { toggleShowItem() },
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
@@ -165,7 +164,7 @@ fun IksicaItemPreview() {
             subsidizedAmount = 0.27,
             paidAmount = 0.55,
             authorised = "Autorizacija",
-            href = "https://www.google.com",
+            url = "https://www.google.com",
             date = LocalDate.now()
         )
     ) {}
@@ -202,7 +201,7 @@ fun IksicaReceiptDetailedPreview() {
                 subsidizedAmount = 0.27,
                 paidAmount = 0.55,
                 authorised = "Autorizacija",
-                href = "https://www.google.com",
+                url = "https://www.google.com",
                 date = LocalDate.now()
             )
         )

@@ -17,7 +17,7 @@ val studomatModule = module {
     single { StudomatRepository(get(), get(), get()) }
     single { StudomatDao(get()) }
     single(named("clientStudomat")) { clientStudomat }
-    viewModel { StudomatViewModel(get(), get(), get()) }
+    viewModel { StudomatViewModel(get(), get(), get(), get()) }
 }
 
 private val clientStudomat: OkHttpClient = OkHttpClient.Builder().cookieJar(object : ClearableCookieJar {

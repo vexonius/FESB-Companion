@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.iksica
+package com.tstudioz.fax.fme.feature.iksica.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -37,6 +37,12 @@ class IksicaFragment : Fragment() {
         setHasOptionsMenu(true)
 
         return binding?.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        iksicaViewModel.getReceipts()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
