@@ -15,9 +15,11 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
+import com.tstudioz.fax.fme.util.SPKey
 import com.tstudioz.fax.fme.util.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.tstudioz.fax.fme.util.PreferenceHelper.set
 
 class SettingsViewModel(
     private val sharedPreferences: SharedPreferences,
@@ -40,7 +42,9 @@ class SettingsViewModel(
 
     fun logout(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            sharedPreferences.edit().clear().apply()
+            sharedPreferences[SPKey.LOGGED_IN] = false
+            sharedPreferences[SPKey.FIRST_TIME] = true
+            sharedPreferences.edit().remove("gen").apply()
             dao.deleteAll()
         }
         val intent = Intent(context, LoginActivity::class.java)
