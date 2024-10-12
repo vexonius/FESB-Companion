@@ -31,8 +31,8 @@ class TimetableViewModel(
     private val _currentEventShown = MutableLiveData<Event?>(null)
     val currentEventShown: LiveData<Event?> = _currentEventShown
 
-    private var _events = MutableLiveData<List<Event>>(emptyList())
-    var events: LiveData<List<Event>> = timeTableRepository.events.asLiveData()
+    private var _events = MutableLiveData(timeTableRepository.events.asLiveData().value ?: emptyList())
+    var events: LiveData<List<Event>> = _events
 
     private val _periods = MutableLiveData<List<TimeTableInfo>>(emptyList())
     val periods: LiveData<List<TimeTableInfo>> = _periods
@@ -60,8 +60,15 @@ class TimetableViewModel(
     }
 
     init {
-        fetchUserTimetable()
         fetchTimetableAgenda()
+    }
+
+    fun loadCached() {
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            timeTableRepository.events.collect { _events.postValue(it) }
+        }
+        _mondayOfSelectedWeek.postValue(
+            LocalDate.now().let { it.minusDays((it.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()) })
     }
 
     fun fetchUserTimetable() {
@@ -92,7 +99,6 @@ class TimetableViewModel(
             val username = userRepository.getCurrentUserName()
             val items = timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, shouldCache)
             _mondayOfSelectedWeek.postValue(shownWeekMonday)
-            events = _events
             _events.postValue(items)
         }
     }
