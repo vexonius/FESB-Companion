@@ -11,6 +11,7 @@ import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.random.NetworkUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,7 +26,8 @@ import java.time.format.DateTimeFormatter
 @InternalCoroutinesApi
 class TimetableViewModel(
     private val timeTableRepository: TimeTableRepositoryInterface,
-    private val userRepository: UserRepositoryInterface
+    private val userRepository: UserRepositoryInterface,
+    private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
     private val _currentEventShown = MutableLiveData<Event?>(null)
@@ -37,10 +39,8 @@ class TimetableViewModel(
     private val _periods = MutableLiveData<List<TimeTableInfo>>(emptyList())
     val periods: LiveData<List<TimeTableInfo>> = _periods
 
-    private val _mondayOfSelectedWeek: MutableLiveData<LocalDate> = MutableLiveData<LocalDate>().apply {
-        val date = LocalDate.now()
-        value = date.minusDays(((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()))
-    }
+    private val _mondayOfSelectedWeek: MutableLiveData<LocalDate> = MutableLiveData<LocalDate>(
+        LocalDate.now().let { it.minusDays((it.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()) })
     val mondayOfSelectedWeek: LiveData<LocalDate> = _mondayOfSelectedWeek
 
     private val _showWeekChooseMenu = MutableLiveData(false)
@@ -63,7 +63,7 @@ class TimetableViewModel(
         fetchTimetableAgenda()
     }
 
-    fun loadCached() {
+    fun resetToCurrentWeek() {
         viewModelScope.launch(Dispatchers.IO + handler) {
             timeTableRepository.events.collect { _events.postValue(it) }
         }
@@ -72,17 +72,21 @@ class TimetableViewModel(
     }
 
     fun fetchUserTimetable() {
-        val today = LocalDate.now()
-        val startDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
-        val endDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
-        fetchUserTimetable(startDate, endDate, startDate, shouldCache = true)
+        if (networkUtils.isNetworkAvailable()) {
+            val today = LocalDate.now()
+            val startDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
+            val endDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
+            fetchUserTimetable(startDate, endDate, startDate, shouldCache = true)
+        }
     }
 
     fun fetchUserTimetable(date: LocalDate) {
-        val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
-        val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
-        _mondayOfSelectedWeek.value = startDate
-        fetchUserTimetable(startDate, endDate, startDate)
+        if (networkUtils.isNetworkAvailable()) {
+            val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
+            val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
+            _mondayOfSelectedWeek.value = startDate
+            fetchUserTimetable(startDate, endDate, startDate)
+        }
     }
 
     private fun fetchUserTimetable(

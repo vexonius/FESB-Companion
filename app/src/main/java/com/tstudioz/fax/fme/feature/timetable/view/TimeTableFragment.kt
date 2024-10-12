@@ -9,17 +9,14 @@ import androidx.fragment.app.Fragment
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.databinding.TabTimetableBinding
-import com.tstudioz.fax.fme.random.NetworkUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class TimeTableFragment : Fragment() {
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private val timetableViewModel: TimetableViewModel by activityViewModel()
-    private val networkUtils: NetworkUtils by inject()
     private var binding: TabTimetableBinding? = null
 
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
@@ -55,10 +52,8 @@ class TimeTableFragment : Fragment() {
     @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     override fun onResume() {
         super.onResume()
-        timetableViewModel.loadCached()
-        if (networkUtils.isNetworkAvailable()) {
-            timetableViewModel.fetchUserTimetable()
-        }
+        timetableViewModel.resetToCurrentWeek()
+        timetableViewModel.fetchUserTimetable()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {

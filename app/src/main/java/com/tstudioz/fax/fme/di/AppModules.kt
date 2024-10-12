@@ -41,7 +41,7 @@ val module = module {
     single<KeystoreManagerInterface> { KeystoreManager(get()) }
     single<DatabaseManagerInterface> { DatabaseManager(get()) }
     single<SharedPreferences> { encryptedSharedPreferences(androidContext()) }
-    viewModel { TimetableViewModel(get(), get()) }
+    viewModel { TimetableViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get(), get(), get()) }
 }
 
