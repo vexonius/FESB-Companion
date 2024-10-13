@@ -49,6 +49,13 @@ class TimeTableFragment : Fragment() {
         return binding?.root
     }
 
+    @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    override fun onResume() {
+        super.onResume()
+        timetableViewModel.resetToCurrentWeek()
+        timetableViewModel.fetchUserTimetable()
+    }
+
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.refreshTimetable).isVisible = true
         menu.findItem(R.id.chooseSchedule).setVisible(true)
