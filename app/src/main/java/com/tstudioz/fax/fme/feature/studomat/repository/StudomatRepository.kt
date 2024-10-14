@@ -18,38 +18,21 @@ class StudomatRepository(
     private val sharedPreferences: SharedPreferences
 ) {
 
-    suspend fun loginUser(
-        email: String,
-        password: String
-    ): StudomatRepositoryResult.LoginResult {
+    suspend fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
+        val studentUnparsed = studomatService.getStudomatData()
+        val student = parseStudent(studentUnparsed)
 
-        if (email == "" || password == "") {
-            return StudomatRepositoryResult.LoginResult.Failure("Username or password is empty")
-        }
-        return when (val result = studomatService.login(email, password)) {
-            is NetworkServiceResult.StudomatResult.Success -> {
-                Log.d("StudomatRepository", "loginUser: ${result.data}")
-                StudomatRepositoryResult.LoginResult.Success(parseStudent(result.data))
-            }
-
-            is NetworkServiceResult.StudomatResult.Failure -> {
-                StudomatRepositoryResult.LoginResult.Failure("Failure getting data:${result.throwable.message}")
-            }
-        }
-    }
-
-    suspend fun getYears(): StudomatRepositoryResult.YearsResult {
         return when (val result = studomatService.getYears()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetYears = parseYears(result.data)
                 studomatDao.insertYears(resultGetYears)
                 Log.d("StudomatRepository", "getYears: $resultGetYears")
-                StudomatRepositoryResult.YearsResult.Success(resultGetYears)
+                StudomatRepositoryResult.StudentAndYearsResult.Success(resultGetYears, student)
             }
 
             is NetworkServiceResult.StudomatResult.Failure -> {
                 Log.d("StudomatRepository", "getYears: ${result.throwable.message}")
-                StudomatRepositoryResult.YearsResult.Failure("Failure getting data:${result.throwable.message}")
+                StudomatRepositoryResult.StudentAndYearsResult.Failure("Failure getting data:${result.throwable.message}")
             }
         }
     }

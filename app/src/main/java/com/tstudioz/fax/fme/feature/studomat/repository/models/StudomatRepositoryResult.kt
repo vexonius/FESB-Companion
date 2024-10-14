@@ -11,10 +11,10 @@ sealed class StudomatRepositoryResult {
         class Failure(val throwable: String) : LoginResult()
     }
 
-    sealed class YearsResult : StudomatRepositoryResult() {
-        data class Success(val data: List<Year>) : YearsResult()
+    sealed class StudentAndYearsResult : StudomatRepositoryResult() {
+        data class Success(val data: List<Year>, val student:Student) : StudentAndYearsResult()
 
-        class Failure(val throwable: String) : YearsResult()
+        class Failure(val throwable: String) : StudentAndYearsResult()
 
     }
 
