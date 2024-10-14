@@ -22,13 +22,14 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
 
         val response = client.newCall(request).execute()
         val doc = response.body?.string()?.let { Jsoup.parse(it) }
+
         samlRequest = doc?.selectFirst("input[name=SAMLRequest]")?.attr("value").toString()
+
         return if (samlRequest != "") {
             Log.d("StudomatService", "getSamlRequest: $samlRequest")
             NetworkServiceResult.StudomatResult.Success("SAMLRequest got!")
         } else {
             Log.d("StudomatService", "getSamlRequest: Couldn't get SAMLRequest!")
-            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get SAMLRequest!"))
             throw Throwable("Couldn't get SAMLRequest!")
         }
     }
@@ -46,12 +47,12 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
         val doc = response.body?.string()?.let { Jsoup.parse(it) }
 
         authState = doc?.selectFirst("form.login-form")?.attr("action")?.substringAfter("AuthState=").toString()
+
         return if (response.isSuccessful && authState != "") {
             Log.d("StudomatService", "sendSamlResponseToAAIEDU: $authState")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse sent to AAIEDU!")
         } else {
             Log.d("StudomatService", "sendSamlResponseToAAIEDU: Couldn't send SAMLResponse to AAIEDU!")
-            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't send SAMLResponse to AAIEDU!"))
             throw Throwable("Couldn't send SAMLResponse to AAIEDU!")
         }
     }
@@ -74,13 +75,14 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
 
         val response = client.newCall(request).execute()
         val doc = response.body?.string()?.let { Jsoup.parse(it) }
+
         samlResponseEncrypted = doc?.selectFirst("input[name=SAMLResponse]")?.attr("value").toString()
+
         return if (samlResponseEncrypted != "") {
             Log.d("StudomatService", "getSamlResponse: $samlResponseEncrypted")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse got!")
         } else {
             Log.d("StudomatService", "getSamlResponse: Couldn't get SAMLResponse!")
-            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get SAMLResponse!"))
             throw Throwable("Couldn't get SAMLResponse!")
         }
     }
@@ -98,6 +100,7 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
 
         val response = client.newCall(request).execute()
         val doc = response.body?.string()?.let { Jsoup.parse(it) }
+
         samlResponseDecrypted = doc?.selectFirst("input[name=SAMLResponse]")?.attr("value").toString()
 
         return if (samlResponseDecrypted != "") {
@@ -105,7 +108,6 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
             NetworkServiceResult.StudomatResult.Success("SAMLResponse decrypted!")
         } else {
             Log.d("StudomatService", "sendSAMLToDecrypt: Couldn't decrypt SAMLResponse!")
-            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't decrypt SAMLResponse!"))
             throw Throwable("Couldn't decrypt SAMLResponse!")
         }
     }
@@ -122,33 +124,13 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
             .build()
 
         val response = client.newCall(request).execute()
+
         return if (response.isSuccessful) {
             Log.d("StudomatService", "sendSAMLToISVU: SAMLResponse sent to ISVU!")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse sent to ISVU!")
         } else {
             Log.d("StudomatService", "sendSAMLToISVU: Couldn't send SAMLResponse to ISVU!")
-            //NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't send SAMLResponse to ISVU!"))
             throw Throwable("Couldn't send SAMLResponse to ISVU!")
-        }
-    }
-
-    fun getStudomatData(): String {
-
-        val request = Request.Builder()
-            .url("https://www.isvu.hr/studomat/hr/index")
-            .build()
-        val response = client.newCall(request).execute()
-        val body = response.body?.string() ?: ""
-
-        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
-            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            throw Throwable("Not logged in!")
-        } else if (response.code == 200) {
-            Log.d("StudomatService", "getStudomatData: ${body.substring(0, 100)}")
-            body
-        } else {
-            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            throw Throwable("Couldn't get Studomat data!")
         }
     }
 }

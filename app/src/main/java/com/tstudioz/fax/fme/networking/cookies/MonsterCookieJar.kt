@@ -9,6 +9,7 @@ import com.tstudioz.fax.fme.feature.login.services.UserService
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
 import okhttp3.Cookie
 import okhttp3.HttpUrl
+import okhttp3.internal.canParseAsIpAddress
 
 class MonsterCookieJar(
     val cache: CookieCache,
@@ -16,9 +17,8 @@ class MonsterCookieJar(
 ) : PersistentCookieJar(cache, persistor) {
 
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-        cache.removeAll { it.name == authCookieISVU }
         val cookieToSave = cookies.map { cookie ->
-            if (!(cookie.name == authCookieISSP || cookie.name == authCookieISVU || cookie.name == "ISVU")) {
+            if (!(cookie.name == authCookieISSP || cookie.name == authCookieISVU)) {
                 return@map cookie
             }
 
@@ -32,17 +32,17 @@ class MonsterCookieJar(
                 .httpOnly()
                 .build()
         }
-        cookies.forEach {
-            if (it.name == "ISVU")
-                Log.d("MonsterCookieJar", "ISVU cookie saved!")
-        }
         super.saveFromResponse(url, cookieToSave)
     }
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
+        super.loadForRequest(url)
         val cookies = cache.filter {
-            it.domain == url.host
+            url.host.endsWith(it.domain)
         }
+        //Log.d("cookeis", url.host + " path:"+url.encodedPath)
+        //Log.d("cookeis super", "super:       " +super.loadForRequest(url).map { it.name + " host:"+it.domain+" path:"+ it.path }.toString() + " " + url.host)
+        //Log.d("cookeis override", "override:    " + cookies.map { it.name + " host:"+it.domain+" path:"+ it.path }.toString() + " " + url.host)
         return cookies
     }
 
