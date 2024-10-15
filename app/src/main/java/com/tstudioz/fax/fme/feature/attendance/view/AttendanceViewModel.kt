@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.common.user.UserRepository
 import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -16,7 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 
 @ExperimentalCoroutinesApi
@@ -25,12 +23,9 @@ class AttendanceViewModel(
     private val repository: AttendanceRepositoryInterface
 ) : ViewModel() {
 
-    val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
+    private val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
 
-    var lastFetch = 0L
-
-    private var _error = MutableLiveData(false)
-    val error: LiveData<Boolean> = _error
+    private var lastFetch = 0L
 
     private var _attendanceList: MutableLiveData<List<List<AttendanceEntry>>> = MutableLiveData(emptyList())
     val attendanceList: LiveData<List<List<AttendanceEntry>>> = _attendanceList
@@ -39,20 +34,12 @@ class AttendanceViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error attendance", exception.toString())
-        runBlocking{ snackbarHostState.showSnackbar("Došlo je do pogreške") }
-        _error.postValue(true)
+        viewModelScope.launch(Dispatchers.IO) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
         loadFromDb()
         fetchAttendance()
-        _error.observeForever {
-            if (it) {
-                viewModelScope.launch(context = Dispatchers.IO + handler) {
-                    snackbarHostState.showSnackbar("Došlo je do pogreške")
-                }
-            }
-        }
     }
 
     private fun has60SecondsPassed(): Boolean {
@@ -61,25 +48,22 @@ class AttendanceViewModel(
 
     fun fetchAttendance() {
         viewModelScope.launch(context = Dispatchers.IO + handler) {
-            if (networkUtils.isNetworkAvailable()) {
-                if (!has60SecondsPassed()) {
-                    return@launch
-                } else {
-                    lastFetch = System.currentTimeMillis()
-                }
-                when (val attendance = repository.fetchAttendance()) {
-                    is NetworkServiceResult.AttendanceParseResult.Success -> {
-                        val data = attendance.data
-                        _attendanceList.postValue(data)
-                    }
-
-                    is NetworkServiceResult.AttendanceParseResult.Failure -> {
-                        _error.postValue(true)
-                    }
-                }
-
-            } else {
+            if (!networkUtils.isNetworkAvailable()) {
                 snackbarHostState.showSnackbar("Niste povezani")
+                return@launch
+            }
+            if (!has60SecondsPassed()) { return@launch }
+
+            lastFetch = System.currentTimeMillis()
+            when (val attendance = repository.fetchAttendance()) {
+                is NetworkServiceResult.AttendanceParseResult.Success -> {
+                    val data = attendance.data
+                    _attendanceList.postValue(data)
+                }
+
+                is NetworkServiceResult.AttendanceParseResult.Failure -> {
+                    snackbarHostState.showSnackbar("Došlo je do pogreške")
+                }
             }
         }
     }

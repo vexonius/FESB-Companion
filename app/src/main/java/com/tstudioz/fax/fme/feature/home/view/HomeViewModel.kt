@@ -24,16 +24,11 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 @InternalCoroutinesApi
 class HomeViewModel(
@@ -56,7 +51,7 @@ class HomeViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("HomeViewModel", "Caught $exception")
-        runBlocking{ snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        viewModelScope.launch(Dispatchers.IO) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
@@ -70,7 +65,7 @@ class HomeViewModel(
         }
     }
 
-    fun getForecast() {
+    private fun getForecast() {
         viewModelScope.launch(Dispatchers.IO + handler) {
             try {
                 val weather = weatherRepository.fetchWeatherDetails()
@@ -100,6 +95,7 @@ class HomeViewModel(
                 }
             } catch (e: Exception) {
                 Log.d("HomeViewModel", "Caught $e")
+                snackbarHostState.showSnackbar("Došlo je do pogreške pri dohvaćanju vremenske prognoze")
             }
         }
     }
@@ -112,7 +108,7 @@ class HomeViewModel(
                 }
             }
         else {
-            _notes.postValue(_notes.value?.plus(note))
+            _notes.value = _notes.value?.plus(note)
         }
         viewModelScope.launch(Dispatchers.IO + handler) {
             noteRepository.insert(note.toNoteRealm())
@@ -120,7 +116,7 @@ class HomeViewModel(
     }
 
     fun delete(note: Note) {
-        _notes.postValue(_notes.value?.minus(note))
+        _notes.value = _notes.value?.minus(note)
         viewModelScope.launch(Dispatchers.IO + handler) {
             noteRepository.delete(note.toNoteRealm())
         }

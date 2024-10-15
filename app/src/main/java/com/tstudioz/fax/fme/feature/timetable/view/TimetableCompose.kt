@@ -21,6 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +38,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -75,6 +79,17 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val event = showDayEvent.observeAsState().value
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.RESUMED -> {
+                timetableViewModel.resetToCurrentWeek()
+                timetableViewModel.fetchUserTimetable()
+            }
+            else -> {}
+        }
+    }
 
     BottomSheetScaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -133,11 +148,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                         Spacer(modifier = Modifier.padding(0.dp, 5.dp))
                         HorizontalCalendar(state = state, dayContent = { day ->
                             Day(day, isSelected = selection == day, periods = periods.value ?: emptyList()) { clicked ->
-                                selection = if (clicked == selection) {
-                                    null
-                                } else {
-                                    clicked
-                                }
+                                selection = clicked.takeUnless { it == selection }
                             }
                         })
                         Row(
@@ -150,7 +161,6 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                                 onClick = {
                                     coroutineScope.launch {
                                         sheetState.hide()
-                                        delay(300)
                                         showWeekChooseMenu(false)
                                     }
                                 }) {
@@ -161,7 +171,6 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                                     fetchUserTimetable(it.date)
                                     coroutineScope.launch {
                                         sheetState.hide()
-                                        delay(300)
                                         showWeekChooseMenu(false)
                                     }
                                 }
@@ -188,12 +197,11 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                 events = mapped,
                 minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
                 maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
-                else if (eventAfter8PM) LocalTime.of(21, 0)
-                else LocalTime.of(20, 0),
+                    else if (eventAfter8PM) LocalTime.of(21, 0)
+                    else LocalTime.of(20, 0),
                 minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
                 maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
-                onClick = { showEvent(it) }
-            )
+                onClick = { showEvent(it) })
 
         }
     }
@@ -235,8 +243,7 @@ fun Day(
         modifier = Modifier
             .aspectRatio(1f)
             .background(
-                shape = CircleShape,
-                color = dayColor ?: Color.Transparent
+                shape = CircleShape, color = dayColor ?: Color.Transparent
             )
             .clip(CircleShape)
             .border(2.dp, if (isSelected) Color.White else Color.Transparent, CircleShape)

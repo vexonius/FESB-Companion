@@ -108,23 +108,15 @@ fun HomeTabCompose(
     val openDialog = remember { mutableStateOf(false) }
     val snackbarHostState = remember { homeViewModel.snackbarHostState }
 
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
 
     LaunchedEffect(lifecycleState) {
-        // Do something with your state
-        // You may want to use DisposableEffect or other alternatives
-        // instead of LaunchedEffect
         when (lifecycleState) {
-            Lifecycle.State.DESTROYED -> {}
-            Lifecycle.State.INITIALIZED -> {}
-            Lifecycle.State.CREATED -> {}
-            Lifecycle.State.STARTED -> {}
             Lifecycle.State.RESUMED -> {
                 homeViewModel.fetchDailyTimetable()
                 menzaViewModel.getMenza()
             }
+            else ->{}
         }
     }
 

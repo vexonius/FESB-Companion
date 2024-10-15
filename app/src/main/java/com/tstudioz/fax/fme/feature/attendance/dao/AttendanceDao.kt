@@ -11,7 +11,7 @@ class AttendanceDao(private val dbManager: DatabaseManagerInterface) : Attendanc
     override suspend fun insert(attendance: List<AttendanceEntry>) {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
-        realm.writeBlocking {
+        realm.write {
             delete(AttendanceEntry::class)
             attendance.forEach {
                 this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)

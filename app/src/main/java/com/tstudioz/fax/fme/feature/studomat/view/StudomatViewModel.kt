@@ -43,7 +43,7 @@ class StudomatViewModel(
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
-        runBlocking { snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        viewModelScope.launch(Dispatchers.IO) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
@@ -52,7 +52,7 @@ class StudomatViewModel(
     }
 
     private fun loadData() {
-        runBlocking(Dispatchers.IO + coroutineExceptionHandler) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             val yearsRealm = repository.readYears().sortedByDescending { it.title }
             val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
             years.postValue(yearsRealm)
@@ -63,11 +63,9 @@ class StudomatViewModel(
 
     suspend fun login(pulldownTriggered: Boolean = false): Boolean {
         val user = User(userRepository.getCurrentUser())
-        val email = user.email
-        val password = user.password
         if (networkUtils.isNetworkAvailable()) {
             loadedTxt.postValue(StudomatState.FETCHING)
-            return when (val result = repository.loginUser(email, password)) {
+            return when (val result = repository.loginUser(user.email, user.password)) {
                 is StudomatRepositoryResult.LoginResult.Success -> {
                     student.postValue(result.data)
                     true
@@ -95,7 +93,7 @@ class StudomatViewModel(
     }
 
 
-    fun initStudomat() {
+    private fun initStudomat() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (!networkUtils.isNetworkAvailable()) {
                 loadedTxt.postValue(StudomatState.FETCHING_ERROR)

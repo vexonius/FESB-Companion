@@ -29,8 +29,8 @@ import com.tstudioz.fax.fme.feature.attendance.compose.AttendanceCompose
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import com.tstudioz.fax.fme.feature.home.view.HomeTabCompose
 import com.tstudioz.fax.fme.feature.home.view.HomeViewModel
-import com.tstudioz.fax.fme.feature.iksica.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.compose.IksicaCompose
+import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.studomat.compose.StudomatCompose
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableCompose

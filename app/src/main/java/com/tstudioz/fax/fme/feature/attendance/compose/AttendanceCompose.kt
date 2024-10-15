@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -18,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -34,25 +34,18 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @Composable
 fun AttendanceCompose(attendanceViewModel: AttendanceViewModel) {
 
-    val items = attendanceViewModel.attendanceList.observeAsState().value?.sortedBy { it.first().semester }
-        ?: emptyList()
+    val items = attendanceViewModel.attendanceList.observeAsState().value ?: emptyList()
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
-    val snackbarHostState = remember { attendanceViewModel.snackbarHostState }
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
+    val snackbarHostState = attendanceViewModel.snackbarHostState
 
     LaunchedEffect(lifecycleState) {
-        // Do something with your state
-        // You may want to use DisposableEffect or other alternatives
-        // instead of LaunchedEffect
         when (lifecycleState) {
-            Lifecycle.State.DESTROYED -> {}
-            Lifecycle.State.INITIALIZED -> {}
-            Lifecycle.State.CREATED -> {}
-            Lifecycle.State.STARTED -> {}
             Lifecycle.State.RESUMED -> {
                 attendanceViewModel.fetchAttendance()
             }
+
+            else -> {}
         }
     }
 
@@ -83,20 +76,22 @@ fun CreateAttendanceListView(items: List<List<AttendanceEntry>>, snackbarHostSta
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
         LazyColumn(Modifier.padding(it)) {
             items(items.size) { index ->
-                ListItem(headlineContent = {
-                    Text(
-                        text = items[index].first().`class` ?: ""
-                    )
-                },
+                val item = items[index]
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = item.first().`class` ?: ""
+                        )
+                    },
                     supportingContent = {
                         Column {
-                            (items[index]).forEach {
+                            (item).forEach { it ->
                                 AttendanceItem(it)
                             }
                         }
                     }
                 )
-                Divider(modifier = Modifier.padding(4.dp))
+                HorizontalDivider(modifier = Modifier.padding(4.dp))
             }
         }
     }

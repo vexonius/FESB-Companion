@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.settings.SettingsActivity
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
-import com.tstudioz.fax.fme.view.activities.SettingsActivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 
