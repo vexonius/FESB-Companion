@@ -22,10 +22,12 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
 
         val response = client.newCall(request).execute()
         val doc = response.body?.string()?.let { Jsoup.parse(it) }
+        val isSuccessful = response.isSuccessful
+        response.close()
 
         samlRequest = doc?.selectFirst("input[name=SAMLRequest]")?.attr("value").toString()
 
-        return if (samlRequest != "") {
+        return if (isSuccessful && samlRequest != "") {
             Log.d("StudomatService", "getSamlRequest: $samlRequest")
             NetworkServiceResult.StudomatResult.Success("SAMLRequest got!")
         } else {
@@ -45,10 +47,12 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
 
         val response = client.newCall(request).execute()
         val doc = response.body?.string()?.let { Jsoup.parse(it) }
+        val isSuccessful = response.isSuccessful
+        response.close()
 
         authState = doc?.selectFirst("form.login-form")?.attr("action")?.substringAfter("AuthState=").toString()
 
-        return if (response.isSuccessful && authState != "") {
+        return if (isSuccessful && authState != "") {
             Log.d("StudomatService", "sendSamlResponseToAAIEDU: $authState")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse sent to AAIEDU!")
         } else {
@@ -75,10 +79,12 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
 
         val response = client.newCall(request).execute()
         val doc = response.body?.string()?.let { Jsoup.parse(it) }
+        val isSuccessful = response.isSuccessful
+        response.close()
 
         samlResponseEncrypted = doc?.selectFirst("input[name=SAMLResponse]")?.attr("value").toString()
 
-        return if (samlResponseEncrypted != "") {
+        return if (isSuccessful && samlResponseEncrypted != "") {
             Log.d("StudomatService", "getSamlResponse: $samlResponseEncrypted")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse got!")
         } else {
@@ -100,10 +106,12 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
 
         val response = client.newCall(request).execute()
         val doc = response.body?.string()?.let { Jsoup.parse(it) }
+        val isSuccessful = response.isSuccessful
+        response.close()
 
         samlResponseDecrypted = doc?.selectFirst("input[name=SAMLResponse]")?.attr("value").toString()
 
-        return if (samlResponseDecrypted != "") {
+        return if (isSuccessful && samlResponseDecrypted != "") {
             Log.d("StudomatService", "sendSAMLToDecrypt: $samlResponseDecrypted")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse decrypted!")
         } else {
@@ -124,8 +132,10 @@ class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServi
             .build()
 
         val response = client.newCall(request).execute()
+        val isSuccessful = response.isSuccessful
+        response.close()
 
-        return if (response.isSuccessful) {
+        return if (isSuccessful) {
             Log.d("StudomatService", "sendSAMLToISVU: SAMLResponse sent to ISVU!")
             NetworkServiceResult.StudomatResult.Success("SAMLResponse sent to ISVU!")
         } else {

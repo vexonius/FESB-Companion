@@ -18,11 +18,13 @@ class StudomatService(private val client: OkHttpClient) {
             .build()
         val response = client.newCall(request).execute()
         val body = response.body?.string() ?: ""
+        val isSuccessful = response.isSuccessful
+        response.close()
 
-        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+        return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
             throw Throwable("Not logged in!")
-        } else if (response.code == 200) {
+        } else if (isSuccessful) {
             Log.d("StudomatService", "getStudomatData: ${body.substring(0, 100)}")
             body
         } else {
@@ -38,8 +40,10 @@ class StudomatService(private val client: OkHttpClient) {
             .build()
         val response = client.newCall(request).execute()
         val body = response.body?.string() ?: ""
+        val isSuccessful = response.isSuccessful
+        response.close()
 
-        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+        return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
             NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
         } else if (body != "") {
@@ -57,10 +61,13 @@ class StudomatService(private val client: OkHttpClient) {
             .build()
         val response = client.newCall(request).execute()
         val body = response.body?.string() ?: ""
-        return if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+        val isSuccessful = response.isSuccessful
+        response.close()
+
+        return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
             NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
-        } else if (response.isSuccessful) {
+        } else if (isSuccessful) {
             Log.d("StudomatService", "getTrenutnuGodinuData: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
         } else {

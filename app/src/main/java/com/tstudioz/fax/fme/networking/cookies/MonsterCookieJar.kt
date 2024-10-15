@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.networking.cookies
 
-import android.util.Log
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.CookieCache
 import com.franmontiel.persistentcookiejar.persistence.CookiePersistor
@@ -9,7 +8,6 @@ import com.tstudioz.fax.fme.feature.login.services.UserService
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
 import okhttp3.Cookie
 import okhttp3.HttpUrl
-import okhttp3.internal.canParseAsIpAddress
 
 class MonsterCookieJar(
     private val cache: CookieCache,
@@ -17,7 +15,7 @@ class MonsterCookieJar(
 ) : PersistentCookieJar(cache, persistor) {
 
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-        val cookieToSave = cookies.map { cookie ->
+        val cookiesToSave = cookies.map { cookie ->
             if (!(cookie.name == authCookieISSP || cookie.name == authCookieISVU)) {
                 return@map cookie
             }
@@ -32,7 +30,7 @@ class MonsterCookieJar(
                 .httpOnly()
                 .build()
         }
-        super.saveFromResponse(url, cookieToSave)
+        super.saveFromResponse(url, cookiesToSave)
     }
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
