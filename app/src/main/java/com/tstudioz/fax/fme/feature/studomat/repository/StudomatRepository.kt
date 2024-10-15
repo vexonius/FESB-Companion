@@ -19,8 +19,7 @@ class StudomatRepository(
 ) {
 
     suspend fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
-        val studentUnparsed = studomatService.getStudomatData()
-        val student = parseStudent(studentUnparsed)
+        val student = parseStudent(studomatService.getStudomatData())
 
         return when (val result = studomatService.getYears()) {
             is NetworkServiceResult.StudomatResult.Success -> {

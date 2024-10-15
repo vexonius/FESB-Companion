@@ -12,8 +12,8 @@ import okhttp3.HttpUrl
 import okhttp3.internal.canParseAsIpAddress
 
 class MonsterCookieJar(
-    val cache: CookieCache,
-    persistor: CookiePersistor
+    private val cache: CookieCache,
+    private val persistor: CookiePersistor
 ) : PersistentCookieJar(cache, persistor) {
 
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
@@ -40,9 +40,6 @@ class MonsterCookieJar(
         val cookies = cache.filter {
             url.host.endsWith(it.domain)
         }
-        //Log.d("cookeis", url.host + " path:"+url.encodedPath)
-        //Log.d("cookeis super", "super:       " +super.loadForRequest(url).map { it.name + " host:"+it.domain+" path:"+ it.path }.toString() + " " + url.host)
-        //Log.d("cookeis override", "override:    " + cookies.map { it.name + " host:"+it.domain+" path:"+ it.path }.toString() + " " + url.host)
         return cookies
     }
 
