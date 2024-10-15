@@ -26,7 +26,7 @@ class FESBCompanion : Application() {
         startKoin {
             androidLogger(level = Level.ERROR)
             androidContext(this@FESBCompanion)
-            modules(module, attendanceModule, loginModule, homeModule, menzaModule, timetableModule, studomatModule, iksicaModule)
+            modules(module, attendanceModule, iksicaModule, loginModule, homeModule, menzaModule, timetableModule, studomatModule)
         }
     }
 

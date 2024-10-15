@@ -72,11 +72,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun observeInputFields() {
-        binding.loginInput.doOnTextChanged { text, start, before, count ->
+        binding.loginInput.doOnTextChanged { text, _, _, _ ->
             loginViewModel.username.value = text.toString()
         }
 
-        binding.loginPass.doOnTextChanged { text, start, before, count ->
+        binding.loginPass.doOnTextChanged { text, _, _, _ ->
             loginViewModel.password.value = text.toString()
         }
     }
@@ -97,7 +97,7 @@ class LoginActivity : AppCompatActivity() {
         binding.progressLogin.visibility = View.VISIBLE
         binding.loginButton.visibility = View.INVISIBLE
 
-        snack = message?.let { Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT) }
+        snack = message.let { Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT) }
         val snackBarView2 = snack?.view
         snackBarView2?.setBackgroundColor(
             ContextCompat.getColor(

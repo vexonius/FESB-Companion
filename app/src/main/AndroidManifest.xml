@@ -7,9 +7,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.gms.permission.ACTIVITY_RECOGNITION" />
+
     <queries>
         <package android:name="com.ugovori.studentskiugovori" />
     </queries>
+
     <application
         android:name=".Application.FESBCompanion"
         android:allowBackup="true"
@@ -49,7 +51,7 @@
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".view.activities.SettingsActivity"
+            android:name=".feature.settings.SettingsActivity"
             android:label="Postavke"
             android:parentActivityName=".view.activities.MainActivity"
             android:screenOrientation="portrait"

@@ -61,7 +61,6 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
         })
     }
 
-
     Scaffold(
         modifier = Modifier
             .pullRefresh(pullRefreshState ?: rememberPullRefreshState(false, {}))
@@ -109,11 +108,13 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
                 item {
                     Column(Modifier.zIndex(1f)) {
                         Dropdown(studomatViewModel)
-                        Row {
-                            Text(
-                                text = "Generirano: ${studomatViewModel.generated.value ?: ""}",
-                                Modifier.padding(8.dp, 4.dp)
-                            )
+                        studomatViewModel.generated.value?.let {
+                            Row {
+                                Text(
+                                    text = "Generirano: $it",
+                                    Modifier.padding(8.dp, 4.dp)
+                                )
+                            }
                         }
                         ProgressBarCompose(subjectList?.count { it.isPassed } ?: 0, subjectList?.size ?: 0)
                     }
@@ -203,7 +204,8 @@ fun StudomatLoading() {
             LinearProgressIndicator(
                 Modifier
                     .fillMaxWidth()
-                    .zIndex(2f))
+                    .zIndex(2f)
+            )
         }
     }
 }

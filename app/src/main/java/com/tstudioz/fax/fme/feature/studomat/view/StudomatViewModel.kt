@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
+import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.feature.studomat.models.Student
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
@@ -21,7 +23,8 @@ import kotlinx.coroutines.launch
 class StudomatViewModel(
     private val repository: StudomatRepository,
     private val sharedPreferences: SharedPreferences,
-    private val networkUtils: NetworkUtils
+    private val networkUtils: NetworkUtils,
+    private val userRepository: UserRepositoryInterface
 ) : ViewModel() {
 
     val isRefreshing = MutableLiveData(false)
@@ -29,13 +32,10 @@ class StudomatViewModel(
     var subjectList = MutableLiveData<List<StudomatSubject>>(emptyList())
     private var loadedTxt = MutableLiveData(StudomatState.UNSET)
     var student = MutableLiveData(Student())
-    var generated = MutableLiveData("")
+    var generated = MutableLiveData<String>()
     var years = MutableLiveData<List<Year>>(emptyList())
     var selectedYear = MutableLiveData(Year("", ""))
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
-
-    val username = sharedPreferences.getString("username", "") ?: ""
-    val password = sharedPreferences.getString("password", "") ?: ""
 
     val loading = loadedTxt.map { it == StudomatState.FETCHING || it == StudomatState.UNSET }
     val offline
@@ -62,9 +62,12 @@ class StudomatViewModel(
     }
 
     suspend fun login(pulldownTriggered: Boolean = false): Boolean {
+        val user = User(userRepository.getCurrentUser())
+        val email = user.email
+        val password = user.password
         if (networkUtils.isNetworkAvailable()) {
             loadedTxt.postValue(StudomatState.FETCHING)
-            return when (val result = repository.loginUser(username, password)) {
+            return when (val result = repository.loginUser(email, password)) {
                 is StudomatRepositoryResult.LoginResult.Success -> {
                     student.postValue(result.data)
                     true

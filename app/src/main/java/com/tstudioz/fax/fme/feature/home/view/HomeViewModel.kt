@@ -47,12 +47,10 @@ class HomeViewModel(
     private val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
 
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
-    private var _forecastGot = MutableLiveData<Boolean>()
     private val _weatherDisplay = MutableLiveData<WeatherDisplay>()
     private val _notes = MutableLiveData<List<Note>>()
 
     val weatherDisplay: LiveData<WeatherDisplay> = _weatherDisplay
-    val forecastGot: LiveData<Boolean> = _forecastGot
     val notes: LiveData<List<Note>> = _notes
     val events: LiveData<List<Event>> = timeTableRepository.events.asLiveData()
 
@@ -99,12 +97,9 @@ class HomeViewModel(
                             summary ?: ""
                         )
                     )
-                    _forecastGot.postValue(true)
-                } else {
-                    _forecastGot.postValue(false)
                 }
             } catch (e: Exception) {
-                _forecastGot.postValue(false)
+                Log.d("HomeViewModel", "Caught $e")
             }
         }
     }
