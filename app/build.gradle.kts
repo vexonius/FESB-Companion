@@ -12,7 +12,7 @@ android {
         applicationId = "com.tstudioz.fax.fme"
         minSdk = 26
         targetSdk = 34
-        versionCode = 22
+        versionCode = 24
         versionName = "3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -70,7 +70,7 @@ android {
 
 dependencies {
 
-    val koinVersion = "3.6.0-Beta5"
+    val koinVersion = "4.0.0"
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
     implementation("androidx.compose.material3:material3-android:1.2.1")

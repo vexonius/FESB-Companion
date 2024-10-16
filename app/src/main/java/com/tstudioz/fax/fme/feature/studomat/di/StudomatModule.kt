@@ -1,48 +1,36 @@
 package com.tstudioz.fax.fme.feature.studomat.di
 
-import com.franmontiel.persistentcookiejar.ClearableCookieJar
 import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
+import com.tstudioz.fax.fme.feature.studomat.services.StudomatLoginService
+import com.tstudioz.fax.fme.feature.studomat.services.StudomatLoginServiceInterface
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
-import okhttp3.Cookie
-import okhttp3.HttpUrl
+import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
+import com.tstudioz.fax.fme.networking.interceptors.ISVULoginInterceptor
 import okhttp3.OkHttpClient
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import java.util.concurrent.TimeUnit
 
 val studomatModule = module {
+    single<ISVULoginInterceptor> { ISVULoginInterceptor(get(), get(), get()) }
+    single<StudomatLoginServiceInterface>{ StudomatLoginService(get()) }
+    single<OkHttpClient>(named("clientStudomat")) { provideISVUPortalClient(get(), get()) }
     single { StudomatService(get(named("clientStudomat"))) }
     single { StudomatRepository(get(), get(), get()) }
     single { StudomatDao(get()) }
-    single(named("clientStudomat")) { clientStudomat }
     viewModel { StudomatViewModel(get(), get(), get(), get()) }
 }
-
-private val clientStudomat: OkHttpClient = OkHttpClient.Builder().cookieJar(object : ClearableCookieJar {
-    private val cookieStore = HashMap<String, MutableList<Cookie>>()
-
-    override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-        if (cookieStore[url.host] == null)
-            cookieStore[url.host] = mutableListOf()
-        cookies.forEach { cookie ->
-            cookieStore[url.host]
-                ?.find { it.name == cookie.name }
-                ?.let { cookieStore[url.host]?.remove(it) }
-            cookieStore[url.host]?.add(cookie)
-        }
-    }
-
-    override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        return cookieStore[url.host] ?: ArrayList()
-    }
-
-    override fun clearSession() {
-        cookieStore.clear()
-    }
-
-    override fun clear() {
-        cookieStore.clear()
-    }
-}).build()
+fun provideISVUPortalClient(
+    monsterCookieJar: MonsterCookieJar,
+    interceptor: ISVULoginInterceptor,
+) : OkHttpClient {
+    return OkHttpClient.Builder()
+        .callTimeout(15, TimeUnit.SECONDS)
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .addInterceptor(interceptor)
+        .cookieJar(monsterCookieJar)
+        .build()
+}
