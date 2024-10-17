@@ -1,5 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica.di
 
+import com.tstudioz.fax.fme.feature.cameras.CamerasRepository
+import com.tstudioz.fax.fme.feature.cameras.CamerasService
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDao
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDaoInterface
@@ -26,7 +28,9 @@ val iksicaModule = module {
     single<IksicaServiceInterface> { IksicaService(get(named("ISSPPortalClient")))}
     single<IksicaRepositoryInterface> { IksicaRepository(get(), get()) }
     single<IksicaDaoInterface> { IksicaDao(get()) }
-    viewModel { IksicaViewModel( get()) }
+    viewModel { IksicaViewModel( get(), get ()) }
+    single {CamerasService(get())}
+    single{CamerasRepository(get())}
 }
 
 fun provideISSPPortalClient(

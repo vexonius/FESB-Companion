@@ -1,26 +1,37 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -28,18 +39,27 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,7 +68,6 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.compose.CircularIndicator
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -57,6 +76,7 @@ import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -80,6 +100,9 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val isRefreshing = viewState is IksicaViewState.Fetching || viewState is IksicaViewState.Loading
 
     val showPopup = remember { mutableStateOf(false) }
+
+    val shownCamera = remember { mutableStateOf("Kampus") }
+    val image = iksicaViewModel.image.observeAsState().value
 
     val pullRefreshState = rememberPullRefreshState(isRefreshing, {
         iksicaViewModel.getReceipts()
@@ -106,17 +129,50 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     .zIndex(2f)
             )
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                when(viewState) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .padding(10.dp, 10.dp, 10.dp, 0.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(onClick = {
+                            iksicaViewModel.getImage("b8_27_eb_aa_ed_1c/")
+                            iksicaViewModel.hideImage()
+                            shownCamera.value = "Kampus"
+                        }) {
+                            Text("Kampus")
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Button(onClick = {
+                            iksicaViewModel.getImage("b8_27_eb_d1_4b_4a/")
+                            iksicaViewModel.hideImage()
+                            shownCamera.value = "FESB"
+                        }) {
+                            Text("FESB")
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Button(onClick = {
+                            iksicaViewModel.getImage("b8_27_eb_ac_55_f5/")
+                            iksicaViewModel.hideImage()
+                            shownCamera.value = "STOP"
+                        }) {
+                            Text("STOP")
+                        }
+                    }
+                }
+                when (viewState) {
                     is IksicaViewState.Initial, is IksicaViewState.Empty, is IksicaViewState.FetchingError -> {
                         item {
                             EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
                         }
                     }
+
                     is IksicaViewState.Success, is IksicaViewState.Fetching -> {
                         val model: StudentData = (viewState as? IksicaViewState.Success)?.data
                             ?: (viewState as? IksicaViewState.Fetching)?.data ?: return@LazyColumn
 
-                            item {
+                        item {
                             ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) {
                                 showPopup.value = true
                             }
@@ -134,12 +190,16 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             }
                         }
                     }
+
                     else -> {}
                 }
             }
+
         }
     }
-
+    if (image != null) {
+        ZoomablePopup(iksicaViewModel, image, "Menza", shownCamera)
+    }
     PopupBox(
         showPopup = showPopup.value,
         onClickOutside = { showPopup.value = !showPopup.value }
@@ -231,6 +291,131 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
                 )
             })
     }
+}
+
+@OptIn(InternalCoroutinesApi::class)
+@Composable
+fun ZoomablePopup(
+    iksicaViewModel: IksicaViewModel,
+    image: Bitmap,
+    contentDescription: String,
+    shownCamera: MutableState<String>
+) {
+    val bitmap = image.asImageBitmap()
+    val scale = remember { mutableFloatStateOf(1f) }
+    val rotationState = remember { mutableFloatStateOf(0f) }
+    val offsetX = remember { mutableFloatStateOf(0f) }
+    val offsetY = remember { mutableFloatStateOf(0f) }
+    val imageWidth = bitmap.width
+    val imageHeight = bitmap.height
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
+            .zIndex(10F)
+            .clickable {}, // da ne bi klinkilo kroz popup background na stvari ispod
+
+    ) {
+
+        Popup(
+            alignment = Alignment.Center, onDismissRequest = {
+                iksicaViewModel.hideImage()
+            }) {
+
+            Box(
+                Modifier
+                    .wrapContentSize()
+                    .padding(10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.surfaceDim, RectangleShape)
+                    .paint(painterResource(id = R.drawable.tile_background__1_), contentScale = ContentScale.Crop, alpha = 0.5f),
+            ) {
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(15.dp, 15.dp, 15.dp, 0.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = shownCamera.value,
+                            modifier = Modifier,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Close",
+                            modifier = Modifier
+                                .size(25.dp)
+                                .clickable {
+                                    iksicaViewModel.hideImage()
+                                }, tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    Image(
+                        modifier = Modifier
+                            .clip(RectangleShape)
+                            .aspectRatio(1f)
+                            .graphicsLayer(
+                                scaleX = maxOf(.5f, minOf(3f, scale.floatValue)),
+                                scaleY = maxOf(.5f, minOf(3f, scale.floatValue)),
+                                rotationZ = rotationState.floatValue,
+                                translationX = offsetX.floatValue,
+                                translationY = offsetY.floatValue
+                            )
+                            .pointerInput(Unit) {
+                                detectTransformGestures { centroid, pan, zoom, rotation ->
+                                    if (rotationState.floatValue + rotation in -180f..180f)
+                                        rotationState.floatValue += rotation
+                                    val rotationAngle = rotationState.floatValue * PI / 180
+                                    val pany =
+                                        (pan.x * sin(rotationAngle) + pan.y * cos(rotationAngle)) * scale.floatValue
+                                    val panx =
+                                        (pan.x * cos(rotationAngle) - pan.y * sin(rotationAngle)) * scale.floatValue
+                                    val imageWIDTH =
+                                        (abs(cos(rotationState.floatValue * PI / 180) * imageWidth) + abs(
+                                            sin(
+                                                rotationState.floatValue * PI / 180
+                                            ) * imageHeight
+                                        )).toFloat()
+                                    val imageHEIGHT =
+                                        (abs(sin(rotationState.floatValue * PI / 180) * imageWidth) + abs(
+                                            cos(
+                                                rotationState.floatValue * PI / 180
+                                            ) * imageHeight
+                                        )).toFloat()
+                                    if (scale.floatValue * zoom in 1f..3f) scale.floatValue *= zoom
+                                    if (scale.floatValue > 1) {
+                                        offsetX.floatValue =
+                                            (offsetX.floatValue + panx.toFloat()).coerceIn(-(imageWIDTH * (scale.floatValue - 1) / 2)..(imageWIDTH * (scale.floatValue - 1) / 2))
+                                        offsetY.floatValue =
+                                            (offsetY.floatValue + pany.toFloat()).coerceIn(-(imageHEIGHT * (scale.floatValue - 1) / 2)..(imageHEIGHT * (scale.floatValue - 1) / 2))
+                                    } else {
+                                        offsetX.floatValue = 0f
+                                        offsetY.floatValue = 0f
+                                    }
+                                }
+                            }
+                            .clickable {
+                                scale.floatValue = 1f
+                                rotationState.floatValue = 0f
+                                offsetX.floatValue = 0f
+                                offsetY.floatValue = 0f
+                            },
+                        contentDescription = contentDescription,
+                        bitmap = bitmap
+                    )
+                }
+            }
+
+        }
+    }
+
 }
 
 fun Modifier.angledGradientBackground(

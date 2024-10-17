@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica.view
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -7,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.feature.cameras.CamerasRepository
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
@@ -17,7 +19,10 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
-class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewModel() {
+class IksicaViewModel(
+    private val repository: IksicaRepositoryInterface,
+    private val camerasRepository: CamerasRepository
+) : ViewModel() {
 
     val snackbarHostState = SnackbarHostState()
 
@@ -30,8 +35,14 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
     private val _viewState = MutableLiveData<IksicaViewState>(IksicaViewState.Initial)
     val viewState: LiveData<IksicaViewState> = _viewState
 
+    private val _image = MutableLiveData<Bitmap?>(null)
+    val image: LiveData<Bitmap?> = _image
+
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
+        viewModelScope.launch(Dispatchers.Main) {
+            snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+        }
     }
 
     init {
@@ -89,6 +100,16 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
                 }
             }
         }
+    }
+
+    fun getImage(href: String) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            _image.postValue(camerasRepository.getImage(href))
+        }
+    }
+
+    fun hideImage() {
+        if (_image.value != null) _image.value = null
     }
 
     fun hideReceiptDetails() {
