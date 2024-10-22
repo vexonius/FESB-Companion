@@ -138,3 +138,15 @@ allprojects {
         }
     }
 }
+
+tasks.register("getBuildVersionNumber") {
+    println(android.defaultConfig.versionCode)
+}
+
+tasks.register("getNextBuildVersionNumber") {
+    println(android.defaultConfig.versionCode?.plus(1) ?: -1)
+}
+
+tasks.register("getAppVersionName") {
+    println(android.defaultConfig.versionName)
+}
