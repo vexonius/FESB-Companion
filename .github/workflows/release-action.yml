@@ -41,5 +41,5 @@ jobs:
           git config --global user.email "actions@github.com"
           git add app/build.gradle.kts
           git commit -m "Version bump to ${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }}"
-          git tag "${{ github.event.inputs.app_version }}({{ env.BUILD_NUMBER }})"
+          git tag "${{ github.event.inputs.app_version }}(${{ env.BUILD_NUMBER }})"
           git push --tags
