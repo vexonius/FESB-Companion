@@ -7,6 +7,8 @@ on:
         description: 'App version'
         required: true
         default: '3.0.1'
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -37,7 +39,8 @@ jobs:
         run: |
           git config --global user.name "Github Actions"
           git config --global user.email "actions@github.com"
-          git commit -am "Version bump to ${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }}"
+          git add app/build.gradle.kts
+          git commit -m "Version bump to ${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }}"
           git push
 
       - name: Create Release
