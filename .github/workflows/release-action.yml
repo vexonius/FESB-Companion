@@ -18,9 +18,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 11.0.22+7
+      - uses: ults-io/mobile-version-bump-action@v2
       - name: Bump version
-        uses: chkfung/android-version-actions@v1.2.2
         with:
-          gradlePath: app/build.gradle.kts 
-          versionCode: ${{github.run_number}}
-          versionName: '${{ github.event.inputs.app_version }}'
+          android-project-path: / # required if you want to trigger Android version bump
+          app-version: '${{ github.event.inputs.app_version }}' # optional param for Android & iOS version
