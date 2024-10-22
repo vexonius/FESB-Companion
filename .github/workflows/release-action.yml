@@ -65,7 +65,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.tstudioz.fax.fme223
+          packageName: com.tstudioz.fax.fme
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: "Beta 3"
           inAppUpdatePriority: 3
