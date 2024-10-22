@@ -35,9 +35,9 @@ jobs:
 
       - name: Commit version bump
         run: |
-          git config --global user.name 'Github Actions'
-          git config --global user.email 'actions@github.com'
-          git commit -am "Version bump to '${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }}'
+          git config --global user.name "Github Actions"
+          git config --global user.email "actions@github.com"
+          git commit -am "Version bump to ${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }}"
           git push
 
       - name: Create Release
