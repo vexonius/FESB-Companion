@@ -64,7 +64,7 @@ jobs:
       - name: Deploy to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.tstudioz.fax.fme223
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: "Beta 3"
