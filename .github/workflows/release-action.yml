@@ -10,7 +10,7 @@ on:
       build_version_number:
         description: 'Build version number'
         required: true
-        default: '25'
+        default: 25
 
 jobs:
   build:
@@ -22,8 +22,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 11.0.22+7
-      - uses: ults-io/mobile-version-bump-action@v2
       - name: Bump version
+        uses: ults-io/mobile-version-bump-action@v2
         with:
           version-code: ${{ github.event.inputs.build_version_number }}
           android-project-path: /
