@@ -21,20 +21,20 @@ jobs:
 
       - name: Get app version
         id: get_version
-        uses: eriknyk/android-get-app-version-action@v1.0.1
+        run: echo "BUILD_NUMBER=$( ./gradlew -q app:getNextBuildVersionNumber )" >> $GITHUB_ENV
 
       - name: Bump version
         uses: chkfung/android-version-actions@v1.2.2
         with:
           gradlePath: app/build.gradle.kts
-          versionCode: ${{ steps.get_version.outputs.nextVersionCode }}
+          versionCode: ${{ env.BUILD_NUMBER }}
           versionName: '${{ github.event.inputs.app_version }}'
 
       - name: Commit version bump
         run: |
           git config --global user.name 'Github Actions'
           git config --global user.email 'actions@github.com'
-          git commit -am "Version bump to '${{ github.event.inputs.app_version }} (Build ${{ steps.get_version.outputs.nextVersionCode }}'
+          git commit -am "Version bump to '${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }}'
           git push
 
       - name: Create Release
@@ -43,9 +43,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: '${{ github.event.inputs.app_version }} (Build ${{ steps.get_version.outputs.nextVersionCode }}'
-          release_name: Release '${{ github.event.inputs.app_version }} (Build ${{ steps.get_version.outputs.nextVersionCode }}'
+          tag_name: '${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }}'
+          release_name: Release '${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }}'
           body: |
-            New release '${{ github.event.inputs.app_version }} (Build ${{ steps.get_version.outputs.nextVersionCode }})'
+            New release '${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }})'
           draft: false
           prerelease: false
