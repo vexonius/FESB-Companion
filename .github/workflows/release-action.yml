@@ -7,10 +7,6 @@ on:
         description: 'App version'
         required: true
         default: '3.0.1'
-      build_version_number:
-        description: 'Build version number'
-        required: true
-        default: 25
 
 jobs:
   build:
@@ -22,9 +18,34 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 11.0.22+7
+
+      - name: Get app version
+        id: get_version
+        uses: eriknyk/android-get-app-version-action@v1.0.1
+
       - name: Bump version
-        uses: ults-io/mobile-version-bump-action@v2
+        uses: chkfung/android-version-actions@v1.2.2
         with:
-          version-code: ${{ github.event.inputs.build_version_number }}
-          android-project-path: /
-          app-version: '${{ github.event.inputs.app_version }}'
+          gradlePath: app/build.gradle.kts
+          versionCode: ${{ steps.get_version.outputs.nextVersionCode }}
+          versionName: '${{ github.event.inputs.app_version }}'
+
+      - name: Commit version bump
+        run: |
+          git config --global user.name 'Github Actions'
+          git config --global user.email 'actions@github.com'
+          git commit -am "Version bump to '${{ github.event.inputs.app_version }} (Build ${{ steps.get_version.outputs.nextVersionCode }}'
+          git push
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: '${{ github.event.inputs.app_version }} (Build ${{ steps.get_version.outputs.nextVersionCode }}'
+          release_name: Release '${{ github.event.inputs.app_version }} (Build ${{ steps.get_version.outputs.nextVersionCode }}'
+          body: |
+            New release '${{ github.event.inputs.app_version }} (Build ${{ steps.get_version.outputs.nextVersionCode }})'
+          draft: false
+          prerelease: false
