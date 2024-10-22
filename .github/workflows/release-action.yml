@@ -68,7 +68,6 @@ jobs:
           packageName: com.tstudioz.fax.fme223
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: "Beta 3"
-          status: inProgress
           inAppUpdatePriority: 3
           whatsNewDirectory: distribution/whatsnew
           mappingFile: app/build/outputs/mapping/release/mapping.txt
