@@ -1,0 +1,74 @@
+name: Android Release Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: 'App version'
+        required: true
+        default: '3.0.1'
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Get app version
+        id: get_version
+        run: |
+          chmod +x gradlew 
+          echo "BUILD_NUMBER=$( ./gradlew -q app:getNextBuildVersionNumber )" >> $GITHUB_ENV
+
+      - name: Bump version
+        uses: chkfung/android-version-actions@v1.2.2
+        with:
+          gradlePath: app/build.gradle.kts
+          versionCode: ${{ env.BUILD_NUMBER }}
+          versionName: '${{ github.event.inputs.app_version }}'
+
+      - name: Commit version bump
+        run: |
+          git config --global user.name "Github Actions"
+          git config --global user.email "actions@github.com"
+          git add app/build.gradle.kts
+          git commit -m "Version bump to ${{ github.event.inputs.app_version }} (Build ${{ env.BUILD_NUMBER }})"
+          git tag "${{ github.event.inputs.app_version }}(${{ env.BUILD_NUMBER }})"
+          git push
+          git push --tags
+
+      - name: Decode Keystore
+        env:
+          KEYSTORE_BASE_64: ${{ secrets.KEYSTORE_BASE_64 }}
+        run: |
+          echo $KEYSTORE_BASE_64 > keystore-b64.txt
+          base64 -d keystore-b64.txt > keystore.jks    
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Create Android App Bundle
+        env:
+          RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: ./gradlew bundleRelease --stacktrace
+
+      - name: Deploy to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.tstudioz.fax.fme
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: "Beta 3"
+          inAppUpdatePriority: 3
+          whatsNewDirectory: distribution/whatsnew
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
