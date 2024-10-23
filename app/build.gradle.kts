@@ -12,17 +12,17 @@ android {
         applicationId = "com.tstudioz.fax.fme"
         minSdk = 26
         targetSdk = 34
-        versionCode = 24
-        versionName = "3.0"
+        versionCode = 25
+        versionName = "3.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         create("release") {
             storeFile = file("./../keystore.jks")
-            storePassword = "E7?hAT@Y&AxK#"
-            keyAlias = "glavni_key"
-            keyPassword = "E7?hAT@Y&AxA#"
+            storePassword = System.getenv("RELEASE_SIGNING_PASSWORD")
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
         }
     }
 
@@ -137,4 +137,16 @@ allprojects {
             jvmTarget = JavaVersion.VERSION_17.toString()
         }
     }
+}
+
+tasks.register("getBuildVersionNumber") {
+    println(android.defaultConfig.versionCode)
+}
+
+tasks.register("getNextBuildVersionNumber") {
+    println(android.defaultConfig.versionCode?.plus(1) ?: -1)
+}
+
+tasks.register("getAppVersionName") {
+    println(android.defaultConfig.versionName)
 }
