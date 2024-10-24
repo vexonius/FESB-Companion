@@ -6,8 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
-import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.feature.studomat.models.Student
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
@@ -23,8 +21,7 @@ import kotlinx.coroutines.launch
 class StudomatViewModel(
     private val repository: StudomatRepository,
     private val sharedPreferences: SharedPreferences,
-    private val networkUtils: NetworkUtils,
-    private val userRepository: UserRepositoryInterface
+    private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
     val isRefreshing = MutableLiveData(false)
@@ -43,73 +40,38 @@ class StudomatViewModel(
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
-        viewModelScope.launch(Dispatchers.IO) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
-        loadData()
-        initStudomat()
+        runBlocking { loadData() }
     }
 
-    private fun loadData() {
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            val yearsRealm = repository.readYears().sortedByDescending { it.title }
-            val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
-            years.postValue(yearsRealm)
-            subjectList.postValue(latestYearSubjects)
-            generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
-        }
-    }
-
-    suspend fun login(pulldownTriggered: Boolean = false): Boolean {
-        val user = User(userRepository.getCurrentUser())
-        if (networkUtils.isNetworkAvailable()) {
-            loadedTxt.postValue(StudomatState.FETCHING)
-            return when (val result = repository.loginUser(user.email, user.password)) {
-                is StudomatRepositoryResult.LoginResult.Success -> {
-                    student.postValue(result.data)
-                    true
-                }
-
-                is StudomatRepositoryResult.LoginResult.Failure -> {
-                    if (pulldownTriggered) {
-                        isRefreshing.postValue(false)
-                    }
-                    if (!result.throwable.contains("Already logging in!")) {
-                        snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
-                    }
-                    loadedTxt.postValue(StudomatState.FETCHING_ERROR)
-                    false
-                }
-            }
-        } else {
-            if (pulldownTriggered) {
-                isRefreshing.postValue(false)
-            }
-            snackbarHostState.showSnackbar("Nema interneta")
-            loadedTxt.postValue(StudomatState.FETCHING_ERROR)
-            return false
-        }
+    private suspend fun loadData() {
+        val yearsRealm = repository.readYears().sortedByDescending { it.title }
+        val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
+        years.postValue(yearsRealm)
+        subjectList.postValue(latestYearSubjects)
+        generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
     }
 
 
-    private fun initStudomat() {
+    fun initStudomat() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (!networkUtils.isNetworkAvailable()) {
                 loadedTxt.postValue(StudomatState.FETCHING_ERROR)
                 snackbarHostState.showSnackbar("Nema interneta")
                 return@launch
             } else {
-                if (!login()) return@launch
-                when (val result = repository.getYears()) {
-                    is StudomatRepositoryResult.YearsResult.Success -> {
+                when (val result = repository.getStudomatDataAndYears()) {
+                    is StudomatRepositoryResult.StudentAndYearsResult.Success -> {
                         result.data.firstOrNull()?.let { getChosenYear(it) }
                         years.postValue(result.data)
+                        student.postValue(result.student)
                         selectedYear.postValue(result.data.firstOrNull())
                         loadedTxt.postValue(StudomatState.FETCHED)
                     }
 
-                    is StudomatRepositoryResult.YearsResult.Failure -> {
+                    is StudomatRepositoryResult.StudentAndYearsResult.Failure -> {
                         loadedTxt.postValue(StudomatState.FETCHING_ERROR)
                         snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
                     }
@@ -134,7 +96,6 @@ class StudomatViewModel(
             sharedPreferences.getString("gen" + year.title, "").let { generated.postValue(it) }
             if (chosenYear != null) {
                 if (networkUtils.isNetworkAvailable()) {
-                    if (!login(pulldownTriggered)) return@launch
                     when (val result = repository.getChosenYear(chosenYear)) {
                         is StudomatRepositoryResult.ChosenYearResult.Success -> {
                             loadedTxt.postValue(StudomatState.FETCHED)

@@ -21,7 +21,7 @@ val studomatModule = module {
     single { StudomatService(get(named("clientStudomat"))) }
     single { StudomatRepository(get(), get(), get()) }
     single { StudomatDao(get()) }
-    viewModel { StudomatViewModel(get(), get(), get(), get()) }
+    viewModel { StudomatViewModel(get(), get(), get()) }
 }
 fun provideISVUPortalClient(
     monsterCookieJar: MonsterCookieJar,
