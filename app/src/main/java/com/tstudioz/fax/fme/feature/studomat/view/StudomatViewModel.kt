@@ -6,13 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.studomat.models.Student
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.networking.NetworkUtils
-import io.realm.kotlin.internal.platform.runBlocking
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,8 +21,7 @@ import kotlinx.coroutines.launch
 class StudomatViewModel(
     private val repository: StudomatRepository,
     private val sharedPreferences: SharedPreferences,
-    private val networkUtils: NetworkUtils
-) : ViewModel() {
+    private val networkUtils: NetworkUtils) : ViewModel() {
 
     val isRefreshing = MutableLiveData(false)
 
@@ -40,22 +39,26 @@ class StudomatViewModel(
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
+        viewModelScope.launch(Dispatchers.IO) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
-        runBlocking { loadData() }
+        loadData()
+        initStudomat()
     }
 
-    private suspend fun loadData() {
-        val yearsRealm = repository.readYears().sortedByDescending { it.title }
-        val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
-        years.postValue(yearsRealm)
-        subjectList.postValue(latestYearSubjects)
-        generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
-    }
+    private fun loadData() {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+
+            val yearsRealm = repository.readYears().sortedByDescending { it.title }
+            val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
+            years.postValue(yearsRealm)
+            subjectList.postValue(latestYearSubjects)
+            generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
+        }}
 
 
-    fun initStudomat() {
+    private fun initStudomat() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (!networkUtils.isNetworkAvailable()) {
                 loadedTxt.postValue(StudomatState.FETCHING_ERROR)
