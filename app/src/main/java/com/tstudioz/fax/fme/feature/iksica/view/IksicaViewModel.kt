@@ -32,7 +32,7 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
-        viewModelScope.launch(Dispatchers.IO){ snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        viewModelScope.launch(Dispatchers.Main){ snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {

@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -61,7 +60,7 @@ class TimetableViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error timetable", exception.toString())
-        viewModelScope.launch(Dispatchers.IO){ snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {

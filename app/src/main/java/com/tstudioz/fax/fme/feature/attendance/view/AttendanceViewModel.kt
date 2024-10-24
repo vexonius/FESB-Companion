@@ -34,7 +34,7 @@ class AttendanceViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error attendance", exception.toString())
-        viewModelScope.launch(Dispatchers.IO) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
@@ -42,9 +42,7 @@ class AttendanceViewModel(
         fetchAttendance()
     }
 
-    private fun has60SecondsPassed(): Boolean {
-        return System.currentTimeMillis() - lastFetch > 60000
-    }
+    private fun has60SecondsPassed(): Boolean =  System.currentTimeMillis() - lastFetch > 60000
 
     fun fetchAttendance() {
         viewModelScope.launch(context = Dispatchers.IO + handler) {
