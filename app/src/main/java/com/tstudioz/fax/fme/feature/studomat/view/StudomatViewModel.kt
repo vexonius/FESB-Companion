@@ -49,7 +49,6 @@ class StudomatViewModel(
 
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-
             val yearsRealm = repository.readYears().sortedByDescending { it.title }
             val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
             years.postValue(yearsRealm)
