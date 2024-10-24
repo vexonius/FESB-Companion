@@ -11,6 +11,7 @@ import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
 import com.tstudioz.fax.fme.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.util.SPKey
+import com.tstudioz.fax.fme.util.SingleLiveEvent
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -29,7 +30,7 @@ class LoginViewModel(
     var firstTimeInApp = MutableLiveData(false)
         private set
 
-    var loggedIn = MutableLiveData(false)
+    var loggedIn = SingleLiveEvent<Unit>()
         private set
 
     var errorMessage = MutableLiveData<String?>(null)
@@ -55,11 +56,10 @@ class LoginViewModel(
         viewModelScope.launch(Dispatchers.IO + handler) {
             when (repository.attemptLogin(username, password)) {
                 is UserRepositoryResult.LoginResult.Success -> {
-                    loggedIn.postValue(true)
+                    loggedIn.postValue(Unit)
                 }
 
                 is UserRepositoryResult.LoginResult.Failure -> {
-                    loggedIn.postValue(false)
                     errorMessage.postValue(application.getString(R.string.login_error_invalid_credentials))
                 }
             }
@@ -72,7 +72,9 @@ class LoginViewModel(
     }
 
     fun checkIfLoggedIn() {
-        loggedIn.value = sharedPreferences[SPKey.LOGGED_IN, false]
+        if (sharedPreferences[SPKey.LOGGED_IN, false]) {
+            loggedIn.value = Unit
+        }
     }
 
     private fun isEmailValid(email: String): Boolean {

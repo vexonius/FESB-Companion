@@ -40,17 +40,13 @@ class SettingsViewModel(
         }
     }
 
-    fun logout(context: Context) {
+    fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
             sharedPreferences[SPKey.LOGGED_IN] = false
             sharedPreferences[SPKey.FIRST_TIME] = true
             sharedPreferences.edit().remove("gen").apply()
             dao.deleteAll()
         }
-        val intent = Intent(context, LoginActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-
-        intentEvent.value = intent
     }
 
     fun sendFeedbackEmail(titleId: Int) {

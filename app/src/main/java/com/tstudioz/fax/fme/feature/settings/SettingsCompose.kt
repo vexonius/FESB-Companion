@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.routing.SettingsRouter
 import org.koin.androidx.compose.koinViewModel
 
 val leftPadding = 10.dp
@@ -35,7 +36,7 @@ val listItemStartPadding = 16.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel()) {
+fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: SettingsRouter) {
     val context = LocalContext.current
 
     viewModel.intentEvent.observeForever(Observer {
@@ -90,7 +91,10 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel()) {
                         id = R.string.logged_in_as,
                         viewModel.username.observeAsState().value ?: ""
                     ),
-                    onClick = { viewModel.logout(context) }
+                    onClick = {
+                        viewModel.logout()
+                        router.routeToLogin()
+                    }
                 )
                 CategoryTitle(title = stringResource(id = R.string.contribute))
                 SettingsItem(
