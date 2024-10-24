@@ -18,14 +18,18 @@ class Router: LoginRouter, HomeRouter, SettingsRouter {
     override fun routeToHome() {
         val activity = activity?.get() ?: return
 
-        activity.startActivity(Intent(activity, MainActivity::class.java))
+        val intent = Intent(activity, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        activity.startActivity(intent)
         activity.finish()
     }
 
     override fun routeToLogin() {
         val activity = activity?.get() ?: return
 
-        activity.startActivity(Intent(activity, LoginActivity::class.java))
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        activity.startActivity(intent)
         activity.finish()
     }
 
