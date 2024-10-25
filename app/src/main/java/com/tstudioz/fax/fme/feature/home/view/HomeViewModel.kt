@@ -51,51 +51,49 @@ class HomeViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("HomeViewModel", "Caught $exception")
-        viewModelScope.launch(Dispatchers.IO) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
         getNotes()
-        if (networkUtils.isNetworkAvailable()) {
-            getForecast()
-        } else {
-            viewModelScope.launch(context = Dispatchers.IO + handler) {
-                snackbarHostState.showSnackbar("Niste povezani")
-            }
-        }
+        getForecast()
     }
 
     private fun getForecast() {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            try {
-                val weather = weatherRepository.fetchWeatherDetails()
-                if (weather != null) {
-                    val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
-                    val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
-                    val forecastNextOneHoursDetails = forecastNextOneHours?.details
-                    val unparsedSummary = forecastNextOneHours?.summary?.symbolCode
-                    val weatherSymbol = weatherSymbolKeys[unparsedSummary]
-                    val iconName = "_" + weatherSymbol?.first.toString() + weatherSymbol?.second
-                    val summary = codeToDisplay[weatherSymbol?.first]?.replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(
-                            Locale.getDefault()
-                        ) else it.toString()
-                    }
-                    _weatherDisplay.postValue(
-                        WeatherDisplay(
-                            "Split",
-                            forecastInstantDetails?.airTemperature ?: 20.0,
-                            forecastInstantDetails?.relativeHumidity ?: 0.0,
-                            forecastInstantDetails?.windSpeed ?: 0.0,
-                            forecastNextOneHoursDetails?.precipitationAmount ?: 0.00,
-                            iconName,
-                            summary ?: ""
+            if (networkUtils.isNetworkAvailable()) {
+                try {
+                    val weather = weatherRepository.fetchWeatherDetails()
+                    if (weather != null) {
+                        val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
+                        val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
+                        val forecastNextOneHoursDetails = forecastNextOneHours?.details
+                        val unparsedSummary = forecastNextOneHours?.summary?.symbolCode
+                        val weatherSymbol = weatherSymbolKeys[unparsedSummary]
+                        val iconName = "_" + weatherSymbol?.first.toString() + weatherSymbol?.second
+                        val summary = codeToDisplay[weatherSymbol?.first]?.replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(
+                                Locale.getDefault()
+                            ) else it.toString()
+                        }
+                        _weatherDisplay.postValue(
+                            WeatherDisplay(
+                                "Split",
+                                forecastInstantDetails?.airTemperature ?: 20.0,
+                                forecastInstantDetails?.relativeHumidity ?: 0.0,
+                                forecastInstantDetails?.windSpeed ?: 0.0,
+                                forecastNextOneHoursDetails?.precipitationAmount ?: 0.00,
+                                iconName,
+                                summary ?: ""
+                            )
                         )
-                    )
+                    }
+                } catch (e: Exception) {
+                    Log.d("HomeViewModel", "Caught $e")
+                    snackbarHostState.showSnackbar("Došlo je do pogreške pri dohvaćanju vremenske prognoze")
                 }
-            } catch (e: Exception) {
-                Log.d("HomeViewModel", "Caught $e")
-                snackbarHostState.showSnackbar("Došlo je do pogreške pri dohvaćanju vremenske prognoze")
+            } else {
+                snackbarHostState.showSnackbar("Niste povezani")
             }
         }
     }

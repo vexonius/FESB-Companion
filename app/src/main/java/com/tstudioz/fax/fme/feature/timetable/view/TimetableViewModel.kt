@@ -61,7 +61,7 @@ class TimetableViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error timetable", exception.toString())
-        viewModelScope.launch(Dispatchers.IO){ snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
