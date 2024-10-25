@@ -25,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Observer
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.routing.SettingsRouter
@@ -38,10 +37,6 @@ val listItemStartPadding = 16.dp
 @Composable
 fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: SettingsRouter) {
     val context = LocalContext.current
-
-    viewModel.intentEvent.observeForever(Observer {
-        context.startActivity(it)
-    })
 
     AppTheme {
         BottomSheetScaffold(
@@ -101,14 +96,14 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
                     title = stringResource(id = R.string.send_feedback),
                     supportText = stringResource(id = R.string.help_improve_app),
                     onClick = {
-                        viewModel.sendFeedbackEmail(R.string.feedback_email_subject)
+                        router.sendEmail(viewModel.getSupportEmailModalModel())
                     }
                 )
                 SettingsItem(
                     title = stringResource(id = R.string.report_bug),
                     supportText = stringResource(id = R.string.help_stabilize_app),
                     onClick = {
-                        viewModel.sendFeedbackEmail(R.string.report_bug_email_subject)
+                        router.sendEmail(viewModel.getBugReportEmailModalModel())
                     }
                 )
                 CategoryTitle(title = stringResource(id = R.string.about_app))
