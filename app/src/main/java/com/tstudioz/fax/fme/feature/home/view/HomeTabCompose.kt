@@ -105,7 +105,6 @@ fun HomeTabCompose(
     val deleteNote: (note: Note) -> Unit = homeViewModel::delete
     val menzaShow = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
-    val snackbarHostState = homeViewModel.snackbarHostState
 
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
 
@@ -121,7 +120,7 @@ fun HomeTabCompose(
 
     AppTheme {
         BottomSheetScaffold(
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            snackbarHost = { SnackbarHost(hostState = homeViewModel.snackbarHostState) },
             sheetPeekHeight = 0.dp,
             sheetContent = {
                 if (menzaShow.value) {
