@@ -30,6 +30,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -40,12 +41,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeCompose(studomatViewModel: StudomatViewModel) {
+fun StudomatCompose(studomatViewModel: StudomatViewModel) {
 
     val subjectList = studomatViewModel.subjectList.observeAsState().value
         ?.sortedBy { it.name }
@@ -59,6 +62,16 @@ fun HomeCompose(studomatViewModel: StudomatViewModel) {
                 studomatViewModel.getChosenYear(it, true)
             }
         })
+    }
+
+    val lifecycleState = LocalLifecycleOwner.current.lifecycle.currentState
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.RESUMED -> {
+                studomatViewModel.selectedYear.value?.let { studomatViewModel.getChosenYear(it) }
+            }
+            else ->{}
+        }
     }
 
     Scaffold(

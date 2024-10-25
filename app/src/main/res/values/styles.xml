@@ -9,14 +9,6 @@
         <item name="android:windowBackground">@color/colorPrimaryDark</item>
     </style>
 
-    <!--<style name="AppTheme.Custom" parent="Theme.AppCompat">
-        &lt;!&ndash; Customize your theme here. &ndash;&gt;
-        <item name="colorPrimary">@color/left_color</item>
-        <item name="colorPrimaryDark">@color/left_color</item>
-        <item name="colorAccent">@color/left_color</item>
-        <item name="android:windowBackground">@color/colorPrimaryDark</item>
-    </style>-->
-
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

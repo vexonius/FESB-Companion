@@ -116,12 +116,13 @@ dependencies {
     //pull to refresh compose
     implementation("androidx.compose.material:material:$composeVersion")
     implementation("androidx.compose.ui:ui-android:$composeVersion")
+    implementation("androidx.navigation:navigation-compose:2.8.2")
 
     //choose calendar
-    implementation("com.kizitonwose.calendar:compose:2.5.0")
+    implementation("com.kizitonwose.calendar:compose:2.6.0")
 
     //weather deserialise
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("com.google.code.gson:gson:2.11.0")
 }
 

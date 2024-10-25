@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.timetable.view
 
 import android.util.Log
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,7 +12,7 @@ import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.random.NetworkUtils
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +30,8 @@ class TimetableViewModel(
     private val userRepository: UserRepositoryInterface,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
+
+    val snackbarHostState = SnackbarHostState()
 
     private val _currentEventShown = MutableLiveData<Event?>(null)
     val currentEventShown: LiveData<Event?> = _currentEventShown
@@ -57,6 +60,7 @@ class TimetableViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error timetable", exception.toString())
+        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
@@ -118,15 +122,15 @@ class TimetableViewModel(
     }
 
     fun showWeekChooseMenu(value: Boolean = true) {
-        _showWeekChooseMenu.postValue(value)
+        _showWeekChooseMenu.value = value
     }
 
     fun showEvent(event: Event) {
-        _currentEventShown.postValue(event)
+        _currentEventShown.value = event
     }
 
     fun hideEvent() {
-        _currentEventShown.postValue(null)
+        _currentEventShown.value = null
     }
 
 }

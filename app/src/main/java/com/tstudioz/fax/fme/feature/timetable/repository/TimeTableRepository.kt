@@ -23,7 +23,6 @@ class TimeTableRepository(
     private val _events: MutableSharedFlow<List<Event>> = MutableSharedFlow(1)
     override val events: SharedFlow<List<Event>> = _events.asSharedFlow()
 
-    override val lastFetched: Long = 0L
 
     init {
         observeEventsFromCache()
