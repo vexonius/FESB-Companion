@@ -36,8 +36,6 @@ val listItemStartPadding = 16.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: SettingsRouter) {
-    val context = LocalContext.current
-
     AppTheme {
         BottomSheetScaffold(
             modifier = Modifier.fillMaxSize(),
@@ -119,7 +117,7 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
                     title = stringResource(id = R.string.data_privacy),
                     supportText = null,
                     onClick = {
-                        viewModel.launchCustomTab(context)
+                        router.openCustomTab(SettingsViewModel.pivacyUrl)
                     }
                 )
                 SettingsItem(

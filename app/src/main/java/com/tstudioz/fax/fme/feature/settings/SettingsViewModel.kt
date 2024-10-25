@@ -1,12 +1,8 @@
 package com.tstudioz.fax.fme.feature.settings
 
 import android.app.Application
-import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -69,17 +65,21 @@ class SettingsViewModel(
 
     fun getSupportEmailModalModel(): EmailModalModel {
         val title = getString(application, R.string.send_mail_using)
-        val receipient = getString(application, R.string.support_email)
         val subject = "${getString(application, R.string.feedback_email_subject)} v${version.value}"
 
-        return EmailModalModel(receipient, title, subject, "")
+        return EmailModalModel(feedbackRecipientAddress, title, subject, "")
     }
 
     fun getBugReportEmailModalModel(): EmailModalModel {
         val title = getString(application, R.string.send_mail_using)
-        val receipient = getString(application, R.string.support_email)
         val subject = "${getString(application, R.string.report_bug_email_subject)} v${version.value}"
 
-        return EmailModalModel(receipient, title, subject, "")
+        return EmailModalModel(feedbackRecipientAddress, title, subject, "")
     }
+
+    companion object {
+        const val pivacyUrl = "https://privacy.etino.dev"
+        const val feedbackRecipientAddress = "support@fesbcompanion.xyz"
+    }
+
 }
