@@ -72,3 +72,9 @@ jobs:
           inAppUpdatePriority: 3
           whatsNewDirectory: distribution/whatsnew
           mappingFile: app/build/outputs/mapping/release/mapping.txt
+      - name: Send notification to discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: 'FESB Companion ${{ github.event.inputs.app_version }}(${{ env.BUILD_NUMBER }}) has been deployed.'
