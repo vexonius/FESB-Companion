@@ -6,13 +6,15 @@ import com.tstudioz.fax.fme.database.models.UserRealm
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
+import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.util.SPKey
 
 class UserRepository(
     private val userService: UserServiceInterface,
     private val userDao: UserDaoInterface,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    private val sessionDelegate: SessionDelegateInterface
 ) : UserRepositoryInterface {
 
     override suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult {
@@ -38,6 +40,12 @@ class UserRepository(
 
     override suspend fun getCurrentUser(): UserRealm {
         return userDao.getUser()
+    }
+
+    override suspend fun deleteAllUserData() {
+        sessionDelegate.clearSession()
+        userDao.deleteAllUserData()
+        sharedPreferences[SPKey.LOGGED_IN] = false
     }
 
     companion object {
