@@ -19,16 +19,16 @@ import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.repository.WeatherRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.weatherSymbolKeys
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 @InternalCoroutinesApi
 class HomeViewModel(
@@ -38,6 +38,8 @@ class HomeViewModel(
     private val timeTableRepository: TimeTableRepositoryInterface,
     private val userRepository: UserRepositoryInterface
 ) : AndroidViewModel(application) {
+
+    private val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
 
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
     private val _weatherDisplay = MutableLiveData<WeatherDisplay>()
@@ -49,42 +51,49 @@ class HomeViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("HomeViewModel", "Caught $exception")
+        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
     }
 
     init {
         getNotes()
+        getForecast()
     }
 
-    fun getForecast() {
+    private fun getForecast() {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            try {
-                val weather = weatherRepository.fetchWeatherDetails()
-                if (weather != null) {
-                    val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
-                    val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
-                    val forecastNextOneHoursDetails = forecastNextOneHours?.details
-                    val unparsedSummary = forecastNextOneHours?.summary?.symbolCode
-                    val weatherSymbol = weatherSymbolKeys[unparsedSummary]
-                    val iconName = "_" + weatherSymbol?.first.toString() + weatherSymbol?.second
-                    val summary = codeToDisplay[weatherSymbol?.first]?.replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(
-                            Locale.getDefault()
-                        ) else it.toString()
-                    }
-                    _weatherDisplay.postValue(
-                        WeatherDisplay(
-                            "Split",
-                            forecastInstantDetails?.airTemperature ?: 20.0,
-                            forecastInstantDetails?.relativeHumidity ?: 0.0,
-                            forecastInstantDetails?.windSpeed ?: 0.0,
-                            forecastNextOneHoursDetails?.precipitationAmount ?: 0.00,
-                            iconName,
-                            summary ?: ""
+            if (networkUtils.isNetworkAvailable()) {
+                try {
+                    val weather = weatherRepository.fetchWeatherDetails()
+                    if (weather != null) {
+                        val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
+                        val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
+                        val forecastNextOneHoursDetails = forecastNextOneHours?.details
+                        val unparsedSummary = forecastNextOneHours?.summary?.symbolCode
+                        val weatherSymbol = weatherSymbolKeys[unparsedSummary]
+                        val iconName = "_" + weatherSymbol?.first.toString() + weatherSymbol?.second
+                        val summary = codeToDisplay[weatherSymbol?.first]?.replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(
+                                Locale.getDefault()
+                            ) else it.toString()
+                        }
+                        _weatherDisplay.postValue(
+                            WeatherDisplay(
+                                "Split",
+                                forecastInstantDetails?.airTemperature ?: 20.0,
+                                forecastInstantDetails?.relativeHumidity ?: 0.0,
+                                forecastInstantDetails?.windSpeed ?: 0.0,
+                                forecastNextOneHoursDetails?.precipitationAmount ?: 0.00,
+                                iconName,
+                                summary ?: ""
+                            )
                         )
-                    )
+                    }
+                } catch (e: Exception) {
+                    Log.d("HomeViewModel", "Caught $e")
+                    snackbarHostState.showSnackbar("Došlo je do pogreške pri dohvaćanju vremenske prognoze")
                 }
-            } catch (e: Exception) {
-                Log.d("HomeViewModel", "Caught $e")
+            } else {
+                snackbarHostState.showSnackbar("Niste povezani")
             }
         }
     }

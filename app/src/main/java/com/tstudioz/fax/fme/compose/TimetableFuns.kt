@@ -152,7 +152,7 @@ fun BasicDayHeader(day: LocalDate) {
         .lowercase()
         .replaceFirstChar { it.uppercase() } + " " + day.format(DayFormatter)
     Text(
-        text =  title,
+        text = title,
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.Medium,
         modifier = Modifier
@@ -383,8 +383,8 @@ fun Schedule(
     val numHours = numMinutes.toFloat() / 60f
     val verticalScrollState = rememberScrollState()
     val horizontalScrollState = rememberScrollState()
-    var sidebarWidth by remember { mutableIntStateOf(0) }
-    var headerHeight by remember { mutableIntStateOf(0) }
+    var sidebarWidth by remember { mutableIntStateOf(95) }
+    var headerHeight by remember { mutableIntStateOf(83) }
     BoxWithConstraints(modifier = modifier) {
         val dayWidth: Dp = when (daySize) {
             is ScheduleSize.FixedSize -> daySize.size
@@ -395,7 +395,6 @@ fun Schedule(
                     daySize.minSize
                 )
             }
-
         }
         val hourHeight: Dp = when (hourSize) {
             is ScheduleSize.FixedSize -> hourSize.size

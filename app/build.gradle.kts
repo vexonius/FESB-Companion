@@ -12,17 +12,17 @@ android {
         applicationId = "com.tstudioz.fax.fme"
         minSdk = 26
         targetSdk = 34
-        versionCode = 24
-        versionName = "3.0"
+        versionCode = 26
+        versionName = "3.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         create("release") {
             storeFile = file("./../keystore.jks")
-            storePassword = "E7?hAT@Y&AxK#"
-            keyAlias = "glavni_key"
-            keyPassword = "E7?hAT@Y&AxA#"
+            storePassword = System.getenv("RELEASE_SIGNING_PASSWORD")
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
         }
     }
 
@@ -116,12 +116,13 @@ dependencies {
     //pull to refresh compose
     implementation("androidx.compose.material:material:$composeVersion")
     implementation("androidx.compose.ui:ui-android:$composeVersion")
+    implementation("androidx.navigation:navigation-compose:2.8.2")
 
     //choose calendar
-    implementation("com.kizitonwose.calendar:compose:2.5.0")
+    implementation("com.kizitonwose.calendar:compose:2.6.0")
 
     //weather deserialise
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("com.google.code.gson:gson:2.11.0")
 }
 
@@ -137,4 +138,16 @@ allprojects {
             jvmTarget = JavaVersion.VERSION_17.toString()
         }
     }
+}
+
+tasks.register("getBuildVersionNumber") {
+    println(android.defaultConfig.versionCode)
+}
+
+tasks.register("getNextBuildVersionNumber") {
+    println(android.defaultConfig.versionCode?.plus(1) ?: -1)
+}
+
+tasks.register("getAppVersionName") {
+    println(android.defaultConfig.versionName)
 }

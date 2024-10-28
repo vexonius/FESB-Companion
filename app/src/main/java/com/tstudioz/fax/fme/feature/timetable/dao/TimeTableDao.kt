@@ -24,7 +24,7 @@ class TimeTableDao(private val dbManager: DatabaseManagerInterface) : TimeTableD
     override suspend fun insert(classes: List<Event>) {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
-        realm.writeBlocking {
+        realm.write {
             val oldClasses = this.query<EventRealm>().find()
             this.delete(oldClasses)
             classes.forEach {

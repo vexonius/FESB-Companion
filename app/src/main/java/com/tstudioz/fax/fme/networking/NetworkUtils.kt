@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.random
+package com.tstudioz.fax.fme.networking
 
 import android.content.Context
 import android.net.ConnectivityManager

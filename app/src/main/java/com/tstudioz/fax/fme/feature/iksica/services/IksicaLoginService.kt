@@ -12,7 +12,9 @@ class IksicaLoginService(
     private var currentUrl: HttpUrl?,
     private var authState: String,
     private var sAMLResponse: String
-): IksicaLoginServiceInterface {
+) : IksicaLoginServiceInterface {
+
+    private var successfulLoginAlready: Boolean = false
 
     override suspend fun getAuthState(): NetworkServiceResult.IksicaResult {
         val request = Request.Builder()
@@ -22,7 +24,17 @@ class IksicaLoginService(
         val response = client.newCall(request).execute()
         val success = response.isSuccessful
         val body = response.body?.string() ?: ""
+        val doc = Jsoup.parse(body)
+
+        successfulLoginAlready = doc.selectFirst("p[class=content_text]")
+                ?.text()?.contains("Uspješno ste autenticirani.", true) == true
+
         response.close()
+
+        if (successfulLoginAlready) {
+            doc.select("input[name=SAMLResponse]").forEach { sAMLResponse = it.attr("value") }
+            return NetworkServiceResult.IksicaResult.Success("Success")
+        }
 
         if (!success || body.isEmpty()) {
             return NetworkServiceResult.IksicaResult.Failure(Throwable("Failed to get AuthState"))
@@ -35,6 +47,11 @@ class IksicaLoginService(
     }
 
     override suspend fun login(email: String, password: String): NetworkServiceResult.IksicaResult {
+        if (successfulLoginAlready) {
+            successfulLoginAlready = false
+            return NetworkServiceResult.IksicaResult.Success("Success login")
+        }
+
         val formBody = FormBody.Builder()
             .add("username", email)
             .add("password", password)
