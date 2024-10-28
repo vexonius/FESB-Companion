@@ -102,6 +102,16 @@ class IksicaViewModel(
         }
     }
 
+    fun getImage(href: String) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            _image.postValue(camerasRepository.getImage(href))
+        }
+    }
+
+    fun hideImage() {
+        if (_image.value != null) _image.value = null
+    }
+
     fun hideReceiptDetails() {
         _receiptSelected.postValue(IksicaReceiptState.None)
     }
