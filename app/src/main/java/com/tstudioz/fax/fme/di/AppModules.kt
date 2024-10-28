@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
@@ -18,6 +19,11 @@ import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
 import com.tstudioz.fax.fme.networking.session.SessionDelegate
 import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
 import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.routing.HomeRouter
+import com.tstudioz.fax.fme.routing.LoginRouter
+import com.tstudioz.fax.fme.routing.Router
+import com.tstudioz.fax.fme.routing.SettingsRouter
+import com.tstudioz.fax.fme.view.activities.MainActivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.Interceptor
@@ -25,12 +31,15 @@ import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
+import org.koin.dsl.bind
+import org.koin.dsl.binds
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @InternalCoroutinesApi
 val module = module {
+    single { Router() } binds arrayOf(LoginRouter::class, SettingsRouter::class, HomeRouter::class)
     single { SettingsDao(get()) }
     single { NetworkUtils(androidContext()) }
     single { MonsterCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(androidContext())) }

@@ -24,12 +24,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.settings.SettingsActivity
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
+import com.tstudioz.fax.fme.routing.HomeRouter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun MainTopAppBar(context: Context, navController: NavHostController, timetableViewModel: TimetableViewModel) {
+fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetableViewModel: TimetableViewModel) {
     val currentDestination =
         navController.currentBackStackEntryAsState().value?.destination?.route?.split(".")?.lastOrNull() ?: ""
     TopAppBar(
@@ -69,7 +70,7 @@ fun MainTopAppBar(context: Context, navController: NavHostController, timetableV
                 }
             }
             IconButton(
-                onClick = { context.startActivity(Intent(context, SettingsActivity::class.java)) },
+                onClick = { router.routeToSettings() },
                 colors = IconButtonDefaults.iconButtonColors().copy(
                     contentColor = Color.White
                 )

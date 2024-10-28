@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.studomat.models.Student
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
@@ -21,7 +20,8 @@ import kotlinx.coroutines.launch
 class StudomatViewModel(
     private val repository: StudomatRepository,
     private val sharedPreferences: SharedPreferences,
-    private val networkUtils: NetworkUtils) : ViewModel() {
+    private val networkUtils: NetworkUtils
+) : ViewModel() {
 
     val isRefreshing = MutableLiveData(false)
 

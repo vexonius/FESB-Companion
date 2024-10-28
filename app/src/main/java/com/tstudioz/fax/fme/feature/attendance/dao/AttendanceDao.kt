@@ -4,6 +4,7 @@ import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.models.AttendanceEntry
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
+import kotlinx.coroutines.runBlocking
 
 class AttendanceDao(private val dbManager: DatabaseManagerInterface) : AttendanceDaoInterface {
 

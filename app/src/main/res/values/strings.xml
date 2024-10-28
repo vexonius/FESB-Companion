@@ -107,8 +107,6 @@
     <string name="developer_names">Tino Emer i Stipe Jurković</string>
     <string name="data_privacy">Privatnost podataka</string>
     <string name="library_licenses">Licence korištenih biblioteka</string>
-    <string name="data_privacy_url">https://privacy.etino.dev/</string>
-    <string name="support_email">support@fesbcompanion.xyz</string>
     <string name="send_mail_using">Pošalji email pomoću...</string>
 
     //Iksica
