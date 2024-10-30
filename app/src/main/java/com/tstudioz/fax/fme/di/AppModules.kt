@@ -38,7 +38,6 @@ import java.util.concurrent.TimeUnit
 @InternalCoroutinesApi
 val module = module {
     single { Router() } binds arrayOf(LoginRouter::class, SettingsRouter::class, HomeRouter::class, AppRouter::class)
-    single { SettingsDao(get()) }
     single { NetworkUtils(androidContext()) }
     single { MonsterCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(androidContext())) }
     single<FESBLoginInterceptor>(named("FESBInterceptor")) { FESBLoginInterceptor(get(), get(), get()) }
