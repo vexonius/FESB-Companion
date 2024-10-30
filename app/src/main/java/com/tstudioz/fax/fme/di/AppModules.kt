@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit
 @InternalCoroutinesApi
 val module = module {
     single { Router() } binds arrayOf(LoginRouter::class, SettingsRouter::class, HomeRouter::class, AppRouter::class)
+    single { SettingsDao(get()) }
     single { NetworkUtils(androidContext()) }
     single { MonsterCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(androidContext())) }
     single<FESBLoginInterceptor>(named("FESBInterceptor")) { FESBLoginInterceptor(get(), get(), get()) }
