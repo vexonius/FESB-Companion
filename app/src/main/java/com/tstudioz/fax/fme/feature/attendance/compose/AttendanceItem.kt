@@ -26,7 +26,7 @@ import com.tstudioz.fax.fme.database.models.AttendanceEntry
 
 @Composable
 fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
-    val type = (attendanceItems.firstOrNull()?.type ?: "").replaceFirstChar { it.uppercase() }
+
     val background = colorResource(id = R.color.raisin_black)
     Column(modifier = Modifier
         .padding(16.dp)
@@ -43,7 +43,7 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
             Column(
                 modifier = Modifier
             ) {
-
+                val type = (attendanceItem.type ?: "").replaceFirstChar { it.uppercase() }
                 Text(type, fontSize = 14.sp)
                 Column {
                     Spacer(modifier = Modifier.height(8.dp))
