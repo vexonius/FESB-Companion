@@ -64,6 +64,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,6 +82,8 @@ import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -120,6 +124,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             Lifecycle.State.RESUMED -> {
                 iksicaViewModel.getReceipts()
             }
+
             else -> {}
         }
     }
@@ -200,12 +205,21 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             }
                         }
 
+                        item{
+                            Text(
+                                text = "Transakcije",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                modifier = Modifier.padding(16.dp, 12.dp))
+                        }
+
                         items(model.receipts) {
                             IksicaItem(it) {
                                 iksicaViewModel.getReceiptDetails(it)
                             }
                         }
                     }
+
                     else -> {}
                 }
             }
@@ -288,23 +302,39 @@ fun PopupBox(
 
 @Composable
 fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
-    Column {
-        HorizontalDivider()
-        ListItem(
-            modifier = Modifier.clickable(onClick = onClick),
-            headlineContent = { Text(receipt.restaurant, overflow = TextOverflow.Ellipsis) },
-            supportingContent = {
-                Text(receipt.dateString + " " + receipt.time + " ")
-            },
-            overlineContent = { Text(receipt.authorised) },
-            trailingContent = {
-                Text(
-                    text = receipt.paidAmount.toBigDecimal()
-                        .setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
-                    fontSize = 15.sp,
-                )
-            })
+    Column(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(16.dp, 5.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(receipt.restaurant.trim(), overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(0.80f))
+            Text(
+                text = "-"+ receipt.subsidizedAmount.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN).toString() + "€",
+                fontSize = 15.sp,
+                modifier = Modifier.weight(0.20f),
+                textAlign = TextAlign.End,
+            )
+        }
+        Row {
+            val today = LocalDate.now()
+            val daysAgo = ChronoUnit.DAYS.between(receipt.date, today)
+
+            val relativeText = when {
+                daysAgo == 0L -> "Danas"
+                daysAgo == 1L -> "Jučer"
+                daysAgo > 1L && daysAgo % 10 == 1L && daysAgo % 100 != 11L-> "Prije $daysAgo dan"
+                daysAgo > 1L -> "Prije $daysAgo dana"
+                else -> "U budućnosti"
+            }
+            Text(relativeText + " " + receipt.time + " ", color = Color(0xFFCCCCCC))
+        }
     }
+    HorizontalDivider(Modifier.padding(horizontal = 10.dp))
+
 }
 
 @OptIn(InternalCoroutinesApi::class)
