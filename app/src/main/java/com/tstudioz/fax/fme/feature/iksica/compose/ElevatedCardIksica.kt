@@ -44,13 +44,13 @@ fun ElevatedCardIksica(
             .fillMaxWidth()
             .aspectRatio(1.586f)
             .padding(25.dp)
-            .clip(shape = RoundedCornerShape(10.dp))
+            .clip(shape = RoundedCornerShape(30.dp))
             .angledGradientBackground(
                 colors = listOf(
-                    Color(0xFFfa2531),
-                    Color(0xFF0075B2)
+                    Color(0xFFFF9966),
+                    Color(0xFFFF5E62)
                 ),
-                degrees = 45f,
+                degrees = 90f,
                 halfHalf = true
             )
     ) {
@@ -63,48 +63,48 @@ fun ElevatedCardIksica(
         ) {
             Column(
                 Modifier
-                    .padding(25.dp, 25.dp, 0.dp, 0.dp)
+                    .padding(25.dp)
                     .weight(0.7f)
             ) {
                 Row(
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .fillMaxSize()
+                ) {
+                    Text(
+                        text = stringResource(
+                            id = R.string.iksica_balance, String.format(Locale.US, "%.2f", balance)
+                        ),
+                        fontSize = 25.sp,
+                        lineHeight = 25.sp,
+                        fontWeight = FontWeight.ExtraBold,
+
+                    )
+                }
+                Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(0.dp, 5.dp)
+                    modifier = Modifier.padding(0.dp, 0.dp)
                 ) {
                     Text(
                         text = name,
                         fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
                     modifier = Modifier
-                        .padding(0.dp, 5.dp)
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = iksicaNumber,
-                        fontSize = 20.sp,
+                        text = iksicaNumber.chunked(4).joinToString(" "),
+                        fontSize = 16.sp,
                     )
                 }
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier
-                    .padding(0.dp, 0.dp, 25.dp, 25.dp)
-                    .weight(0.3f)
-                    .fillMaxSize()
-            ) {
-                Text(
-                    text = stringResource(
-                        id = R.string.iksica_balance, String.format(Locale.US, "%.2f", balance)
-                    ),
-                    fontSize = 25.sp,
-                    lineHeight = 25.sp,
-                    fontWeight = FontWeight.Bold
-                )
             }
         }
     }
