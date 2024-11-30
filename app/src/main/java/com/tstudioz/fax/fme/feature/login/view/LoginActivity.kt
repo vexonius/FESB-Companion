@@ -13,8 +13,10 @@ import androidx.core.widget.doOnTextChanged
 import com.google.android.material.snackbar.Snackbar
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.databinding.ActivityLoginBinding
+import com.tstudioz.fax.fme.routing.LoginRouter
 import com.tstudioz.fax.fme.view.activities.MainActivity
 import kotlinx.coroutines.InternalCoroutinesApi
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(InternalCoroutinesApi::class)
@@ -23,9 +25,12 @@ class LoginActivity : AppCompatActivity() {
     private var snack: Snackbar? = null
     private lateinit var binding: ActivityLoginBinding
     private val loginViewModel: LoginViewModel by viewModel()
+    private val router: LoginRouter by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        router.register(this)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         val view: View = binding.root
@@ -63,11 +68,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun isUserLoggedIn() {
-        loginViewModel.loggedIn.observe(this) { loggedIn ->
-            if (loggedIn) {
-                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                finish()
-            }
+        loginViewModel.loggedIn.observe(this) { _ ->
+            router.routeToHome()
         }
     }
 
