@@ -6,6 +6,7 @@ import okhttp3.Request
 import java.io.BufferedInputStream
 
 class CamerasService(private val client: OkHttpClient) {
+
     suspend fun getCameraImageUrls(href: String): CamerasResult.GetCamerasResult {
         val request = Request.Builder()
             .url("https://camerasfiles.dbtouch.com/images/$href")

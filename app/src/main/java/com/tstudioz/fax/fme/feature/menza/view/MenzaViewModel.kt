@@ -24,6 +24,9 @@ class MenzaViewModel(
     private var _menza: MutableLiveData<Menza?> = MutableLiveData()
     val menza: LiveData<Menza?> = _menza
 
+    private var _menzaOther: MutableLiveData<Menza?> = MutableLiveData()
+    val menzaOther: LiveData<Menza?> = _menzaOther
+
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("MenzaViewModel", "CoroutineExceptionHandler got $exception")
     }
@@ -34,9 +37,22 @@ class MenzaViewModel(
 
     fun getMenza() {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            when (val menza = repository.fetchMenzaDetails()) {
+            when (val menza = repository.fetchMenzaDetails("fesb_vrh", true)) {
                 is MenzaResult.Success -> {
                     _menza.postValue(menza.data)
+                }
+
+                is MenzaResult.Failure -> {
+                }
+            }
+        }
+    }
+
+    fun fetchMenza(place:String) {
+        viewModelScope.launch(Dispatchers.IO + handler) {
+           when (val menza = repository.fetchMenzaDetails(place,false)) {
+                is MenzaResult.Success -> {
+                    _menzaOther.postValue(menza.data)
                 }
 
                 is MenzaResult.Failure -> {

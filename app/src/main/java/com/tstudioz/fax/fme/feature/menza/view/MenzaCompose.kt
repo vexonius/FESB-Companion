@@ -134,7 +134,8 @@ fun MeniCompose(meni: Menu) {
         text = meni.name,
         fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(vertical = 10.dp)
+        modifier = Modifier.padding(vertical = 10.dp),
+        color = Color.Black
     )
     MeniText(meni.soupOrTea)
     MeniText(meni.mainCourse)
@@ -147,7 +148,8 @@ fun MeniCompose(meni: Menu) {
         textAlign = TextAlign.End,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp)
+            .padding(vertical = 5.dp),
+        color = Color.Black
     )
 }
 
@@ -157,7 +159,8 @@ fun MeniComposeChoose(meni: List<MeniSpecial>) {
         text = stringResource(id = R.string.meals_by_choice),
         fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(vertical = 10.dp)
+        modifier = Modifier.padding(vertical = 10.dp),
+        color = Color.Black
     )
     meni.forEach {
         Row(
@@ -169,13 +172,15 @@ fun MeniComposeChoose(meni: List<MeniSpecial>) {
             Text(
                 text = it.meal,
                 fontSize = 16.sp,
-                modifier = Modifier.weight(0.8f)
+                modifier = Modifier.weight(0.8f),
+                color = Color.Black
             )
             Text(
                 text = stringResource(id = R.string.meni_price, it.price),
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
-                modifier = Modifier.weight(0.2f)
+                modifier = Modifier.weight(0.2f),
+                color = Color.Black
             )
         }
         HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
@@ -189,7 +194,8 @@ fun MeniText(text: String, divider: Boolean = true) {
         Text(
             text = text,
             fontSize = 16.sp,
-            modifier = Modifier.padding(vertical = 5.dp)
+            modifier = Modifier.padding(vertical = 5.dp),
+            color = Color.Black
         )
         if (divider) {
             HorizontalDivider(color = Color.LightGray, thickness = 1.dp)

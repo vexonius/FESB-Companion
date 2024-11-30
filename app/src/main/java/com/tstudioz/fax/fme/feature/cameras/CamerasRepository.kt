@@ -15,7 +15,7 @@ class CamerasRepository(private val camerasService: CamerasService) {
                     throw Exception("No images found")
                 }
 
-                when (val bitmap = camerasService.getCameraImage(href + hrefs.last())) {
+                when (val bitmap = camerasService.getCameraImage(href +"/" + hrefs.last())) {
                     is CamerasResult.Image.Success -> {
                         bitmap.data
                     }

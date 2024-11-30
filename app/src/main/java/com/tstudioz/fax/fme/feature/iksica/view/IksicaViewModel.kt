@@ -38,6 +38,29 @@ class IksicaViewModel(
     private val _image = MutableLiveData<Bitmap?>(null)
     val image: LiveData<Bitmap?> = _image
 
+    val mapOfCameras = mapOf(
+        "nothin1" to "B8_27_EB_33_5C_A8",
+        "nothin2" to "B8_27_EB_40_18_25",
+        "nothin3" to "b8_27_eb_27_10_43",
+        "nothin4" to "b8_27_eb_47_b4_60",
+        "nothin5" to "b8_27_eb_62_eb_61",
+        "nothin6" to "b8_27_eb_69_c3_d3",
+        "nothin7" to "b8_27_eb_84_6b_7f",
+        "nothin8" to "b8_27_eb_92_2f_df",
+        "nothin9" to "b8_27_eb_96_25_80",
+        "nothin10" to "b8_27_eb_99_71_4a",
+        "nothin12" to "b8_27_eb_ca_18_85",
+        "nothin13" to "b8_27_eb_f6_28_58",
+
+        "hostel" to "b8_27_eb_56_1c_fa",
+        "indeks" to "b8_27_eb_82_01_dd",
+        "kampus" to "b8_27_eb_aa_ed_1c",
+        "fesb_stop" to "b8_27_eb_ac_55_f5",
+        "fesb_vrh" to "b8_27_eb_d1_4b_4a",
+        "efst" to "b8_27_eb_d4_79_96",
+        "fgag" to "b8_27_eb_ff_a3_7c"
+    )
+
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
         viewModelScope.launch(Dispatchers.Main) {
@@ -104,7 +127,7 @@ class IksicaViewModel(
 
     fun getImage(href: String) {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _image.postValue(camerasRepository.getImage(href))
+            _image.postValue(mapOfCameras[href]?.let { camerasRepository.getImage(it) })
         }
     }
 

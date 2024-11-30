@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
 import android.graphics.Bitmap
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,15 +31,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -62,6 +60,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -74,13 +73,17 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
+import com.tstudioz.fax.fme.feature.menza.view.MenzaBottomSheet
+import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
+import org.koin.androidx.compose.koinViewModel
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -99,6 +102,7 @@ import kotlin.math.sin
 @Composable
 fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
+    val menzaViewModel: MenzaViewModel = koinViewModel()
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -158,7 +162,8 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Button(onClick = {
-                            iksicaViewModel.getImage("b8_27_eb_aa_ed_1c/")
+                            iksicaViewModel.getImage("kampus")
+                            menzaViewModel.fetchMenza("kampus")
                             iksicaViewModel.hideImage()
                             shownCamera.value = "Kampus"
                         }) {
@@ -166,7 +171,8 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                         }
                         Spacer(modifier = Modifier.width(10.dp))
                         Button(onClick = {
-                            iksicaViewModel.getImage("b8_27_eb_d1_4b_4a/")
+                            iksicaViewModel.getImage("fesb_vrh")
+                            menzaViewModel.fetchMenza("fesb_vrh")
                             iksicaViewModel.hideImage()
                             shownCamera.value = "FESB"
                         }) {
@@ -174,7 +180,8 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                         }
                         Spacer(modifier = Modifier.width(10.dp))
                         Button(onClick = {
-                            iksicaViewModel.getImage("b8_27_eb_ac_55_f5/")
+                            iksicaViewModel.getImage("fesb_stop")
+                            menzaViewModel.fetchMenza("fesb_stop")
                             iksicaViewModel.hideImage()
                             shownCamera.value = "STOP"
                         }) {
@@ -205,12 +212,13 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             }
                         }
 
-                        item{
+                        item {
                             Text(
                                 text = "Transakcije",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp,
-                                modifier = Modifier.padding(16.dp, 12.dp))
+                                modifier = Modifier.padding(16.dp, 12.dp)
+                            )
                         }
 
                         items(model.receipts) {
@@ -226,7 +234,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         }
     }
     if (image != null) {
-        ZoomablePopup(iksicaViewModel, image, "Menza", shownCamera)
+        ZoomablePopup(iksicaViewModel, image, "Menza", shownCamera, menzaViewModel)
     }
     PopupBox(
         showPopup = showPopup.value,
@@ -313,7 +321,8 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
         ) {
             Text(receipt.restaurant.trim(), overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(0.80f))
             Text(
-                text = "-"+ receipt.subsidizedAmount.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN).toString() + "€",
+                text = "-" + receipt.subsidizedAmount.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN)
+                    .toString() + "€",
                 fontSize = 15.sp,
                 modifier = Modifier.weight(0.20f),
                 textAlign = TextAlign.End,
@@ -326,7 +335,7 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
             val relativeText = when {
                 daysAgo == 0L -> "Danas"
                 daysAgo == 1L -> "Jučer"
-                daysAgo > 1L && daysAgo % 10 == 1L && daysAgo % 100 != 11L-> "Prije $daysAgo dan"
+                daysAgo > 1L && daysAgo % 10 == 1L && daysAgo % 100 != 11L -> "Prije $daysAgo dan"
                 daysAgo > 1L -> "Prije $daysAgo dana"
                 else -> "U budućnosti"
             }
@@ -343,7 +352,8 @@ fun ZoomablePopup(
     iksicaViewModel: IksicaViewModel,
     image: Bitmap,
     contentDescription: String,
-    shownCamera: MutableState<String>
+    shownCamera: MutableState<String>,
+    menzaViewModel: MenzaViewModel
 ) {
     val bitmap = image.asImageBitmap()
     val scale = remember { mutableFloatStateOf(1f) }
@@ -352,7 +362,7 @@ fun ZoomablePopup(
     val offsetY = remember { mutableFloatStateOf(0f) }
     val imageWidth = bitmap.width
     val imageHeight = bitmap.height
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
@@ -360,7 +370,6 @@ fun ZoomablePopup(
             .clickable {}, // da ne bi klinkilo kroz popup background na stvari ispod
 
     ) {
-
         Popup(
             alignment = Alignment.Center, onDismissRequest = {
                 iksicaViewModel.hideImage()
@@ -371,8 +380,12 @@ fun ZoomablePopup(
                     .wrapContentSize()
                     .padding(10.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.surfaceDim, RectangleShape)
-                    .paint(painterResource(id = R.drawable.tile_background__1_), contentScale = ContentScale.Crop, alpha = 0.5f),
+                    .background(colorResource(id = R.color.greenHighlight), RectangleShape)
+                    .paint(
+                        painterResource(id = R.drawable.tile_background__1_),
+                        contentScale = ContentScale.Crop,
+                        alpha = 0.3f
+                    ),
             ) {
 
                 Column(
@@ -454,12 +467,11 @@ fun ZoomablePopup(
                         contentDescription = contentDescription,
                         bitmap = bitmap
                     )
+                    MenzaBottomSheet(menzaViewModel.menzaOther.observeAsState().value)
                 }
             }
-
         }
     }
-
 }
 
 fun Modifier.angledGradientBackground(

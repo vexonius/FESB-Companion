@@ -9,7 +9,7 @@ import com.tstudioz.fax.fme.feature.menza.service.MenzaServiceInterface
 import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.koin.androidApplication
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 @OptIn(InternalCoroutinesApi::class)
