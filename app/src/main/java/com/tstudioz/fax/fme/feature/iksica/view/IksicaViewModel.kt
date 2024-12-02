@@ -13,6 +13,10 @@ import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
+import com.tstudioz.fax.fme.feature.menza.MenzaResult
+import com.tstudioz.fax.fme.feature.menza.models.Menza
+import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepository
+import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -21,7 +25,8 @@ import kotlinx.coroutines.launch
 @InternalCoroutinesApi
 class IksicaViewModel(
     private val repository: IksicaRepositoryInterface,
-    private val camerasRepository: CamerasRepository
+    private val camerasRepository: CamerasRepository,
+    private val menzaRepository: MenzaRepositoryInterface
 ) : ViewModel() {
 
     val snackbarHostState = SnackbarHostState()
@@ -38,7 +43,13 @@ class IksicaViewModel(
     private val _image = MutableLiveData<Bitmap?>(null)
     val image: LiveData<Bitmap?> = _image
 
-    val mapOfCameras = mapOf(
+    private val _imageName = MutableLiveData<String?>(null)
+    val imageName: LiveData<String?> = _imageName
+
+    private val _menza = MutableLiveData<Menza?>()
+    val menza: LiveData<Menza?> = _menza
+
+    private val mapOfCameras = mapOf(
         "nothin1" to "B8_27_EB_33_5C_A8",
         "nothin2" to "B8_27_EB_40_18_25",
         "nothin3" to "b8_27_eb_27_10_43",
@@ -125,14 +136,45 @@ class IksicaViewModel(
         }
     }
 
-    fun getImage(href: String) {
+    fun runImageMenza(place:String, name:String) {
+        clearImage()
+        getImage(place)
+        fetchMenza(place, name)
+    }
+
+    private fun getImage(page: String) {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _image.postValue(mapOfCameras[href]?.let { camerasRepository.getImage(it) })
+            _image.postValue(mapOfCameras[page]?.let { camerasRepository.getImage(it) })
         }
     }
 
-    fun hideImage() {
-        if (_image.value != null) _image.value = null
+    private fun fetchMenza(place:String, name:String) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            when (val menza = menzaRepository.fetchMenzaDetails(place,false)) {
+                is MenzaResult.Success -> {
+                    _menza.postValue(menza.data)
+                    setImageName(name)
+                }
+
+                is MenzaResult.Failure -> {
+                    snackbarHostState.showSnackbar("Greška prilikom dohvaćanja menze")
+                }
+            }
+        }
+    }
+
+    fun setImageName(name: String?){
+        _imageName.postValue(name)
+    }
+
+    fun closeImageMenza(){
+        clearImage()
+        _menza.postValue(null)
+    }
+
+    private fun clearImage() {
+        _image.value = null
+        _imageName.value=null
     }
 
     fun hideReceiptDetails() {

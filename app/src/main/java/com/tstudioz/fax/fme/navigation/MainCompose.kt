@@ -72,6 +72,7 @@ fun MainNavHost(
             MainTopAppBar(
                 navController = navController,
                 timetableViewModel = timetableViewModel,
+                iksicaViewModel = iksicaViewModel,
                 router = router
             )
         },
@@ -85,11 +86,9 @@ fun MainNavHost(
     ) { innerPadding ->
         NavHost(navController = navController, startDestination = startDestination, modifier = Modifier.padding(innerPadding),
             enterTransition = {
-                // you can change whatever you want transition
                 EnterTransition.None
             },
             exitTransition = {
-                // you can change whatever you want transition
                 ExitTransition.None
             }) {
             composable<Iksica> {

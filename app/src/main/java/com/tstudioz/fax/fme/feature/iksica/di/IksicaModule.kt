@@ -15,7 +15,7 @@ import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.ISSPLoginInterceptor
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.OkHttpClient
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
@@ -28,7 +28,7 @@ val iksicaModule = module {
     single<IksicaServiceInterface> { IksicaService(get(named("ISSPPortalClient")))}
     single<IksicaRepositoryInterface> { IksicaRepository(get(), get()) }
     single<IksicaDaoInterface> { IksicaDao(get()) }
-    viewModel { IksicaViewModel( get(), get ()) }
+    viewModel { IksicaViewModel( get(), get(), get()) }
     single {CamerasService(get())}
     single{CamerasRepository(get())}
 }
