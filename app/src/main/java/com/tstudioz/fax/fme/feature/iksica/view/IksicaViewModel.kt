@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.feature.cameras.CamerasRepository
 import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
@@ -16,12 +15,12 @@ import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.feature.menza.MenzaResult
 import com.tstudioz.fax.fme.feature.menza.models.Menza
-import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepository
 import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import okhttp3.HttpUrl
 
 @InternalCoroutinesApi
 class IksicaViewModel(
@@ -41,8 +40,8 @@ class IksicaViewModel(
     private val _viewState = MutableLiveData<IksicaViewState>(IksicaViewState.Initial)
     val viewState: LiveData<IksicaViewState> = _viewState
 
-    private val _image = MutableLiveData<Bitmap?>(null)
-    val image: LiveData<Bitmap?> = _image
+    private val _imageUrl = MutableLiveData<HttpUrl?>(null)
+    val imageUrl: LiveData<HttpUrl?> = _imageUrl
 
     private val _imageName = MutableLiveData<String?>(null)
     val imageName: LiveData<String?> = _imageName
@@ -145,7 +144,7 @@ class IksicaViewModel(
 
     private fun getImage(page: String) {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _image.postValue(mapOfCameras[page]?.let { camerasRepository.getImage(it) })
+            _imageUrl.postValue(mapOfCameras[page]?.let { camerasRepository.getImage(it) })
         }
     }
 
@@ -174,7 +173,7 @@ class IksicaViewModel(
     }
 
     private fun clearImage() {
-        _image.value = null
+        _imageUrl.value = null
         _imageName.value=null
     }
 

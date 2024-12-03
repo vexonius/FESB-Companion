@@ -99,7 +99,6 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                     sheetState = sheetState,
                     onDismissRequest = { hideEvent() },
                     containerColor = event.color,
-                    windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                     shape = RectangleShape
                 ) {
@@ -110,7 +109,6 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
             if (shownWeekChooseMenu.observeAsState(initial = false).value) {
                 ModalBottomSheet(sheetState = sheetState,
                     containerColor = MaterialTheme.colorScheme.surface,
-                    windowInsets = WindowInsets(0.dp),
                     onDismissRequest = {
                         showWeekChooseMenu(false)
                     })

@@ -6,7 +6,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.util.UUID
 
-class ParseAttendance{
+class ParseAttendance {
 
     fun parseAttendance(
         element: Element,
@@ -17,12 +17,14 @@ class ParseAttendance{
         Jsoup.parse(body).select(".courseCategories div.courseCategory").forEach { kat ->
             val mAttendanceEntry = AttendanceEntry()
             mAttendanceEntry.semester = semester
-            mAttendanceEntry.`class` = element.select(".cellContent").first()?.text()
-            mAttendanceEntry.type = kat.getElementsByClass("name").first()?.text()
+            mAttendanceEntry.`class` = element.select(".cellContent").first()?.text() ?: ""
+            mAttendanceEntry.type =
+                (kat.getElementsByClass("name").first()?.text() ?: "").replaceFirstChar { it.uppercase() }
             mAttendanceEntry.attended = kat.select(".attended > span.num").first()?.text()?.toInt() ?: 99
             mAttendanceEntry.absent = kat.select(".absent > span.num").first()?.text()?.toInt() ?: 99
-            mAttendanceEntry.required = kat.select(".required-attendance > span").first()?.text()
-            mAttendanceEntry.total = (mAttendanceEntry.required?.split("od")?.last()?.trim() ?: "99").toInt()
+            val reqAttend = kat.select(".required-attendance > span").first()?.text()
+            mAttendanceEntry.required = (reqAttend?.split("od")?.firstOrNull()?.trim() ?: "").toIntOrNull() ?: 99
+            mAttendanceEntry.total = (reqAttend?.split("od")?.last()?.trim())?.toIntOrNull() ?: 99
             mAttendanceEntry.id = UUID.nameUUIDFromBytes(
                 ("${mAttendanceEntry.attended}${mAttendanceEntry.absent}${mAttendanceEntry.`class`}" +
                         "${mAttendanceEntry.type}${mAttendanceEntry.required}${mAttendanceEntry.total}${mAttendanceEntry.semester}").toByteArray()

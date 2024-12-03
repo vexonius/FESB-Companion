@@ -57,9 +57,7 @@ import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
-import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.androidx.compose.koinViewModel
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -83,7 +81,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
     val showPopup = remember { mutableStateOf(false) }
 
-    val image = iksicaViewModel.image.observeAsState().value
+    val imageUrl = iksicaViewModel.imageUrl.observeAsState().value
     val imageName = iksicaViewModel.imageName.observeAsState().value
 
     val locations = listOf(
@@ -127,8 +125,8 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            //RotatableZoomableImage(image.asImageBitmap(), "Menza")
-            image?.asImageBitmap()?.let { Rotatable90Image(image = it, contentDescription = "Menza") }
+            //imageUrl?.let { RotatableZoomableImage(imageUrl = it, "Menza") }
+            imageUrl?.let { Rotatable90Image(imageUrl = it, contentDescription = "Menza") }
             MeniComposeIksica(iksicaViewModel.menza.observeAsState().value)
             BackHandler {
                 iksicaViewModel.closeImageMenza()

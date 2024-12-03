@@ -11,7 +11,6 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-
 fun Modifier.angledGradientBackground(
     colors: List<Color>,
     degrees: Float,

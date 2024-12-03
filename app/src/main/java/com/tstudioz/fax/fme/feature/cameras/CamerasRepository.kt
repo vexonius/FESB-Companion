@@ -1,22 +1,27 @@
 package com.tstudioz.fax.fme.feature.cameras
 
-import android.graphics.Bitmap
 import android.util.Log
+import okhttp3.HttpUrl
+import org.jsoup.Jsoup
 
-class CamerasRepository(private val camerasService: CamerasService) : CamerasRepositoryInterface {
+class CamerasRepository(private val camerasService: CamerasServiceInterface) : CamerasRepositoryInterface {
 
-    override suspend fun getImage(href: String): Bitmap {
-
-        val hrefs: List<String>
-
-        when (val result = camerasService.getCameraImageUrls(href)) {
+    override suspend fun getImage(path: String): HttpUrl {
+        return when (val result = camerasService.getCameraImageUrls(path)) {
             is CamerasResult.GetCamerasResult.Success -> {
 
-                hrefs = parseImageUrls(result.data)
+                val hrefs = parseImageUrls(result.data)
                 if (hrefs.isEmpty()) {
                     Log.e("image", "No images found")
                     throw Exception("No images found")
                 }
+                HttpUrl.Builder()
+                    .scheme("https")
+                    .host("camerasfiles.dbtouch.com")
+                    .addPathSegment("images")
+                    .addPathSegment(path)
+                    .addPathSegment(hrefs.last())
+                    .build()
             }
 
             is CamerasResult.GetCamerasResult.Failure -> {
@@ -24,15 +29,13 @@ class CamerasRepository(private val camerasService: CamerasService) : CamerasRep
                 throw Exception("Images urls fetching error")
             }
         }
-        when (val bitmap = camerasService.getCameraImage(href, hrefs.last())) {
-            is CamerasResult.Image.Success -> {
-                return bitmap.data
-            }
+    }
 
-            is CamerasResult.Image.Failure -> {
-                Log.e("image", "Image fetching error")
-                throw Exception("Image fetching error")
-            }
-        }
+    private fun parseImageUrls(body: String): List<String> {
+        return Jsoup.parse(body).select("a")
+            .map { it.attr("href") }
+            .filter { !it.contains("medium") }
+            .filter { !it.contains("small") }
+            .filter { !it.contains("../") }
     }
 }

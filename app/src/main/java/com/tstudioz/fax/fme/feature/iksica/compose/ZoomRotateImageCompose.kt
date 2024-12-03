@@ -1,34 +1,40 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
+import android.graphics.drawable.BitmapDrawable
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import okhttp3.HttpUrl
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun RotatableZoomableImage(image: ImageBitmap, contentDescription: String) {
+fun RotatableZoomableImage(imageUrl: HttpUrl, contentDescription: String) {
     val scale = remember { mutableFloatStateOf(1f) }
     val rotationState = remember { mutableFloatStateOf(0f) }
     val offsetX = remember { mutableFloatStateOf(0f) }
     val offsetY = remember { mutableFloatStateOf(0f) }
     val aspectRatio = remember { mutableFloatStateOf(16 / 9f) }
+    val imageWidth = remember { mutableIntStateOf(0) }
+    val imageHeight = remember { mutableIntStateOf(0) }
 
     val modifiableModifier = Modifier.aspectRatio(aspectRatio.floatValue.coerceIn(9 / 16f..16 / 9f))
 
-    Image(
+    AsyncImage(
         modifier = modifiableModifier
             .animateContentSize()
             .graphicsLayer(
@@ -49,8 +55,10 @@ fun RotatableZoomableImage(image: ImageBitmap, contentDescription: String) {
                     val scaledPanX = (pan.x * cosRotAngle - pan.y * sinRotAngle).toFloat() * scale.floatValue
                     val scaledPanY = (pan.x * sinRotAngle + pan.y * cosRotAngle).toFloat() * scale.floatValue
 
-                    val rotatedWidth = (abs(cosRotAngle * image.width) + abs(sinRotAngle * image.height)).toFloat()
-                    val rotatedHeight = (abs(sinRotAngle * image.width) + abs(cosRotAngle * image.height)).toFloat()
+                    val rotatedWidth =
+                        (abs(cosRotAngle * imageWidth.intValue) + abs(sinRotAngle * imageHeight.intValue)).toFloat()
+                    val rotatedHeight =
+                        (abs(sinRotAngle * imageWidth.intValue) + abs(cosRotAngle * imageHeight.intValue)).toFloat()
 
                     val extraWidth = 0.12f
 
@@ -79,18 +87,35 @@ fun RotatableZoomableImage(image: ImageBitmap, contentDescription: String) {
                 aspectRatio.floatValue = 16 / 9f
             },
         contentDescription = contentDescription,
-        bitmap = image
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(imageUrl)
+            .crossfade(true)
+            .listener(
+                onSuccess = { _, result ->
+                    (result.drawable as? BitmapDrawable)?.bitmap?.let {
+                        imageWidth.intValue = it.width
+                        imageHeight.intValue = it.height
+                    }
+                },
+                onError = { _, _ ->
+                    imageWidth.intValue = 0
+                    imageHeight.intValue = 0
+                }
+            )
+            .build()
     )
 
 }
 
 @Composable
-fun Rotatable90Image(image: ImageBitmap, contentDescription: String) {
+fun Rotatable90Image(imageUrl: HttpUrl, contentDescription: String) {
     val scale = remember { mutableFloatStateOf(1f) }
     val rotationState = remember { mutableFloatStateOf(0f) }
     val aspectRatio = remember { mutableFloatStateOf(16 / 9f) }
 
-    Image(
+    AsyncImage(
+        model = imageUrl,
+        contentDescription = contentDescription,
         modifier = Modifier
             .aspectRatio(aspectRatio.floatValue.coerceIn(9 / 16f..16 / 9f))
             .animateContentSize()
@@ -115,9 +140,6 @@ fun Rotatable90Image(image: ImageBitmap, contentDescription: String) {
                     scale.floatValue = 1.77f
                 else
                     scale.floatValue = 1f
-            },
-        contentDescription = contentDescription,
-        bitmap = image
+            }
     )
-
 }

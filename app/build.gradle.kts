@@ -124,6 +124,10 @@ dependencies {
     //weather deserialise
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("com.google.code.gson:gson:2.11.0")
+
+    //Coil
+    implementation(platform("androidx.compose:compose-bom:2024.11.00"))
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
 
 configurations.all {
