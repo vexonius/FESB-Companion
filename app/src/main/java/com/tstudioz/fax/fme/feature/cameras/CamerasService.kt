@@ -24,7 +24,7 @@ class CamerasService(private val client: OkHttpClient) : CamerasServiceInterface
         response.close()
 
         if (!response.isSuccessful) {
-            return CamerasResult.GetCamerasResult.Failure(Throwable("Failure getCameraImage"))
+            return CamerasResult.GetCamerasResult.Failure
         }
 
         return CamerasResult.GetCamerasResult.Success(doc)
