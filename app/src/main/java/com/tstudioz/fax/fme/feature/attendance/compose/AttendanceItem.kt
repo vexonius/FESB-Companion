@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.database.models.AttendanceEntry
+import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 
 
 @Composable

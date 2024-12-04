@@ -70,6 +70,7 @@ android {
 
 dependencies {
 
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.5")
     val koinVersion = "4.0.0"
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")

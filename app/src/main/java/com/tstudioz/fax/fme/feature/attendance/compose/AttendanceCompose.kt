@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -33,6 +34,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.spacing
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -92,12 +94,12 @@ fun CreateAttendanceListView(attendanceViewModel: AttendanceViewModel, snackbarH
         ) {
             Row {
                 FilterButton(
-                    selected = shownSemester?.equals(AttendanceViewModel.ShownSemester.FIRST) ?: false,
+                    selected = shownSemester == AttendanceViewModel.ShownSemester.FIRST ,
                     text = stringResource(id = R.string.first_semester),
                     onClick = { attendanceViewModel.showSemester(AttendanceViewModel.ShownSemester.FIRST) }
                 )
                 FilterButton(
-                    selected = shownSemester?.equals(AttendanceViewModel.ShownSemester.SECOND) ?: false,
+                    selected = shownSemester == AttendanceViewModel.ShownSemester.SECOND,
                     text = stringResource(id = R.string.second_semester),
                     onClick = { attendanceViewModel.showSemester(AttendanceViewModel.ShownSemester.SECOND) }
                 )
@@ -116,7 +118,7 @@ fun FilterButton(
     text: String,
     onClick: () -> Unit
 ) {
-    Spacer(modifier = Modifier.padding(10.dp))
+    Spacer(modifier = Modifier.padding(MaterialTheme.spacing.small))
     TextButton(
         modifier = Modifier
             .clip(RoundedCornerShape(40.dp))

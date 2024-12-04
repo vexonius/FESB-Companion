@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.database
 
 import com.tstudioz.fax.fme.database.models.*
+import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm

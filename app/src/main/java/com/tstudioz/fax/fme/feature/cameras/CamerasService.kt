@@ -1,10 +1,8 @@
 package com.tstudioz.fax.fme.feature.cameras
 
-import android.graphics.BitmapFactory
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.BufferedInputStream
 
 class CamerasService(private val client: OkHttpClient) : CamerasServiceInterface {
 

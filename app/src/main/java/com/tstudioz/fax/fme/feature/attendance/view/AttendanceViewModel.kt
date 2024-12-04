@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.database.models.AttendanceEntry
+import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.networking.NetworkUtils
@@ -33,16 +33,16 @@ class AttendanceViewModel(
     val attendanceListFull: LiveData<List<List<AttendanceEntry>>> = _attendanceListFull
 
     private val attendanceFirstSem = _attendanceListFull.map { list -> list.filter { it.firstOrNull()?.semester == 1 } }
-    private val attendanceSecondSem = _attendanceListFull.map { list -> list.filter { it.firstOrNull()?.semester == 2 } }
+    private val attendanceSecondSem =
+        _attendanceListFull.map { list -> list.filter { it.firstOrNull()?.semester == 2 } }
 
-    private val _shownSemester: MutableLiveData<ShownSemester> = MutableLiveData(ShownSemester.BOTH)
-    val shownSemester: MutableLiveData<ShownSemester> = _shownSemester
+    private val _shownSemester: MutableLiveData<ShownSemester?> = MutableLiveData(null)
+    val shownSemester: MutableLiveData<ShownSemester?> = _shownSemester
 
     private val _attendance: LiveData<List<List<AttendanceEntry>>> = _shownSemester.switchMap {
         when (it) {
             ShownSemester.FIRST -> attendanceFirstSem
             ShownSemester.SECOND -> attendanceSecondSem
-            ShownSemester.BOTH -> _attendanceListFull
             null -> _attendanceListFull
         }
     }
@@ -95,14 +95,12 @@ class AttendanceViewModel(
     }
 
     fun showSemester(semester: ShownSemester) {
-        if (_shownSemester.value == semester) _shownSemester.value = ShownSemester.BOTH
-        else _shownSemester.value = semester
+        _shownSemester.value = if (_shownSemester.value == semester) null else semester
     }
 
     enum class ShownSemester {
         FIRST,
-        SECOND,
-        BOTH
+        SECOND
     }
 }
 
