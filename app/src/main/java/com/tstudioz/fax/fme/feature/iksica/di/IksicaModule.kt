@@ -13,7 +13,7 @@ import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.ISSPLoginInterceptor
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.OkHttpClient
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit

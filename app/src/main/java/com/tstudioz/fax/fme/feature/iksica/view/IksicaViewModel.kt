@@ -11,13 +11,16 @@ import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
+import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
-class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewModel() {
+class IksicaViewModel(
+    private val repository: IksicaRepositoryInterface
+) : ViewModel() {
 
     val snackbarHostState = SnackbarHostState()
 
@@ -32,7 +35,9 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
-        viewModelScope.launch(Dispatchers.Main){ snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        viewModelScope.launch(Dispatchers.Main) {
+            snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+        }
     }
 
     init {
@@ -91,6 +96,7 @@ class IksicaViewModel(private val repository: IksicaRepositoryInterface) : ViewM
             }
         }
     }
+
 
     fun hideReceiptDetails() {
         _receiptSelected.postValue(IksicaReceiptState.None)

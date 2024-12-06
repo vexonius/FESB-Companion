@@ -81,7 +81,7 @@ fun ElevatedCardIksica(
                         lineHeight = 25.sp,
                         fontWeight = FontWeight.ExtraBold,
 
-                    )
+                        )
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

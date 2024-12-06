@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,10 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -34,11 +31,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -47,8 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -62,11 +52,6 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.hypot
-import kotlin.math.sin
 
 @OptIn(
     InternalCoroutinesApi::class,
@@ -123,7 +108,9 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     .align(Alignment.TopCenter)
                     .zIndex(2f)
             )
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
                 when (viewState) {
                     is IksicaViewState.Initial, is IksicaViewState.Empty, is IksicaViewState.FetchingError -> {
                         item {
@@ -141,18 +128,19 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             }
                         }
 
-                        if (model.receipts.isEmpty()) {
-                            item {
+                        item {
+                            if (model.receipts.isEmpty()) {
                                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
                             }
                         }
 
-                        item{
+                        item {
                             Text(
                                 text = "Transakcije",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp,
-                                modifier = Modifier.padding(16.dp, 12.dp))
+                                modifier = Modifier.padding(16.dp, 12.dp)
+                            )
                         }
 
                         items(model.receipts) {
@@ -194,51 +182,6 @@ fun EmptyIksicaView(text: String) {
     }
 }
 
-@Composable
-fun PopupBox(
-    showPopup: Boolean,
-    onClickOutside: () -> Unit,
-    content: @Composable() () -> Unit
-) {
-    if (showPopup) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
-                .zIndex(10F)
-                .clickable {}, // da ne bi klinkilo kroz popup background na stvari ispod
-            contentAlignment = Alignment.Center
-        ) {
-            // popup
-            Popup(
-                alignment = Alignment.Center,
-                properties = PopupProperties(
-                    excludeFromSystemGesture = true,
-                ),
-                // to dismiss on click outside
-                onDismissRequest = { onClickOutside() },
-            ) {
-                Box(
-                    modifier = Modifier
-                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(10.dp))
-                ) {
-                    Box(
-                        Modifier
-                            .wrapContentSize(align = Alignment.Center)
-                            .background(
-                                MaterialTheme.colorScheme.surface,
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .clip(RoundedCornerShape(4.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        content()
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
@@ -253,7 +196,8 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
         ) {
             Text(receipt.restaurant.trim(), overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(0.80f))
             Text(
-                text = "-"+ receipt.subsidizedAmount.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN).toString() + "€",
+                text = "-" + receipt.subsidizedAmount.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN)
+                    .toString() + "€",
                 fontSize = 15.sp,
                 modifier = Modifier.weight(0.20f),
                 textAlign = TextAlign.End,
@@ -266,7 +210,7 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
             val relativeText = when {
                 daysAgo == 0L -> "Danas"
                 daysAgo == 1L -> "Jučer"
-                daysAgo > 1L && daysAgo % 10 == 1L && daysAgo % 100 != 11L-> "Prije $daysAgo dan"
+                daysAgo > 1L && daysAgo % 10 == 1L && daysAgo % 100 != 11L -> "Prije $daysAgo dan"
                 daysAgo > 1L -> "Prije $daysAgo dana"
                 else -> "U budućnosti"
             }
@@ -274,61 +218,4 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
         }
     }
     HorizontalDivider(Modifier.padding(horizontal = 10.dp))
-
 }
-
-fun Modifier.angledGradientBackground(
-    colors: List<Color>,
-    degrees: Float,
-    halfHalf: Boolean = false
-) =
-    drawBehind {
-        var deg2 = degrees
-
-        val (x, y) = size
-        val gamma = atan2(y, x)
-
-        if (halfHalf) {
-            deg2 = atan2(x, y).times(180f / PI).toFloat()
-        }
-
-        if (gamma == 0f || gamma == (PI / 2).toFloat()) {
-            return@drawBehind
-        }
-
-        val degreesNormalised = (deg2 % 360).let { if (it < 0) it + 360 else it }
-
-        val alpha = (degreesNormalised * PI / 180).toFloat()
-
-        val gradientLength = when (alpha) {
-            in 0f..gamma, in (2 * PI - gamma)..2 * PI -> {
-                x / cos(alpha)
-            }
-
-            in gamma..(PI - gamma).toFloat() -> {
-                y / sin(alpha)
-            }
-
-            in (PI - gamma)..(PI + gamma) -> {
-                x / -cos(alpha)
-            }
-
-            in (PI + gamma)..(2 * PI - gamma) -> {
-                y / -sin(alpha)
-            }
-
-            else -> hypot(x, y)
-        }
-
-        val centerOffsetX = cos(alpha) * gradientLength / 2
-        val centerOffsetY = sin(alpha) * gradientLength / 2
-
-        drawRect(
-            brush = Brush.linearGradient(
-                colors = colors,
-                start = Offset(center.x - centerOffsetX, center.y - centerOffsetY),
-                end = Offset(center.x + centerOffsetX, center.y + centerOffsetY)
-            ),
-            size = size
-        )
-    }
