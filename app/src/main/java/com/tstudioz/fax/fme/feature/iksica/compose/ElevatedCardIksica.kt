@@ -80,7 +80,6 @@ fun ElevatedCardIksica(
                         fontSize = 25.sp,
                         lineHeight = 25.sp,
                         fontWeight = FontWeight.ExtraBold,
-
                         )
                 }
                 Row(

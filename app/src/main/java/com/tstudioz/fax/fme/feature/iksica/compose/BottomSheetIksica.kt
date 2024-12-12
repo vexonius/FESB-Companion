@@ -117,11 +117,13 @@ fun IksicaReceiptDetailed(
 fun IksicaItemDetailed(
     item: ReceiptItem
 ) {
+
     Row(
         Modifier
             .fillMaxWidth()
             .padding(20.dp, 5.dp, 15.dp, 5.dp)
     ) {
+
         Text(text = item.amount.toString() + "x", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.width(6.dp))
         Column(
@@ -147,7 +149,7 @@ fun IksicaItemDetailed(
             Row {
                 Text(
                     text = "Cijena: " + item.price.toString() + " €",
-                    color = MaterialTheme.colorScheme.outline,
+                    color = MaterialTheme.colorScheme.outline
                 )
                 Text(
                     text = "  Subvencija: " + item.subsidizedAmount.toString() + " €",

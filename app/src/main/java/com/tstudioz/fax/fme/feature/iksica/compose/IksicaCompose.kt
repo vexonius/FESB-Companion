@@ -108,9 +108,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     .align(Alignment.TopCenter)
                     .zIndex(2f)
             )
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 when (viewState) {
                     is IksicaViewState.Initial, is IksicaViewState.Empty, is IksicaViewState.FetchingError -> {
                         item {
