@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,13 +44,14 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.iksica.daysAgoText
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
+import com.tstudioz.fax.fme.feature.iksica.roundToTwo
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import kotlinx.coroutines.InternalCoroutinesApi
-import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -134,7 +136,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
                         item {
                             Text(
-                                text = "Transakcije",
+                                text = stringResource(id = R.string.transactions),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp,
                                 modifier = Modifier.padding(16.dp, 12.dp)
@@ -192,10 +194,14 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(receipt.restaurant.trim(), overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(0.80f))
             Text(
-                text = "-" + receipt.subsidizedAmount.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN)
-                    .toString() + "€",
+                receipt.restaurant.trim(),
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(0.80f)
+            )
+            Text(
+                text = stringResource(id = R.string.minus_amount, receipt.subsidizedAmount.roundToTwo())
+                        + stringResource(id = R.string.currency),
                 fontSize = 15.sp,
                 modifier = Modifier.weight(0.20f),
                 textAlign = TextAlign.End,
@@ -203,16 +209,8 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
         }
         Row {
             val today = LocalDate.now()
-            val daysAgo = ChronoUnit.DAYS.between(receipt.date, today)
-
-            val relativeText = when {
-                daysAgo == 0L -> "Danas"
-                daysAgo == 1L -> "Jučer"
-                daysAgo > 1L && daysAgo % 10 == 1L && daysAgo % 100 != 11L -> "Prije $daysAgo dan"
-                daysAgo > 1L -> "Prije $daysAgo dana"
-                else -> "U budućnosti"
-            }
-            Text(relativeText + " " + receipt.time + " ", color = Color(0xFFCCCCCC))
+            val daysAgo = ChronoUnit.DAYS.between(receipt.date, today).daysAgoText(LocalContext.current)
+            Text(daysAgo + " " + receipt.time, color = Color(0xFFCCCCCC))
         }
     }
     HorizontalDivider(Modifier.padding(horizontal = 10.dp))
