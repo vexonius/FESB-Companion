@@ -1,6 +1,8 @@
 package com.tstudioz.fax.fme.feature.login.view
 
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.compose.AppTheme
@@ -22,12 +24,24 @@ class LoginActivity : AppCompatActivity() {
         router.register(this)
 
         isUserLoggedIn()
-        setContent() {
+        onBackListen()
+        setContent {
             AppTheme { LoginCompose(loginViewModel) }
         }
 
         loginViewModel.checkIfFirstTimeInApp()
         loginViewModel.checkIfLoggedIn()
+    }
+
+    private fun onBackListen(){
+        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val a = Intent(Intent.ACTION_MAIN)
+                a.addCategory(Intent.CATEGORY_HOME)
+                a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(a)
+            }
+        })
     }
 
     private fun isUserLoggedIn() {
