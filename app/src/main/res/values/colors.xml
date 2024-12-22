@@ -42,4 +42,9 @@
     <color name="greenHighlight">#20d2bb</color>
     <color name="ic_launcher_background">#34434C</color>
 
+    //Login screen
+    <color name="login_button">#006AFF</color>
+    <color name="login_error_color_container">#852221</color>
+    <color name="login_error_color_content">#FFDAD6</color>
+
 </resources>
