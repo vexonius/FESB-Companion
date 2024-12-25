@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -55,8 +56,8 @@ import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
@@ -69,13 +70,15 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
     val shownWeekChooseMenu = timetableViewModel.shownWeekChooseMenu
     val lessonsToShow = timetableViewModel.events
     val shownWeek = timetableViewModel.mondayOfSelectedWeek
-    val periods = timetableViewModel.periods
+    val daysWithStuff = timetableViewModel.daysWithStuff
     val monthData = timetableViewModel.monthData
     val fetchUserTimetable = { selectedDate: LocalDate -> timetableViewModel.fetchUserTimetable(selectedDate) }
     val showEvent = { it: Event -> timetableViewModel.showEvent(it) }
     val showWeekChooseMenu = { it: Boolean -> timetableViewModel.showWeekChooseMenu(it) }
     val hideEvent = { timetableViewModel.hideEvent() }
     val snackbarHostState = timetableViewModel.snackbarHostState
+
+
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val event = showDayEvent.observeAsState().value
@@ -87,6 +90,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                 timetableViewModel.resetToCurrentWeek()
                 timetableViewModel.fetchUserTimetable()
             }
+
             else -> {}
         }
     }
@@ -147,7 +151,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                         )
                         Spacer(modifier = Modifier.padding(0.dp, 5.dp))
                         HorizontalCalendar(state = state, dayContent = { day ->
-                            Day(day, isSelected = selection == day, periods = periods.value ?: emptyList()) { clicked ->
+                            Day(day, isSelected = selection == day, daysWithStuff = daysWithStuff.value ?: emptyMap()) { clicked ->
                                 selection = clicked.takeUnless { it == selection }
                             }
                         })
@@ -197,8 +201,8 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                 events = mapped,
                 minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
                 maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
-                    else if (eventAfter8PM) LocalTime.of(21, 0)
-                    else LocalTime.of(20, 0),
+                else if (eventAfter8PM) LocalTime.of(21, 0)
+                else LocalTime.of(20, 0),
                 minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
                 maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
                 onClick = { showEvent(it) })
@@ -207,7 +211,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
     }
 }
 
-val orderOfPeriodImportance = listOf(
+val orderOfPeriodColors = listOf(
     "Narančasta",
     "Plava",
     "Yellow",
@@ -218,37 +222,47 @@ val orderOfPeriodImportance = listOf(
     "Bijela",
 )
 
+
 @Composable
 fun Day(
     day: CalendarDay,
     isSelected: Boolean = false,
-    periods: List<TimeTableInfo>,
+    daysWithStuff: Map<LocalDate, List<TimeTableInfo>>,
     onClick: (CalendarDay) -> Unit = {},
 ) {
-    val selectedItemColor = MaterialTheme.colorScheme.secondary
     val inActiveTextColor = Color.DarkGray
     val textColor = when (day.position) {
         DayPosition.MonthDate -> Color.Unspecified
         DayPosition.InDate, DayPosition.OutDate -> inActiveTextColor
     }
-    val inPeriods = mutableListOf<TimeTableInfo>()
+    val nextDay = day.date.plusDays(1)
+    val prevDay = day.date.minusDays(1)
+    val inPeriods = daysWithStuff[day.date] ?: emptyList()
+    val rightPeriods = daysWithStuff[nextDay] ?: emptyList()
+    val leftPeriods = daysWithStuff[prevDay] ?: emptyList()
 
-    periods.filter { (it.startDate?.compareTo(day.date) ?: 1) <= 0 && (it.endDate?.compareTo(day.date) ?: -1) >= 0 }
-        .forEach {
-            inPeriods.add(it)
-        }
-    val dayColor = inPeriods.minByOrNull { orderOfPeriodImportance.indexOf(it.category) }?.colorCode?.let { Color(it) }
+    val dayColor = inPeriods.minByOrNull { orderOfPeriodColors.indexOf(it.category) }?.colorCode?.let { Color(it) }
+    val leftColor = leftPeriods.minByOrNull { orderOfPeriodColors.indexOf(it.category) }?.colorCode?.let { Color(it) }
+    val rightColor = rightPeriods.minByOrNull { orderOfPeriodColors.indexOf(it.category) }?.colorCode?.let { Color(it) }
+    val sameColorOnLeft = leftColor == dayColor && day.date.dayOfWeek != DayOfWeek.MONDAY
+    val sameColorOnRight = rightColor == dayColor && day.date.dayOfWeek != DayOfWeek.SUNDAY
+    val borderShape = remember(sameColorOnLeft, sameColorOnRight) {
+        RoundedCornerShape(
+            topStartPercent = if (sameColorOnLeft) 0 else 50,
+            topEndPercent = if (sameColorOnRight) 0 else 50,
+            bottomStartPercent = if (sameColorOnLeft) 0 else 50,
+            bottomEndPercent = if (sameColorOnRight) 0 else 50
+        )
+    }
 
     Column(
         modifier = Modifier
             .aspectRatio(1f)
-            .background(
-                shape = CircleShape, color = dayColor ?: Color.Transparent
-            )
+            .background(shape = borderShape, color = dayColor ?: Color.Transparent)
             .clip(CircleShape)
+            .clickable { onClick(day) }
             .border(2.dp, if (isSelected) Color.White else Color.Transparent, CircleShape)
-            .padding(8.dp)
-            .clickable { onClick(day) },
+            .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
