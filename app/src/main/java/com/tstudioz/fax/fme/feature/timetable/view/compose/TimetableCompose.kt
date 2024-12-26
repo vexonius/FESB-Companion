@@ -1,16 +1,19 @@
-package com.tstudioz.fax.fme.feature.timetable.view
+package com.tstudioz.fax.fme.feature.timetable.view.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
@@ -20,6 +23,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,12 +37,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -49,16 +58,15 @@ import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.compose.BottomInfoCompose
-import com.tstudioz.fax.fme.compose.Schedule
-import com.tstudioz.fax.fme.compose.SimpleCalendarTitle
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
+import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
 
@@ -77,8 +85,6 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
     val showWeekChooseMenu = { it: Boolean -> timetableViewModel.showWeekChooseMenu(it) }
     val hideEvent = { timetableViewModel.hideEvent() }
     val snackbarHostState = timetableViewModel.snackbarHostState
-
-
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val event = showDayEvent.observeAsState().value
@@ -151,7 +157,11 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                         )
                         Spacer(modifier = Modifier.padding(0.dp, 5.dp))
                         HorizontalCalendar(state = state, dayContent = { day ->
-                            Day(day, isSelected = selection == day, daysWithStuff = daysWithStuff.value ?: emptyMap()) { clicked ->
+                            Day(
+                                day,
+                                isSelected = selection == day,
+                                daysWithStuff = daysWithStuff.value ?: emptyMap()
+                            ) { clicked ->
                                 selection = clicked.takeUnless { it == selection }
                             }
                         })
@@ -198,7 +208,24 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
             val eventAfter9PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(21, 0)) }
 
             Schedule(
-                events = mapped,
+                events = mapped.plusElement(
+                    Event(
+                        name = "Pauza zadnja osam zanny uuuuuuuuu uuuuuu",
+                        classroom = "a100",
+                        start = LocalDateTime.now().with(LocalTime.of(12, 0)),
+                        end = LocalDateTime.now().with(LocalTime.of(13, 0)),
+                        color = Color(0xFFfffffff),
+                        colorId = R.color.white,
+                        id = "0",
+                        shortName = "Pauza",
+                    )
+                ),
+                eventContent = { posEvent ->
+                    BasicEventCustom(
+                        positionedEvent = posEvent,
+                        onClick = { showEvent(posEvent.event) }
+                    )
+                },
                 minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
                 maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
                 else if (eventAfter8PM) LocalTime.of(21, 0)
@@ -207,6 +234,71 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                 maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
                 onClick = { showEvent(it) })
 
+        }
+    }
+}
+
+@Composable
+fun BasicEventCustom(
+    positionedEvent: PositionedEvent,
+    modifier: Modifier = Modifier,
+    onClick: (Event) -> Unit = {}
+) {
+    val event = positionedEvent.event
+    val topRadius =
+        if (positionedEvent.splitType == SplitType.Start || positionedEvent.splitType == SplitType.Both) 0.dp else 8.dp
+    val bottomRadius =
+        if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 8.dp
+
+
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(2.dp)
+            .clipToBounds()
+            .clip(
+                RoundedCornerShape(
+                    topStart = topRadius,
+                    topEnd = topRadius,
+                    bottomEnd = bottomRadius,
+                    bottomStart = bottomRadius,
+                )
+            )
+            .background(Color(0xFF232323))
+            .clickable { onClick(positionedEvent.event) }
+    ) {
+
+        VerticalDivider(Modifier.padding(end = 2.dp), color = event.color, thickness = 4.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .clipToBounds()
+                .padding(4.dp)
+        ) {
+            Text(
+                text = event.name,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
+                fontSize = 10.sp,
+                lineHeight = 12.sp,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.weight(0.7f, fill = false),
+            )
+
+            Text(
+                text = event.classroom,
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 10.sp,
+                lineHeight = 10.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .weight(0.3f)
+                    .padding(top = 4.dp)
+            )
         }
     }
 }

@@ -1,6 +1,5 @@
-package com.tstudioz.fax.fme.compose
+package com.tstudioz.fax.fme.feature.timetable.view.compose
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -774,5 +773,6 @@ fun SchedulePreview() {
     Schedule(
         minTime = LocalTime.of(8, 0),
         maxTime = LocalTime.of(20, 0),
-        events = sampleEvents2)
+        events = sampleEvents2
+    )
 }

@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.compose
+package com.tstudioz.fax.fme.feature.timetable.view.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
