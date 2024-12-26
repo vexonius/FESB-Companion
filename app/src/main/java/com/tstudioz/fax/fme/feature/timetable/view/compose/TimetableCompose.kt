@@ -208,18 +208,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
             val eventAfter9PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(21, 0)) }
 
             Schedule(
-                events = mapped.plusElement(
-                    Event(
-                        name = "Pauza zadnja osam zanny uuuuuuuuu uuuuuu",
-                        classroom = "a100",
-                        start = LocalDateTime.now().with(LocalTime.of(12, 0)),
-                        end = LocalDateTime.now().with(LocalTime.of(13, 0)),
-                        color = Color(0xFFfffffff),
-                        colorId = R.color.white,
-                        id = "0",
-                        shortName = "Pauza",
-                    )
-                ),
+                events = mapped,
                 eventContent = { posEvent ->
                     BasicEventCustom(
                         positionedEvent = posEvent,
