@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
@@ -39,13 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -54,21 +50,20 @@ import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
-import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
+import com.tstudioz.fax.fme.feature.timetable.MonthData
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
@@ -86,7 +81,8 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
     val hideEvent = { timetableViewModel.hideEvent() }
     val snackbarHostState = timetableViewModel.snackbarHostState
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetStateEvent = rememberModalBottomSheetState()
+    val sheetStateCalendar = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val event = showDayEvent.observeAsState().value
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
 
@@ -106,92 +102,36 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
         sheetContent = {
             event?.let {
                 ModalBottomSheet(
-                    sheetState = sheetState,
+                    sheetState = sheetStateEvent,
                     onDismissRequest = { hideEvent() },
-                    containerColor = event.color,
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
-                    shape = RectangleShape
                 ) {
                     BottomInfoCompose(it)
                 }
             }
-
             if (shownWeekChooseMenu.observeAsState(initial = false).value) {
-                ModalBottomSheet(sheetState = sheetState,
+                ModalBottomSheet(
+                    sheetState = sheetStateCalendar,
+                    onDismissRequest = { showWeekChooseMenu(false) },
                     containerColor = MaterialTheme.colorScheme.surface,
                     windowInsets = WindowInsets(0.dp),
-                    onDismissRequest = {
-                        showWeekChooseMenu(false)
-                    })
-                {
-                    Column(Modifier.padding(8.dp, 8.dp, 8.dp, 20.dp)) {
-                        var selection by remember {
-                            mutableStateOf<CalendarDay?>(
-                                CalendarDay(
-                                    LocalDate.now(),
-                                    DayPosition.MonthDate
-                                )
-                            )
-                        }
-                        val state = rememberCalendarState(
-                            startMonth = monthData.value?.startMonth ?: YearMonth.now(),
-                            endMonth = monthData.value?.endMonth ?: YearMonth.now(),
-                            firstVisibleMonth = monthData.value?.currentMonth ?: YearMonth.now(),
-                            firstDayOfWeek = monthData.value?.firstDayOfWeek ?: firstDayOfWeekFromLocale()
-                        )
-                        val coroutineScope = rememberCoroutineScope()
-                        SimpleCalendarTitle(
-                            modifier = Modifier.fillMaxWidth(),
-                            currentMonth = state.firstVisibleMonth.yearMonth,
-                            goToPrevious = {
+                    dragHandle = { },
+                ) {
+                    val coroutineScope = rememberCoroutineScope()
+                    monthData.value?.let {
+                        BottomSheetCalendar(
+                            monthData = it,
+                            daysWithStuff = daysWithStuff.value ?: emptyMap(),
+                            fetchUserTimetable = fetchUserTimetable,
+                            coroutineScope = coroutineScope,
+                            hideSheet = {
                                 coroutineScope.launch {
-                                    state.scrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
+                                    sheetStateCalendar.hide()
+                                    showWeekChooseMenu(false)
                                 }
-                            },
-                            goToNext = {
-                                coroutineScope.launch {
-                                    state.scrollToMonth(state.firstVisibleMonth.yearMonth.nextMonth)
-                                }
-                            },
+                            }
                         )
-                        Spacer(modifier = Modifier.padding(0.dp, 5.dp))
-                        HorizontalCalendar(state = state, dayContent = { day ->
-                            Day(
-                                day,
-                                isSelected = selection == day,
-                                daysWithStuff = daysWithStuff.value ?: emptyMap()
-                            ) { clicked ->
-                                selection = clicked.takeUnless { it == selection }
-                            }
-                        })
-                        Row(
-                            horizontalArrangement = Arrangement.End,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp, 16.dp)
-                        ) {
-                            TextButton(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        sheetState.hide()
-                                        showWeekChooseMenu(false)
-                                    }
-                                }) {
-                                Text(text = stringResource(id = R.string.cancelChoosingWeek), color = Color.Gray)
-                            }
-                            TextButton(onClick = {
-                                selection?.let {
-                                    fetchUserTimetable(it.date)
-                                    coroutineScope.launch {
-                                        sheetState.hide()
-                                        showWeekChooseMenu(false)
-                                    }
-                                }
-                            }) {
-                                Text(text = stringResource(id = R.string.chooseChoosingWeek))
-                            }
-                        }
                     }
                 }
             }
@@ -226,6 +166,75 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
         }
     }
 }
+
+@Composable
+fun BottomSheetCalendar(
+    monthData: MonthData,
+    daysWithStuff: Map<LocalDate, List<TimeTableInfo>>,
+    fetchUserTimetable: (LocalDate) -> Unit,
+    hideSheet: () -> Unit,
+    coroutineScope: CoroutineScope,
+) {
+    Column(Modifier.padding(8.dp, 8.dp, 8.dp, 20.dp)) {
+        var selection by remember {
+            mutableStateOf<CalendarDay?>(
+                CalendarDay(
+                    LocalDate.now(),
+                    DayPosition.MonthDate
+                )
+            )
+        }
+        val state = rememberCalendarState(
+            startMonth = monthData.startMonth,
+            endMonth = monthData.endMonth,
+            firstVisibleMonth = monthData.currentMonth,
+            firstDayOfWeek = monthData.firstDayOfWeek
+        )
+        SimpleCalendarTitle(
+            modifier = Modifier.fillMaxWidth(),
+            currentMonth = state.firstVisibleMonth.yearMonth,
+            goToPrevious = {
+                coroutineScope.launch {
+                    state.scrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
+                }
+            },
+            goToNext = {
+                coroutineScope.launch {
+                    state.scrollToMonth(state.firstVisibleMonth.yearMonth.nextMonth)
+                }
+            },
+        )
+        Spacer(modifier = Modifier.padding(vertical = 5.dp))
+        HorizontalCalendar(state = state, dayContent = { day ->
+            Day(
+                day,
+                isSelected = selection == day,
+                daysWithStuff = daysWithStuff
+            ) { clicked ->
+                selection = clicked.takeUnless { it == selection }
+            }
+        })
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp, 16.dp)
+        ) {
+            TextButton(hideSheet) {
+                Text(stringResource(id = R.string.cancelChoosingWeek), color = Color.Gray)
+            }
+            TextButton({
+                selection?.let {
+                    fetchUserTimetable(it.date)
+                    hideSheet()
+                }
+            }) {
+                Text(stringResource(id = R.string.chooseChoosingWeek))
+            }
+        }
+    }
+}
+
 
 @Composable
 fun BasicEventCustom(

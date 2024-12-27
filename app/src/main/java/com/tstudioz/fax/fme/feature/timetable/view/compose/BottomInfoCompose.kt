@@ -1,108 +1,84 @@
 package com.tstudioz.fax.fme.feature.timetable.view.compose
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.TimetableType
-import java.time.LocalDateTime
 
-@Preview
 @Composable
-fun BottomInfoCompose(
-    event: Event = Event(
-        name = "Event",
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now(),
-        eventType = TimetableType.OTHER,
-        description = "Description",
-        color = Color.Blue,
-        shortName = "E",
-        id = "id",
-        groups = "Grupa 1, ",
-        )
-) {
+fun BottomInfoCompose(event: Event) {
     Column(
         Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(0.dp, 0.dp, 0.dp, 10.dp)
-            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(20.dp, 5.dp, 15.dp, 20.dp)
+            .fillMaxSize()
     ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .background(event.color)
-        ) {
-            Text(text = event.name, fontSize = 24.sp, modifier = Modifier.padding(15.dp))
+        Text(text = event.name, fontSize = 28.sp, modifier = Modifier.padding(0.dp, 15.dp, 15.dp, 15.dp))
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(0.dp, 0.dp, 15.dp, 15.dp)) {
+            val radius = 8.dp
+            Canvas(modifier = Modifier.size(radius * 2)) { drawCircle(color = event.color, radius = radius.toPx()) }
+            Spacer(modifier = Modifier.size(10.dp))
+            Text(text = event.eventType.type, style = MaterialTheme.typography.titleMedium)
         }
-        BottomElement(
-            text = event.eventType.type,
-            modifierText = Modifier.padding(10.dp, 10.dp, 0.dp, 5.dp),
-            modifierRow = Modifier.padding(15.dp, 15.dp, 0.dp, 10.dp),
-            icon = R.drawable.classroom
-        )
-        BottomElement(
-            text = event.professor,
-            modifierText = Modifier.padding(10.dp, 10.dp, 0.dp, 5.dp),
-            modifierRow = Modifier.padding(start = 15.dp, bottom = 10.dp),
-            icon = R.drawable.profesor
-        )
-        BottomElement(
-            text = "${event.start.toLocalTime()} - ${event.end.toLocalTime()}",
-            modifierText = Modifier.padding(10.dp, 10.dp, 0.dp, 5.dp),
-            modifierRow = Modifier.padding(start = 15.dp, bottom = 10.dp),
-            icon = R.drawable.time
-        )
-        BottomElement(
-            text = event.groups.split(",").firstOrNull() ?: "",
-            modifierText = Modifier.padding(10.dp, 10.dp, 0.dp, 5.dp),
-            modifierRow = Modifier.padding(start = 15.dp, bottom = 10.dp),
-            icon = R.drawable.group
-        )
-        BottomElement(
-            text = event.classroom,
-            modifierText = Modifier.padding(10.dp, 10.dp, 0.dp, 5.dp),
-            modifierRow = Modifier.padding(start = 15.dp, bottom = 10.dp),
-            icon = R.drawable.mjesto_odrzavanja
-        )
+        val modifier = Modifier.padding(bottom = 10.dp)
+        Row(Modifier.fillMaxWidth()) {
+            Column(Modifier.weight(1f)) {
+                BottomElement(
+                    title = stringResource(id = R.string.professor),
+                    text = event.professor,
+                    modifier = modifier,
+                )
+                BottomElement(
+                    title = stringResource(id = R.string.time),
+                    text = stringResource(id = R.string.time_range, event.start.toLocalTime(), event.end.toLocalTime()),
+                    modifier = modifier,
+                )
+                BottomElement(
+                    title = stringResource(id = R.string.recurring), text = event.recurringUntil, modifier = modifier
+                )
+            }
+            Column(Modifier.weight(1f)) {
+                BottomElement(
+                    title = stringResource(id = R.string.group),
+                    text = event.groups.split(",").firstOrNull() ?: "",
+                    modifier = modifier,
+                )
+                BottomElement(
+                    title = stringResource(id = R.string.classroom),
+                    text = event.classroom,
+                    modifier = modifier,
+                )
+            }
+        }
     }
 }
 
 @Composable
 fun BottomElement(
+    title: String,
     text: String,
-    modifierText: Modifier = Modifier,
-    modifierRow: Modifier = Modifier,
-    color: Color = Color.Transparent,
-    icon: Int
+    modifier: Modifier = Modifier,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-        modifier = modifierRow
+    Column(
+        modifier = modifier
     ) {
-        Icon(
-            painterResource(icon),
-            contentDescription = "Localized description",
-            modifier = Modifier.size(25.dp)
-        )
-        Text(text = text, modifier = modifierText)
+        Text(text = title, style = MaterialTheme.typography.bodyMedium)
+        Text(text = text, style = MaterialTheme.typography.titleMedium)
     }
 
 }

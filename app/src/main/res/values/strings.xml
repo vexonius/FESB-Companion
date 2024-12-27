@@ -124,4 +124,13 @@
     <string name="rights_from_label">Prava od</string>
     <string name="right_until_label">Prava do</string>
     <string name="card_balance_label">Stanje iksice</string>
+
+    //Timetable
+    //bottom sheet
+    <string name="professor">Profesor</string>
+    <string name="time">Vrijeme</string>
+    <string name="recurring">Ponavlja se</string>
+    <string name="group">Grupa</string>
+    <string name="classroom">Učionica</string>
+    <string name="time_range">%1$s - %2$s</string>
 </resources>
