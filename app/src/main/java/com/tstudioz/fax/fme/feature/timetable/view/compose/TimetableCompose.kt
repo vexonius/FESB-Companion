@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,8 +44,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -61,9 +66,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.Async.Schedule
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
@@ -98,6 +108,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
     }
 
     BottomSheetScaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         sheetContent = {
             event?.let {
@@ -138,32 +149,75 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
         },
         sheetPeekHeight = 0.dp,
     ) {
-        Column {
-            val mapped = lessonsToShow.observeAsState(emptyList()).value.onEach {
-                it.color = colorResource(id = it.colorId)
-            }
-            val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
-            val eventBefore8AM = mapped.any { it.start.toLocalTime().isBefore(LocalTime.of(8, 0)) }
-            val eventAfter8PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(20, 0)) }
-            val eventAfter9PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(21, 0)) }
+        val mapped = lessonsToShow.observeAsState(emptyList()).value.onEach {
+            it.color = colorResource(id = it.colorId)
+        }/*.plus(
+            Event(
+                name = "Test 1",
+                start = LocalDateTime.now().minusDays(3).minusHours(6),
+                end = LocalDateTime.now().plusHours(1).minusDays(3).minusHours(6),
+                classroom = " ",
+                color = Color.Transparent,
+                colorId = R.color.red_nice,
+                groups = " ",
+                professor = " ",
+                recurringUntil = " ",
+                id = "00",
+                shortName = "ww"
+            )).plus(
+            Event(
+                name = "Test 2",
+                start = LocalDateTime.now().minusDays(3).minusHours(6),
+                end = LocalDateTime.now().plusHours(2).minusDays(3).minusHours(6),
+                classroom = " ",
+                color = Color.Transparent,
+                colorId = R.color.red_nice,
+                groups = " ",
+                professor = " ",
+                recurringUntil = " ",
+                id = "01",
+                shortName = "ww"
+            )).plus(
+            Event(
+                name = "Test 3",
+                start = LocalDateTime.now().minusDays(3).minusHours(6),
+                end = LocalDateTime.now().plusHours(3).minusDays(3).minusHours(6),
+                classroom = " ",
+                color = Color.Transparent,
+                colorId = R.color.red_nice,
+                groups = " ",
+                professor = " ",
+                recurringUntil = " ",
+                id = "02",
+                shortName = "ww"
+            ),
+        )*/
+        val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
+        val eventBefore8AM = mapped.any { it.start.toLocalTime().isBefore(LocalTime.of(8, 0)) }
+        val eventAfter8PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(20, 0)) }
+        val eventAfter9PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(21, 0)) }
 
-            Schedule(
-                events = mapped,
-                eventContent = { posEvent ->
-                    BasicEventCustom(
-                        positionedEvent = posEvent,
-                        onClick = { showEvent(posEvent.event) }
-                    )
-                },
-                minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
-                maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
-                else if (eventAfter8PM) LocalTime.of(21, 0)
-                else LocalTime.of(20, 0),
-                minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
-                maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
-                onClick = { showEvent(it) })
-
-        }
+        Schedule(
+            events = mapped,
+            eventContent = { posEvent ->
+                BasicEventCustom(
+                    positionedEvent = posEvent,
+                    onClick = { showEvent(posEvent.event) }
+                )
+            },
+            dayHeader = { day ->
+                BasicDayHeaderCustom(day)
+            },
+            timeLabel = { time ->
+                BasicSidebarLabelCustom(time)
+            },
+            minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
+            maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
+            else if (eventAfter8PM) LocalTime.of(21, 0)
+            else LocalTime.of(20, 0),
+            minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
+            maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
+            onClick = { showEvent(it) })
     }
 }
 
@@ -235,6 +289,54 @@ fun BottomSheetCalendar(
     }
 }
 
+private val HourFormatter = DateTimeFormatter.ofPattern("H")
+
+@Composable
+fun BasicSidebarLabelCustom(
+    time: LocalTime,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = time.format(HourFormatter),
+        textAlign = TextAlign.End,
+        fontSize = 12.sp,
+        lineHeight = 12.sp,
+        modifier = modifier//.padding(vertical = 0.dp, horizontal = 8.dp)
+            .fillMaxHeight(),
+        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+    )
+
+}
+
+private val DayFormatter = DateTimeFormatter.ofPattern("d")
+
+@Composable
+fun BasicDayHeaderCustom(day: LocalDate) {
+    val dayOfWeek = day.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+        .take(3).lowercase().replaceFirstChar { it.uppercase() }
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+        Text(
+            text = day.format(DayFormatter) + ". ",
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            modifier = Modifier,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+        )
+        Text(
+            text = dayOfWeek,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
 
 @Composable
 fun BasicEventCustom(

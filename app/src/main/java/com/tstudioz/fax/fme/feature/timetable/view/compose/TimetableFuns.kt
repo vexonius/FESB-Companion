@@ -31,6 +31,8 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -48,8 +50,6 @@ import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimetableType
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -75,19 +75,14 @@ data class PositionedEvent(
     val date: LocalDate,
     val start: LocalTime,
     val end: LocalTime,
-    val col: Int = 0,
-    val colSpan: Int = 1,
-    val colTotal: Int = 1,
+    val column: Int = 0,
+    val columnSpan: Int = 1,
+    val columnTotal: Int = 1,
 )
 
-val EventTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-
-@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
 fun BasicEvent(
-    positionedEvent: PositionedEvent,
-    modifier: Modifier = Modifier,
-    onClick : (Event) -> Unit = {}
+    positionedEvent: PositionedEvent, modifier: Modifier = Modifier, onClick: (Event) -> Unit = {}
 ) {
     val event = positionedEvent.event
     val topRadius =
@@ -95,23 +90,20 @@ fun BasicEvent(
     val bottomRadius =
         if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 8.dp
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(2.dp)
-            .clipToBounds()
-            .background(
-                event.color,
-                shape = RoundedCornerShape(
-                    topStart = topRadius,
-                    topEnd = topRadius,
-                    bottomEnd = bottomRadius,
-                    bottomStart = bottomRadius,
-                )
+    Column(modifier = modifier
+        .fillMaxSize()
+        .padding(2.dp)
+        .clipToBounds()
+        .background(
+            event.color, shape = RoundedCornerShape(
+                topStart = topRadius,
+                topEnd = topRadius,
+                bottomEnd = bottomRadius,
+                bottomStart = bottomRadius,
             )
-            .padding(4.dp)
-            .clickable { onClick(positionedEvent.event) }
-    ) {
+        )
+        .padding(4.dp)
+        .clickable { onClick(positionedEvent.event) }) {
         Text(
             text = event.name,
             style = MaterialTheme.typography.bodySmall,
@@ -119,7 +111,9 @@ fun BasicEvent(
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Start,
-            modifier = Modifier.fillMaxWidth().weight(1f, fill = false),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f, fill = false),
         )
 
         Text(
@@ -128,27 +122,25 @@ fun BasicEvent(
             maxLines = 1,
             overflow = TextOverflow.Clip,
             textAlign = TextAlign.Start,
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp).weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp)
+                .weight(1f),
         )
     }
 }
 
-private class EventDataModifier(
-    val positionedEvent: PositionedEvent,
-) : ParentDataModifier {
+private class EventDataModifier(val positionedEvent: PositionedEvent) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?) = positionedEvent
 }
 
-private fun Modifier.eventData(positionedEvent: PositionedEvent) =
-    this.then(EventDataModifier(positionedEvent))
+private fun Modifier.eventData(positionedEvent: PositionedEvent) = this.then(EventDataModifier(positionedEvent))
 
 private val DayFormatter = DateTimeFormatter.ofPattern("d")
 
 @Composable
 fun BasicDayHeader(day: LocalDate) {
-    val title = day.dayOfWeek.getDisplayName(TextStyle.SHORT, java.util.Locale.getDefault())
-        .take(3)
-        .lowercase()
+    val title = day.dayOfWeek.getDisplayName(TextStyle.SHORT, java.util.Locale.getDefault()).take(3).lowercase()
         .replaceFirstChar { it.uppercase() } + " " + day.format(DayFormatter)
     Text(
         text = title,
@@ -161,12 +153,6 @@ fun BasicDayHeader(day: LocalDate) {
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun BasicDayHeaderPreview() {
-    BasicDayHeader(day = LocalDate.now())
-}
-
 @Composable
 fun ScheduleHeader(
     minDate: LocalDate,
@@ -176,8 +162,7 @@ fun ScheduleHeader(
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
 ) {
     Row(
-        modifier = modifier
-            .background(color = colorResource(R.color.colorPrimary))
+        modifier = modifier.background(color = colorResource(R.color.colorPrimary))
     ) {
         val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
         repeat(numDays) { i ->
@@ -186,16 +171,6 @@ fun ScheduleHeader(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ScheduleHeaderPreview() {
-    ScheduleHeader(
-        minDate = LocalDate.now(),
-        maxDate = LocalDate.now().plusDays(5),
-        dayWidth = 256.dp,
-    )
 }
 
 private val HourFormatter = DateTimeFormatter.ofPattern("H")
@@ -213,13 +188,6 @@ fun BasicSidebarLabel(
             .padding(vertical = 0.dp, horizontal = 8.dp),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BasicSidebarLabelPreview() {
-    BasicSidebarLabel(time = LocalTime.NOON, Modifier.sizeIn(maxHeight = 64.dp))
 }
 
 @Composable
@@ -247,15 +215,8 @@ fun ScheduleSidebar(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ScheduleSidebarPreview() {
-    ScheduleSidebar(hourHeight = 64.dp)
-}
-
 private fun splitEvents(events: List<Event>): List<PositionedEvent> {
-    return events
-        .map { event ->
+    return events.map { event ->
             val startDate = event.start.toLocalDate()
             val endDate = event.end.toLocalDate()
             if (startDate == endDate) {
@@ -290,61 +251,80 @@ private fun PositionedEvent.overlapsWith(other: PositionedEvent): Boolean {
     return date == other.date && start < other.end && end > other.start
 }
 
-private fun List<PositionedEvent>.timesOverlapWith(event: PositionedEvent): Boolean {
+private fun List<PositionedEvent>.anyEventOverlapsWith(event: PositionedEvent): Boolean {
     return any { it.overlapsWith(event) }
 }
 
 private fun arrangeEvents(events: List<PositionedEvent>): List<PositionedEvent> {
+    /**
+     * Final list of events with their positions
+     */
     val positionedEvents = mutableListOf<PositionedEvent>()
-    val groupEvents: MutableList<MutableList<PositionedEvent>> = mutableListOf()
 
-    fun resetGroup() {
-        groupEvents.forEachIndexed { colIndex, col ->
-            col.forEach { e ->
-                positionedEvents.add(e.copy(col = colIndex, colTotal = groupEvents.size))
+    /**
+     * List of columns, each column is a list of events that are in that column
+     */
+    val columnsOfEvents: MutableList<MutableList<PositionedEvent>> = mutableListOf()
+
+    fun moveElementsFromGroup() {
+        columnsOfEvents.forEachIndexed { columnIndex, groupColumn ->
+            groupColumn.forEach { event ->
+                positionedEvents.add(event.copy(column = columnIndex, columnTotal = columnsOfEvents.size))
             }
         }
-        groupEvents.clear()
+        columnsOfEvents.clear()
     }
 
-    events.forEach { event ->
-        var firstFreeCol = -1
-        var numFreeCol = 0
-        for (i in 0 until groupEvents.size) {
-            val col = groupEvents[i]
-            if (col.timesOverlapWith(event)) {
-                if (firstFreeCol < 0) continue else break
-            }
-            if (firstFreeCol < 0) firstFreeCol = i
-            numFreeCol++
-        }
+    events.forEach { eventToAdd ->
+        /**
+         * Value is -1 if there is no free column, otherwise it's the index of the first free column*/
+        var firstFreeColumn = -1
 
+        /**
+         * Number of free columns after the first free column*/
+        var numberOfFreeColumns = 0
+
+        //Goes trough all columns and checks if the event overlaps with any of the events in the column.
+        //If it does, it checks how many columns are free after the first non-overlapping event.
+        //So it ends up with the first free column and the number of free columns after it.
+
+        for (i in 0 until columnsOfEvents.size) {
+            if (columnsOfEvents[i].anyEventOverlapsWith(eventToAdd)) {
+                if (firstFreeColumn < 0) continue else break
+            }
+            if (firstFreeColumn < 0) firstFreeColumn = i
+            numberOfFreeColumns++
+        }
+        val noOverlap = numberOfFreeColumns == columnsOfEvents.size
+        val overlapsWithAll = firstFreeColumn < 0
         when {
-            // Overlaps with all, add a new column
-            firstFreeCol < 0 -> {
-                groupEvents += mutableListOf(event)
+            noOverlap -> {
+                moveElementsFromGroup()
+                columnsOfEvents += mutableListOf(eventToAdd)
+            }
+
+            overlapsWithAll -> {
+                columnsOfEvents += mutableListOf(eventToAdd)
                 // Expand anything that spans into the previous column and doesn't overlap with this event
-                for (ci in 0 until groupEvents.size - 1) {
-                    val col = groupEvents[ci]
-                    col.forEachIndexed { ei, e ->
-                        if (ci + e.colSpan == groupEvents.size - 1 && !e.overlapsWith(event)) {
-                            col[ei] = e.copy(colSpan = e.colSpan + 1)
+                for (columnIndex in 0 until columnsOfEvents.size - 1) {
+                    val column = columnsOfEvents[columnIndex]
+                    column.forEachIndexed { eIndex, eventInColumn ->
+                        if (columnIndex + eventInColumn.columnSpan == columnsOfEvents.size - 1 && !eventInColumn.overlapsWith(
+                                eventToAdd
+                            )
+                        ) {
+                            column[eIndex] = eventInColumn.copy(columnSpan = +1)
                         }
                     }
                 }
             }
-            // No overlap with any, start a new group
-            numFreeCol == groupEvents.size -> {
-                resetGroup()
-                groupEvents += mutableListOf(event)
-            }
             // At least one column free, add to first free column and expand to as many as possible
             else -> {
-                groupEvents[firstFreeCol] += event.copy(colSpan = numFreeCol)
+                columnsOfEvents[firstFreeColumn] += eventToAdd.copy(columnSpan = numberOfFreeColumns)
             }
         }
     }
-    resetGroup()
+    moveElementsFromGroup()
     return positionedEvents
 }
 
@@ -364,8 +344,7 @@ fun Schedule(
     onClick: (Event) -> Unit = { },
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
         BasicEvent(
-            positionedEvent = it,
-            onClick = onClick
+            positionedEvent = it, onClick = onClick
         )
     },
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
@@ -390,8 +369,7 @@ fun Schedule(
             is ScheduleSize.FixedCount -> with(LocalDensity.current) { ((constraints.maxWidth - sidebarWidth) / daySize.count).toDp() }
             is ScheduleSize.Adaptive -> with(LocalDensity.current) {
                 maxOf(
-                    ((constraints.maxWidth - sidebarWidth) / numDays).toDp(),
-                    daySize.minSize
+                    ((constraints.maxWidth - sidebarWidth) / numDays).toDp(), daySize.minSize
                 )
             }
         }
@@ -400,38 +378,32 @@ fun Schedule(
             is ScheduleSize.FixedCount -> with(LocalDensity.current) { ((constraints.maxHeight - headerHeight) / hourSize.count).toDp() }
             is ScheduleSize.Adaptive -> with(LocalDensity.current) {
                 maxOf(
-                    ((constraints.maxHeight - headerHeight) / numHours).toDp(),
-                    hourSize.minSize
+                    ((constraints.maxHeight - headerHeight) / numHours).toDp(), hourSize.minSize
                 )
             }
 
         }
         Column(modifier = modifier) {
-            ScheduleHeader(
-                minDate = minDate,
+            ScheduleHeader(minDate = minDate,
                 maxDate = maxDate,
                 dayWidth = dayWidth,
                 dayHeader = dayHeader,
                 modifier = Modifier
-                    .background(color = colorResource(R.color.colorPrimary))
                     .padding(start = with(LocalDensity.current) { sidebarWidth.toDp() })
                     .horizontalScroll(horizontalScrollState)
-                    .onGloballyPositioned { headerHeight = it.size.height }
-            )
+                    .onGloballyPositioned { headerHeight = it.size.height })
             Row(
                 modifier = Modifier
                     .weight(1f)
                     .align(Alignment.Start)
             ) {
-                ScheduleSidebar(
-                    hourHeight = hourHeight,
+                ScheduleSidebar(hourHeight = hourHeight,
                     minTime = minTime,
                     maxTime = maxTime,
                     label = timeLabel,
                     modifier = Modifier
                         .verticalScroll(verticalScrollState)
-                        .onGloballyPositioned { sidebarWidth = it.size.width }
-                )
+                        .onGloballyPositioned { sidebarWidth = it.size.width })
                 BasicSchedule(
                     events = events,
                     eventContent = eventContent,
@@ -456,10 +428,7 @@ fun BasicSchedule(
     events: List<Event>,
     modifier: Modifier = Modifier,
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
-        BasicEvent(
-            positionedEvent = it,
-            onClick = { }
-        )
+        BasicEvent(positionedEvent = it, onClick = { })
     },
     minDate: LocalDate = events.minByOrNull(Event::start)?.start?.toLocalDate() ?: LocalDate.now(),
     maxDate: LocalDate = events.maxByOrNull(Event::end)?.end?.toLocalDate() ?: LocalDate.now(),
@@ -472,102 +441,104 @@ fun BasicSchedule(
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes / 60
     val dividerColor = colorResource(R.color.colorPrimary)
-    val positionedEvents =
-        remember(events) { arrangeEvents(splitEvents(events.sortedBy(Event::start))).filter { it.end > minTime && it.start < maxTime } }
-    Layout(
-        content = {
-            positionedEvents.forEach { positionedEvent ->
-                Box(modifier = Modifier.eventData(positionedEvent)) {
-                    eventContent(positionedEvent)
-                }
+    val positionedEvents = remember(events) {
+        arrangeEvents(
+            splitEvents(
+                events.sortedBy(Event::start)
+            )
+        ).filter { it.end > minTime && it.start < maxTime }
+    }
+    Layout(content = {
+        positionedEvents.forEach { positionedEvent ->
+            Box(modifier = Modifier.eventData(positionedEvent)) {
+                eventContent(positionedEvent)
             }
-        },
-        modifier = modifier
-            .padding(1.dp, 1.dp)
-            .drawBehind {
-                val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
-                val firstHourOffsetMinutes =
-                    if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(
-                        minTime,
-                        firstHour.plusHours(1)
-                    )
-                val firstHourOffset = (firstHourOffsetMinutes / 60f) * hourHeight.toPx()
-                drawLine(
-                    dividerColor,
-                    start = Offset(0f, 0f),
-                    end = Offset(0f, size.height),
-                    strokeWidth = 1.dp.toPx()
-                )
-                repeat(numHours) {
-                    drawLine(
-                        dividerColor,
-                        start = Offset(0f, it * hourHeight.toPx() + firstHourOffset),
-                        end = Offset(size.width, it * hourHeight.toPx() + firstHourOffset),
-                        strokeWidth = 1.dp.toPx()
-                    )
-                }
-                repeat(numDays - 1) {
-                    drawLine(
-                        dividerColor,
-                        start = Offset((it + 1) * dayWidth.toPx() - 3, 0f),
-                        end = Offset((it + 1) * dayWidth.toPx() - 3, size.height),
-                        strokeWidth = 1.dp.toPx()
-                    )
-                }
-            }
-    ) { measureables, constraints ->
+        }
+    }, modifier = modifier.drawBehind {
+            drawScheduleBackground(
+                minTime = minTime,
+                numDays = numDays,
+                numHours = numHours,
+                hourHeight = hourHeight,
+                dayWidth = dayWidth,
+                dividerColor = dividerColor
+            )
+        }) { measureables, constraints ->
         val height = (hourHeight.toPx() * (numMinutes / 60f)).roundToInt()
         val width = dayWidth.roundToPx() * numDays
+
         val placeablesWithEvents = measureables.map { measurable ->
             val splitEvent = measurable.parentData as PositionedEvent
-            val eventDurationMinutes =
-                ChronoUnit.MINUTES.between(splitEvent.start, minOf(splitEvent.end, maxTime))
-            val eventHeight = ((eventDurationMinutes / 60f) * hourHeight.toPx()).roundToInt()
+            val eventDurationMinutes = ChronoUnit.MINUTES.between(splitEvent.start, minOf(splitEvent.end, maxTime))
+            val eventHeight = (hourHeight.toPx() * eventDurationMinutes / 60f).roundToInt()
             val eventWidth =
-                ((splitEvent.colSpan.toFloat() / splitEvent.colTotal.toFloat()) * dayWidth.toPx()).roundToInt()
+                (dayWidth.toPx() * splitEvent.columnSpan.toFloat() / splitEvent.columnTotal.toFloat()).roundToInt()
             val placeable = measurable.measure(
                 constraints.copy(
-                    minWidth = eventWidth,
-                    maxWidth = eventWidth,
-                    minHeight = eventHeight,
-                    maxHeight = eventHeight
+                    minWidth = eventWidth, maxWidth = eventWidth, minHeight = eventHeight, maxHeight = eventHeight
                 )
             )
             Pair(placeable, splitEvent)
         }
         layout(width, height) {
             placeablesWithEvents.forEach { (placeable, splitEvent) ->
-                val eventOffsetMinutes = if (splitEvent.start > minTime) ChronoUnit.MINUTES.between(
-                    minTime,
-                    splitEvent.start
-                ) else 0
-                val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
+                val eventOffsetMinutes =
+                    if (splitEvent.start > minTime) ChronoUnit.MINUTES.between(minTime, splitEvent.start)
+                    else 0
                 val eventOffsetDays = ChronoUnit.DAYS.between(minDate, splitEvent.date).toInt()
-                val eventX = eventOffsetDays * dayWidth.roundToPx() +
-                        (splitEvent.col * (dayWidth.toPx() / splitEvent.colTotal.toFloat())).roundToInt()
+                val eventX =
+                    eventOffsetDays * dayWidth.roundToPx() + (dayWidth.toPx() * splitEvent.column / splitEvent.columnTotal.toFloat()).roundToInt()
+                val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
                 placeable.place(eventX, eventY)
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun EventPreview(
-    @PreviewParameter(EventsProvider::class) event: Event,
+fun DrawScope.drawScheduleBackground(
+    minTime: LocalTime, numDays: Int, numHours: Int, hourHeight: Dp, dayWidth: Dp, dividerColor: Color
 ) {
-    BasicEvent(
-        PositionedEvent(
-            event,
-            SplitType.Start,
-            event.start.toLocalDate(),
-            event.start.toLocalTime(),
-            event.end.toLocalTime()
-        ),
-        modifier = Modifier.sizeIn(maxHeight = 64.dp),
-        onClick = { }
-    )
+    val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
+    val firstHourOffsetMinutes = if (firstHour == minTime) 0
+    else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
+    val firstHourOffset = (firstHourOffsetMinutes / 60f) * hourHeight.toPx()
+
+    val dashWidth = 2.dp
+    val dashHeight: Dp = 2.dp
+    val gapWidth: Dp = 2.dp
+    val pathEffect = PathEffect.dashPathEffect(intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()), phase = 0f)
+    val strokeWidthFullLine = 1.dp.toPx()
+
+    repeat(numHours) {
+        drawLine(
+            dividerColor,
+            start = Offset(0f, it * hourHeight.toPx() + firstHourOffset + 0.5f * hourHeight.toPx()),
+            end = Offset(size.width, it * hourHeight.toPx() + firstHourOffset + 0.5f * hourHeight.toPx()),
+            alpha = 0.5f,
+            pathEffect = pathEffect,
+            strokeWidth = dashHeight.toPx()
+        )
+    }
+
+    repeat(numHours + 1) {
+        drawLine(
+            dividerColor,
+            start = Offset(0f, it * hourHeight.toPx() + firstHourOffset),
+            end = Offset(size.width, it * hourHeight.toPx() + firstHourOffset),
+            strokeWidth = strokeWidthFullLine
+        )
+    }
+
+    repeat(numDays + 1) {
+        drawLine(
+            dividerColor,
+            start = Offset(it * dayWidth.toPx(), 0f),
+            end = Offset(it * dayWidth.toPx(), size.height),
+            strokeWidth = strokeWidthFullLine
+        )
+    }
 }
+
 
 private val sampleEvents = listOf(
     Event(
@@ -634,6 +605,7 @@ private val sampleEvents = listOf(
         description = "This Workshop will take you through the basics of building your first app with Jetpack Compose, Android's new modern UI toolkit that simplifies and accelerates UI development on Android.",
     ),
 )
+
 private val sampleEvents2 = listOf(
     Event(
         id = "0",
@@ -771,8 +743,45 @@ class EventsProvider : PreviewParameterProvider<Event> {
 @Composable
 fun SchedulePreview() {
     Schedule(
-        minTime = LocalTime.of(8, 0),
-        maxTime = LocalTime.of(20, 0),
-        events = sampleEvents2
+        minTime = LocalTime.of(8, 0), maxTime = LocalTime.of(20, 0), events = sampleEvents2
     )
 }
+
+@Preview(showBackground = true)
+@Composable
+fun BasicDayHeaderPreview() {
+    BasicDayHeader(day = LocalDate.now())
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ScheduleHeaderPreview() {
+    ScheduleHeader(
+        minDate = LocalDate.now(),
+        maxDate = LocalDate.now().plusDays(5),
+        dayWidth = 256.dp,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BasicSidebarLabelPreview() {
+    BasicSidebarLabel(time = LocalTime.NOON, Modifier.sizeIn(maxHeight = 64.dp))
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ScheduleSidebarPreview() {
+    ScheduleSidebar(hourHeight = 64.dp)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EventPreview(
+    @PreviewParameter(EventsProvider::class) event: Event,
+) {
+    BasicEvent(PositionedEvent(
+        event, SplitType.Start, event.start.toLocalDate(), event.start.toLocalTime(), event.end.toLocalTime()
+    ), modifier = Modifier.sizeIn(maxHeight = 64.dp), onClick = { })
+}
+
