@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -217,34 +218,34 @@ fun ScheduleSidebar(
 
 private fun splitEvents(events: List<Event>): List<PositionedEvent> {
     return events.map { event ->
-            val startDate = event.start.toLocalDate()
-            val endDate = event.end.toLocalDate()
-            if (startDate == endDate) {
-                listOf(
-                    PositionedEvent(
-                        event,
-                        SplitType.None,
-                        event.start.toLocalDate(),
-                        event.start.toLocalTime(),
-                        event.end.toLocalTime()
-                    )
+        val startDate = event.start.toLocalDate()
+        val endDate = event.end.toLocalDate()
+        if (startDate == endDate) {
+            listOf(
+                PositionedEvent(
+                    event,
+                    SplitType.None,
+                    event.start.toLocalDate(),
+                    event.start.toLocalTime(),
+                    event.end.toLocalTime()
                 )
-            } else {
-                val days = ChronoUnit.DAYS.between(startDate, endDate)
-                val splitEvents = mutableListOf<PositionedEvent>()
-                for (i in 0..days) {
-                    val date = startDate.plusDays(i)
-                    splitEvents += PositionedEvent(
-                        event,
-                        splitType = if (date == startDate) SplitType.End else if (date == endDate) SplitType.Start else SplitType.Both,
-                        date = date,
-                        start = if (date == startDate) event.start.toLocalTime() else LocalTime.MIN,
-                        end = if (date == endDate) event.end.toLocalTime() else LocalTime.MAX,
-                    )
-                }
-                splitEvents
+            )
+        } else {
+            val days = ChronoUnit.DAYS.between(startDate, endDate)
+            val splitEvents = mutableListOf<PositionedEvent>()
+            for (i in 0..days) {
+                val date = startDate.plusDays(i)
+                splitEvents += PositionedEvent(
+                    event,
+                    splitType = if (date == startDate) SplitType.End else if (date == endDate) SplitType.Start else SplitType.Both,
+                    date = date,
+                    start = if (date == startDate) event.start.toLocalTime() else LocalTime.MIN,
+                    end = if (date == endDate) event.end.toLocalTime() else LocalTime.MAX,
+                )
             }
-        }.flatten()
+            splitEvents
+        }
+    }.flatten()
 }
 
 private fun PositionedEvent.overlapsWith(other: PositionedEvent): Boolean {
@@ -409,8 +410,8 @@ fun Schedule(
                     eventContent = eventContent,
                     minDate = minDate,
                     maxDate = maxDate,
-                    minTime = minTime,
-                    maxTime = maxTime,
+                    minDayTime = minTime,
+                    maxDayTime = maxTime,
                     dayWidth = dayWidth,
                     hourHeight = hourHeight,
                     modifier = Modifier
@@ -432,22 +433,23 @@ fun BasicSchedule(
     },
     minDate: LocalDate = events.minByOrNull(Event::start)?.start?.toLocalDate() ?: LocalDate.now(),
     maxDate: LocalDate = events.maxByOrNull(Event::end)?.end?.toLocalDate() ?: LocalDate.now(),
-    minTime: LocalTime = LocalTime.MIN,
-    maxTime: LocalTime = LocalTime.MAX,
+    minDayTime: LocalTime = LocalTime.MIN,
+    maxDayTime: LocalTime = LocalTime.MAX,
     dayWidth: Dp,
     hourHeight: Dp,
 ) {
-    val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
-    val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
-    val numHours = numMinutes / 60
-    val dividerColor = colorResource(R.color.colorPrimary)
+    val numberOfDaysToShow = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
+    val numberOfMinutesToShow = ChronoUnit.MINUTES.between(minDayTime, maxDayTime).toInt() + 1
+    val numberOfHours = numberOfMinutesToShow / 60
     val positionedEvents = remember(events) {
         arrangeEvents(
             splitEvents(
                 events.sortedBy(Event::start)
             )
-        ).filter { it.end > minTime && it.start < maxTime }
+        ).filter { it.end > minDayTime && it.start < maxDayTime }
     }
+    val dividerColor = colorResource(R.color.colorPrimary)
+
     Layout(content = {
         positionedEvents.forEach { positionedEvent ->
             Box(modifier = Modifier.eventData(positionedEvent)) {
@@ -455,85 +457,95 @@ fun BasicSchedule(
             }
         }
     }, modifier = modifier.drawBehind {
-            drawScheduleBackground(
-                minTime = minTime,
-                numDays = numDays,
-                numHours = numHours,
-                hourHeight = hourHeight,
-                dayWidth = dayWidth,
-                dividerColor = dividerColor
-            )
-        }) { measureables, constraints ->
-        val height = (hourHeight.toPx() * (numMinutes / 60f)).roundToInt()
-        val width = dayWidth.roundToPx() * numDays
+        drawScheduleBackground(
+            minDayTime = minDayTime,
+            numberOfDaysToShow = numberOfDaysToShow,
+            numberOfHours = numberOfHours,
+            hourHeight = hourHeight,
+            dayWidth = dayWidth,
+            dividerColor = dividerColor,
+        )
+    }) { measureables, _ ->
+        val dayWidthPx = dayWidth.toPx()
+        val hourHeightPx = hourHeight.toPx()
+        val height = (hourHeightPx * numberOfMinutesToShow / 60f).roundToInt()
+        val width = dayWidthPx.roundToInt() * numberOfDaysToShow
 
-        val placeablesWithEvents = measureables.map { measurable ->
-            val splitEvent = measurable.parentData as PositionedEvent
-            val eventDurationMinutes = ChronoUnit.MINUTES.between(splitEvent.start, minOf(splitEvent.end, maxTime))
-            val eventHeight = (hourHeight.toPx() * eventDurationMinutes / 60f).roundToInt()
-            val eventWidth =
-                (dayWidth.toPx() * splitEvent.columnSpan.toFloat() / splitEvent.columnTotal.toFloat()).roundToInt()
-            val placeable = measurable.measure(
-                constraints.copy(
-                    minWidth = eventWidth, maxWidth = eventWidth, minHeight = eventHeight, maxHeight = eventHeight
-                )
-            )
-            Pair(placeable, splitEvent)
-        }
         layout(width, height) {
-            placeablesWithEvents.forEach { (placeable, splitEvent) ->
-                val eventOffsetMinutes =
-                    if (splitEvent.start > minTime) ChronoUnit.MINUTES.between(minTime, splitEvent.start)
-                    else 0
-                val eventOffsetDays = ChronoUnit.DAYS.between(minDate, splitEvent.date).toInt()
-                val eventX =
-                    eventOffsetDays * dayWidth.roundToPx() + (dayWidth.toPx() * splitEvent.column / splitEvent.columnTotal.toFloat()).roundToInt()
-                val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
-                placeable.place(eventX, eventY)
+            measureables.forEach { measurable ->
+                val splitEvent = measurable.parentData as PositionedEvent
+                val apparentStartOfEvent = minOf(splitEvent.end, maxDayTime)
+                val eventDurationMinutes = splitEvent.start.until(apparentStartOfEvent, ChronoUnit.MINUTES)
+
+                val eventOffsetDays = minDate.until(splitEvent.date, ChronoUnit.DAYS).toInt()
+                val eventOffsetMinutes = minDayTime.until(splitEvent.start, ChronoUnit.MINUTES).takeIf { it > 0 } ?: 0
+
+                val eventColumnStart = splitEvent.column / splitEvent.columnTotal.toFloat()
+                val eventColumnSpanPercent = splitEvent.columnSpan / splitEvent.columnTotal.toFloat()
+
+                val eventHeight = (hourHeightPx * eventDurationMinutes / 60f).roundToInt()
+                val eventWidth = (dayWidthPx * eventColumnSpanPercent).roundToInt()
+
+                val eventYCoordinate = (hourHeightPx * eventOffsetMinutes / 60f).roundToInt()
+                val eventXCoordinate = (dayWidthPx * (eventOffsetDays + eventColumnStart)).roundToInt()
+                measurable.measure(
+                    Constraints(
+                        minWidth = eventWidth,
+                        maxWidth = eventWidth,
+                        minHeight = eventHeight,
+                        maxHeight = eventHeight
+                    )
+                ).place(eventXCoordinate, eventYCoordinate)
             }
         }
     }
 }
 
 fun DrawScope.drawScheduleBackground(
-    minTime: LocalTime, numDays: Int, numHours: Int, hourHeight: Dp, dayWidth: Dp, dividerColor: Color
+    minDayTime: LocalTime,
+    numberOfDaysToShow: Int,
+    numberOfHours: Int,
+    hourHeight: Dp,
+    dayWidth: Dp,
+    dividerColor: Color
 ) {
-    val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
-    val firstHourOffsetMinutes = if (firstHour == minTime) 0
-    else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
-    val firstHourOffset = (firstHourOffsetMinutes / 60f) * hourHeight.toPx()
+    val dayWidthPx = dayWidth.toPx()
+    val hourHeightPx = hourHeight.toPx()
+    val firstHour = minDayTime.truncatedTo(ChronoUnit.HOURS)
+    val firstHourOffsetMinutes = minDayTime.until(firstHour, ChronoUnit.MINUTES)
+    val firstHourOffset = (firstHourOffsetMinutes / 60f) * hourHeightPx
 
-    val dashWidth = 2.dp
-    val dashHeight: Dp = 2.dp
-    val gapWidth: Dp = 2.dp
-    val pathEffect = PathEffect.dashPathEffect(intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()), phase = 0f)
     val strokeWidthFullLine = 1.dp.toPx()
+    val dashWidth = 2.dp.toPx()
+    val dashHeight = 2.dp.toPx()
+    val gapWidth = 2.dp.toPx()
+    val pathEffect = PathEffect.dashPathEffect(intervals = floatArrayOf(dashWidth, gapWidth), phase = 0f)
 
-    repeat(numHours) {
+    repeat(numberOfHours) {
         drawLine(
             dividerColor,
-            start = Offset(0f, it * hourHeight.toPx() + firstHourOffset + 0.5f * hourHeight.toPx()),
-            end = Offset(size.width, it * hourHeight.toPx() + firstHourOffset + 0.5f * hourHeight.toPx()),
-            alpha = 0.5f,
+            start = Offset(0f, (it + 0.5f) * hourHeightPx + firstHourOffset),
+            end = Offset(size.width, (it + 0.5f) * hourHeightPx + firstHourOffset),
+            strokeWidth = dashHeight,
             pathEffect = pathEffect,
-            strokeWidth = dashHeight.toPx()
+            alpha = 0.5f,
         )
     }
 
-    repeat(numHours + 1) {
+    repeat(numberOfHours + 1) {
         drawLine(
             dividerColor,
-            start = Offset(0f, it * hourHeight.toPx() + firstHourOffset),
-            end = Offset(size.width, it * hourHeight.toPx() + firstHourOffset),
+            start = Offset(0f, it * hourHeightPx + firstHourOffset),
+            end = Offset(size.width, it * hourHeightPx + firstHourOffset),
             strokeWidth = strokeWidthFullLine
         )
     }
 
-    repeat(numDays + 1) {
+    repeat(numberOfDaysToShow + 1) {
         drawLine(
             dividerColor,
-            start = Offset(it * dayWidth.toPx(), 0f),
-            end = Offset(it * dayWidth.toPx(), size.height),
+            start = Offset(it * dayWidthPx, 0f),
+            end = Offset(it * dayWidthPx, size.height),
             strokeWidth = strokeWidthFullLine
         )
     }

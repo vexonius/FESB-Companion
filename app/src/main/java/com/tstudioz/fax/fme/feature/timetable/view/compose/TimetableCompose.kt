@@ -154,8 +154,8 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
         }/*.plus(
             Event(
                 name = "Test 1",
-                start = LocalDateTime.now().minusDays(3).minusHours(6),
-                end = LocalDateTime.now().plusHours(1).minusDays(3).minusHours(6),
+                start = LocalDateTime.now().minusDays(3).minusHours(0),
+                end = LocalDateTime.now().plusHours(1).minusDays(3).minusHours(0),
                 classroom = " ",
                 color = Color.Transparent,
                 colorId = R.color.red_nice,
@@ -167,8 +167,8 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
             )).plus(
             Event(
                 name = "Test 2",
-                start = LocalDateTime.now().minusDays(3).minusHours(6),
-                end = LocalDateTime.now().plusHours(2).minusDays(3).minusHours(6),
+                start = LocalDateTime.now().minusDays(3).minusHours(0),
+                end = LocalDateTime.now().plusHours(2).minusDays(3).minusHours(0),
                 classroom = " ",
                 color = Color.Transparent,
                 colorId = R.color.red_nice,
@@ -180,8 +180,8 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
             )).plus(
             Event(
                 name = "Test 3",
-                start = LocalDateTime.now().minusDays(3).minusHours(6),
-                end = LocalDateTime.now().plusHours(3).minusDays(3).minusHours(6),
+                start = LocalDateTime.now().minusDays(3).minusHours(0),
+                end = LocalDateTime.now().plusHours(3).minusDays(3).minusHours(0),
                 classroom = " ",
                 color = Color.Transparent,
                 colorId = R.color.red_nice,
@@ -354,7 +354,7 @@ fun BasicEventCustom(
     Row(
         modifier = modifier
             .fillMaxSize()
-            .padding(2.dp)
+            .padding(horizontal =  2.dp)
             .clipToBounds()
             .clip(
                 RoundedCornerShape(
