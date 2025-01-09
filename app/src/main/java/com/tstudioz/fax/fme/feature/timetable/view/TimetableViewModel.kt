@@ -40,9 +40,8 @@ class TimetableViewModel(
     private var _events = MutableLiveData(timeTableRepository.events.asLiveData().value ?: emptyList())
     var events: LiveData<List<Event>> = _events
 
-    private val _daysWithStuff = MutableLiveData<MutableMap<LocalDate, List<TimeTableInfo>>>(mutableMapOf())
-    val daysWithStuff: LiveData<MutableMap<LocalDate, List<TimeTableInfo>>> = _daysWithStuff
-
+    private val _daysInPeriods = MutableLiveData<MutableMap<LocalDate, TimeTableInfo>>(mutableMapOf())
+    val daysInPeriods: LiveData<MutableMap<LocalDate, TimeTableInfo>> = _daysInPeriods
 
     private val _mondayOfSelectedWeek: MutableLiveData<LocalDate> = MutableLiveData<LocalDate>(
         LocalDate.now().let { it.minusDays((it.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()) })
@@ -118,17 +117,7 @@ class TimetableViewModel(
         endDate: String = (LocalDate.now().year + 1).toString() + "-8-1"
     ) {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            val daysWithStuffTmp : MutableMap<LocalDate, List<TimeTableInfo>> = mutableMapOf()
-            timeTableRepository.fetchTimeTableCalendar(startDate, endDate).forEach{
-                var date = it.startDate ?: return@forEach
-                val end = it.endDate ?: return@forEach
-                if (date.isAfter(end)) return@forEach
-                while (date.isBefore(end) || (date == end)){
-                    daysWithStuffTmp[date] = daysWithStuffTmp[date]?.plus(it) ?: listOf(it)
-                    date = date.plusDays(1)
-                }
-            }
-            _daysWithStuff.postValue(daysWithStuffTmp)
+            _daysInPeriods.postValue(timeTableRepository.fetchTimeTableCalendar(startDate, endDate))
         }
     }
 

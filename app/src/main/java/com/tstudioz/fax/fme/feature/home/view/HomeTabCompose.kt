@@ -503,7 +503,7 @@ fun TimetableItem(event: Event) {
             .height(IntrinsicSize.Min),
     ) {
         VerticalDivider(
-            color = colorResource(id = event.colorId),
+            color = event.color,
             modifier = Modifier
                 .fillMaxHeight()
                 .width(20.dp),

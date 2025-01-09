@@ -42,4 +42,7 @@
     <color name="greenHighlight">#20d2bb</color>
     <color name="ic_launcher_background">#34434C</color>
 
+    //Timetable
+    <color name="eventCardBackground">#232323</color>
+
 </resources>

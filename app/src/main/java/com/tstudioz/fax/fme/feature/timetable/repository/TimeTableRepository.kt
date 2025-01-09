@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class TimeTableRepository(
     private val timetableService: TimetableServiceInterface,
@@ -57,7 +58,7 @@ class TimeTableRepository(
         }
     }
 
-    override suspend fun fetchTimeTableCalendar(startDate: String, endDate: String): List<TimeTableInfo> {
+    override suspend fun fetchTimeTableCalendar(startDate: String, endDate: String): MutableMap<LocalDate, TimeTableInfo> {
         val params: HashMap<String, String> = hashMapOf(
             "FromDate" to startDate,
             "ToDate" to endDate

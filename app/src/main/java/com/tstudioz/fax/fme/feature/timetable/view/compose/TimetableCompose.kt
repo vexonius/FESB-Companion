@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.timetable.view.compose
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,8 +13,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
@@ -44,11 +45,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -66,14 +64,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.jetbrains.annotations.Async.Schedule
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+
+private val HourFormatter = DateTimeFormatter.ofPattern("H")
+private val DayFormatter = DateTimeFormatter.ofPattern("d. ")
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
@@ -83,7 +82,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
     val shownWeekChooseMenu = timetableViewModel.shownWeekChooseMenu
     val lessonsToShow = timetableViewModel.events
     val shownWeek = timetableViewModel.mondayOfSelectedWeek
-    val daysWithStuff = timetableViewModel.daysWithStuff
+    val daysInPeriods = timetableViewModel.daysInPeriods.value ?: emptyMap()
     val monthData = timetableViewModel.monthData
     val fetchUserTimetable = { selectedDate: LocalDate -> timetableViewModel.fetchUserTimetable(selectedDate) }
     val showEvent = { it: Event -> timetableViewModel.showEvent(it) }
@@ -111,17 +110,16 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
         containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         sheetContent = {
-            event?.let {
+            if (event != null) {
                 ModalBottomSheet(
                     sheetState = sheetStateEvent,
                     onDismissRequest = { hideEvent() },
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                 ) {
-                    BottomInfoCompose(it)
+                    BottomSheetEventInfo(event)
                 }
-            }
-            if (shownWeekChooseMenu.observeAsState(initial = false).value) {
+            } else if (shownWeekChooseMenu.observeAsState(initial = false).value) {
                 ModalBottomSheet(
                     sheetState = sheetStateCalendar,
                     onDismissRequest = { showWeekChooseMenu(false) },
@@ -133,7 +131,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                     monthData.value?.let {
                         BottomSheetCalendar(
                             monthData = it,
-                            daysWithStuff = daysWithStuff.value ?: emptyMap(),
+                            daysInPeriods = daysInPeriods,
                             fetchUserTimetable = fetchUserTimetable,
                             coroutineScope = coroutineScope,
                             hideSheet = {
@@ -149,72 +147,31 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
         },
         sheetPeekHeight = 0.dp,
     ) {
-        val mapped = lessonsToShow.observeAsState(emptyList()).value.onEach {
-            it.color = colorResource(id = it.colorId)
-        }/*.plus(
-            Event(
-                name = "Test 1",
-                start = LocalDateTime.now().minusDays(3).minusHours(0),
-                end = LocalDateTime.now().plusHours(1).minusDays(3).minusHours(0),
-                classroom = " ",
-                color = Color.Transparent,
-                colorId = R.color.red_nice,
-                groups = " ",
-                professor = " ",
-                recurringUntil = " ",
-                id = "00",
-                shortName = "ww"
-            )).plus(
-            Event(
-                name = "Test 2",
-                start = LocalDateTime.now().minusDays(3).minusHours(0),
-                end = LocalDateTime.now().plusHours(2).minusDays(3).minusHours(0),
-                classroom = " ",
-                color = Color.Transparent,
-                colorId = R.color.red_nice,
-                groups = " ",
-                professor = " ",
-                recurringUntil = " ",
-                id = "01",
-                shortName = "ww"
-            )).plus(
-            Event(
-                name = "Test 3",
-                start = LocalDateTime.now().minusDays(3).minusHours(0),
-                end = LocalDateTime.now().plusHours(3).minusDays(3).minusHours(0),
-                classroom = " ",
-                color = Color.Transparent,
-                colorId = R.color.red_nice,
-                groups = " ",
-                professor = " ",
-                recurringUntil = " ",
-                id = "02",
-                shortName = "ww"
-            ),
-        )*/
+        val mapped = lessonsToShow.observeAsState(emptyList()).value
         val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
-        val eventBefore8AM = mapped.any { it.start.toLocalTime().isBefore(LocalTime.of(8, 0)) }
-        val eventAfter8PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(20, 0)) }
-        val eventAfter9PM = mapped.any { it.end.toLocalTime().isAfter(LocalTime.of(21, 0)) }
+        val eventBefore8AM = mapped.minByOrNull { it.start.toLocalTime() }
+        val eventExistsBefore8AM = eventBefore8AM?.start?.toLocalTime()?.isBefore(LocalTime.of(8, 0))
+        val eventAfter8PM = mapped.maxByOrNull { it.end.toLocalTime() }
+        val eventExistsAfter8PM = eventAfter8PM?.end?.toLocalTime()?.isAfter(LocalTime.of(20, 0))
+        val minTime = if (eventExistsBefore8AM == true) eventBefore8AM.start.toLocalTime() else LocalTime.of(8, 0)
+        val maxTime = if (eventExistsAfter8PM == true) eventAfter8PM.end.toLocalTime() else LocalTime.of(20, 0)
 
         Schedule(
             events = mapped,
             eventContent = { posEvent ->
-                BasicEventCustom(
+                EventCard(
                     positionedEvent = posEvent,
                     onClick = { showEvent(posEvent.event) }
                 )
             },
             dayHeader = { day ->
-                BasicDayHeaderCustom(day)
+                DayHeader(day)
             },
             timeLabel = { time ->
-                BasicSidebarLabelCustom(time)
+                SidebarLabel(time)
             },
-            minTime = if (eventBefore8AM) LocalTime.of(7, 0) else LocalTime.of(8, 0),
-            maxTime = if (eventAfter9PM) LocalTime.of(22, 0)
-            else if (eventAfter8PM) LocalTime.of(21, 0)
-            else LocalTime.of(20, 0),
+            minTime = minTime,
+            maxTime = maxTime,
             minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
             maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
             onClick = { showEvent(it) })
@@ -224,7 +181,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
 @Composable
 fun BottomSheetCalendar(
     monthData: MonthData,
-    daysWithStuff: Map<LocalDate, List<TimeTableInfo>>,
+    daysInPeriods: Map<LocalDate, TimeTableInfo>,
     fetchUserTimetable: (LocalDate) -> Unit,
     hideSheet: () -> Unit,
     coroutineScope: CoroutineScope,
@@ -263,7 +220,7 @@ fun BottomSheetCalendar(
             Day(
                 day,
                 isSelected = selection == day,
-                daysWithStuff = daysWithStuff
+                daysInPeriods = daysInPeriods
             ) { clicked ->
                 selection = clicked.takeUnless { it == selection }
             }
@@ -289,10 +246,8 @@ fun BottomSheetCalendar(
     }
 }
 
-private val HourFormatter = DateTimeFormatter.ofPattern("H")
-
 @Composable
-fun BasicSidebarLabelCustom(
+fun SidebarLabel(
     time: LocalTime,
     modifier: Modifier = Modifier,
 ) {
@@ -301,19 +256,20 @@ fun BasicSidebarLabelCustom(
         textAlign = TextAlign.End,
         fontSize = 12.sp,
         lineHeight = 12.sp,
-        modifier = modifier//.padding(vertical = 0.dp, horizontal = 8.dp)
-            .fillMaxHeight(),
+        modifier = modifier.fillMaxHeight(),
         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
     )
 
 }
 
-private val DayFormatter = DateTimeFormatter.ofPattern("d")
-
 @Composable
-fun BasicDayHeaderCustom(day: LocalDate) {
-    val dayOfWeek = day.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-        .take(3).lowercase().replaceFirstChar { it.uppercase() }
+fun DayHeader(day: LocalDate) {
+    val dayOfWeek = day
+        .dayOfWeek
+        .getDisplayName(TextStyle.SHORT, Locale.getDefault())
+        .take(3)
+        .lowercase()
+        .replaceFirstChar { it.uppercase() }
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier
@@ -321,7 +277,7 @@ fun BasicDayHeaderCustom(day: LocalDate) {
             .background(MaterialTheme.colorScheme.surface)
     ) {
         Text(
-            text = day.format(DayFormatter) + ". ",
+            text = day.format(DayFormatter),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
@@ -339,7 +295,7 @@ fun BasicDayHeaderCustom(day: LocalDate) {
 }
 
 @Composable
-fun BasicEventCustom(
+fun EventCard(
     positionedEvent: PositionedEvent,
     modifier: Modifier = Modifier,
     onClick: (Event) -> Unit = {}
@@ -350,11 +306,10 @@ fun BasicEventCustom(
     val bottomRadius =
         if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 8.dp
 
-
     Row(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal =  2.dp)
+            .padding(horizontal = 2.dp)
             .clipToBounds()
             .clip(
                 RoundedCornerShape(
@@ -364,7 +319,7 @@ fun BasicEventCustom(
                     bottomStart = bottomRadius,
                 )
             )
-            .background(Color(0xFF232323))
+            .background(colorResource(id = R.color.eventCardBackground))
             .clickable { onClick(positionedEvent.event) }
     ) {
 
@@ -403,39 +358,28 @@ fun BasicEventCustom(
     }
 }
 
-val orderOfPeriodColors = listOf(
-    "Narančasta",
-    "Plava",
-    "Yellow",
-    "Crvena",
-    "Ljubičasta",
-    "Zelena",
-    "Siva",
-    "Bijela",
-)
-
 
 @Composable
 fun Day(
     day: CalendarDay,
     isSelected: Boolean = false,
-    daysWithStuff: Map<LocalDate, List<TimeTableInfo>>,
+    daysInPeriods: Map<LocalDate, TimeTableInfo>,
     onClick: (CalendarDay) -> Unit = {},
 ) {
-    val inActiveTextColor = Color.DarkGray
+    val inactiveTextColor = Color.DarkGray
     val textColor = when (day.position) {
         DayPosition.MonthDate -> Color.Unspecified
-        DayPosition.InDate, DayPosition.OutDate -> inActiveTextColor
+        DayPosition.InDate, DayPosition.OutDate -> inactiveTextColor
     }
     val nextDay = day.date.plusDays(1)
     val prevDay = day.date.minusDays(1)
-    val inPeriods = daysWithStuff[day.date] ?: emptyList()
-    val rightPeriods = daysWithStuff[nextDay] ?: emptyList()
-    val leftPeriods = daysWithStuff[prevDay] ?: emptyList()
+    val inPeriod = daysInPeriods[day.date]
+    val leftPeriod = daysInPeriods[prevDay]
+    val rightPeriod = daysInPeriods[nextDay]
 
-    val dayColor = inPeriods.minByOrNull { orderOfPeriodColors.indexOf(it.category) }?.colorCode?.let { Color(it) }
-    val leftColor = leftPeriods.minByOrNull { orderOfPeriodColors.indexOf(it.category) }?.colorCode?.let { Color(it) }
-    val rightColor = rightPeriods.minByOrNull { orderOfPeriodColors.indexOf(it.category) }?.colorCode?.let { Color(it) }
+    val dayColor = inPeriod?.colorCode?.let { Color(it) }
+    val leftColor = leftPeriod?.colorCode?.let { Color(it) }
+    val rightColor = rightPeriod?.colorCode?.let { Color(it) }
     val sameColorOnLeft = leftColor == dayColor && day.date.dayOfWeek != DayOfWeek.MONDAY
     val sameColorOnRight = rightColor == dayColor && day.date.dayOfWeek != DayOfWeek.SUNDAY
     val borderShape = remember(sameColorOnLeft, sameColorOnRight) {

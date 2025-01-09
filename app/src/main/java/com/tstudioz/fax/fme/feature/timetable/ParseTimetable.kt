@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.timetable
 
+import androidx.compose.ui.graphics.toArgb
 import com.google.gson.GsonBuilder
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Recurring
@@ -52,7 +53,8 @@ suspend fun parseTimetable(body: String): List<Event> {
                     eventType = type,
                     groups = group,
                     classroom = room,
-                    colorId = type.color,
+                    colorId = type.color.toArgb(),
+                    color = type.color,
                     start = LocalDateTime.of(
                         LocalDate.parse(startdate),
                         LocalTime.of(starth, startmin)
@@ -99,13 +101,39 @@ suspend fun makeAcronym(name: String): String {
     return name
 }
 
+val orderOfPeriodColors = listOf(
+    "Bijela",
+    "Siva",
+    "Zelena",
+    "Ljubičasta",
+    "Crvena",
+    "Yellow",
+    "Plava",
+    "Narančasta",
+)
 
-suspend fun parseTimetableInfo(json: String): List<TimeTableInfo> {
+
+suspend fun parseTimetableInfo(json: String): MutableMap<LocalDate, TimeTableInfo> {
     val gson = GsonBuilder()
         .registerTypeAdapter(Long::class.java, ColorDeserializer())
         .registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
         .create()
-    return gson.fromJson(json, Array<TimeTableInfo>::class.java).toList()
+
+    val daysInPeriods: MutableMap<LocalDate, TimeTableInfo> = mutableMapOf()
+
+    gson.fromJson(json, Array<TimeTableInfo>::class.java)
+        .filter { it.startDate.isBefore(it.endDate.plusDays(1)) }
+        .forEach { period ->
+            var date = period.startDate
+            while (date.isBefore(period.endDate.plusDays(1))) {
+                val day = daysInPeriods[date]
+                if (day == null || (orderOfPeriodColors.indexOf(period.category) > orderOfPeriodColors.indexOf(day.category))) {
+                    daysInPeriods[date] = period
+                }
+                date = date.plusDays(1)
+            }
+        }
+    return daysInPeriods
 }
 
 private fun parseNumbersFromString(element: Element?): Recurring {

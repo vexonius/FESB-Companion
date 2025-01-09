@@ -126,7 +126,6 @@
     <string name="card_balance_label">Stanje iksice</string>
 
     //Timetable
-    //bottom sheet
     <string name="professor">Profesor</string>
     <string name="time">Vrijeme</string>
     <string name="recurring">Ponavlja se</string>
