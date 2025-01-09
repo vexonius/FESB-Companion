@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +20,6 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
@@ -44,6 +42,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +53,6 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.compose.CircularIndicator
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -61,6 +60,8 @@ import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -97,6 +98,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             Lifecycle.State.RESUMED -> {
                 iksicaViewModel.getReceipts()
             }
+
             else -> {}
         }
     }
@@ -122,17 +124,18 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     .zIndex(2f)
             )
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                when(viewState) {
+                when (viewState) {
                     is IksicaViewState.Initial, is IksicaViewState.Empty, is IksicaViewState.FetchingError -> {
                         item {
                             EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
                         }
                     }
+
                     is IksicaViewState.Success, is IksicaViewState.Fetching -> {
                         val model: StudentData = (viewState as? IksicaViewState.Success)?.data
                             ?: (viewState as? IksicaViewState.Fetching)?.data ?: return@LazyColumn
 
-                            item {
+                        item {
                             ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) {
                                 showPopup.value = true
                             }
@@ -144,12 +147,21 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             }
                         }
 
+                        item{
+                            Text(
+                                text = "Transakcije",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                modifier = Modifier.padding(16.dp, 12.dp))
+                        }
+
                         items(model.receipts) {
                             IksicaItem(it) {
                                 iksicaViewModel.getReceiptDetails(it)
                             }
                         }
                     }
+
                     else -> {}
                 }
             }
@@ -230,23 +242,39 @@ fun PopupBox(
 
 @Composable
 fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
-    Column {
-        HorizontalDivider()
-        ListItem(
-            modifier = Modifier.clickable(onClick = onClick),
-            headlineContent = { Text(receipt.restaurant, overflow = TextOverflow.Ellipsis) },
-            supportingContent = {
-                Text(receipt.dateString + " " + receipt.time + " ")
-            },
-            overlineContent = { Text(receipt.authorised) },
-            trailingContent = {
-                Text(
-                    text = receipt.paidAmount.toBigDecimal()
-                        .setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
-                    fontSize = 15.sp,
-                )
-            })
+    Column(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(16.dp, 5.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(receipt.restaurant.trim(), overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(0.80f))
+            Text(
+                text = "-"+ receipt.subsidizedAmount.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN).toString() + "€",
+                fontSize = 15.sp,
+                modifier = Modifier.weight(0.20f),
+                textAlign = TextAlign.End,
+            )
+        }
+        Row {
+            val today = LocalDate.now()
+            val daysAgo = ChronoUnit.DAYS.between(receipt.date, today)
+
+            val relativeText = when {
+                daysAgo == 0L -> "Danas"
+                daysAgo == 1L -> "Jučer"
+                daysAgo > 1L && daysAgo % 10 == 1L && daysAgo % 100 != 11L-> "Prije $daysAgo dan"
+                daysAgo > 1L -> "Prije $daysAgo dana"
+                else -> "U budućnosti"
+            }
+            Text(relativeText + " " + receipt.time + " ", color = Color(0xFFCCCCCC))
+        }
     }
+    HorizontalDivider(Modifier.padding(horizontal = 10.dp))
+
 }
 
 fun Modifier.angledGradientBackground(

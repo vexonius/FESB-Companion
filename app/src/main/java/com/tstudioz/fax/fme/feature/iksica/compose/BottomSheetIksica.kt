@@ -12,23 +12,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
 import java.math.RoundingMode
@@ -46,6 +41,7 @@ fun BottomSheetIksica(
         onDismissRequest = { toggleShowItem() },
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
+        dragHandle = {},
     ) {
         IksicaReceiptDetailed(receipt)
     }
@@ -55,15 +51,23 @@ fun BottomSheetIksica(
 fun IksicaReceiptDetailed(
     receipt: Receipt?
 ) {
-    LazyColumn {
+    LazyColumn(
+        Modifier.background(MaterialTheme.colorScheme.background)
+    ) {
         item {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.Start,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp, 0.dp, 20.dp, 10.dp)
+                    .padding(20.dp, 20.dp, 20.dp, 10.dp)
             ) {
-                Text(text = receipt?.restaurant ?: "", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = "Detalji transakcije",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 10.dp)
+                )
+                Text(text = receipt?.restaurant ?: "", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Text(text = (receipt?.dateString ?: "") + ", " + (receipt?.time ?: ""), fontSize = 15.sp)
             }
         }
@@ -72,34 +76,39 @@ fun IksicaReceiptDetailed(
         }
         item {
             Spacer(modifier = Modifier.height(10.dp))
+
             Column(
-                Modifier
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier
                     .padding(20.dp, 10.dp, 20.dp, 10.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(MaterialTheme.colorScheme.background)
+                    .fillMaxWidth()
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(15.dp)
-                ) {
-                    Text(text = "Ukupno plaćeno: ", fontSize = 18.sp)
-                    Text(
-                        text = receipt?.paidAmount?.toBigDecimal()
-                            ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €", fontSize = 18.sp
-                    )
-                }
-                HorizontalDivider()
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(15.dp)
-                ) {
-                    Text(text = "Ukupno subvencionirano: ", fontSize = 18.sp)
-                    Text(text = receipt?.subsidizedAmount.toString() + " €", fontSize = 18.sp)
+                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(text = "Ukupno ", fontSize = 16.sp)
+                        Text(text = "Subvencionirano ", fontSize = 16.sp)
+                        Text(text = "Plaćeno ", fontSize = 16.sp)
+                    }
+                    Column {
+                        Text(
+                            text = receipt?.receiptAmount?.toBigDecimal()
+                                ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = receipt?.subsidizedAmount?.toBigDecimal()
+                                ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = receipt?.paidAmount?.toBigDecimal()
+                                ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
@@ -108,39 +117,47 @@ fun IksicaReceiptDetailed(
 fun IksicaItemDetailed(
     item: ReceiptItem
 ) {
+
     Row(
         Modifier
-            .background(MaterialTheme.colorScheme.background)
             .fillMaxWidth()
-            .padding(15.dp, 10.dp, 15.dp, 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
+            .padding(20.dp, 5.dp, 15.dp, 5.dp)
     ) {
-        Column(Modifier.weight(0.85f)) {
-            Row(Modifier.padding(bottom = 5.dp)) {
-                Text(text = item.amount.toString() + "x", fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(text = item.articleName, fontWeight = FontWeight.Bold)
-            }
-            Text(
-                text = "Cijena: " + item.price.toString() + " €",
-                color = MaterialTheme.colorScheme.outline
-            )
-            Text(
-                text = "Subvencija: " + item.subsidizedAmount.toString() + " €",
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
+
+        Text(text = item.amount.toString() + "x", fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.width(6.dp))
         Column(
-            Modifier.padding(start = 15.dp)
+            Modifier
+                .fillMaxWidth()
         ) {
-            Text(
-                text = item.total.toBigDecimal().minus(item.subsidizedAmount.toBigDecimal())
-                    .times(item.amount.toBigDecimal()).toString() + " €"
-            )
+
+            Row(
+                Modifier
+                    .padding(bottom = 5.dp)
+                    .fillMaxWidth()
+            ) {
+                Row(modifier = Modifier.weight(0.7f)) {
+                    Text(text = item.articleName, fontWeight = FontWeight.Bold)
+                }
+                Text(
+                    text = item.total.toBigDecimal().minus(item.subsidizedAmount.toBigDecimal())
+                        .times(item.amount.toBigDecimal()).toString() + " €", modifier = Modifier
+                        .weight(0.20f)
+                        .padding(start = 10.dp)
+                )
+            }
+            Row {
+                Text(
+                    text = "Cijena: " + item.price.toString() + " €",
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    text = "  Subvencija: " + item.subsidizedAmount.toString() + " €",
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
         }
     }
-    HorizontalDivider()
 }
 
 @Preview
