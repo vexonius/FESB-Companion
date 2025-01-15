@@ -23,7 +23,11 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
@@ -42,7 +46,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @Composable
 fun LoginCompose(loginViewModel: LoginViewModel) {
 
-    //var passwordVisibility by remember { mutableStateOf(false) }
+    val passwordVisibility by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Scaffold(
@@ -80,47 +84,7 @@ fun LoginCompose(loginViewModel: LoginViewModel) {
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                Column {
-                    OutlinedTextField(
-                        value = loginViewModel.username.observeAsState().value ?: "",
-                        onValueChange = { loginViewModel.username.value = it },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(id = R.color.login_button),
-                            focusedLabelColor = colorResource(id = R.color.login_button),
-                            cursorColor = colorResource(id = R.color.login_button),
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        label = { Text(text = stringResource(id = R.string.login_email_or_username)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = loginViewModel.password.observeAsState().value ?: "",
-                        onValueChange = { loginViewModel.password.value = it },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(id = R.color.login_button),
-                            focusedLabelColor = colorResource(id = R.color.login_button),
-                            cursorColor = colorResource(id = R.color.login_button),
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        label = { Text(text = stringResource(id = R.string.login_password)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        visualTransformation =/* if (passwordVisibility) VisualTransformation.None else */PasswordVisualTransformation(),
-                        /* trailingIcon = {
-                             IconButton(onClick = {
-                                 passwordVisibility = !passwordVisibility
-                             }) {
-                                 Icon(
-                                     painter = icon,
-                                     contentDescription = "Visibility Icon",
-                                     modifier = Modifier.padding(7.dp)
-                                 )
-                             }
-                         },*/
-                    )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
+                TextFields(loginViewModel)//, passwordVisibility)
                 Box(
                     modifier = Modifier
                         .align(Alignment.End)
@@ -152,5 +116,49 @@ fun LoginCompose(loginViewModel: LoginViewModel) {
                 Spacer(modifier = Modifier.height(70.dp))
             }
         }
+    }
+}
+
+@OptIn(InternalCoroutinesApi::class)
+@Composable
+fun TextFields(loginViewModel: LoginViewModel/*, passwordVisibility: Boolean*/){
+    Column (Modifier.padding(0.dp, 16.dp, 0.dp, 8.dp)) {
+        OutlinedTextField(
+            value = loginViewModel.username.observeAsState().value ?: "",
+            onValueChange = { loginViewModel.username.value = it },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = colorResource(id = R.color.login_button),
+                focusedLabelColor = colorResource(id = R.color.login_button),
+                cursorColor = colorResource(id = R.color.login_button),
+            ),
+            shape = RoundedCornerShape(10.dp),
+            label = { Text(text = stringResource(id = R.string.login_email_or_username)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = loginViewModel.password.observeAsState().value ?: "",
+            onValueChange = { loginViewModel.password.value = it },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = colorResource(id = R.color.login_button),
+                focusedLabelColor = colorResource(id = R.color.login_button),
+                cursorColor = colorResource(id = R.color.login_button),
+            ),
+            shape = RoundedCornerShape(10.dp),
+            label = { Text(text = stringResource(id = R.string.login_password)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation =/* if (passwordVisibility) VisualTransformation.None else */PasswordVisualTransformation(),
+            /* trailingIcon = {
+                 IconButton(onClick = {
+                     passwordVisibility = !passwordVisibility
+                 }) {
+                     Icon(
+                         painter = icon,
+                         contentDescription = "Visibility Icon",
+                         modifier = Modifier.padding(7.dp)
+                     )
+                 }
+             },*/
+        )
     }
 }

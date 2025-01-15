@@ -30,7 +30,7 @@ class LoginViewModel(
     val showLoading = MutableLiveData(false)
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
 
-    private var firstTimeInApp = MutableLiveData(false)
+    var firstTimeInApp = MutableLiveData(false)
         private set
 
     var loggedIn = SingleLiveEvent<Unit>()
