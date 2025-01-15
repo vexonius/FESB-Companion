@@ -58,7 +58,7 @@ class TimeTableRepository(
         }
     }
 
-    override suspend fun fetchTimeTableCalendar(startDate: String, endDate: String): MutableMap<LocalDate, TimeTableInfo> {
+    override suspend fun fetchTimeTableCalendar(startDate: String, endDate: String): Map<LocalDate, TimeTableInfo> {
         val params: HashMap<String, String> = hashMapOf(
             "FromDate" to startDate,
             "ToDate" to endDate

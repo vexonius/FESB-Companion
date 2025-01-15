@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.timetable.view.compose
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
@@ -79,7 +77,7 @@ private val DayFormatter = DateTimeFormatter.ofPattern("d. ")
 fun TimetableCompose(timetableViewModel: TimetableViewModel) {
 
     val showDayEvent = timetableViewModel.currentEventShown
-    val shownWeekChooseMenu = timetableViewModel.shownWeekChooseMenu
+    val shownWeekChooseMenu = timetableViewModel.shownWeekChooseMenu.observeAsState(initial = false).value
     val lessonsToShow = timetableViewModel.events
     val shownWeek = timetableViewModel.mondayOfSelectedWeek
     val daysInPeriods = timetableViewModel.daysInPeriods.value ?: emptyMap()
@@ -117,9 +115,9 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                     windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                 ) {
-                    BottomSheetEventInfo(event)
+                    EventBottomSheet(event)
                 }
-            } else if (shownWeekChooseMenu.observeAsState(initial = false).value) {
+            } else if (shownWeekChooseMenu) {
                 ModalBottomSheet(
                     sheetState = sheetStateCalendar,
                     onDismissRequest = { showWeekChooseMenu(false) },

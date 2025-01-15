@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,7 +21,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 
 @Composable
-fun BottomSheetEventInfo(event: Event) {
+fun EventBottomSheet(event: Event) {
     Column(
         Modifier
             .background(MaterialTheme.colorScheme.surface)

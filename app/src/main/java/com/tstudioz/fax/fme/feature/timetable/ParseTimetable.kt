@@ -101,19 +101,18 @@ suspend fun makeAcronym(name: String): String {
     return name
 }
 
-val orderOfPeriodColors = listOf(
-    "Bijela",
-    "Siva",
-    "Zelena",
-    "Ljubičasta",
-    "Crvena",
-    "Yellow",
-    "Plava",
-    "Narančasta",
+val periodColors = mapOf(
+    "Bijela" to 1,
+    "Siva" to 2,
+    "Zelena" to 3,
+    "Ljubičasta" to 4,
+    "Crvena" to 5,
+    "Yellow" to 6,
+    "Plava" to 7,
+    "Narančasta" to 8,
 )
 
-
-suspend fun parseTimetableInfo(json: String): MutableMap<LocalDate, TimeTableInfo> {
+suspend fun parseTimetableInfo(json: String): Map<LocalDate, TimeTableInfo> {
     val gson = GsonBuilder()
         .registerTypeAdapter(Long::class.java, ColorDeserializer())
         .registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
@@ -127,13 +126,16 @@ suspend fun parseTimetableInfo(json: String): MutableMap<LocalDate, TimeTableInf
             var date = period.startDate
             while (date.isBefore(period.endDate.plusDays(1))) {
                 val day = daysInPeriods[date]
-                if (day == null || (orderOfPeriodColors.indexOf(period.category) > orderOfPeriodColors.indexOf(day.category))) {
+                val savedColorImportance = periodColors.getOrDefault(day?.category, 0)
+                val checkingColorImportance = periodColors.getOrDefault(period.category, 0)
+                val isMoreImportant = checkingColorImportance > savedColorImportance
+                if (day == null || isMoreImportant) {
                     daysInPeriods[date] = period
                 }
                 date = date.plusDays(1)
             }
         }
-    return daysInPeriods
+    return daysInPeriods.toMap()
 }
 
 private fun parseNumbersFromString(element: Element?): Recurring {

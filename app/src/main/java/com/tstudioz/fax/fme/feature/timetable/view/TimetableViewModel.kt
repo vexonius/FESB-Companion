@@ -40,8 +40,8 @@ class TimetableViewModel(
     private var _events = MutableLiveData(timeTableRepository.events.asLiveData().value ?: emptyList())
     var events: LiveData<List<Event>> = _events
 
-    private val _daysInPeriods = MutableLiveData<MutableMap<LocalDate, TimeTableInfo>>(mutableMapOf())
-    val daysInPeriods: LiveData<MutableMap<LocalDate, TimeTableInfo>> = _daysInPeriods
+    private val _daysInPeriods = MutableLiveData<Map<LocalDate, TimeTableInfo>>(mutableMapOf())
+    val daysInPeriods: LiveData<Map<LocalDate, TimeTableInfo>> = _daysInPeriods
 
     private val _mondayOfSelectedWeek: MutableLiveData<LocalDate> = MutableLiveData<LocalDate>(
         LocalDate.now().let { it.minusDays((it.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()) })
