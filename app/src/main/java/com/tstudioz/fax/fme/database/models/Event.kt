@@ -101,14 +101,27 @@ fun fromRealmObject(eventRealm: EventRealm): Event {
     )
 }
 
-enum class TimetableType(val type: String, val color: Color) {
-    PREDAVANJE("Predavanje", blueNice),
-    AUDITORNA_VJEZBA("Auditorna vježba", greenNice),
-    KOLOKVIJ("Kolokvij", purpleNice),
-    LABORATORIJSKA_VJEZBA("Laboratorijska vježba", redNice),
-    KONSTRUKCIJSKA_VJEZBA("Konstrukcijska vježba", greyNice),
-    SEMINAR("Seminar", blueNice),
-    ISPIT("Ispit", purpleNice),
-    OTHER("Other", blueNice)
+enum class TimetableType(val value: String) {
+    PREDAVANJE("Predavanja"),
+    AUDITORNA_VJEZBA("Auditorne vježbe"),
+    KOLOKVIJ("Kolokviji"),
+    LABORATORIJSKA_VJEZBA("Laboratorijske vježbe"),
+    KONSTRUKCIJSKA_VJEZBA("Konstrukcijske vježbe"),
+    SEMINAR("Seminari"),
+    ISPIT("Ispiti"),
+    OTHER("Other")
+}
+
+fun TimetableType.color(): Color {
+    return when (this) {
+        TimetableType.PREDAVANJE -> blueNice
+        TimetableType.AUDITORNA_VJEZBA -> greenNice
+        TimetableType.KOLOKVIJ -> purpleNice
+        TimetableType.LABORATORIJSKA_VJEZBA -> redNice
+        TimetableType.KONSTRUKCIJSKA_VJEZBA -> greyNice
+        TimetableType.SEMINAR -> blueNice
+        TimetableType.ISPIT -> purpleNice
+        TimetableType.OTHER -> blueNice
+    }
 }
 

@@ -518,7 +518,7 @@ fun TimetableItem(event: Event) {
             val formatter = DateTimeFormatter.ofPattern("HH:mm")
             val range = event.start.format(formatter) + " - " + event.end.format(formatter)
             Row {
-                Text(text = "$range ∙ ${event.eventType.type} ∙ ${event.classroom}", fontSize = 13.sp)
+                Text(text = "$range ∙ ${event.eventType.value} ∙ ${event.classroom}", fontSize = 13.sp)
             }
         }
     }

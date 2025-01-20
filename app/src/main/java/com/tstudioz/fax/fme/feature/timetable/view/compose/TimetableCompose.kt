@@ -57,6 +57,7 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.MonthData
+import com.tstudioz.fax.fme.feature.timetable.utils.TimetableDateFormatter
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,9 +69,6 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-
-private val HourFormatter = DateTimeFormatter.ofPattern("H")
-private val DayFormatter = DateTimeFormatter.ofPattern("d. ")
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
@@ -250,7 +248,7 @@ fun SidebarLabel(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = time.format(HourFormatter),
+        text = time.format(TimetableDateFormatter.hourFormatter),
         textAlign = TextAlign.End,
         fontSize = 12.sp,
         lineHeight = 12.sp,
@@ -275,7 +273,7 @@ fun DayHeader(day: LocalDate) {
             .background(MaterialTheme.colorScheme.surface)
     ) {
         Text(
-            text = day.format(DayFormatter),
+            text = day.format(TimetableDateFormatter.dayFormatter),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,

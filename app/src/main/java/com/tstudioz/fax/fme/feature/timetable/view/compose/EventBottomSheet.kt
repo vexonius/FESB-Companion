@@ -40,7 +40,7 @@ fun EventBottomSheet(event: Event) {
             val radius = 8.dp
             Canvas(modifier = Modifier.size(radius * 2)) { drawCircle(color = event.color, radius = radius.toPx()) }
             Spacer(modifier = Modifier.size(10.dp))
-            Text(text = event.eventType.type, style = MaterialTheme.typography.titleMedium)
+            Text(text = event.eventType.value, style = MaterialTheme.typography.titleMedium)
         }
         val modifier = Modifier.padding(bottom = 10.dp)
         Column(Modifier.fillMaxWidth()) {
