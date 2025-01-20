@@ -91,7 +91,7 @@ fun makeAcronym(name: String): String {
 
     return name
 }
-
+// TODO: Improve sometime in the future
 val periodColors = mapOf(
     "Bijela" to 1,
     "Siva" to 2,
@@ -103,6 +103,7 @@ val periodColors = mapOf(
     "Narančasta" to 8,
 )
 
+// TODO: Improve parsing or replace with API in the future
 fun parseTimetableInfo(json: String): Map<LocalDate, TimeTableInfo> {
     val gson = GsonBuilder()
         .registerTypeAdapter(Long::class.java, ColorDeserializer())
