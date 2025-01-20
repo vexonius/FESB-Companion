@@ -31,7 +31,7 @@ fun parseTimetable(body: String): List<Event> {
             val enddate = e.attr("data-endsdate").toString()
             val endh = e.attr("data-endshour").toInt()
             val endmin = e.attr("data-endsmin").toInt()
-            val type = editType(e.selectFirst("span.groupCategory")?.text()?.split(",")?.get(0) ?: "")
+            val type = setType(e.selectFirst("span.groupCategory")?.text()?.split(",")?.get(0) ?: "")
             val name = e.selectFirst("span.name.normal")?.text()
                 ?: e.selectFirst("div.popup > div.eventContent > div.header > div > span.title")?.text()
                 ?: ""
@@ -77,13 +77,8 @@ fun parseTimetable(body: String): List<Event> {
     return events
 }
 
-private fun editType(type: String): TimetableType {
-    return try {
-        TimetableType.valueOf(type)
-    } catch (e: IllegalArgumentException) {
-        TimetableType.OTHER
-    }
-}
+private fun setType(typeValue: String): TimetableType = TimetableType
+    .entries.firstOrNull { it.value == typeValue } ?: TimetableType.OTHER
 
 fun makeAcronym(name: String): String {
     val acronym = StringBuilder()
