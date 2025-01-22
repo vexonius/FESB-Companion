@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -23,21 +26,25 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.login.view.LoginViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -46,8 +53,14 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @Composable
 fun LoginCompose(loginViewModel: LoginViewModel) {
 
-    val passwordVisibility by remember { mutableStateOf(false) }
+    val passwordVisibility = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val showLoading = loginViewModel.showLoading.observeAsState().value
+
+    fun onDone() {
+        keyboardController?.hide()
+        loginViewModel.tryUserLogin()
+    }
 
     Scaffold(
         Modifier.fillMaxSize(),
@@ -84,13 +97,19 @@ fun LoginCompose(loginViewModel: LoginViewModel) {
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold
                 )
-                TextFields(loginViewModel)//, passwordVisibility)
+                TextFields(
+                    loginViewModel.username,
+                    loginViewModel.password,
+                    passwordVisibility,
+                    keyboardController,
+                    onDone = ::onDone
+                )
                 Box(
                     modifier = Modifier
                         .align(Alignment.End)
                         .height(40.dp)
                 ) {
-                    if (loginViewModel.showLoading.observeAsState().value == true) {
+                    if (showLoading == true) {
                         CircularProgressIndicator(
                             modifier = Modifier
                                 .width(40.dp)
@@ -100,10 +119,7 @@ fun LoginCompose(loginViewModel: LoginViewModel) {
                         )
                     } else {
                         Button(
-                            onClick = {
-                                keyboardController?.hide()
-                                loginViewModel.tryUserLogin()
-                            },
+                            onClick = ::onDone,
                             colors = ButtonDefaults.buttonColors(colorResource(id = R.color.login_button)),
                         ) {
                             Text(
@@ -119,46 +135,48 @@ fun LoginCompose(loginViewModel: LoginViewModel) {
     }
 }
 
-@OptIn(InternalCoroutinesApi::class)
 @Composable
-fun TextFields(loginViewModel: LoginViewModel/*, passwordVisibility: Boolean*/){
-    Column (Modifier.padding(0.dp, 16.dp, 0.dp, 8.dp)) {
+fun TextFields(
+    username: MutableLiveData<String>,
+    password: MutableLiveData<String>,
+    passwordVisibility: MutableState<Boolean>,
+    keyboardController: SoftwareKeyboardController?,
+    onDone: () -> Unit
+) {
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = colorResource(id = R.color.login_button),
+        focusedLabelColor = colorResource(id = R.color.login_button),
+        cursorColor = colorResource(id = R.color.login_button),
+    )
+    val textFieldShape = RoundedCornerShape(10.dp)
+    Column(Modifier.padding(0.dp, 16.dp, 0.dp, 8.dp)) {
         OutlinedTextField(
-            value = loginViewModel.username.observeAsState().value ?: "",
-            onValueChange = { loginViewModel.username.value = it },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(id = R.color.login_button),
-                focusedLabelColor = colorResource(id = R.color.login_button),
-                cursorColor = colorResource(id = R.color.login_button),
-            ),
-            shape = RoundedCornerShape(10.dp),
+            value = username.observeAsState().value ?: "",
+            onValueChange = { username.value = it },
+            colors = textFieldColors,
+            shape = textFieldShape,
             label = { Text(text = stringResource(id = R.string.login_email_or_username)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
-            value = loginViewModel.password.observeAsState().value ?: "",
-            onValueChange = { loginViewModel.password.value = it },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(id = R.color.login_button),
-                focusedLabelColor = colorResource(id = R.color.login_button),
-                cursorColor = colorResource(id = R.color.login_button),
-            ),
-            shape = RoundedCornerShape(10.dp),
+            value = password.observeAsState().value ?: "",
+            onValueChange = { password.value = it },
+            colors = textFieldColors,
+            shape = textFieldShape,
             label = { Text(text = stringResource(id = R.string.login_password)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation =/* if (passwordVisibility) VisualTransformation.None else */PasswordVisualTransformation(),
-            /* trailingIcon = {
-                 IconButton(onClick = {
-                     passwordVisibility = !passwordVisibility
-                 }) {
-                     Icon(
-                         painter = icon,
-                         contentDescription = "Visibility Icon",
-                         modifier = Modifier.padding(7.dp)
-                     )
-                 }
-             },*/
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions( onDone = { onDone() }),
+            visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisibility.value = !passwordVisibility.value }) {
+                    Icon(
+                        painter = painterResource(R.drawable.visibility),
+                        contentDescription = "Visibility Icon",
+                        modifier = Modifier.padding(7.dp)
+                    )
+                }
+            },
         )
     }
 }
