@@ -3,8 +3,11 @@ package com.tstudioz.fax.fme.feature.login.compose
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -24,9 +27,9 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,29 +45,71 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.feature.login.view.LoginViewModel
-import kotlinx.coroutines.InternalCoroutinesApi
+import com.tstudioz.fax.fme.feature.login.models.TextFieldModel
 
-@OptIn(InternalCoroutinesApi::class)
 @Composable
-fun LoginCompose(loginViewModel: LoginViewModel) {
+fun LoginCompose(
+    showLoading: MutableLiveData<Boolean>,
+    snackbarHostState: SnackbarHostState,
+    username: MutableLiveData<String>,
+    password: MutableLiveData<String>,
+    tryUserLogin: () -> Unit
+) {
 
-    val passwordVisibility = remember { mutableStateOf(false) }
+    val passwordHidden = remember { mutableStateOf(true) }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val showLoading = loginViewModel.showLoading.observeAsState().value
+    val showLoadingObserved = showLoading.observeAsState().value
 
     fun onDone() {
         keyboardController?.hide()
-        loginViewModel.tryUserLogin()
+        tryUserLogin()
     }
+
+    val usernameModel = TextFieldModel(
+        username,
+        stringResource(id = R.string.login_email_or_username),
+        KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+        KeyboardActions(onDone = { onDone() }),
+        null,
+        null,
+        ::onDone
+    )
+    val passwordModel = TextFieldModel(
+        password,
+        stringResource(id = R.string.login_password),
+        KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+        KeyboardActions(onDone = { onDone() }),
+        passwordHidden,
+        {
+            if (passwordHidden.value) {
+                IconButton(onClick = { passwordHidden.value = !passwordHidden.value }) {
+                    Icon(
+                        painter = painterResource(R.drawable.visibility_show),
+                        contentDescription = "Visibility Icon",
+                        modifier = Modifier.padding(7.dp)
+                    )
+                }
+            } else {
+                IconButton(onClick = { passwordHidden.value = !passwordHidden.value }) {
+                    Icon(
+                        painter = painterResource(R.drawable.visibility_hide),
+                        contentDescription = "Visibility Off Icon",
+                        modifier = Modifier.padding(7.dp)
+                    )
+                }
+            }
+        },
+        ::onDone
+    )
 
     Scaffold(
         Modifier.fillMaxSize(),
         snackbarHost = {
-            SnackbarHost(hostState = loginViewModel.snackbarHostState) {
+            SnackbarHost(hostState = snackbarHostState) {
                 Snackbar(
                     it,
                     containerColor = colorResource(id = R.color.login_error_color_container),
@@ -76,107 +120,104 @@ fun LoginCompose(loginViewModel: LoginViewModel) {
         },
     ) { contentPadding ->
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
+                .padding(40.dp, 16.dp, 40.dp, 8.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Column(
-                horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = stringResource(id = R.string.login_login_title),
-                    style = MaterialTheme.typography.displaySmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = stringResource(id = R.string.login_safe_data),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold
-                )
-                TextFields(
-                    loginViewModel.username,
-                    loginViewModel.password,
-                    passwordVisibility,
-                    keyboardController,
-                    onDone = ::onDone
-                )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .height(40.dp)
-                ) {
-                    if (showLoading == true) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .width(40.dp)
-                                .padding(10.dp),
-                            strokeWidth = 4.dp,
-                            strokeCap = StrokeCap.Round
-                        )
-                    } else {
-                        Button(
-                            onClick = ::onDone,
-                            colors = ButtonDefaults.buttonColors(colorResource(id = R.color.login_button)),
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.login_action_submit),
-                                color = colorResource(id = R.color.white)
-                            )
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(70.dp))
-            }
+            Spacer(modifier = Modifier.height(128.dp))
+            Text(
+                text = stringResource(id = R.string.login_login_title),
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(id = R.string.login_safe_data),
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+            CustomTextField(usernameModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            CustomTextField(passwordModel)
+            Spacer(modifier = Modifier.height(24.dp))
+            ButtonCircularLoading(showLoadingObserved, ::onDone)
+            Spacer(modifier = Modifier.height(64.dp))
+
         }
     }
 }
 
+@Preview
 @Composable
-fun TextFields(
-    username: MutableLiveData<String>,
-    password: MutableLiveData<String>,
-    passwordVisibility: MutableState<Boolean>,
-    keyboardController: SoftwareKeyboardController?,
-    onDone: () -> Unit
-) {
+fun LoginComposePreview() {
+    LoginCompose(MutableLiveData(false), SnackbarHostState(), MutableLiveData(""), MutableLiveData(""), {})
+}
+
+@Composable
+fun CustomTextField(textFieldModel: TextFieldModel) {
     val textFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = colorResource(id = R.color.login_button),
         focusedLabelColor = colorResource(id = R.color.login_button),
         cursorColor = colorResource(id = R.color.login_button),
     )
     val textFieldShape = RoundedCornerShape(10.dp)
-    Column(Modifier.padding(0.dp, 16.dp, 0.dp, 8.dp)) {
-        OutlinedTextField(
-            value = username.observeAsState().value ?: "",
-            onValueChange = { username.value = it },
-            colors = textFieldColors,
-            shape = textFieldShape,
-            label = { Text(text = stringResource(id = R.string.login_email_or_username)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = password.observeAsState().value ?: "",
-            onValueChange = { password.value = it },
-            colors = textFieldColors,
-            shape = textFieldShape,
-            label = { Text(text = stringResource(id = R.string.login_password)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions( onDone = { onDone() }),
-            visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(onClick = { passwordVisibility.value = !passwordVisibility.value }) {
-                    Icon(
-                        painter = painterResource(R.drawable.visibility),
-                        contentDescription = "Visibility Icon",
-                        modifier = Modifier.padding(7.dp)
+
+    OutlinedTextField(
+        value = textFieldModel.text.observeAsState().value ?: "",
+        onValueChange = { textFieldModel.text.value = it },
+        colors = textFieldColors,
+        shape = textFieldShape,
+        label = { Text(text = textFieldModel.label) },
+        keyboardOptions = textFieldModel.keyboardOptions,
+        keyboardActions = textFieldModel.keyboardActions,
+        visualTransformation = if (textFieldModel.textHidden?.value == true) PasswordVisualTransformation() else VisualTransformation.None,
+        trailingIcon = textFieldModel.trailingIcon,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+
+@Composable
+fun ButtonCircularLoading(
+    showLoadingObserved: Boolean?, onDone: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.End
+    ) {
+        Box(
+            Modifier
+                .height(40.dp)
+                .width(120.dp)
+                .align(Alignment.CenterVertically)
+        ) {
+            if (showLoadingObserved == true) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .width(35.dp)
+                        .padding(5.dp)
+                        .align(Alignment.Center),
+                    strokeWidth = 4.dp,
+                    strokeCap = StrokeCap.Round
+                )
+            } else {
+                Button(
+                    onClick = onDone,
+                    colors = ButtonDefaults.buttonColors(colorResource(id = R.color.login_button)),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.login_action_submit),
+                        color = colorResource(id = R.color.white)
                     )
                 }
-            },
-        )
+            }
+        }
     }
 }

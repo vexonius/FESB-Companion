@@ -26,15 +26,23 @@ class LoginActivity : AppCompatActivity() {
         isUserLoggedIn()
         onBackListen()
         setContent {
-            AppTheme { LoginCompose(loginViewModel) }
+            AppTheme {
+                LoginCompose(
+                    showLoading = loginViewModel.showLoading,
+                    snackbarHostState = loginViewModel.snackbarHostState,
+                    username = loginViewModel.username,
+                    password = loginViewModel.password,
+                    tryUserLogin = { loginViewModel.tryUserLogin() }
+                )
+            }
         }
 
         loginViewModel.checkIfFirstTimeInApp()
         loginViewModel.checkIfLoggedIn()
     }
 
-    private fun onBackListen(){
-        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
+    private fun onBackListen() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val a = Intent(Intent.ACTION_MAIN)
                 a.addCategory(Intent.CATEGORY_HOME)
