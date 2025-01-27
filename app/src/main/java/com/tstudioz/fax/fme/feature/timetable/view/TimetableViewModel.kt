@@ -11,6 +11,7 @@ import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
+import com.tstudioz.fax.fme.feature.timetable.MonthData
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.networking.NetworkUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -18,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -40,8 +40,8 @@ class TimetableViewModel(
     private var _events = MutableLiveData(timeTableRepository.events.asLiveData().value ?: emptyList())
     var events: LiveData<List<Event>> = _events
 
-    private val _periods = MutableLiveData<List<TimeTableInfo>>(emptyList())
-    val periods: LiveData<List<TimeTableInfo>> = _periods
+    private val _daysInPeriods = MutableLiveData<Map<LocalDate, TimeTableInfo>>(mutableMapOf())
+    val daysInPeriods: LiveData<Map<LocalDate, TimeTableInfo>> = _daysInPeriods
 
     private val _mondayOfSelectedWeek: MutableLiveData<LocalDate> = MutableLiveData<LocalDate>(
         LocalDate.now().let { it.minusDays((it.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()) })
@@ -117,8 +117,7 @@ class TimetableViewModel(
         endDate: String = (LocalDate.now().year + 1).toString() + "-8-1"
     ) {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            val result = timeTableRepository.fetchTimeTableCalendar(startDate, endDate)
-            _periods.postValue(result)
+            _daysInPeriods.postValue(timeTableRepository.fetchTimeTableCalendar(startDate, endDate))
         }
     }
 
