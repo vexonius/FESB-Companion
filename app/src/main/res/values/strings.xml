@@ -4,7 +4,7 @@
     <string name="todaysEvents">DANAŠNJA PREDAVANJA</string>
     <string name="prehrana">PREHRANA</string>
 
-    //tabs
+    // tabs
     <string name="tab_iksica">Iksica</string>
     <string name="tab_attendance">Prisutnost</string>
     <string name="tab_home">Home</string>
@@ -65,11 +65,11 @@
     <string name="attendance_offline">Niste povezani</string>
     <string name="attendance_retry">Ponovi</string>
 
-    //Attendance misc
+    // Attendance misc
 
     <string name="attendance_required">Obavezno %1$s</string>
 
-    //Studomat subject texts
+    // Studomat subject texts
 
     <string name="elective_group">Izborna grupa:</string>
     <string name="semester">Semestar:</string>
@@ -87,12 +87,12 @@
     <string name="weather_precip_chance">%1$.1f mm</string>
     <string name="weather_wind">%1$.1f km/h</string>
 
-    //Menza
+    // Menza
     <string name="meni_price">%1$s €</string>
     <string name="meals_by_choice">JELA PO IZBORU</string>
     <string name="menza_no_data">Nije postavljen jelovnik za današnji dan.</string>
 
-    //Settings
+    // Settings
     <string name="category_user">KORISNIK</string>
     <string name="logout">Odjava</string>
     <string name="logged_in_as">Prijavljeni ste kao %1$s</string>
@@ -111,7 +111,7 @@
     <string name="library_licenses">Licence korištenih biblioteka</string>
     <string name="send_mail_using">Pošalji email pomoću...</string>
 
-    //Iksica
+    // Iksica
     <string name="iksica_no_data">Nema podataka</string>
     <string name="iksica_loading">Učitavanje…</string>
     <string name="iksica_balance">%1$s €</string>
@@ -126,4 +126,12 @@
     <string name="rights_from_label">Prava od</string>
     <string name="right_until_label">Prava do</string>
     <string name="card_balance_label">Stanje iksice</string>
+
+    // Timetable
+    <string name="professor">Profesor</string>
+    <string name="time">Vrijeme</string>
+    <string name="recurring">Ponavlja se</string>
+    <string name="group">Grupa</string>
+    <string name="classroom">Učionica</string>
+    <string name="time_range">%1$s - %2$s</string>
 </resources>
