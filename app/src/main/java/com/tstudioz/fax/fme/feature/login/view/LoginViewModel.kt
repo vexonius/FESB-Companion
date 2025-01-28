@@ -29,6 +29,7 @@ class LoginViewModel(
     var password = MutableLiveData("")
     val showLoading = MutableLiveData(false)
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
+    var passwordHidden = MutableLiveData(true)
 
     var firstTimeInApp = MutableLiveData(false)
         private set

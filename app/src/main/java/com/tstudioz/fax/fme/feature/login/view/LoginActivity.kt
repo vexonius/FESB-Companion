@@ -32,6 +32,7 @@ class LoginActivity : AppCompatActivity() {
                     snackbarHostState = loginViewModel.snackbarHostState,
                     username = loginViewModel.username,
                     password = loginViewModel.password,
+                    passwordHidden = loginViewModel.passwordHidden,
                     tryUserLogin = { loginViewModel.tryUserLogin() }
                 )
             }

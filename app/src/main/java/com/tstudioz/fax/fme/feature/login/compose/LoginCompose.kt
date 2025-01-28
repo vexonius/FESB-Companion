@@ -31,8 +31,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
@@ -57,10 +55,10 @@ fun LoginCompose(
     snackbarHostState: SnackbarHostState,
     username: MutableLiveData<String>,
     password: MutableLiveData<String>,
+    passwordHidden: MutableLiveData<Boolean>,
     tryUserLogin: () -> Unit
 ) {
 
-    val passwordHidden = remember { mutableStateOf(true) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val showLoadingObserved = showLoading.observeAsState().value
 
@@ -70,23 +68,19 @@ fun LoginCompose(
     }
 
     val usernameModel = TextFieldModel(
-        username,
-        stringResource(id = R.string.login_email_or_username),
-        KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-        KeyboardActions(onDone = { onDone() }),
-        null,
-        null,
-        ::onDone
+        text = username,
+        label = stringResource(id = R.string.login_email_or_username),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
     )
     val passwordModel = TextFieldModel(
-        password,
-        stringResource(id = R.string.login_password),
-        KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-        KeyboardActions(onDone = { onDone() }),
-        passwordHidden,
-        {
-            if (passwordHidden.value) {
-                IconButton(onClick = { passwordHidden.value = !passwordHidden.value }) {
+        text = password,
+        label = stringResource(id = R.string.login_password),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { onDone() }),
+        textHidden = passwordHidden,
+        trailingIcon = {
+            if (passwordHidden.observeAsState().value == true) {
+                IconButton(onClick = { passwordHidden.value = passwordHidden.value?.not() ?: false }) {
                     Icon(
                         painter = painterResource(R.drawable.visibility_show),
                         contentDescription = "Visibility Icon",
@@ -94,7 +88,7 @@ fun LoginCompose(
                     )
                 }
             } else {
-                IconButton(onClick = { passwordHidden.value = !passwordHidden.value }) {
+                IconButton(onClick = { passwordHidden.value = passwordHidden.value?.not() ?: false }) {
                     Icon(
                         painter = painterResource(R.drawable.visibility_hide),
                         contentDescription = "Visibility Off Icon",
@@ -102,8 +96,7 @@ fun LoginCompose(
                     )
                 }
             }
-        },
-        ::onDone
+        }
     )
 
     Scaffold(
@@ -155,7 +148,13 @@ fun LoginCompose(
 @Preview
 @Composable
 fun LoginComposePreview() {
-    LoginCompose(MutableLiveData(false), SnackbarHostState(), MutableLiveData(""), MutableLiveData(""), {})
+    LoginCompose(
+        MutableLiveData(false),
+        SnackbarHostState(),
+        MutableLiveData(""),
+        MutableLiveData(""),
+        MutableLiveData(true),
+        {})
 }
 
 @Composable
@@ -175,7 +174,7 @@ fun CustomTextField(textFieldModel: TextFieldModel) {
         label = { Text(text = textFieldModel.label) },
         keyboardOptions = textFieldModel.keyboardOptions,
         keyboardActions = textFieldModel.keyboardActions,
-        visualTransformation = if (textFieldModel.textHidden?.value == true) PasswordVisualTransformation() else VisualTransformation.None,
+        visualTransformation = if (textFieldModel.textHidden?.observeAsState()?.value == true) PasswordVisualTransformation() else VisualTransformation.None,
         trailingIcon = textFieldModel.trailingIcon,
         modifier = Modifier.fillMaxWidth()
     )
