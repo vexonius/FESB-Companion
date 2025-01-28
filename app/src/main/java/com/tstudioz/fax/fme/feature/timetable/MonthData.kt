@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.timetable.view
+package com.tstudioz.fax.fme.feature.timetable
 
 import java.time.DayOfWeek
 import java.time.YearMonth
