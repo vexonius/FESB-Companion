@@ -79,22 +79,18 @@ fun LoginCompose(
         keyboardActions = KeyboardActions(onDone = { onDone() }),
         textHidden = passwordHidden,
         trailingIcon = {
-            if (passwordHidden.observeAsState().value == true) {
-                IconButton(onClick = { passwordHidden.value = passwordHidden.value?.not() ?: false }) {
-                    Icon(
-                        painter = painterResource(R.drawable.visibility_show),
-                        contentDescription = "Visibility Icon",
-                        modifier = Modifier.padding(7.dp)
-                    )
-                }
-            } else {
-                IconButton(onClick = { passwordHidden.value = passwordHidden.value?.not() ?: false }) {
-                    Icon(
-                        painter = painterResource(R.drawable.visibility_hide),
-                        contentDescription = "Visibility Off Icon",
-                        modifier = Modifier.padding(7.dp)
-                    )
-                }
+            IconButton(onClick = { passwordHidden.value = passwordHidden.value?.not() ?: false }) {
+                Icon(
+                    painter = painterResource(
+                        if (passwordHidden.observeAsState().value == true) {
+                            R.drawable.visibility_show
+                        } else {
+                            R.drawable.visibility_hide
+                        }
+                    ),
+                    contentDescription = "Visibility Icon",
+                    modifier = Modifier.padding(7.dp)
+                )
             }
         }
     )
@@ -143,18 +139,6 @@ fun LoginCompose(
 
         }
     }
-}
-
-@Preview
-@Composable
-fun LoginComposePreview() {
-    LoginCompose(
-        MutableLiveData(false),
-        SnackbarHostState(),
-        MutableLiveData(""),
-        MutableLiveData(""),
-        MutableLiveData(true),
-        {})
 }
 
 @Composable
@@ -219,4 +203,17 @@ fun ButtonCircularLoading(
             }
         }
     }
+}
+
+
+@Preview
+@Composable
+fun LoginComposePreview() {
+    LoginCompose(
+        MutableLiveData(false),
+        SnackbarHostState(),
+        MutableLiveData(""),
+        MutableLiveData(""),
+        MutableLiveData(true),
+        {})
 }
