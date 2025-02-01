@@ -124,7 +124,7 @@ fun IksicaItemDetailed(
             .padding(20.dp, 5.dp, 15.dp, 5.dp)
     ) {
 
-        Text(text = stringResource(R.string.amount_x, item.amount.toString()) , fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.amount_x, item.amount.toString()), fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.width(6.dp))
         Column(Modifier.fillMaxWidth()) {
             Row(Modifier.fillMaxWidth()) {
@@ -141,11 +141,12 @@ fun IksicaItemDetailed(
             }
             Row {
                 Text(
-                    text = "Cijena: " + item.price.toString() + stringResource(R.string.currency),
+                    text = stringResource(R.string.price_of_item, item.price.toString()) + stringResource(R.string.currency),
                     color = MaterialTheme.colorScheme.outline
                 )
+                Spacer(modifier = Modifier.width(2.dp))
                 Text(
-                    text = "  Subvencija: " + item.subsidizedAmount.toString() + stringResource(R.string.currency),
+                    text = stringResource(R.string.subsidized_price_of_item, item.subsidizedAmount.toString()) + stringResource(R.string.currency),
                     color = MaterialTheme.colorScheme.outline
                 )
             }

@@ -43,7 +43,7 @@ fun ElevatedCardIksica(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1.586f)
-            .padding(25.dp)
+            .padding(24.dp)
             .clip(shape = RoundedCornerShape(30.dp))
             .angledGradientBackground(
                 colors = listOf(
@@ -67,22 +67,6 @@ fun ElevatedCardIksica(
                     .weight(0.7f)
             ) {
                 Row(
-                    verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier
-                        .weight(0.3f)
-                        .fillMaxSize()
-                ) {
-                    Text(
-                        text = stringResource(
-                            id = R.string.iksica_balance, String.format(Locale.US, "%.2f", balance)
-                        ),
-                        fontSize = 25.sp,
-                        lineHeight = 25.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        )
-                }
-                Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(0.dp, 0.dp)
@@ -102,6 +86,22 @@ fun ElevatedCardIksica(
                     Text(
                         text = iksicaNumber.chunked(4).joinToString(" "),
                         fontSize = 16.sp,
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .fillMaxSize()
+                ) {
+                    Text(
+                        text = stringResource(
+                            id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", balance)
+                        ),
+                        fontSize = 25.sp,
+                        lineHeight = 25.sp,
+                        fontWeight = FontWeight.ExtraBold,
                     )
                 }
             }

@@ -137,5 +137,11 @@
     <string name="in_the_future">U budućnosti</string>
     <string name="minus_amount">-%1$s</string>
     <string name="amount_x">%1$sx</string>
+    <string name="price_of_item">Cijena: %1$s</string>
+    <string name="subsidized_price_of_item">Subvencija: %1$s</string>
+
+    <string name="error_receipt_details_iksica">Greška prilikom dohvaćanja detalja računa</string>
+    <string name="error_fetching_receipts_iksica">Greška prilikom dohvaćanja računa</string>
+    <string name="error_general_iksica">Greška prilikom dohvaćanja podataka</string>
 
 </resources>
