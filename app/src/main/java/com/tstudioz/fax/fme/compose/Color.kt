@@ -63,6 +63,13 @@ val md_theme_dark_surfaceTint = Color(0xFF54D7F3)
 val md_theme_dark_outlineVariant = Color(0xFF3F484B)
 val md_theme_dark_scrim = Color(0xFF000000)
 
+//Colors for each of the event types
+val redNice = Color(0xFFFF5252)
+val blueNice = Color(0xFF29B6F6)
+val greenNice = Color(0xFF64DD17)
+val purpleNice = Color(0xFFBA68C8)
+val greyNice = Color(0xFF757575)
+val purpleDark = Color(0xFF7B1FA2)
 
 val seed = Color(0xFF006879)
 

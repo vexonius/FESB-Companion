@@ -33,8 +33,6 @@ class UserService(private val client: OkHttpClient) : UserServiceInterface {
             NetworkServiceResult.LoginResult.Failure(Throwable("Error during login"))}
     }
 
-    override fun logoutUser() = (client.cookieJar as MonsterCookieJar).clear()
-
     companion object {
         private const val SCHEME = "https"
 
