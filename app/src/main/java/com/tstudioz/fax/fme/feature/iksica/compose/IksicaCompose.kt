@@ -135,15 +135,18 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         }) {
         when (viewState) {
             is IksicaViewState.Initial, is IksicaViewState.Empty, is IksicaViewState.FetchingError -> {
-                TopBarIksica()
-                Box(Modifier.fillMaxWidth()) {
-                    PullRefreshIndicator(
-                        isRefreshing, pullRefreshState, Modifier
-                            .align(Alignment.TopCenter)
-                            .zIndex(5f)
-                    )
+                Column{
+                    TopBarIksica()
+                    Box(Modifier.fillMaxWidth()) {
+                        PullRefreshIndicator(
+                            isRefreshing, pullRefreshState, Modifier
+                                .align(Alignment.TopCenter)
+                                .zIndex(5f)
+                        )
+                        LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) { item{ EmptyIksicaView(stringResource(id = R.string.iksica_no_data)) } }
+                    }
                 }
-                EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
+
             }
 
             is IksicaViewState.Success, is IksicaViewState.Fetching -> {
