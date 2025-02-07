@@ -2,8 +2,6 @@ package com.tstudioz.fax.fme.feature.iksica.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,10 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -36,7 +33,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -76,32 +71,46 @@ import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import kotlin.math.roundToInt
 
 @OptIn(
-    InternalCoroutinesApi::class,
-    ExperimentalMaterial3Api::class,
-    ExperimentalMaterialApi::class
+    InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class
 )
 @Composable
 fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val listState = rememberLazyListState()
 
     val receiptSelected = iksicaViewModel.receiptSelected.observeAsState().value
     val studentData = iksicaViewModel.studentData.observeAsState().value
 
     val viewState = iksicaViewModel.viewState.observeAsState().value ?: IksicaViewState.Loading
     val isRefreshing = viewState is IksicaViewState.Fetching || viewState is IksicaViewState.Loading
-
     val showPopup = remember { mutableStateOf(false) }
 
-    val pullRefreshState = rememberPullRefreshState(isRefreshing, {
-        iksicaViewModel.getReceipts()
-    })
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, { iksicaViewModel.getReceipts() })
 
-    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
+    val marginTop = with(LocalDensity.current) { 0.dp.toPx() }
+    var composableHeight by remember { mutableIntStateOf(0) }
+    var offset by remember { mutableIntStateOf(0) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val delta = available.y
+                if (listState.firstVisibleItemIndex == 0) {
+                    offset = (offset + delta).coerceIn(marginTop, composableHeight.toFloat()).toInt()
+                }
+                return Offset(
+                    0f, if (offset < composableHeight && offset > marginTop) delta else 0f
+                )
+            }
+
+            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource) = Offset.Zero
+        }
+    }
 
     LaunchedEffect(lifecycleState) {
         when (lifecycleState) {
@@ -113,24 +122,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         }
     }
 
-    val marginTopInPx = with(LocalDensity.current) { 0.dp.toPx() }
-    var imageHeightInPx by remember { mutableIntStateOf(0) }
-    var offset by remember { mutableIntStateOf(0) }
-
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
-                offset = (offset + delta).coerceIn(marginTopInPx, imageHeightInPx.toFloat()).toInt()
-                return Offset(
-                    0f,
-                    if (offset < imageHeightInPx && offset > marginTopInPx) delta else 0f
-                )
-            }
-        }
-    }
-    BottomSheetScaffold(
-        sheetPeekHeight = 0.dp,
+    BottomSheetScaffold(sheetPeekHeight = 0.dp,
         modifier = Modifier
             .pullRefresh(pullRefreshState)
             .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -141,91 +133,98 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                 BottomSheetIksica(receiptSelected.data) { iksicaViewModel.hideReceiptDetails() }
             }
         }) {
-        Box(Modifier.fillMaxWidth()) {
-            PullRefreshIndicator(
-                isRefreshing,
-                pullRefreshState,
-                Modifier
-                    .align(Alignment.TopCenter)
-                    .zIndex(5f)
-            )
-            Box(
-                modifier = Modifier.nestedScroll(nestedScrollConnection)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .onGloballyPositioned {
-                            imageHeightInPx = it.size.height
-                            offset = imageHeightInPx
-                        }
-                ) {
-                    Row(
-                        modifier = Modifier.background(Color.Transparent)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.tab_iksica),
-                            fontSize = 30.sp,
-                            modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp)
-                        )
-                    }
-                    val model: StudentData = (viewState as? IksicaViewState.Success)?.data
-                        ?: (viewState as? IksicaViewState.Fetching)?.data ?: return@Column
-                    ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) {
-                        showPopup.value = true
-                    }
+        when (viewState) {
+            is IksicaViewState.Initial, is IksicaViewState.Empty, is IksicaViewState.FetchingError -> {
+                TopBarIksica()
+                Box(Modifier.fillMaxWidth()) {
+                    PullRefreshIndicator(
+                        isRefreshing, pullRefreshState, Modifier
+                            .align(Alignment.TopCenter)
+                            .zIndex(5f)
+                    )
                 }
-                Column(modifier = Modifier.offset { IntOffset(0, offset) }) {
-                    when (viewState) {
-                        is IksicaViewState.Initial, is IksicaViewState.Empty, is IksicaViewState.FetchingError -> {
-                            EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
+                EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
+            }
+
+            is IksicaViewState.Success, is IksicaViewState.Fetching -> {
+                val model: StudentData =
+                    (viewState as? IksicaViewState.Success)?.data ?: (viewState as? IksicaViewState.Fetching)?.data
+                    ?: return@BottomSheetScaffold
+                Box(
+                    modifier = Modifier.nestedScroll(nestedScrollConnection)
+                ) {
+                    Column(Modifier.onGloballyPositioned {
+                        if (composableHeight == 0) {
+                            composableHeight = it.size.height
+                            offset = composableHeight
+                        }
+                    }) {
+                        TopBarIksica()
+                        Box(Modifier.fillMaxWidth()) {
+                            PullRefreshIndicator(
+                                isRefreshing, pullRefreshState, Modifier
+                                    .align(Alignment.TopCenter)
+                                    .zIndex(5f)
+                            )
+                            ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) {
+                                showPopup.value = true
+                            }
+                        }
+                    }
+                    Column(modifier = Modifier.offset { IntOffset(0, offset) }) {
+                        if (model.receipts.isEmpty()) {
+                            EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
                         }
 
-                        is IksicaViewState.Success, is IksicaViewState.Fetching -> {
-                            val model: StudentData = (viewState as? IksicaViewState.Success)?.data
-                                ?: (viewState as? IksicaViewState.Fetching)?.data ?: return@Column
+                        TransakcijeText()
 
-                            if (model.receipts.isEmpty()) {
-                                EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-                                    .background(colorResource(R.color.chinese_black))
-                            ) {
-                                Text(
-                                    text = stringResource(id = R.string.transactions),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp,
-                                    modifier = Modifier.padding(16.dp, 30.dp, 16.dp, 12.dp)
-                                )
-                            }
-                            LazyColumn {
-                                items(model.receipts) {
-                                    IksicaItem(it) {
-                                        iksicaViewModel.getReceiptDetails(it)
-                                    }
+                        LazyColumn(state = listState) {
+                            items(model.receipts) {
+                                IksicaItem(it) {
+                                    iksicaViewModel.getReceiptDetails(it)
                                 }
                             }
                         }
-
-                        else -> {}
-
                     }
                 }
             }
+
+            else -> {}
         }
     }
 
-    PopupBox(
-        showPopup = showPopup.value,
-        onClickOutside = { showPopup.value = !showPopup.value }
-    ) {
+    PopupBox(showPopup = showPopup.value, onClickOutside = { showPopup.value = !showPopup.value }) {
         if (studentData != null) {
             CardIksicaPopupContent(studentData)
         }
     }
+}
+
+@Composable
+fun TopBarIksica() {
+    Row(
+        modifier = Modifier.background(Color.Transparent)
+    ) {
+        Text(
+            text = stringResource(id = R.string.tab_iksica),
+            fontSize = 30.sp,
+            modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 16.dp)
+        )
+    }
+}
+
+@Composable
+fun TransakcijeText() {
+    Text(
+        text = stringResource(id = R.string.transactions),
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
+            .background(colorResource(R.color.chinese_black))
+            .padding(20.dp, 30.dp, 16.dp, 24.dp)
+    )
 }
 
 @Composable
@@ -238,8 +237,7 @@ fun EmptyIksicaView(text: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = text,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            text = text, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
     }
 }
@@ -253,29 +251,35 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(16.dp, 5.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(
-                receipt.restaurant.trim(),
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(0.80f)
+                receipt.restaurant.trim(), overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(0.80f)
             )
             Text(
-                text = stringResource(id = R.string.minus_amount, receipt.subsidizedAmount.roundToTwo())
-                        + stringResource(id = R.string.currency),
+                text = stringResource(
+                    id = R.string.minus_amount,
+                    receipt.subsidizedAmount.roundToTwo()
+                ) + stringResource(id = R.string.currency),
                 fontSize = 15.sp,
                 modifier = Modifier.weight(0.20f),
                 textAlign = TextAlign.End,
             )
         }
-        Row {
-            val today = LocalDate.now()
-            val daysAgo = ChronoUnit.DAYS.between(receipt.date, today).daysAgoText(LocalContext.current)
-            Text(daysAgo, color = greyishWhite)
-            Spacer(modifier = Modifier.width(2.dp))
-            Text(receipt.time, color = greyishWhite)
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Row {
+                val today = LocalDate.now()
+                val daysAgo = ChronoUnit.DAYS.between(receipt.date, today).daysAgoText(LocalContext.current)
+                Text(daysAgo, color = greyishWhite)
+                Spacer(modifier = Modifier.width(2.dp))
+                Text(receipt.time, color = greyishWhite)
+            }
+            Text(
+                text = stringResource(id = R.string.receipt_details),
+                fontSize = 13.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End,
+                color = colorResource(id = R.color.brandeis_blue)
+            )
         }
     }
     HorizontalDivider(Modifier.padding(horizontal = 10.dp))

@@ -97,7 +97,7 @@ fun ElevatedCardIksica(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp, 45.dp)
+            .padding(24.dp, 30.dp, 24.dp, 50.dp)
             .aspectRatio(1.586f)
             .drawBehind {
                 val canvasSize = size
