@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.feature.settings
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.AndroidViewModel
@@ -10,16 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.settings.model.EmailModalModel
-import com.tstudioz.fax.fme.util.SPKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.tstudioz.fax.fme.util.PreferenceHelper.set
 
 class SettingsViewModel(
-    private val sharedPreferences: SharedPreferences,
-    private val userRepository: UserRepositoryInterface,
     private val application: Application,
-    private val dao: SettingsDao
+    private val userRepository: UserRepositoryInterface,
 ) : AndroidViewModel(application) {
 
     val username: MutableLiveData<String> = MutableLiveData()
@@ -33,12 +28,14 @@ class SettingsViewModel(
         }
     }
 
+    /**
+     * Method below will remove all user data from database,
+     * which will trigger session delegate flow event and
+     * router will route to login screen
+     */
     fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
-            sharedPreferences[SPKey.LOGGED_IN] = false
-            sharedPreferences[SPKey.FIRST_TIME] = true
-            sharedPreferences.edit().remove("gen").apply()
-            dao.deleteAll()
+            userRepository.deleteAllUserData()
         }
     }
 

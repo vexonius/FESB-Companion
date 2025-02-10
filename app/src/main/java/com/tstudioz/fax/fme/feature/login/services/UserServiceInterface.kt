@@ -7,7 +7,5 @@ interface UserServiceInterface {
 
     suspend fun loginUser(username: String, password: String): NetworkServiceResult.LoginResult
 
-    fun logoutUser()
-
 }
 

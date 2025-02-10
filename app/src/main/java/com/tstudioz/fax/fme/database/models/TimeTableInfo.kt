@@ -9,9 +9,9 @@ data class TimeTableInfo (
     @SerializedName("Name")
     var name: String = "",
     @SerializedName("StartDate")
-    var startDate: LocalDate? = null,
+    var startDate: LocalDate,
     @SerializedName("EndDate")
-    var endDate: LocalDate?= null,
+    var endDate: LocalDate,
     @SerializedName("StartDateText")
     var startDateText: String = "",
     @SerializedName("EndDateText")

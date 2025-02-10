@@ -2,6 +2,11 @@ package com.tstudioz.fax.fme.database.models
 
 import androidx.compose.ui.graphics.Color
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.blueNice
+import com.tstudioz.fax.fme.compose.greenNice
+import com.tstudioz.fax.fme.compose.greyNice
+import com.tstudioz.fax.fme.compose.purpleNice
+import com.tstudioz.fax.fme.compose.redNice
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import java.time.LocalDateTime
@@ -75,6 +80,7 @@ fun fromRealmObject(eventRealm: EventRealm): Event {
         name = eventRealm.name ?: "",
         shortName = eventRealm.shortName ?: "",
         colorId = eventRealm.colorId ?: 0,
+        color = Color(eventRealm.colorId ?: 0),
         professor = eventRealm.professor ?: "",
         eventType = eventRealm.eventType?.let {
             try {
@@ -95,14 +101,27 @@ fun fromRealmObject(eventRealm: EventRealm): Event {
     )
 }
 
-enum class TimetableType(val type: String, val color: Int) {
-    PREDAVANJE("Predavanje", R.color.blue_nice),
-    AUDITORNA_VJEZBA("Auditorna vježba", R.color.green_nice),
-    KOLOKVIJ("Kolokvij", R.color.purple_nice),
-    LABORATORIJSKA_VJEZBA("Laboratorijska vježba", R.color.red_nice),
-    KONSTRUKCIJSKA_VJEZBA("Konstrukcijska vježba", R.color.grey_nice),
-    SEMINAR("Seminar", R.color.blue_nice),
-    ISPIT("Ispit", R.color.purple_dark),
-    OTHER("Other", R.color.blue_nice)
+enum class TimetableType(val value: String) {
+    PREDAVANJE("Predavanja"),
+    AUDITORNA_VJEZBA("Auditorne vježbe"),
+    KOLOKVIJ("Kolokviji"),
+    LABORATORIJSKA_VJEZBA("Laboratorijske vježbe"),
+    KONSTRUKCIJSKA_VJEZBA("Konstrukcijske vježbe"),
+    SEMINAR("Seminari"),
+    ISPIT("Ispiti"),
+    OTHER("Other")
+}
+
+fun TimetableType.color(): Color {
+    return when (this) {
+        TimetableType.PREDAVANJE -> blueNice
+        TimetableType.AUDITORNA_VJEZBA -> greenNice
+        TimetableType.KOLOKVIJ -> purpleNice
+        TimetableType.LABORATORIJSKA_VJEZBA -> redNice
+        TimetableType.KONSTRUKCIJSKA_VJEZBA -> greyNice
+        TimetableType.SEMINAR -> blueNice
+        TimetableType.ISPIT -> purpleNice
+        TimetableType.OTHER -> blueNice
+    }
 }
 

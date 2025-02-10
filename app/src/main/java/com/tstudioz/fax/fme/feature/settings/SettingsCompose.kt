@@ -86,7 +86,6 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
                     ),
                     onClick = {
                         viewModel.logout()
-                        router.routeToLogin()
                     }
                 )
                 CategoryTitle(title = stringResource(id = R.string.contribute))
