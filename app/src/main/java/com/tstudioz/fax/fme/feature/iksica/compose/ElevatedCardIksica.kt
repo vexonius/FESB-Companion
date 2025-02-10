@@ -21,9 +21,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.BlurEffect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
@@ -34,50 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.glowingColor
+import com.tstudioz.fax.fme.compose.gradientColors
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import java.util.Locale
-
-@Composable
-fun GlowingCard(
-    glowingColor: Color,
-    modifier: Modifier = Modifier,
-    padding: Dp = 0.dp,
-    containerColor: Color = Color.White,
-    cornersRadius: Dp = 0.dp,
-    glowingRadius: Dp = 20.dp,
-    xShifting: Dp = 0.dp,
-    yShifting: Dp = 0.dp,
-    content: @Composable BoxScope.() -> Unit
-) {
-    Box(
-        modifier = modifier
-            .padding(padding)
-            .drawBehind {
-                val canvasSize = size
-                drawContext.canvas.nativeCanvas.apply {
-                    drawRoundRect(
-                        40f, // Left
-                        20f, // Top
-                        canvasSize.width - 40, // Right
-                        canvasSize.height - 20, // Bottom
-                        cornersRadius.toPx(), // Radius X
-                        cornersRadius.toPx(), // Radius Y
-                        Paint().apply {
-                            color = containerColor.toArgb()
-                            isAntiAlias = true
-                            setShadowLayer(
-                                glowingRadius.toPx(),
-                                xShifting.toPx(), yShifting.toPx(),
-                                glowingColor.copy(alpha = 0.85f).toArgb()
-                            )
-                        }
-                    )
-                }
-            }
-    ) {
-        content()
-    }
-}
 
 @Preview
 @Composable
@@ -88,11 +58,10 @@ fun ElevatedCardIksica(
     onClick: () -> Unit = {}
 ) {
     val cornersRadius = 30.dp
-    val glowingRadius = 70.dp
+    val glowingRadius = 100.dp
     val xShifting = 0.dp
     val yShifting = 0.dp
-    val containerColor = Color.White
-    val glowingColor = Color(0xFFFF9966)
+    val containerColor = MaterialTheme.colorScheme.surface
 
     Box(
         modifier = Modifier
@@ -114,8 +83,27 @@ fun ElevatedCardIksica(
                             isAntiAlias = true
                             setShadowLayer(
                                 glowingRadius.toPx(),
-                                xShifting.toPx(), yShifting.toPx(),
-                                glowingColor.copy(alpha = 0.85f).toArgb()
+                                xShifting.toPx(),
+                                yShifting.toPx(),
+                                glowingColor.toArgb()
+                            )
+                        }
+                    )
+                    drawRoundRect(
+                        0f,
+                        0f,
+                        canvasSize.width,
+                        canvasSize.height,
+                        cornersRadius.toPx(),
+                        cornersRadius.toPx(),
+                        Paint().apply {
+                            color = containerColor.toArgb()
+                            isAntiAlias = true
+                            setShadowLayer(
+                                (glowingRadius/4).toPx(),
+                                xShifting.toPx(),
+                                yShifting.toPx(),
+                                glowingColor.toArgb()
                             )
                         }
                     )
@@ -123,18 +111,12 @@ fun ElevatedCardIksica(
             }
             .clip(shape = RoundedCornerShape(cornersRadius))
             .angledGradientBackground(
-                colors = listOf(
-                    Color(0xFFFF9966),
-                    Color(0xFFFF5E62)
-                ),
-                degrees = 90f,
-                halfHalf = true
+                colors = gradientColors,
+                degrees = 32f
             )
     ) {
         Column(
-            Modifier
-                //.fillMaxSize()
-                .clickable { onClick() },
+            Modifier.clickable { onClick() },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {

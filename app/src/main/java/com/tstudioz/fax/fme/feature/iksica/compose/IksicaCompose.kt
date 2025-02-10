@@ -135,7 +135,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         }) {
         when (viewState) {
             is IksicaViewState.Initial, is IksicaViewState.Empty, is IksicaViewState.FetchingError -> {
-                Column{
+                Column {
                     TopBarIksica()
                     Box(Modifier.fillMaxWidth()) {
                         PullRefreshIndicator(
@@ -143,7 +143,10 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                                 .align(Alignment.TopCenter)
                                 .zIndex(5f)
                         )
-                        LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) { item{ EmptyIksicaView(stringResource(id = R.string.iksica_no_data)) } }
+                        LazyColumn(
+                            Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center
+                        ) { item { EmptyIksicaView(stringResource(id = R.string.iksica_no_data)) } }
                     }
                 }
 
@@ -174,7 +177,11 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             }
                         }
                     }
-                    Column(modifier = Modifier.offset { IntOffset(0, offset) }) {
+                    Column(modifier = Modifier
+                        .offset { IntOffset(0, offset) }
+                        .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
+                        .background(colorResource(R.color.chinese_black))
+                    ) {
                         if (model.receipts.isEmpty()) {
                             EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
                         }
@@ -183,9 +190,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
                         LazyColumn(state = listState) {
                             items(model.receipts) {
-                                IksicaItem(it) {
-                                    iksicaViewModel.getReceiptDetails(it)
-                                }
+                                IksicaItem(it) { iksicaViewModel.getReceiptDetails(it) }
                             }
                         }
                     }
@@ -224,8 +229,6 @@ fun TransakcijeText() {
         fontSize = 20.sp,
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-            .background(colorResource(R.color.chinese_black))
             .padding(20.dp, 30.dp, 16.dp, 24.dp)
     )
 }
