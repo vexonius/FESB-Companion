@@ -31,6 +31,8 @@
     <string name="login_email_or_username">FESB email ili korisničko ime</string>
     <string name="login_password">Lozinka</string>
     <string name="login_action_submit">Prijava</string>
+    <string name="login_login_title">Prijavi se</string>
+    <string name="login_safe_data">Tvoji podaci su sigurni i ne dijele se s trećim stranama.</string>
 
     <string name="weather_icon_desc">Ikona vremena</string>
 
