@@ -5,13 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,25 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.BlurEffect
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.layer.GraphicsLayer
-import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
@@ -59,62 +45,36 @@ fun ElevatedCardIksica(
 ) {
     val cornersRadius = 30.dp
     val glowingRadius = 100.dp
-    val xShifting = 0.dp
-    val yShifting = 0.dp
-    val containerColor = MaterialTheme.colorScheme.surface
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(24.dp, 30.dp, 24.dp, 50.dp)
-            .aspectRatio(1.586f)
-            .drawBehind {
-                val canvasSize = size
-                drawContext.canvas.nativeCanvas.apply {
-                    drawRoundRect(
-                        0f,
-                        0f,
-                        canvasSize.width,
-                        canvasSize.height,
-                        cornersRadius.toPx(),
-                        cornersRadius.toPx(),
-                        Paint().apply {
-                            color = containerColor.toArgb()
-                            isAntiAlias = true
-                            setShadowLayer(
-                                glowingRadius.toPx(),
-                                xShifting.toPx(),
-                                yShifting.toPx(),
-                                glowingColor.toArgb()
-                            )
-                        }
-                    )
-                    drawRoundRect(
-                        0f,
-                        0f,
-                        canvasSize.width,
-                        canvasSize.height,
-                        cornersRadius.toPx(),
-                        cornersRadius.toPx(),
-                        Paint().apply {
-                            color = containerColor.toArgb()
-                            isAntiAlias = true
-                            setShadowLayer(
-                                (glowingRadius/4).toPx(),
-                                xShifting.toPx(),
-                                yShifting.toPx(),
-                                glowingColor.toArgb()
-                            )
-                        }
-                    )
-                }
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(24.dp, 30.dp, 24.dp, 50.dp)
+        .aspectRatio(1.586f)
+        .drawBehind {
+            val canvasSize = size
+            drawContext.canvas.nativeCanvas.apply {
+                drawRoundRect(0f,
+                    0f,
+                    canvasSize.width, canvasSize.height,
+                    cornersRadius.toPx(), cornersRadius.toPx(),
+                    Paint().apply {
+                        isAntiAlias = true
+                        setShadowLayer(glowingRadius.toPx(), 0f, 0f, glowingColor.toArgb())
+                    })
+                drawRoundRect(0f,
+                    0f,
+                    canvasSize.width, canvasSize.height,
+                    cornersRadius.toPx(), cornersRadius.toPx(),
+                    Paint().apply {
+                        isAntiAlias = true
+                        setShadowLayer((glowingRadius / 4).toPx(), 0f, 0f, glowingColor.toArgb())
+                    })
             }
-            .clip(shape = RoundedCornerShape(cornersRadius))
-            .angledGradientBackground(
-                colors = gradientColors,
-                degrees = 32f
-            )
-    ) {
+        }
+        .clip(shape = RoundedCornerShape(cornersRadius))
+        .angledGradientBackground(
+            colors = gradientColors, degrees = 32f
+        )) {
         Column(
             Modifier.clickable { onClick() },
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -131,19 +91,22 @@ fun ElevatedCardIksica(
                     modifier = Modifier.padding(0.dp, 0.dp)
                 ) {
                     Text(
-                        text = name,
-                        fontSize = 25.sp,
-                        fontWeight = FontWeight.Bold
+                        text = name, fontSize = 25.sp, fontWeight = FontWeight.Bold
                     )
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
+                    val formattedNumber = buildList {
+                        add(iksicaNumber.take(6))
+                        add(iksicaNumber.drop(6).take(2))
+                        add(iksicaNumber.drop(8).take(10))
+                        add(iksicaNumber.takeLast(1))
+                    }.joinToString(" ")
                     Text(
-                        text = iksicaNumber.chunked(4).joinToString(" "),
+                        text = formattedNumber,
                         fontSize = 16.sp,
                     )
                 }
@@ -200,9 +163,7 @@ fun CardIksicaPopupContent(model: StudentData) {
 
 @Composable
 fun CardIksicaPopupRow(
-    leftText: String,
-    rightText: String,
-    divider: Boolean = true
+    leftText: String, rightText: String, divider: Boolean = true
 ) {
     Row(
         Modifier
