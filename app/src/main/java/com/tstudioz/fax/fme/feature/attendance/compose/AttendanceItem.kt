@@ -17,6 +17,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,19 +30,22 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
 
     Column(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(24.dp, 8.dp)
             .clip(RoundedCornerShape(30.dp))
             .background(colorResource(id = R.color.raisin_black))
-            .padding(16.dp)
+            .padding(24.dp)
     ) {
         Text(
             text = attendanceItems.firstOrNull()?.`class` ?: "",
             fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         attendanceItems.forEach { attendanceItem ->
             Column {
-                Text(attendanceItem.type, fontSize = 14.sp)
+                Text(
+                    attendanceItem.type, fontSize = 14.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
                 Column {
                     Spacer(modifier = Modifier.height(8.dp))
                     AttendanceProgressBar(
@@ -49,15 +53,15 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
                         attended = attendanceItem.attended,
                         absent = attendanceItem.absent
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(
-                            R.string.attendance_done_required,
+                            R.string.attendance_stats_format,
                             attendanceItem.attended,
                             attendanceItem.total,
                             attendanceItem.required
                         ),
-                        fontSize = 11.sp
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(vertical = 4.dp)
                     )
                 }
             }
@@ -77,16 +81,43 @@ fun AttendanceProgressBar(
     val red = colorResource(id = R.color.crayola)
     Row {
         Canvas(
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .height(radius)
         ) {
             for (i in 0 until total) {
                 drawCircle(
                     color = if (i < attended) green else if (i >= total - absent) red else off,
                     radius = radius.toPx(),
-                    center = Offset(((i + 0.5) * size.width / total).toFloat(), 0f),
+                    center = Offset(i * size.width / total + radius.toPx(), 0f),
                 )
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewAttendanceItem() {
+    val attendanceItems = listOf(
+        AttendanceEntry(
+        ).apply {
+            `class` = "Class 1"
+            type = "Type 1"
+            total = 10
+            attended = 5
+            absent = 2
+            required = 8
+        },
+        AttendanceEntry(
+        ).apply {
+            `class` = "Class 1"
+            type = "Type 2"
+            total = 10
+            attended = 5
+            absent = 2
+            required = 8
+        }
+    )
+    AttendanceItem(attendanceItems)
 }

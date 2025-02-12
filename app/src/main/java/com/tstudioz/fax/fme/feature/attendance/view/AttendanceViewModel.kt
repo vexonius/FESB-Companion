@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.feature.attendance.ShownSemester
 import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -98,9 +99,5 @@ class AttendanceViewModel(
         _shownSemester.value = if (_shownSemester.value == semester) null else semester
     }
 
-    enum class ShownSemester {
-        FIRST,
-        SECOND
-    }
 }
 

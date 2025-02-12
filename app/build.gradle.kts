@@ -20,11 +20,12 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("./../keystore.jks")
-            storePassword = System.getenv("RELEASE_SIGNING_PASSWORD")
-            keyAlias = System.getenv("RELEASE_KEY_ALIAS")
-            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+            storePassword = "E7?hAT@Y&AxK#"
+            keyAlias = "glavni_key"
+            keyPassword = "E7?hAT@Y&AxA#"
         }
     }
+
 
     buildTypes {
         release {
