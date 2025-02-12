@@ -13,7 +13,7 @@ import com.tstudioz.fax.fme.feature.settings.model.EmailModalModel
 import com.tstudioz.fax.fme.view.activities.MainActivity
 import java.lang.ref.WeakReference
 
-class Router: LoginRouter, HomeRouter, SettingsRouter {
+class Router: AppRouter, LoginRouter, HomeRouter, SettingsRouter {
 
     private var activity: WeakReference<Activity>? = null
 
@@ -74,6 +74,12 @@ class Router: LoginRouter, HomeRouter, SettingsRouter {
 
         customTabsIntent.launchUrl(activity, Uri.parse(url))
     }
+
+}
+
+interface AppRouter {
+
+    fun routeToLogin()
 
 }
 

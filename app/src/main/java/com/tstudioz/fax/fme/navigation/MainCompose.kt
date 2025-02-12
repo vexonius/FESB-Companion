@@ -12,7 +12,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +32,7 @@ import com.tstudioz.fax.fme.feature.iksica.compose.IksicaCompose
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.studomat.compose.StudomatCompose
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
-import com.tstudioz.fax.fme.feature.timetable.view.TimetableCompose
+import com.tstudioz.fax.fme.feature.timetable.view.compose.TimetableCompose
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.routing.HomeRouter
 import kotlinx.coroutines.ExperimentalCoroutinesApi

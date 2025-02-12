@@ -36,7 +36,8 @@
             android:name=".feature.login.view.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Simple"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

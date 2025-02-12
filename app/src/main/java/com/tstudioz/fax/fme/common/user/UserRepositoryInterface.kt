@@ -11,4 +11,6 @@ interface UserRepositoryInterface {
 
     suspend fun getCurrentUser(): UserRealm
 
-    }
+    suspend fun deleteAllUserData()
+
+}
