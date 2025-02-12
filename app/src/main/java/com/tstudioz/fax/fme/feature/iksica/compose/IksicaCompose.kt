@@ -134,7 +134,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             }
         }) {
         when (viewState) {
-            is IksicaViewState.Initial, is IksicaViewState.Empty, is IksicaViewState.FetchingError -> {
+            is IksicaViewState.Initial, is IksicaViewState.Empty -> {
                 Column {
                     TopBarIksica()
                     Box(Modifier.fillMaxWidth()) {
