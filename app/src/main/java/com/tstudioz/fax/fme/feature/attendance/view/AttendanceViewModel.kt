@@ -29,6 +29,8 @@ class AttendanceViewModel(
     private val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
 
     private var lastFetch = 0L
+    private val has60SecondPassed: Boolean
+        get() = System.currentTimeMillis() - lastFetch > 60000
 
     private var _attendanceListFull: MutableLiveData<List<List<AttendanceEntry>>> = MutableLiveData(emptyList())
     val attendanceListFull: LiveData<List<List<AttendanceEntry>>> = _attendanceListFull
@@ -52,6 +54,7 @@ class AttendanceViewModel(
 
     val snackbarHostState = SnackbarHostState()
 
+
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error attendance", exception.toString())
         viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
@@ -62,17 +65,13 @@ class AttendanceViewModel(
         fetchAttendance()
     }
 
-    private fun has60SecondsPassed(): Boolean = System.currentTimeMillis() - lastFetch > 60000
-
     fun fetchAttendance() {
         viewModelScope.launch(context = Dispatchers.IO + handler) {
             if (!networkUtils.isNetworkAvailable()) {
                 snackbarHostState.showSnackbar("Niste povezani")
                 return@launch
             }
-            if (!has60SecondsPassed()) {
-                return@launch
-            }
+            if (!has60SecondPassed) return@launch
 
             lastFetch = System.currentTimeMillis()
             when (val attendance = repository.fetchAttendance()) {
@@ -87,7 +86,6 @@ class AttendanceViewModel(
             }
         }
     }
-
 
     private fun loadFromDb() {
         viewModelScope.launch(context = Dispatchers.IO + handler) {

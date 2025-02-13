@@ -43,7 +43,8 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
         attendanceItems.forEach { attendanceItem ->
             Column {
                 Text(
-                    attendanceItem.type, fontSize = 14.sp,
+                    attendanceItem.type,
+                    fontSize = 14.sp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
                 Column {
