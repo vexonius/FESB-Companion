@@ -33,54 +33,56 @@ import kotlinx.coroutines.InternalCoroutinesApi
 fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetableViewModel: TimetableViewModel) {
     val currentDestination =
         navController.currentBackStackEntryAsState().value?.destination?.route?.split(".")?.lastOrNull() ?: ""
-    TopAppBar(
-        colors = if (currentDestination != "Home") {
-            TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                titleContentColor = MaterialTheme.colorScheme.onSurface,
-            )
-        } else {
-            TopAppBarDefaults.topAppBarColors(
-                containerColor = colorResource(id = R.color.dark_cyan),
-                titleContentColor = Color.White
-            )
-        },
-        title = {
-            Text(
-                topLevelRoutes.find {
-                    it.route.toString() == currentDestination
-                }?.nameId?.let { stringResource(it) } ?: "",
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        },
-        actions = {
-            if (currentDestination == "TimeTable") {
+    if (currentDestination != "Attendance") {
+        TopAppBar(
+            colors = if (currentDestination != "Home") {
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                )
+            } else {
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = colorResource(id = R.color.dark_cyan),
+                    titleContentColor = Color.White
+                )
+            },
+            title = {
+                Text(
+                    topLevelRoutes.find {
+                        it.route.toString() == currentDestination
+                    }?.nameId?.let { stringResource(it) } ?: "",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            actions = {
+                if (currentDestination == "TimeTable") {
+                    IconButton(
+                        onClick = { timetableViewModel.showWeekChooseMenu() },
+                        colors = IconButtonDefaults.iconButtonColors().copy(
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.timetable_date_select_icon),
+                            contentDescription = stringResource(id = R.string.change_week),
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
                 IconButton(
-                    onClick = { timetableViewModel.showWeekChooseMenu() },
+                    onClick = { router.routeToSettings() },
                     colors = IconButtonDefaults.iconButtonColors().copy(
                         contentColor = Color.White
                     )
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.timetable_date_select_icon),
-                        contentDescription = stringResource(id = R.string.change_week),
+                        painter = painterResource(id = R.drawable.settings_icon),
+                        contentDescription = stringResource(id = R.string.settings),
                         modifier = Modifier.size(30.dp)
                     )
                 }
-            }
-            IconButton(
-                onClick = { router.routeToSettings() },
-                colors = IconButtonDefaults.iconButtonColors().copy(
-                    contentColor = Color.White
-                )
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.settings_icon),
-                    contentDescription = stringResource(id = R.string.settings),
-                    modifier = Modifier.size(30.dp)
-                )
-            }
-        },
-    )
+            },
+        )
+    }
 }

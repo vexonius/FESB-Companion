@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.feature.attendance.repository
 
 import android.util.Log
-import com.tstudioz.fax.fme.database.models.AttendanceEntry
+import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.ParseAttendance
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
