@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -83,6 +86,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     BottomSheetScaffold(
         sheetPeekHeight = 0.dp,
         modifier = Modifier
+            .padding(WindowInsets.navigationBars.asPaddingValues())
             .pullRefresh(pullRefreshState)
             .nestedScroll(TopAppBarDefaults.pinnedScrollBehavior().nestedScrollConnection),
         scaffoldState = scaffoldState,
