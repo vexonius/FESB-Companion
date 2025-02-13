@@ -9,7 +9,7 @@ import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterfa
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 

@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.feature.attendance.dao
 
-import com.tstudioz.fax.fme.database.models.AttendanceEntry
+import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 
 interface AttendanceDaoInterface {
 

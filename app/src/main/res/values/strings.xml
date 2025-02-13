@@ -67,7 +67,9 @@
 
     // Attendance misc
 
-    <string name="attendance_required">Obavezno %1$s</string>
+    <string name="attendance_stats_format">Odrađeno %1$s/%2$s. Obavezno %3$s</string>
+    <string name="first_semester">1. Semestar</string>
+    <string name="second_semester">2. Semestar</string>
 
     // Studomat subject texts
 
