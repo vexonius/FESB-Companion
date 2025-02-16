@@ -71,7 +71,6 @@ fun MainNavHost(
             MainTopAppBar(
                 navController = navController,
                 timetableViewModel = timetableViewModel,
-                iksicaViewModel = iksicaViewModel,
                 router = router
             )
         },

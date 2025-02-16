@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,18 +34,33 @@ fun MeniComposeIksica(menies: Menza?) {
         .padding(bottom = 16.dp)
         .clip(RoundedCornerShape(15.dp))
         .background(colorResource(id = R.color.raisin_black))
-        .padding(20.dp, 10.dp)
+        .border(1.dp, colorResource(R.color.quartz), RoundedCornerShape(16.dp))
+        .padding(24.dp, 8.dp)
         .fillMaxWidth()
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .clip(RoundedCornerShape(30.dp))
+            .background(colorResource(R.color.raisin_black))
+            .padding(16.dp)
     ) {
         Text(
-            text = "Ručak",
-            fontSize = 25.sp,
+            text = "FESB",
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 10.dp)
+            modifier = Modifier.padding(16.dp, 8.dp, 0.dp, 0.dp)
+        )
+        Text(
+            text = "Restoran Kampus, Ul. Ruđera Boškovića 32",
+            fontSize = 15.sp,
+            modifier = Modifier.padding(16.dp, 0.dp, 0.dp, 24.dp)
+        )
+        Text(
+            text = "Ručak",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(16.dp, 8.dp)
         )
         menies?.menies?.filter { it.mealTime == "RUČAK" }?.forEach {
             MeniItem(it, mealModifier)

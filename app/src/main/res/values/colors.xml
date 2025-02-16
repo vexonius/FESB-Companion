@@ -53,4 +53,7 @@
     //Timetable
     <color name="eventCardBackground">#232323</color>
 
+    //Menza
+    <color name="quartz">#4B4B4B</color>
+
 </resources>
