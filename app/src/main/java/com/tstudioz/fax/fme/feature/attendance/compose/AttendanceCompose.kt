@@ -1,7 +1,9 @@
 package com.tstudioz.fax.fme.feature.attendance.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,12 +14,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,13 +28,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.spacing
+import com.tstudioz.fax.fme.feature.attendance.ShownSemester
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -64,6 +66,7 @@ fun AttendanceCompose(attendanceViewModel: AttendanceViewModel) {
         } else {
             EmptyView()
         }
+
     }
 }
 
@@ -92,20 +95,24 @@ fun CreateAttendanceListView(attendanceViewModel: AttendanceViewModel, snackbarH
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            Row {
-                FilterButton(
-                    selected = shownSemester == AttendanceViewModel.ShownSemester.FIRST ,
+            Text(
+                text = stringResource(id = R.string.tab_attendance),
+                modifier = Modifier.padding(32.dp, 40.dp, 0.dp, 8.dp),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Row(
+                Modifier.padding(horizontal = 32.dp)
+            ) {
+                FilterButton(selected = shownSemester == ShownSemester.FIRST,
                     text = stringResource(id = R.string.first_semester),
-                    onClick = { attendanceViewModel.showSemester(AttendanceViewModel.ShownSemester.FIRST) }
-                )
-                FilterButton(
-                    selected = shownSemester == AttendanceViewModel.ShownSemester.SECOND,
+                    onClick = { attendanceViewModel.showSemester(ShownSemester.FIRST) })
+                FilterButton(selected = shownSemester == ShownSemester.SECOND,
                     text = stringResource(id = R.string.second_semester),
-                    onClick = { attendanceViewModel.showSemester(AttendanceViewModel.ShownSemester.SECOND) }
-                )
+                    onClick = { attendanceViewModel.showSemester(ShownSemester.SECOND) })
             }
 
-            list.forEach() { item ->
+            list.forEach { item ->
                 AttendanceItem(item)
             }
         }
@@ -114,17 +121,29 @@ fun CreateAttendanceListView(attendanceViewModel: AttendanceViewModel, snackbarH
 
 @Composable
 fun FilterButton(
-    selected: Boolean,
-    text: String,
-    onClick: () -> Unit
+    selected: Boolean, text: String, onClick: () -> Unit
 ) {
-    Spacer(modifier = Modifier.padding(MaterialTheme.spacing.small))
-    TextButton(
+    Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(40.dp))
+            .padding(vertical = 8.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .clickable { onClick() }
             .background(color = colorResource(id = if (selected) R.color.brandeis_blue else R.color.raisin_black)),
-        onClick = onClick
     ) {
-        Text(text, color = colorResource(id = R.color.white))
+        Text(
+            text = text,
+            color = colorResource(id = R.color.white),
+            modifier = Modifier.padding(12.dp, 6.dp),
+            fontSize = 14.sp
+        )
+    }
+    Spacer(modifier = Modifier.padding(8.dp))
+}
+
+@Preview
+@Composable
+fun FilterButtonPreview() {
+    AppTheme {
+        FilterButton(selected = true, text = "First Semester", onClick = {})
     }
 }

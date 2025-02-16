@@ -9,6 +9,7 @@ open class AttendanceEntry : RealmObject {
     var id: String = ""
     var `class`: String = ""
     var type: String = ""
+    var link: String = ""
     var attended = 0
     var absent = 0
     var required: Int = 0
