@@ -1,7 +1,10 @@
 package com.tstudioz.fax.fme.view.activities
 
 import android.os.Bundle
+import android.view.WindowManager
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.navigation.Attendance
 import com.tstudioz.fax.fme.navigation.Home
@@ -18,6 +21,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         router.register(this)
+
+        enableEdgeToEdge()
 
         setContent {
             val startDestination = when (intent.action.toString()) {

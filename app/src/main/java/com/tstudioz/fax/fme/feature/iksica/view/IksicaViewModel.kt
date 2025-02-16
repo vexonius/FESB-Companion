@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica.view
 
-import android.graphics.Bitmap
+import android.app.Application
 import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
@@ -25,6 +26,7 @@ import okhttp3.HttpUrl
 @InternalCoroutinesApi
 class IksicaViewModel(
     private val repository: IksicaRepositoryInterface,
+    private val application: Application,
     private val camerasRepository: CamerasRepositoryInterface,
     private val menzaRepository: MenzaRepositoryInterface
 ) : ViewModel() {
@@ -75,7 +77,7 @@ class IksicaViewModel(
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
         viewModelScope.launch(Dispatchers.Main) {
-            snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+            snackbarHostState.showSnackbar(application.getString(R.string.error_general_iksica))
         }
     }
 
@@ -105,7 +107,7 @@ class IksicaViewModel(
 
                 is IksicaResult.CardAndReceiptsResult.Failure -> {
                     snackbarHostState.showSnackbar(
-                        "Greška prilikom dohvaćanja liste računa",
+                        application.getString(R.string.error_fetching_receipts_iksica),
                         duration = SnackbarDuration.Short
                     )
                 }
@@ -128,7 +130,7 @@ class IksicaViewModel(
                 is IksicaResult.ReceiptResult.Failure -> {
                     _receiptSelected.postValue(IksicaReceiptState.Error(details.throwable.message.toString()))
                     snackbarHostState.showSnackbar(
-                        "Greška prilikom dohvaćanja detalja računa",
+                        application.getString(R.string.error_receipt_details_iksica),
                         duration = SnackbarDuration.Short
                     )
                 }

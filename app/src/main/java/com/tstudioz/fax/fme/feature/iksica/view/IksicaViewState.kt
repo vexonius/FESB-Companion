@@ -8,7 +8,6 @@ sealed class IksicaViewState {
     data object Loading : IksicaViewState()
     data class Fetching(val data: StudentData) : IksicaViewState()
     data class Success(val data: StudentData) : IksicaViewState()
-    data object FetchingError : IksicaViewState()
     data object Empty : IksicaViewState()
 }
 

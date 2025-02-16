@@ -43,7 +43,7 @@ fun MainTopAppBar(
 ) {
     val currentDestination =
         navController.currentBackStackEntryAsState().value?.destination?.route?.split(".")?.lastOrNull() ?: ""
-    if (currentDestination != "Attendance") {
+    if (currentDestination != "Iksica" && currentDestination != "Attendance") {
     TopAppBar(
         colors = if (currentDestination != "Home") {
             TopAppBarDefaults.topAppBarColors(

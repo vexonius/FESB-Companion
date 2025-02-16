@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
+import android.graphics.Paint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,8 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.glowingColor
+import com.tstudioz.fax.fme.compose.gradientColors
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import java.util.Locale
 
 @Preview
@@ -39,25 +43,40 @@ fun ElevatedCardIksica(
     balance: Double = 0.00,
     onClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1.586f)
-            .padding(25.dp)
-            .clip(shape = RoundedCornerShape(30.dp))
-            .angledGradientBackground(
-                colors = listOf(
-                    Color(0xFFFF9966),
-                    Color(0xFFFF5E62)
-                ),
-                degrees = 90f,
-                halfHalf = true
-            )
-    ) {
+    val cornersRadius = 30.dp
+    val glowingRadius = 100.dp
+
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(24.dp, 30.dp, 24.dp, 50.dp)
+        .aspectRatio(1.586f)
+        .drawBehind {
+            val canvasSize = size
+            drawContext.canvas.nativeCanvas.apply {
+                drawRoundRect(0f,
+                    0f,
+                    canvasSize.width, canvasSize.height,
+                    cornersRadius.toPx(), cornersRadius.toPx(),
+                    Paint().apply {
+                        isAntiAlias = true
+                        setShadowLayer(glowingRadius.toPx(), 0f, 0f, glowingColor.toArgb())
+                    })
+                drawRoundRect(0f,
+                    0f,
+                    canvasSize.width, canvasSize.height,
+                    cornersRadius.toPx(), cornersRadius.toPx(),
+                    Paint().apply {
+                        isAntiAlias = true
+                        setShadowLayer((glowingRadius / 4).toPx(), 0f, 0f, glowingColor.toArgb())
+                    })
+            }
+        }
+        .clip(shape = RoundedCornerShape(cornersRadius))
+        .angledGradientBackground(
+            colors = gradientColors, degrees = 32f
+        )) {
         Column(
-            Modifier
-                .fillMaxSize()
-                .clickable { onClick() },
+            Modifier.clickable { onClick() },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -67,7 +86,32 @@ fun ElevatedCardIksica(
                     .weight(0.7f)
             ) {
                 Row(
-                    verticalAlignment = Alignment.Top,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(0.dp, 0.dp)
+                ) {
+                    Text(
+                        text = name, fontSize = 25.sp, fontWeight = FontWeight.Bold
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val formattedNumber = buildList {
+                        add(iksicaNumber.take(6))
+                        add(iksicaNumber.drop(6).take(2))
+                        add(iksicaNumber.drop(8).take(10))
+                        add(iksicaNumber.takeLast(1))
+                    }.joinToString(" ")
+                    Text(
+                        text = formattedNumber,
+                        fontSize = 16.sp,
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.End,
                     modifier = Modifier
                         .weight(0.3f)
@@ -75,34 +119,11 @@ fun ElevatedCardIksica(
                 ) {
                     Text(
                         text = stringResource(
-                            id = R.string.iksica_balance, String.format(Locale.US, "%.2f", balance)
+                            id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", balance)
                         ),
                         fontSize = 25.sp,
                         lineHeight = 25.sp,
                         fontWeight = FontWeight.ExtraBold,
-
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(0.dp, 0.dp)
-                ) {
-                    Text(
-                        text = name,
-                        fontSize = 25.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = iksicaNumber.chunked(4).joinToString(" "),
-                        fontSize = 16.sp,
                     )
                 }
             }
@@ -142,9 +163,7 @@ fun CardIksicaPopupContent(model: StudentData) {
 
 @Composable
 fun CardIksicaPopupRow(
-    leftText: String,
-    rightText: String,
-    divider: Boolean = true
+    leftText: String, rightText: String, divider: Boolean = true
 ) {
     Row(
         Modifier

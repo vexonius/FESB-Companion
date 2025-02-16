@@ -128,6 +128,26 @@
     <string name="rights_from_label">Prava od</string>
     <string name="right_until_label">Prava do</string>
     <string name="card_balance_label">Stanje iksice</string>
+    <string name="transactions">Transakcije</string>
+    <string name="transaction_details">Detalji transakcije</string>
+    <string name="transaction_total">Ukupno</string>
+    <string name="transaction_subsidized">Subvencionirano</string>
+    <string name="transaction_paid">Plaćeno</string>
+    <string name="currency">\u0020€</string>
+    <string name="today">Danas</string>
+    <string name="yesterday">Jučer</string>
+    <string name="days_ago_one">Prije %1$d dan</string>
+    <string name="days_ago_multiple">Prije %1$d dana</string>
+    <string name="in_the_future">U budućnosti</string>
+    <string name="minus_amount">-%1$s</string>
+    <string name="amount_x">%1$sx</string>
+    <string name="price_of_item">Cijena: %1$s</string>
+    <string name="subsidized_price_of_item">Subvencija: %1$s</string>
+    <string name="receipt_details">Detalji</string>
+    <string name="error_receipt_details_iksica">Greška prilikom dohvaćanja detalja računa</string>
+    <string name="error_fetching_receipts_iksica">Greška prilikom dohvaćanja računa</string>
+    <string name="error_general_iksica">Greška prilikom dohvaćanja podataka</string>
+
 
     // Timetable
     <string name="professor">Profesor</string>
