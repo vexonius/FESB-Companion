@@ -11,6 +11,7 @@ import com.tstudioz.fax.fme.database.DatabaseManager
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.KeystoreManager
 import com.tstudioz.fax.fme.database.KeystoreManagerInterface
+import com.tstudioz.fax.fme.feature.settings.SettingsService
 import com.tstudioz.fax.fme.feature.settings.SettingsViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
@@ -48,7 +49,8 @@ val module = module {
     single<DatabaseManagerInterface> { DatabaseManager(get()) }
     single<SharedPreferences> { encryptedSharedPreferences(androidContext()) }
     viewModel { TimetableViewModel(get(), get(), get()) }
-    viewModel { SettingsViewModel(androidApplication(), get()) }
+    viewModel { SettingsViewModel(androidApplication(), get(), get()) }
+    single{SettingsService(get(), get())}
 }
 
 fun provideOkHttpClient(monsterCookieJar: MonsterCookieJar): OkHttpClient {

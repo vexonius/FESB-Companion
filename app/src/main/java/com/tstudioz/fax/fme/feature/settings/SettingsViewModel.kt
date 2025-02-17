@@ -6,15 +6,18 @@ import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.settings.model.EmailModalModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class SettingsViewModel(
     private val application: Application,
     private val userRepository: UserRepositoryInterface,
+    private val settingsService: SettingsService
 ) : AndroidViewModel(application) {
 
     val username: MutableLiveData<String> = MutableLiveData()
@@ -72,6 +75,13 @@ class SettingsViewModel(
         val subject = "${getString(application, R.string.report_bug_email_subject)} v${version.value}"
 
         return EmailModalModel(feedbackRecipientAddress, title, subject, "")
+    }
+
+    fun sendBluetoothAddr(bleAddr: String): String {
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsService.sendBluetoothAddr(bleAddr)
+        }
+        return "Success"
     }
 
     companion object {

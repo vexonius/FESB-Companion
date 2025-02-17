@@ -69,6 +69,7 @@ class StudomatViewModel(
                         result.data.firstOrNull()?.let { getChosenYear(it) }
                         years.postValue(result.data)
                         student.postValue(result.student)
+                        sharedPreferences.edit().putString("student", result.student.name +" " +result.student.surname).apply()
                         selectedYear.postValue(result.data.firstOrNull())
                         loadedTxt.postValue(StudomatState.FETCHED)
                     }

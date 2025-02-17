@@ -4,22 +4,34 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -126,10 +138,84 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
                         viewModel.displayLicensesDialog()
                     }
                 )
+                BluetoothAddrSendDialog(onClick = { viewModel.sendBluetoothAddr(it) })
             }
         }
     }
 }
+
+@Composable
+fun BluetoothAddrSendDialog(
+    onClick: (String) -> Unit
+) {
+    val editMessage = remember { mutableStateOf("") }
+    val message = remember { mutableStateOf("") }
+    val openDialog = remember { mutableStateOf(false) }
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        if (!openDialog.value) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp)
+                    .clickable { openDialog.value = true }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.add_new),
+                    contentDescription = stringResource(id = R.string.add_note),
+                    modifier = Modifier.size(25.dp)
+                )
+                Text(
+                    text = "Pošalji bluetooth addresu uređaja",
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                )
+            }
+        } else {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    TextField(
+                        value = editMessage.value,
+                        onValueChange = { editMessage.value = it },
+                        singleLine = true,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
+                            unfocusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
+                        ),
+                        placeholder = {
+                            Text(
+                                text = "Unesi bluetooth addresu uređaja",
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(0.dp)
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(modifier = Modifier.align(Alignment.End)) {
+                        OutlinedButton(
+                            onClick = { openDialog.value = false }
+                        ) { Text(stringResource(id = R.string.cancel_note)) }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        OutlinedButton(onClick = {
+                            message.value = editMessage.value
+                            openDialog.value = false
+                            editMessage.value = ""
+                            onClick(message.value)
+                        }
+                        ) { Text("Pošalji") }
+                    }
+                }
+
+            }
+        }
+    }
+}
+
 
 @Composable
 fun CategoryTitle(title: String) {
