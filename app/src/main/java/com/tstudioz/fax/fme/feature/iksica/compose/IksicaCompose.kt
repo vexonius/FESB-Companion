@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,7 +30,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -59,18 +57,23 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import kotlinx.coroutines.InternalCoroutinesApi
 
-@OptIn(InternalCoroutinesApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(
+    InternalCoroutinesApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
     val scaffoldState = rememberBottomSheetScaffoldState()
-    val listState = rememberLazyListState()
 
     val receiptSelected = iksicaViewModel.receiptSelected.observeAsState().value
     val studentData = iksicaViewModel.studentData.observeAsState().value
@@ -81,7 +84,9 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
     val pullRefreshState = rememberPullRefreshState(isRefreshing, { iksicaViewModel.getReceipts() })
 
-    LaunchedEffect(lifecycleState) { if (lifecycleState == Lifecycle.State.RESUMED) iksicaViewModel.getReceipts() }
+    LaunchedEffect(lifecycleState) {
+        if (lifecycleState == Lifecycle.State.RESUMED) iksicaViewModel.getReceipts()
+    }
 
     BottomSheetScaffold(
         sheetPeekHeight = 0.dp,
@@ -95,23 +100,32 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             if (receiptSelected is IksicaReceiptState.Success)
                 BottomSheetIksica(receiptSelected.data) { iksicaViewModel.hideReceiptDetails() }
         }) {
-        when (viewState) {
-            is IksicaViewState.Initial, is IksicaViewState.Empty -> {
-                EmptyIksicaView(isRefreshing, pullRefreshState)
-            }
+        Box(Modifier.fillMaxWidth()) {
+            PullRefreshIndicator(
+                isRefreshing, pullRefreshState, Modifier
+                    .align(Alignment.TopCenter)
+                    .zIndex(5f)
+            )
+            when (viewState) {
+                is IksicaViewState.Initial, is IksicaViewState.Empty -> EmptyIksicaView()
+                is IksicaViewState.Success -> {
+                    PopulatedIksicaView(
+                        viewState.data,
+                        onCardClick = { showPopup.value = true },
+                        onItemClick = { iksicaViewModel.getReceiptDetails(it) }
+                    )
+                }
 
-            is IksicaViewState.Success, is IksicaViewState.Fetching -> {
-                PopulatedIksicaView(
-                    iksicaViewModel,
-                    viewState,
-                    showPopup,
-                    listState,
-                    isRefreshing,
-                    pullRefreshState
-                )
-            }
+                is IksicaViewState.Fetching -> {
+                    PopulatedIksicaView(
+                        viewState.data,
+                        onCardClick = { showPopup.value = true },
+                        onItemClick = { iksicaViewModel.getReceiptDetails(it) }
+                    )
+                }
 
-            else -> {}
+                else -> {}
+            }
         }
     }
 
@@ -122,17 +136,11 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun EmptyIksicaView(isRefreshing: Boolean, pullRefreshState: PullRefreshState) {
+fun EmptyIksicaView() {
     Column {
         TopBarIksica()
         Box(Modifier.fillMaxWidth()) {
-            PullRefreshIndicator(
-                isRefreshing, pullRefreshState, Modifier
-                    .align(Alignment.TopCenter)
-                    .zIndex(5f)
-            )
             LazyColumn(
                 Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center
@@ -145,16 +153,13 @@ fun EmptyIksicaView(isRefreshing: Boolean, pullRefreshState: PullRefreshState) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, InternalCoroutinesApi::class)
 @Composable
 fun PopulatedIksicaView(
-    iksicaViewModel: IksicaViewModel,
-    viewState: IksicaViewState,
-    showPopup: MutableState<Boolean>,
-    listState: LazyListState,
-    isRefreshing: Boolean,
-    pullRefreshState: PullRefreshState
+    model: StudentData,
+    onCardClick: () -> Unit,
+    onItemClick: (Receipt) -> Unit
 ) {
+    val listState = rememberLazyListState()
     val sheetTopPadding = with(LocalDensity.current) { 0.dp.toPx() }
     var composableHeight by remember { mutableIntStateOf(0) }
     var sheetOffset by remember { mutableIntStateOf(0) }
@@ -164,21 +169,25 @@ fun PopulatedIksicaView(
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 if (listState.firstVisibleItemIndex == 0) {
-                    sheetOffset = (sheetOffset + delta).coerceIn(sheetTopPadding, composableHeight.toFloat()).toInt()
+                    sheetOffset =
+                        (sheetOffset + delta).coerceIn(sheetTopPadding, composableHeight.toFloat())
+                            .toInt()
                 }
-                return Offset(0f, if (composableHeight > sheetOffset && sheetOffset > sheetTopPadding) delta else 0f)
+                return Offset(
+                    0f,
+                    if (composableHeight > sheetOffset && sheetOffset > sheetTopPadding) delta else 0f
+                )
             }
 
-            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource) =
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ) =
                 Offset(0f, if (sheetOffset == 0) available.y else 0f)
         }
     }
 
-    val model = when (viewState) {
-        is IksicaViewState.Success -> viewState.data
-        is IksicaViewState.Fetching -> viewState.data
-        else -> return
-    }
     Box(modifier = Modifier.nestedScroll(nestedScrollConnection)) {
         Column(Modifier.onGloballyPositioned {
             if (composableHeight == 0) {
@@ -189,12 +198,9 @@ fun PopulatedIksicaView(
             TopBarIksica()
 
             Box(Modifier.fillMaxWidth()) {
-                PullRefreshIndicator(
-                    isRefreshing, pullRefreshState, Modifier
-                        .align(Alignment.TopCenter)
-                        .zIndex(5f)
-                )
-                ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) { showPopup.value = true }
+                ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) {
+                    onCardClick()
+                }
             }
         }
         Column(modifier = Modifier
@@ -208,7 +214,7 @@ fun PopulatedIksicaView(
                 TransakcijeText()
                 LazyColumn(state = listState) {
                     items(model.receipts) {
-                        IksicaItem(it) { iksicaViewModel.getReceiptDetails(it) }
+                        IksicaItem(it) { onItemClick(it) }
                     }
                 }
             }
@@ -251,7 +257,8 @@ fun EmptyIksicaView(text: String) {
         verticalAlignment = Alignment.Top
     ) {
         Text(
-            text = text, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            text = text,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
     }
 }
