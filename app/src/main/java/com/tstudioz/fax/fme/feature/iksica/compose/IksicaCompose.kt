@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,12 +14,12 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.BottomSheetScaffold
@@ -29,14 +30,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +49,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -63,6 +65,7 @@ import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 
 @OptIn(
     InternalCoroutinesApi::class,
@@ -73,7 +76,10 @@ import kotlinx.coroutines.InternalCoroutinesApi
 fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState()
+    val listState = rememberLazyListState()
+    val nestedSheetState = rememberNestedSheetState(composableHeight = 999, sheetOffset = 999)
 
     val receiptSelected = iksicaViewModel.receiptSelected.observeAsState().value
     val studentData = iksicaViewModel.studentData.observeAsState().value
@@ -86,6 +92,17 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
     LaunchedEffect(lifecycleState) {
         if (lifecycleState == Lifecycle.State.RESUMED) iksicaViewModel.getReceipts()
+
+    }
+
+    DisposableEffect(lifecycleState) {
+        onDispose {
+            if (lifecycleState == Lifecycle.State.CREATED) {
+                coroutineScope.launch {
+                    listState.scrollToItem(0)
+                }
+            }
+        }
     }
 
     BottomSheetScaffold(
@@ -106,11 +123,14 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     .align(Alignment.TopCenter)
                     .zIndex(5f)
             )
+
             when (viewState) {
                 is IksicaViewState.Initial, is IksicaViewState.Empty -> EmptyIksicaView()
                 is IksicaViewState.Success -> {
                     PopulatedIksicaView(
                         viewState.data,
+                        listState,
+                        nestedSheetState,
                         onCardClick = { showPopup.value = true },
                         onItemClick = { iksicaViewModel.getReceiptDetails(it) }
                     )
@@ -119,6 +139,8 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                 is IksicaViewState.Fetching -> {
                     PopulatedIksicaView(
                         viewState.data,
+                        listState,
+                        nestedSheetState,
                         onCardClick = { showPopup.value = true },
                         onItemClick = { iksicaViewModel.getReceiptDetails(it) }
                     )
@@ -156,26 +178,28 @@ fun EmptyIksicaView() {
 @Composable
 fun PopulatedIksicaView(
     model: StudentData,
+    listState: LazyListState,
+    nestedSheetState: NestedSheetState,
     onCardClick: () -> Unit,
     onItemClick: (Receipt) -> Unit
 ) {
-    val listState = rememberLazyListState()
-    val sheetTopPadding = with(LocalDensity.current) { 0.dp.toPx() }
-    var composableHeight by remember { mutableIntStateOf(0) }
-    var sheetOffset by remember { mutableIntStateOf(0) }
+
+    val sheetOffset = nestedSheetState.sheetOffset
+    val sheetTopPadding = nestedSheetState.sheetTopPadding
+    val composableHeight = nestedSheetState.composableHeight
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 if (listState.firstVisibleItemIndex == 0) {
-                    sheetOffset =
-                        (sheetOffset + delta).coerceIn(sheetTopPadding, composableHeight.toFloat())
+                    sheetOffset.intValue =
+                        (sheetOffset.intValue + delta).coerceIn(sheetTopPadding, composableHeight.intValue.toFloat())
                             .toInt()
                 }
                 return Offset(
                     0f,
-                    if (composableHeight > sheetOffset && sheetOffset > sheetTopPadding) delta else 0f
+                    if (composableHeight.intValue > sheetOffset.intValue && sheetOffset.intValue > sheetTopPadding) delta else 0f
                 )
             }
 
@@ -184,15 +208,16 @@ fun PopulatedIksicaView(
                 available: Offset,
                 source: NestedScrollSource
             ) =
-                Offset(0f, if (sheetOffset == 0) available.y else 0f)
+                Offset(0f, if (sheetOffset.intValue == 0) available.y else 0f)
         }
     }
 
     Box(modifier = Modifier.nestedScroll(nestedScrollConnection)) {
         Column(Modifier.onGloballyPositioned {
-            if (composableHeight == 0) {
-                composableHeight = it.size.height
-                sheetOffset = it.size.height
+            if (!nestedSheetState.set) {
+                nestedSheetState.set = true
+                composableHeight.intValue = it.size.height
+                sheetOffset.intValue = it.size.height
             }
         }) {
             TopBarIksica()
@@ -204,7 +229,7 @@ fun PopulatedIksicaView(
             }
         }
         Column(modifier = Modifier
-            .offset { IntOffset(0, sheetOffset) }
+            .offset { IntOffset(0, sheetOffset.intValue) }
             .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
             .background(colorResource(R.color.chinese_black))
         ) {
