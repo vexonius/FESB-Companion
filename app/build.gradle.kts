@@ -1,5 +1,3 @@
-import java.util.Properties
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -7,8 +5,6 @@ plugins {
     id("io.realm.kotlin") version "1.16.0"
     kotlin("plugin.serialization") version "2.0.0"
 }
-
-val localProperties = Properties().apply { load(File(rootDir, "local.properties").inputStream()) }
 
 android {
     compileSdk = 34
@@ -24,9 +20,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("./../keystore.jks")
-            storePassword = localProperties.getProperty("RELEASE_SIGNING_PASSWORD")
-            keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
-            keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+            storePassword = System.getenv("RELEASE_SIGNING_PASSWORD")
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
         }
     }
 
