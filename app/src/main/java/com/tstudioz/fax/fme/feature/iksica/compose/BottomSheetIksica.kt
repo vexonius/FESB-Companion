@@ -44,7 +44,6 @@ fun BottomSheetIksica(
         onDismissRequest = { toggleShowItem() },
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
-        windowInsets = WindowInsets(0.dp),
         dragHandle = { },
     ) {
         IksicaReceiptDetailed(receipt)

@@ -25,13 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 
 
 @Composable
@@ -46,8 +47,7 @@ fun SubjectView(subject: StudomatSubject) {
             .wrapContentHeight(),
     ) {
         Column(
-            Modifier
-                .background(MaterialTheme.colorScheme.surfaceDim)
+            Modifier.background(MaterialTheme.colorScheme.surfaceDim)
         ) {
             Column(
                 Modifier
@@ -61,22 +61,73 @@ fun SubjectView(subject: StudomatSubject) {
                 Modifier.padding(4.dp, 0.dp, 0.dp, 8.dp)
             ) {
                 if (expanded) {
-                    PredmetText(text = stringResource(id = R.string.elective_group), value = subject.electiveGroup ?: "")
+                    PredmetText(
+                        text = stringResource(id = R.string.elective_group), value = subject.electiveGroup ?: ""
+                    )
                     PredmetText(text = stringResource(id = R.string.semester), value = subject.semester ?: "")
                     PredmetText(text = stringResource(id = R.string.lectures), value = subject.lectures ?: "")
                     PredmetText(text = stringResource(id = R.string.exercises), value = subject.exercises ?: "")
                     PredmetText(text = stringResource(id = R.string.ects_enrolled), value = subject.ectsEnrolled ?: "")
                     PredmetText(text = stringResource(id = R.string.is_taken), value = subject.isTaken ?: "")
-                    PredmetText(text = stringResource(id = R.string.status), value = subject.status ?: "", isPassed = subject.isPassed)
+                    PredmetText(
+                        text = stringResource(id = R.string.status),
+                        value = subject.status ?: "",
+                        isPassed = subject.isPassed
+                    )
                     PredmetText(text = stringResource(id = R.string.grade), value = subject.grade ?: "")
                     PredmetText(text = stringResource(id = R.string.exam_date), value = subject.examDate ?: "")
                 } else {
                     PredmetText(text = stringResource(id = R.string.semester), value = subject.semester ?: "")
                     PredmetText(text = stringResource(id = R.string.ects_enrolled), value = subject.ectsEnrolled ?: "")
-                    PredmetText(text = stringResource(id = R.string.status), value = subject.status ?: "", isPassed = subject.isPassed)
+                    PredmetText(
+                        text = stringResource(id = R.string.status),
+                        value = subject.status ?: "",
+                        isPassed = subject.isPassed
+                    )
                     PredmetText(text = stringResource(id = R.string.grade), value = subject.grade ?: "")
                 }
 
+            }
+        }
+    }
+}
+
+@Composable
+fun YearView(list: List<StudomatSubject>) {
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .clip(RoundedCornerShape(30.dp))
+            .background(color = colorResource(id = R.color.raisin_black))
+            .fillMaxWidth()
+            .wrapContentHeight()
+    ) {
+        Text(
+            text = "Upisani predmeti",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Left,
+            modifier = Modifier.padding(24.dp, 28.dp, 0.dp, 16.dp)
+        )
+        list.forEach {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp, 8.dp)
+                    .wrapContentHeight(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = it.name,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Left
+                )
+                Text(
+                    text = it.grade,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Right
+                )
             }
         }
     }
@@ -102,8 +153,7 @@ fun PredmetText(text: String, value: String, isTitle: Boolean = false, isPassed:
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = value,
-            modifier = if (isPassed) {
+            text = value, modifier = if (isPassed) {
                 Modifier
                     .wrapContentSize()
                     .clip(RoundedCornerShape(12.dp, 0.dp, 0.dp, 12.dp))
@@ -113,9 +163,7 @@ fun PredmetText(text: String, value: String, isTitle: Boolean = false, isPassed:
                 Modifier
                     .wrapContentSize()
                     .padding(8.dp, 8.dp, 16.dp, 8.dp)
-            },
-            fontSize = if (isTitle) 16.sp else 14.sp,
-            textAlign = TextAlign.Right
+            }, fontSize = if (isTitle) 16.sp else 14.sp, textAlign = TextAlign.Right
         )
     }
 

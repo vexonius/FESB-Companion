@@ -61,4 +61,8 @@ class StudomatRepository(
         return studomatDao.read(year)
     }
 
+    suspend fun readAll(): List<StudomatSubject> {
+        return studomatDao.readAll()
+    }
+
 }

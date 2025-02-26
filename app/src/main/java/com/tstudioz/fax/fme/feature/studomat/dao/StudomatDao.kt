@@ -36,6 +36,13 @@ class StudomatDao(private val dbManager: DatabaseManagerInterface) :StudomatDaoI
         return result.sortedBy { it.name }
     }
 
+    suspend fun readAll(): List<StudomatSubject> {
+        val realm = Realm.open(dbManager.getDefaultConfiguration())
+        val result = realm.query(StudomatSubject::class).find()
+
+        return result.sortedBy { it.name }
+    }
+
     override suspend fun readYears(): List<Year> {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
         val result = realm.query(Year::class).find()

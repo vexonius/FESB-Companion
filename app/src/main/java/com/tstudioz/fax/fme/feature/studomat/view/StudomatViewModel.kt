@@ -26,6 +26,7 @@ class StudomatViewModel(
     val isRefreshing = MutableLiveData(false)
 
     var subjectList = MutableLiveData<List<StudomatSubject>>(emptyList())
+    val allYears = MutableLiveData<Map<String, List<StudomatSubject>>>(emptyMap())
     private var loadedTxt = MutableLiveData(StudomatState.UNSET)
     var student = MutableLiveData(Student())
     var generated = MutableLiveData<String>()
@@ -44,6 +45,7 @@ class StudomatViewModel(
 
     init {
         loadData()
+        loadAllYears()
         initStudomat()
     }
 
@@ -55,6 +57,13 @@ class StudomatViewModel(
             subjectList.postValue(latestYearSubjects)
             generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
         }}
+
+    private fun loadAllYears() {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            val yearsRealm = repository.readAll().groupBy { it.year }
+            allYears.postValue(yearsRealm)
+        }
+    }
 
 
     private fun initStudomat() {

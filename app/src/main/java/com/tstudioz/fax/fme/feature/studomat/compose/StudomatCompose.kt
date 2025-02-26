@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -44,6 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.tbuonomo.viewpagerdotsindicator.compose.DotsIndicator
+import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
+import com.tbuonomo.viewpagerdotsindicator.compose.type.ShiftIndicatorType
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 
@@ -54,6 +59,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
     val subjectList = studomatViewModel.subjectList.observeAsState().value
         ?.sortedBy { it.name }
         ?.sortedBy { it.semester }
+    val allYears = studomatViewModel.allYears.observeAsState().value
     val loading = studomatViewModel.loading.observeAsState().value
     val snackbarHostState = remember { studomatViewModel.snackbarHostState }
     val isRefreshing = studomatViewModel.isRefreshing.observeAsState().value
@@ -119,7 +125,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
             }
             LazyColumn(
                 modifier = Modifier.padding(16.dp, 10.dp, 16.dp, 0.dp)
-            ) {
+            ) {/*
                 item {
                     Column(Modifier.zIndex(1f)) {
                         Dropdown(studomatViewModel)
@@ -133,8 +139,24 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
                         }
                         ProgressBarCompose(subjectList?.count { it.isPassed } ?: 0, subjectList?.size ?: 0)
                     }
+                }*/
+                item{
+                    if (allYears != null) {
+                        val list = allYears.toList().sortedByDescending { it.first }
+                        val pagerState = rememberPagerState(pageCount = { list.size })
+                        val pageCount = list.size
+                        Row  (horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()){ DotsIndicator(
+                            dotCount = pageCount,
+                            type = ShiftIndicatorType(dotsGraphic = DotGraphic(color = MaterialTheme.colorScheme.primary)),
+                            pagerState = pagerState
+                        ) }
+
+                        HorizontalPager(verticalAlignment = Alignment.Top, state = pagerState) { page ->
+                            YearView(list[page].second)
+                        }
+                    }
                 }
-                if (!subjectList.isNullOrEmpty()) {
+                /*if (!subjectList.isNullOrEmpty()) {
                     items(subjectList.size) { item ->
                         SubjectView(subject = subjectList[item])
                     }
@@ -158,7 +180,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
                             Text("Nema podataka za prikazati.")
                         }
                     }
-                }
+                }*/
             }
         }
     }
