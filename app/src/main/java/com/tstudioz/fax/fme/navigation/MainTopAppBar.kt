@@ -12,7 +12,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.darkCyan
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.routing.HomeRouter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,7 +39,7 @@ fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetabl
                 )
             } else {
                 TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(id = R.color.dark_cyan),
+                    containerColor = darkCyan,
                     titleContentColor = Color.White
                 )
             },

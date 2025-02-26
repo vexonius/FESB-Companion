@@ -37,7 +37,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,6 +48,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.colorPrimary
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimetableType
 import java.time.LocalDate
@@ -164,7 +164,7 @@ fun ScheduleHeader(
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
 ) {
     Row(
-        modifier = modifier.background(color = colorResource(R.color.colorPrimary))
+        modifier = modifier.background(color = colorPrimary)
     ) {
         val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
         repeat(numDays) { i ->
@@ -449,7 +449,7 @@ fun BasicSchedule(
             )
         ).filter { it.end > minDayTime && it.start < maxDayTime }
     }
-    val dividerColor = colorResource(R.color.colorPrimary)
+    val dividerColor = colorPrimary
 
     Layout(content = {
         positionedEvents.forEach { positionedEvent ->

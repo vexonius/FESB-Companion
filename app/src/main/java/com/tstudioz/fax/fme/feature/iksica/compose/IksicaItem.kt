@@ -14,13 +14,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.brandeisBlue
+import com.tstudioz.fax.fme.compose.chineseBlack
 import com.tstudioz.fax.fme.compose.greyishWhite
 import com.tstudioz.fax.fme.feature.iksica.daysAgoText
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
@@ -32,7 +33,7 @@ import java.time.temporal.ChronoUnit
 fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
     Column(
         modifier = Modifier
-            .background(colorResource(R.color.chinese_black))
+            .background(chineseBlack)
             .clickable(onClick = onClick)
             .padding(16.dp, 5.dp)
     ) {
@@ -62,7 +63,7 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
                 fontSize = 13.sp,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.End,
-                color = colorResource(id = R.color.brandeis_blue)
+                color = brandeisBlue
             )
         }
     }

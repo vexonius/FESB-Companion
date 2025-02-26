@@ -27,7 +27,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +36,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.brandeisBlue
+import com.tstudioz.fax.fme.compose.raisinBlack
+import com.tstudioz.fax.fme.compose.white
 import com.tstudioz.fax.fme.feature.attendance.ShownSemester
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -132,11 +134,11 @@ fun FilterButton(
             .padding(vertical = 8.dp)
             .clip(RoundedCornerShape(10.dp))
             .clickable { onClick() }
-            .background(color = colorResource(id = if (selected) R.color.brandeis_blue else R.color.raisin_black)),
+            .background(color = if (selected) brandeisBlue else raisinBlack),
     ) {
         Text(
             text = text,
-            color = colorResource(id = R.color.white),
+            color = white,
             modifier = Modifier.padding(12.dp, 6.dp),
             fontSize = 14.sp
         )

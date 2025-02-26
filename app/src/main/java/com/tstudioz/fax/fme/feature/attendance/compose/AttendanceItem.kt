@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,6 +21,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.chineseBlack
+import com.tstudioz.fax.fme.compose.crayola
+import com.tstudioz.fax.fme.compose.raisinBlack
+import com.tstudioz.fax.fme.compose.ufoGreen
 import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 
 
@@ -32,7 +35,7 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
         modifier = Modifier
             .padding(24.dp, 8.dp)
             .clip(RoundedCornerShape(30.dp))
-            .background(colorResource(id = R.color.raisin_black))
+            .background(raisinBlack)
             .padding(24.dp)
     ) {
         Text(
@@ -77,9 +80,9 @@ fun AttendanceProgressBar(
     absent: Int,
     radius: Dp = 10.dp
 ) {
-    val green = colorResource(id = R.color.ufo_green)
-    val off = colorResource(id = R.color.chinese_black)
-    val red = colorResource(id = R.color.crayola)
+    val green = ufoGreen
+    val off = chineseBlack
+    val red = crayola
     Row {
         Canvas(
             Modifier

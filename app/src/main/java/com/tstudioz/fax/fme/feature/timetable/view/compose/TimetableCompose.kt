@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,6 +53,7 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.eventCardBackground
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.MonthData
@@ -315,7 +315,7 @@ fun EventCard(
                     bottomStart = bottomRadius,
                 )
             )
-            .background(colorResource(id = R.color.eventCardBackground))
+            .background(eventCardBackground)
             .clickable { onClick(positionedEvent.event) }
     ) {
 

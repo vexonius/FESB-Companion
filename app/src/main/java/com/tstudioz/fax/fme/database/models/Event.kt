@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.database.models
 
 import androidx.compose.ui.graphics.Color
-import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.blueNice
 import com.tstudioz.fax.fme.compose.greenNice
 import com.tstudioz.fax.fme.compose.greyNice

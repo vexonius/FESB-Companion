@@ -49,7 +49,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -59,6 +58,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.chineseBlack
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -231,7 +231,7 @@ fun PopulatedIksicaView(
         Column(modifier = Modifier
             .offset { IntOffset(0, sheetOffset.intValue) }
             .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-            .background(colorResource(R.color.chinese_black))
+            .background(chineseBlack)
         ) {
             if (model.receipts.isEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))

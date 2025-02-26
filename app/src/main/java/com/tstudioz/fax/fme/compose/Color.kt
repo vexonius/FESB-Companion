@@ -1,4 +1,5 @@
 package com.tstudioz.fax.fme.compose
+
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF006879)
@@ -80,3 +81,46 @@ val gradientColors = listOf(
     Color(0xFFDD3742),
     Color(0xFFA344DE)
 )
+
+val colorPrimary = Color(0xFF263238)
+val colorPrimaryDark = Color(0xFF1E262A)
+val colorAccent = Color(0xFF00C4FF)
+val white = Color(0xFFFFFFFF)
+val white20 = Color(0x70FFFFFF)
+val darkCyan = Color(0xFF0097A7)
+val darkerCyan = Color(0xFF00838F)
+val greenBlue = Color(0xFF0F5EB4)
+val lust = Color(0xFFE1141B)
+
+// Bottom Navigation
+val inactive = Color(0xFF658393)
+
+// Shades of grey
+val shadyBlue = Color(0xFF658393)
+
+// Attendance colors
+val ufoGreen = Color(0xFF43E388)
+val crayola = Color(0xFFFF5353)
+val chineseBlack = Color(0xFF171717)
+val raisinBlack = Color(0xFF232323)
+val brandeisBlue = Color(0xFF006AFF)
+
+// Adapter item colors
+val almostWhite = Color(0xFFCECECE)
+val black = Color(0xFF000000)
+
+// Screens background color
+val welcome2 = Color(0xFF20D2BB)
+
+val endeavour = Color(0xFF0052A3)
+val passGreen = Color(0xFF02B010)
+val greenHighlight = Color(0xFF20D2BB)
+val icLauncherBackground = Color(0xFF34434C)
+
+// Login screen
+val loginButton = Color(0xFF006AFF)
+val loginErrorColorContainer = Color(0xFF852221)
+val loginErrorColorContent = Color(0xFFFFDAD6)
+
+// Timetable
+val eventCardBackground = Color(0xFF232323)

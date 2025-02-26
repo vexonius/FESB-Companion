@@ -56,7 +56,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +68,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.colorPrimaryDark
+import com.tstudioz.fax.fme.compose.darkCyan
+import com.tstudioz.fax.fme.compose.greenBlue
+import com.tstudioz.fax.fme.compose.lust
+import com.tstudioz.fax.fme.compose.shadyBlue
+import com.tstudioz.fax.fme.compose.welcome2
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
@@ -171,7 +176,7 @@ fun WeatherCompose(
     weather: WeatherDisplay
 ) {
     Column(
-        modifier = Modifier.background(colorResource(id = R.color.dark_cyan)),
+        modifier = Modifier.background(darkCyan),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -282,12 +287,12 @@ fun NotesCompose(
                 text = stringResource(id = R.string.notes),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(sidePadding, 5.dp, sidePadding, 0.dp),
-                color = colorResource(id = R.color.shady_blue)
+                color = shadyBlue
             )
         }
         Column(
             modifier = Modifier
-                .background(colorResource(id = R.color.colorPrimaryDark))
+                .background(colorPrimaryDark)
                 .fillMaxWidth()
                 .padding(sidePadding, 0.dp)
         ) {
@@ -323,8 +328,8 @@ fun NotesCompose(
                             onValueChange = { editMessage.value = it },
                             singleLine = true,
                             colors = TextFieldDefaults.colors(
-                                focusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
-                                unfocusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
+                                focusedContainerColor = colorPrimaryDark,
+                                unfocusedContainerColor = colorPrimaryDark,
                             ),
                             placeholder = {
                                 Text(
@@ -455,7 +460,7 @@ fun TodayTimetableCompose(
             Text(
                 text = stringResource(id = R.string.todaysEvents),
                 fontSize = 13.sp,
-                color = colorResource(id = R.color.shady_blue)
+                color = shadyBlue
             )
         }
 
@@ -484,7 +489,7 @@ fun TodayTimetableCompose(
                     fontSize = 18.sp,
                     modifier = Modifier
                         .padding(top = 15.dp, bottom = 10.dp),
-                    color = colorResource(id = R.color.shady_blue)
+                    color = shadyBlue
                 )
             }
 
@@ -498,7 +503,7 @@ fun TimetableItem(event: Event) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .background(colorResource(id = R.color.colorPrimaryDark))
+            .background(colorPrimaryDark)
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
     ) {
@@ -532,23 +537,23 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
                 text = stringResource(id = R.string.prehrana),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 7.dp),
-                color = colorResource(id = R.color.shady_blue)
+                color = shadyBlue
             )
         }
         val context = LocalContext.current
         CardCompose(
             stringResource(id = R.string.menza_title),
             stringResource(id = R.string.menza_desc),
-            colorResource(id = R.color.welcome2),
-            colorResource(id = R.color.welcome2),
+            welcome2,
+            welcome2,
             onClick = {
                 menzaShow.value = true
             })
         CardCompose(
             stringResource(id = R.string.ugovori_title),
             stringResource(id = R.string.ugovori_desc),
-            colorResource(id = R.color.green_blue),
-            colorResource(id = R.color.lust),
+            greenBlue,
+            lust,
             onClick = {
                 val appPackageName = "com.ugovori.studentskiugovori"
                 val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
