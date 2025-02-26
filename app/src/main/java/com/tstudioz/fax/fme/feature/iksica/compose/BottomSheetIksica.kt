@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,13 +21,15 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
-import java.math.RoundingMode
+import com.tstudioz.fax.fme.feature.iksica.roundToTwo
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +44,8 @@ fun BottomSheetIksica(
         onDismissRequest = { toggleShowItem() },
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
-        dragHandle = {},
+        windowInsets = WindowInsets(0.dp),
+        dragHandle = { },
     ) {
         IksicaReceiptDetailed(receipt)
     }
@@ -62,7 +66,7 @@ fun IksicaReceiptDetailed(
                     .padding(20.dp, 20.dp, 20.dp, 10.dp)
             ) {
                 Text(
-                    text = "Detalji transakcije",
+                    text = stringResource(id = R.string.transaction_details),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 10.dp)
@@ -85,24 +89,22 @@ fun IksicaReceiptDetailed(
             ) {
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                     Column(horizontalAlignment = Alignment.End) {
-                        Text(text = "Ukupno ", fontSize = 16.sp)
-                        Text(text = "Subvencionirano ", fontSize = 16.sp)
-                        Text(text = "Plaćeno ", fontSize = 16.sp)
+                        Text(text = stringResource(id = R.string.transaction_total), fontSize = 16.sp)
+                        Text(text = stringResource(id = R.string.transaction_subsidized), fontSize = 16.sp)
+                        Text(text = stringResource(id = R.string.transaction_paid), fontSize = 16.sp)
                     }
+                    Spacer(modifier = Modifier.width(20.dp))
                     Column {
                         Text(
-                            text = receipt?.receiptAmount?.toBigDecimal()
-                                ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
+                            text = receipt?.receiptAmount?.roundToTwo() + stringResource(R.string.currency),
                             fontSize = 16.sp
                         )
                         Text(
-                            text = receipt?.subsidizedAmount?.toBigDecimal()
-                                ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
+                            text = receipt?.subsidizedAmount?.roundToTwo() + stringResource(R.string.currency),
                             fontSize = 16.sp
                         )
                         Text(
-                            text = receipt?.paidAmount?.toBigDecimal()
-                                ?.setScale(2, RoundingMode.HALF_EVEN).toString() + " €",
+                            text = receipt?.paidAmount?.roundToTwo() + stringResource(R.string.currency),
                             fontSize = 16.sp
                         )
                     }
@@ -124,35 +126,29 @@ fun IksicaItemDetailed(
             .padding(20.dp, 5.dp, 15.dp, 5.dp)
     ) {
 
-        Text(text = item.amount.toString() + "x", fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.amount_x, item.amount.toString()), fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.width(6.dp))
-        Column(
-            Modifier
-                .fillMaxWidth()
-        ) {
-
-            Row(
-                Modifier
-                    .padding(bottom = 5.dp)
-                    .fillMaxWidth()
-            ) {
+        Column(Modifier.fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth()) {
                 Row(modifier = Modifier.weight(0.7f)) {
                     Text(text = item.articleName, fontWeight = FontWeight.Bold)
                 }
                 Text(
                     text = item.total.toBigDecimal().minus(item.subsidizedAmount.toBigDecimal())
-                        .times(item.amount.toBigDecimal()).toString() + " €", modifier = Modifier
+                        .times(item.amount.toBigDecimal()).toString() + stringResource(R.string.currency),
+                    modifier = Modifier
                         .weight(0.20f)
                         .padding(start = 10.dp)
                 )
             }
             Row {
                 Text(
-                    text = "Cijena: " + item.price.toString() + " €",
+                    text = stringResource(R.string.price_of_item, item.price.toString()) + stringResource(R.string.currency),
                     color = MaterialTheme.colorScheme.outline
                 )
+                Spacer(modifier = Modifier.width(2.dp))
                 Text(
-                    text = "  Subvencija: " + item.subsidizedAmount.toString() + " €",
+                    text = stringResource(R.string.subsidized_price_of_item, item.subsidizedAmount.toString()) + stringResource(R.string.currency),
                     color = MaterialTheme.colorScheme.outline
                 )
             }
@@ -188,7 +184,6 @@ fun IksicaItemPreview() {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun IksicaReceiptDetailedPreview() {

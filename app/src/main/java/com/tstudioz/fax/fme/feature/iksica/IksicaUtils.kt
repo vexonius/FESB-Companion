@@ -1,10 +1,13 @@
 package com.tstudioz.fax.fme.feature.iksica
 
+import android.content.Context
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import io.realm.kotlin.ext.realmListOf
 import org.jsoup.Jsoup
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -104,3 +107,21 @@ fun parseDetaljeRacuna(doc: String): MutableList<ReceiptItem> {
     return detaljiRacuna
 }
 
+/**
+ * Rounds the Double to two decimal places by using BigDecimal.
+ */
+fun Double.roundToTwo(): String {
+    return this.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN).toString()
+}
+
+fun Long.daysAgoText(context: Context): String {
+    return when {
+        this == 0L -> context.getString(R.string.today)
+        this == 1L -> context.getString(R.string.yesterday)
+        this > 1L && this % 10 == 1L && this % 100 != 11L ->
+            context.getString(R.string.days_ago_one, this)
+        this > 1L ->
+            context.getString(R.string.days_ago_multiple, this)
+        else -> context.getString(R.string.in_the_future)
+    }
+}

@@ -1,7 +1,5 @@
 package com.tstudioz.fax.fme.navigation
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.feature.settings.SettingsActivity
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.routing.HomeRouter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +30,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetableViewModel: TimetableViewModel) {
     val currentDestination =
         navController.currentBackStackEntryAsState().value?.destination?.route?.split(".")?.lastOrNull() ?: ""
-    if (currentDestination != "Attendance") {
+    if (currentDestination != "Iksica" && currentDestination != "Attendance") {
         TopAppBar(
             colors = if (currentDestination != "Home") {
                 TopAppBarDefaults.topAppBarColors(

@@ -72,3 +72,11 @@ val greyNice = Color(0xFF757575)
 val purpleDark = Color(0xFF7B1FA2)
 
 val seed = Color(0xFF006879)
+
+
+val greyishWhite = Color(0xFFCCCCCC)
+val glowingColor = Color(0xFFFF538F)
+val gradientColors = listOf(
+    Color(0xFFDD3742),
+    Color(0xFFA344DE)
+)
