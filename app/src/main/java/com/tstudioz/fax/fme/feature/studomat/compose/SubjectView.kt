@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 import com.tstudioz.fax.fme.compose.accentGreen
 
 
@@ -52,7 +52,7 @@ fun SubjectView(subject: StudomatSubject) {
         ) {
             Column(
                 Modifier
-                    .background(theme_dark_secondaryContainer)
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .padding(4.dp, 2.dp, 4.dp, 2.dp)
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
@@ -115,6 +115,7 @@ fun PredmetText(text: String, value: String, isTitle: Boolean = false, isPassed:
                     .wrapContentSize()
                     .padding(8.dp, 8.dp, 16.dp, 8.dp)
             },
+            color = if (isPassed) Color.Black else MaterialTheme.colorScheme.onSurface,
             fontSize = if (isTitle) 16.sp else 14.sp,
             textAlign = TextAlign.Right
         )

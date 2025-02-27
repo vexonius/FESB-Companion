@@ -28,9 +28,6 @@ import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.compose.accentBlue
-import com.tstudioz.fax.fme.compose.theme_dark_outline
-import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
-import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.routing.SettingsRouter
 import org.koin.androidx.compose.koinViewModel
 
@@ -42,7 +39,7 @@ val listItemStartPadding = 16.dp
 fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: SettingsRouter) {
     AppTheme {
         BottomSheetScaffold(
-            containerColor = theme_dark_surface,
+            containerColor = MaterialTheme.colorScheme.surface,
             modifier = Modifier.fillMaxSize(),
             sheetPeekHeight = 0.dp,
             sheetContent = {
@@ -140,7 +137,7 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
 
 @Composable
 fun CategoryTitle(title: String) {
-    HorizontalDivider(color = theme_dark_outline)
+    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
     Box(
         modifier = Modifier
             .padding(
@@ -154,7 +151,7 @@ fun CategoryTitle(title: String) {
         Text(
             text = title,
             modifier = Modifier.padding(start = leftPadding),
-            color = theme_dark_secondaryContainer,
+            color = MaterialTheme.colorScheme.secondaryContainer,
             fontSize = 17.sp,
             fontWeight = FontWeight.Bold
         )

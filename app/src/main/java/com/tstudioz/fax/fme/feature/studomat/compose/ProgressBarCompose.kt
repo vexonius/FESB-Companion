@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 
 @Composable
 fun ProgressBarCompose(passed: Int, total: Int) {
@@ -24,7 +24,7 @@ fun ProgressBarCompose(passed: Int, total: Int) {
             LinearProgressIndicator(
                 progress = { passed.toFloat() / total.toFloat() },
                 modifier = Modifier.wrapContentWidth(),
-                color = theme_dark_secondaryContainer,
+                color = MaterialTheme.colorScheme.secondaryContainer,
             )
             Text(
                 text = "$passed/$total",

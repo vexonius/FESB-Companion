@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.tstudioz.fax.fme.compose.theme_dark_primaryContainer
 import com.tstudioz.fax.fme.database.models.Event
 import java.time.LocalDate
 import java.time.LocalTime
@@ -158,9 +157,7 @@ fun ScheduleHeader(
     modifier: Modifier = Modifier,
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
 ) {
-    Row(
-        modifier = modifier.background(color = theme_dark_primaryContainer)
-    ) {
+    Row(modifier = modifier) {
         val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
         repeat(numDays) { i ->
             Box(modifier = Modifier.width(dayWidth)) {
@@ -444,7 +441,7 @@ fun BasicSchedule(
             )
         ).filter { it.end > minDayTime && it.start < maxDayTime }
     }
-    val dividerColor = theme_dark_primaryContainer
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant
 
     Layout(content = {
         positionedEvents.forEach { positionedEvent ->

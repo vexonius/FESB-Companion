@@ -68,11 +68,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.theme_dark_surface
-import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
+import com.tstudioz.fax.fme.compose.gradientColors
 import com.tstudioz.fax.fme.compose.lust
-import com.tstudioz.fax.fme.compose.theme_dark_onSurface
-import com.tstudioz.fax.fme.compose.theme_dark_secondary
+import com.tstudioz.fax.fme.compose.shadyBlue
 import com.tstudioz.fax.fme.compose.welcome2
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
@@ -176,7 +174,7 @@ fun WeatherCompose(
     weather: WeatherDisplay
 ) {
     Column(
-        modifier = Modifier.background(theme_dark_secondaryContainer),
+        modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -286,13 +284,15 @@ fun NotesCompose(
             Text(
                 text = stringResource(id = R.string.notes),
                 fontSize = 13.sp,
-                modifier = Modifier.padding(sidePadding, 5.dp, sidePadding, 0.dp),
-                color = theme_dark_secondary
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(sidePadding, 5.dp, sidePadding, 0.dp),
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
         Column(
             modifier = Modifier
-                .background(theme_dark_surface)
+                .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
                 .padding(sidePadding, 0.dp)
         ) {
@@ -314,7 +314,7 @@ fun NotesCompose(
                     Text(
                         text = stringResource(id = R.string.add_note),
                         fontSize = 16.sp,
-                        color = theme_dark_onSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(start = 10.dp)
                     )
@@ -329,8 +329,8 @@ fun NotesCompose(
                             onValueChange = { editMessage.value = it },
                             singleLine = true,
                             colors = TextFieldDefaults.colors(
-                                focusedContainerColor = theme_dark_surface,
-                                unfocusedContainerColor = theme_dark_surface,
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                             ),
                             placeholder = {
                                 Text(
@@ -461,7 +461,7 @@ fun TodayTimetableCompose(
             Text(
                 text = stringResource(id = R.string.todaysEvents),
                 fontSize = 13.sp,
-                color = theme_dark_secondary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -490,7 +490,7 @@ fun TodayTimetableCompose(
                     fontSize = 18.sp,
                     modifier = Modifier
                         .padding(top = 15.dp, bottom = 10.dp),
-                    color = theme_dark_onSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -504,7 +504,7 @@ fun TimetableItem(event: Event) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .background(theme_dark_surface)
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
     ) {
@@ -538,7 +538,7 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
                 text = stringResource(id = R.string.prehrana),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 7.dp),
-                color = theme_dark_secondary
+                color = MaterialTheme.colorScheme.secondary
             )
         }
         val context = LocalContext.current
@@ -553,7 +553,7 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
         CardCompose(
             stringResource(id = R.string.ugovori_title),
             stringResource(id = R.string.ugovori_desc),
-            theme_dark_secondaryContainer,
+            shadyBlue,
             lust,
             onClick = {
                 val appPackageName = "com.ugovori.studentskiugovori"
