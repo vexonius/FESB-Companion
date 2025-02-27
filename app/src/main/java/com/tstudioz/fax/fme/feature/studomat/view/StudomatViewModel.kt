@@ -25,13 +25,10 @@ class StudomatViewModel(
 
     val isRefreshing = MutableLiveData(false)
 
-    var subjectList = MutableLiveData<List<StudomatSubject>>(emptyList())
-    val allYears = MutableLiveData<Map<String, List<StudomatSubject>>>(emptyMap())
+    val allYears = MutableLiveData<List<Pair<String, List<StudomatSubject>>>>(emptyList())
     private var loadedTxt = MutableLiveData(StudomatState.UNSET)
-    var student = MutableLiveData(Student())
-    var generated = MutableLiveData<String>()
+    private var student = MutableLiveData(Student())
     var years = MutableLiveData<List<Year>>(emptyList())
-    var selectedYear = MutableLiveData(Year("", ""))
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
 
     val loading = loadedTxt.map { it == StudomatState.FETCHING || it == StudomatState.UNSET }
@@ -44,24 +41,25 @@ class StudomatViewModel(
     }
 
     init {
-        loadData()
+        //loadData()
         loadAllYears()
         initStudomat()
     }
 
-    private fun loadData() {
+    /*private fun loadData() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             val yearsRealm = repository.readYears().sortedByDescending { it.title }
             val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
             years.postValue(yearsRealm)
             subjectList.postValue(latestYearSubjects)
             generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
-        }}
+        }
+    }*/
 
     private fun loadAllYears() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            val yearsRealm = repository.readAll().groupBy { it.year }
-            allYears.postValue(yearsRealm)
+            val yearsRealm = repository.readAll().sortedBy { it.name }.sortedBy { it.semester }.groupBy { it.year }
+            allYears.postValue(yearsRealm.toList())
         }
     }
 
@@ -75,10 +73,9 @@ class StudomatViewModel(
             } else {
                 when (val result = repository.getStudomatDataAndYears()) {
                     is StudomatRepositoryResult.StudentAndYearsResult.Success -> {
-                        result.data.firstOrNull()?.let { getChosenYear(it) }
+                        fetchAllYears(result.data)
                         years.postValue(result.data)
                         student.postValue(result.student)
-                        selectedYear.postValue(result.data.firstOrNull())
                         loadedTxt.postValue(StudomatState.FETCHED)
                     }
 
@@ -91,7 +88,7 @@ class StudomatViewModel(
         }
     }
 
-    fun getChosenYear(year: Year, pulldownTriggered: Boolean = false) {
+    /*fun getChosenYear(year: Year, pulldownTriggered: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (pulldownTriggered) {
                 isRefreshing.postValue(true)
@@ -107,7 +104,7 @@ class StudomatViewModel(
             sharedPreferences.getString("gen" + year.title, "").let { generated.postValue(it) }
             if (chosenYear != null) {
                 if (networkUtils.isNetworkAvailable()) {
-                    when (val result = repository.getChosenYear(chosenYear)) {
+                    when (val result = repository.getYear(chosenYear)) {
                         is StudomatRepositoryResult.ChosenYearResult.Success -> {
                             loadedTxt.postValue(StudomatState.FETCHED)
                             subjectList.postValue(result.data.first)
@@ -121,6 +118,36 @@ class StudomatViewModel(
                     }
                 }
             }
+            if (pulldownTriggered) {
+                isRefreshing.postValue(false)
+            }
+        }
+    }*/
+
+    fun fetchAllYears(freshYears: List<Year> = years.value ?: emptyList(), pulldownTriggered: Boolean = false) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            if (pulldownTriggered) {
+                isRefreshing.postValue(true)
+            }
+            var allYearsTemp = mutableListOf<Pair<String, List<StudomatSubject>>>()
+            freshYears.forEach { year ->
+                if (networkUtils.isNetworkAvailable()) {
+                    when (val result = repository.getYear(year)) {
+                        is StudomatRepositoryResult.ChosenYearResult.Success -> {
+                            allYearsTemp = allYearsTemp.plus(
+                                year.title to result.data.first
+                                    .sortedBy { it.name }
+                                    .sortedBy { it.semester }
+                            ).toMutableList()
+                        }
+
+                        is StudomatRepositoryResult.ChosenYearResult.Failure -> {
+                            snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+                        }
+                    }
+                }
+            }
+            allYears.postValue(allYearsTemp)
             if (pulldownTriggered) {
                 isRefreshing.postValue(false)
             }

@@ -36,7 +36,7 @@ class StudomatRepository(
         }
     }
 
-    suspend fun getChosenYear(year: Year): StudomatRepositoryResult.ChosenYearResult {
+    suspend fun getYear(year: Year): StudomatRepositoryResult.ChosenYearResult {
         return when (val data = studomatService.getChosenYear(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetChosenYear = parseCurrentYear(data.data)

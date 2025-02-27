@@ -30,7 +30,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetableViewModel: TimetableViewModel) {
     val currentDestination =
         navController.currentBackStackEntryAsState().value?.destination?.route?.split(".")?.lastOrNull() ?: ""
-    if (currentDestination != "Iksica" && currentDestination != "Attendance") {
+    if (currentDestination != "Iksica" && currentDestination != "Attendance" && currentDestination != "Studomat") {
         TopAppBar(
             colors = if (currentDestination != "Home") {
                 TopAppBarDefaults.topAppBarColors(

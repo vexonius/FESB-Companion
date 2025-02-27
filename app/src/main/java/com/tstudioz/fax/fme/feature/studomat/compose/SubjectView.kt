@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -96,9 +97,10 @@ fun SubjectView(subject: StudomatSubject) {
 fun YearView(list: List<StudomatSubject>) {
     Column(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(24.dp, 12.dp)
             .clip(RoundedCornerShape(30.dp))
             .background(color = colorResource(id = R.color.raisin_black))
+            .padding(24.dp, 24.dp, 24.dp, 24.dp)
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
@@ -107,13 +109,14 @@ fun YearView(list: List<StudomatSubject>) {
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Left,
-            modifier = Modifier.padding(24.dp, 28.dp, 0.dp, 16.dp)
+            modifier = Modifier.padding(0.dp, 4.dp, 0.dp, 16.dp)
         )
-        list.forEach {
+        list.forEachIndexed { index, it ->
+            if (index != 0) HorizontalDivider()
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(24.dp, 8.dp)
+                    .padding(0.dp, 8.dp)
                     .wrapContentHeight(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -124,7 +127,7 @@ fun YearView(list: List<StudomatSubject>) {
                     textAlign = TextAlign.Left
                 )
                 Text(
-                    text = it.grade,
+                    text = it.grade.takeUnless { it.contains("podatak") } ?: "-",
                     fontSize = 14.sp,
                     textAlign = TextAlign.Right
                 )

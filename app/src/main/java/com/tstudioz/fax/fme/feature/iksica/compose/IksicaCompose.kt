@@ -108,7 +108,6 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     BottomSheetScaffold(
         sheetPeekHeight = 0.dp,
         modifier = Modifier
-            .padding(WindowInsets.navigationBars.asPaddingValues())
             .pullRefresh(pullRefreshState)
             .nestedScroll(TopAppBarDefaults.pinnedScrollBehavior().nestedScrollConnection),
         scaffoldState = scaffoldState,
