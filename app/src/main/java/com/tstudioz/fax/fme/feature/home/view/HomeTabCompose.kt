@@ -68,11 +68,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.colorPrimaryDark
-import com.tstudioz.fax.fme.compose.darkCyan
-import com.tstudioz.fax.fme.compose.greenBlue
+import com.tstudioz.fax.fme.compose.theme_dark_surface
+import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 import com.tstudioz.fax.fme.compose.lust
-import com.tstudioz.fax.fme.compose.shadyBlue
+import com.tstudioz.fax.fme.compose.theme_dark_onSurface
+import com.tstudioz.fax.fme.compose.theme_dark_secondary
 import com.tstudioz.fax.fme.compose.welcome2
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
@@ -176,7 +176,7 @@ fun WeatherCompose(
     weather: WeatherDisplay
 ) {
     Column(
-        modifier = Modifier.background(darkCyan),
+        modifier = Modifier.background(theme_dark_secondaryContainer),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -287,12 +287,12 @@ fun NotesCompose(
                 text = stringResource(id = R.string.notes),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(sidePadding, 5.dp, sidePadding, 0.dp),
-                color = shadyBlue
+                color = theme_dark_secondary
             )
         }
         Column(
             modifier = Modifier
-                .background(colorPrimaryDark)
+                .background(theme_dark_surface)
                 .fillMaxWidth()
                 .padding(sidePadding, 0.dp)
         ) {
@@ -314,6 +314,7 @@ fun NotesCompose(
                     Text(
                         text = stringResource(id = R.string.add_note),
                         fontSize = 16.sp,
+                        color = theme_dark_onSurface,
                         modifier = Modifier
                             .padding(start = 10.dp)
                     )
@@ -328,8 +329,8 @@ fun NotesCompose(
                             onValueChange = { editMessage.value = it },
                             singleLine = true,
                             colors = TextFieldDefaults.colors(
-                                focusedContainerColor = colorPrimaryDark,
-                                unfocusedContainerColor = colorPrimaryDark,
+                                focusedContainerColor = theme_dark_surface,
+                                unfocusedContainerColor = theme_dark_surface,
                             ),
                             placeholder = {
                                 Text(
@@ -460,7 +461,7 @@ fun TodayTimetableCompose(
             Text(
                 text = stringResource(id = R.string.todaysEvents),
                 fontSize = 13.sp,
-                color = shadyBlue
+                color = theme_dark_secondary
             )
         }
 
@@ -489,7 +490,7 @@ fun TodayTimetableCompose(
                     fontSize = 18.sp,
                     modifier = Modifier
                         .padding(top = 15.dp, bottom = 10.dp),
-                    color = shadyBlue
+                    color = theme_dark_onSurface
                 )
             }
 
@@ -503,7 +504,7 @@ fun TimetableItem(event: Event) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .background(colorPrimaryDark)
+            .background(theme_dark_surface)
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
     ) {
@@ -537,7 +538,7 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
                 text = stringResource(id = R.string.prehrana),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 7.dp),
-                color = shadyBlue
+                color = theme_dark_secondary
             )
         }
         val context = LocalContext.current
@@ -552,7 +553,7 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
         CardCompose(
             stringResource(id = R.string.ugovori_title),
             stringResource(id = R.string.ugovori_desc),
-            greenBlue,
+            theme_dark_secondaryContainer,
             lust,
             onClick = {
                 val appPackageName = "com.ugovori.studentskiugovori"
@@ -726,9 +727,7 @@ fun CustomDialog(
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-
-                    ),
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background),
             )
         }
         Spacer(modifier = Modifier.height(8.dp))

@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.endeavour
-import com.tstudioz.fax.fme.compose.passGreen
+import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
+import com.tstudioz.fax.fme.compose.accentGreen
 
 
 @Composable
@@ -52,7 +52,7 @@ fun SubjectView(subject: StudomatSubject) {
         ) {
             Column(
                 Modifier
-                    .background(endeavour)
+                    .background(theme_dark_secondaryContainer)
                     .padding(4.dp, 2.dp, 4.dp, 2.dp)
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
@@ -108,7 +108,7 @@ fun PredmetText(text: String, value: String, isTitle: Boolean = false, isPassed:
                 Modifier
                     .wrapContentSize()
                     .clip(RoundedCornerShape(12.dp, 0.dp, 0.dp, 12.dp))
-                    .background(passGreen)
+                    .background(accentGreen)
                     .padding(8.dp, 8.dp, 16.dp, 8.dp)
             } else {
                 Modifier

@@ -20,9 +20,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.compose.brandeisBlue
-import com.tstudioz.fax.fme.compose.chineseBlack
+import com.tstudioz.fax.fme.compose.accentBlue
+import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.compose.greyishWhite
+import com.tstudioz.fax.fme.compose.theme_dark_outline
+import com.tstudioz.fax.fme.compose.theme_dark_outlineVariant
+import com.tstudioz.fax.fme.compose.theme_dark_primaryContainer
 import com.tstudioz.fax.fme.feature.iksica.daysAgoText
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.roundToTwo
@@ -33,7 +36,7 @@ import java.time.temporal.ChronoUnit
 fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
     Column(
         modifier = Modifier
-            .background(chineseBlack)
+            .background(theme_dark_surface)
             .clickable(onClick = onClick)
             .padding(16.dp, 5.dp)
     ) {
@@ -63,9 +66,9 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
                 fontSize = 13.sp,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.End,
-                color = brandeisBlue
+                color = theme_dark_outlineVariant
             )
         }
     }
-    HorizontalDivider(Modifier.padding(horizontal = 10.dp))
+    HorizontalDivider(Modifier.padding(horizontal = 10.dp), color = theme_dark_outline)
 }

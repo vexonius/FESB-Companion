@@ -136,8 +136,7 @@ fun NavbarPreview() {
                     },
                     selected = true,
                     alwaysShowLabel = false,
-                    onClick = {
-                    }
+                    onClick = {}
                 )
             }
         }
