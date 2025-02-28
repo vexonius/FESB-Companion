@@ -65,6 +65,12 @@ class MonsterCookieJar(
         return authCookies.isNotEmpty()
     }
 
+    fun clearCookiesForUrl(url: HttpUrl) {
+        val cookies = loadForRequest(url)
+        persistor.removeAll(cookies)
+        cache.removeAll { cookies.contains(it) }
+    }
+
     companion object {
 
         const val authCookieFESB = "Fesb.AuthCookie"
