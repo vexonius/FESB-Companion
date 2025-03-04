@@ -21,7 +21,7 @@ class StudomatRepository(
     suspend fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
         val student = parseStudent(studomatService.getStudomatData())
 
-        return when (val result = studomatService.getYears()) {
+        return when (val result = studomatService.getYearNames()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetYears = parseYears(result.data)
                 studomatDao.insertYears(resultGetYears)
@@ -37,7 +37,7 @@ class StudomatRepository(
     }
 
     suspend fun getYear(year: Year): StudomatRepositoryResult.ChosenYearResult {
-        return when (val data = studomatService.getChosenYear(year.href)) {
+        return when (val data = studomatService.getYearSubjects(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetChosenYear = parseCurrentYear(data.data)
                 studomatDao.insert(resultGetChosenYear.first)
@@ -53,16 +53,11 @@ class StudomatRepository(
         }
     }
 
-    suspend fun readYears(): List<Year> {
-        return studomatDao.readYears()
+    suspend fun readYearNames(): List<Year> {
+        return studomatDao.readYearNames()
     }
 
-    suspend fun read(year: String): List<StudomatSubject> {
-        return studomatDao.read(year)
+    suspend fun read(): List<StudomatSubject> {
+        return studomatDao.read()
     }
-
-    suspend fun readAll(): List<StudomatSubject> {
-        return studomatDao.readAll()
-    }
-
 }

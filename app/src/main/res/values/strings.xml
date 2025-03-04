@@ -83,6 +83,8 @@
     <string name="grade">Ocjena:</string>
     <string name="exam_date">Datum ispitnog roka:</string>
 
+    <string name="enrolled_subjects">Upisani predmeti</string>
+
 
     <string name="weather_temp">%1$.0f°</string>
     <string name="weather_humidity">%1$.1f%%</string>

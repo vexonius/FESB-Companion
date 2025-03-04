@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LinearProgressIndicator
@@ -50,7 +52,6 @@ import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 fun StudomatCompose(studomatViewModel: StudomatViewModel) {
 
     val allYears = studomatViewModel.allYears.observeAsState().value
-    val loading = studomatViewModel.loading.observeAsState().value
     val snackbarHostState = remember { studomatViewModel.snackbarHostState }
     val isRefreshing = studomatViewModel.isRefreshing.observeAsState().value
     val pullRefreshState =
@@ -71,29 +72,8 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
     Scaffold(
         modifier = Modifier.pullRefresh(pullRefreshState),
         contentWindowInsets = WindowInsets(0.dp),
-        bottomBar = {
-            if (studomatViewModel.offline) {
-                Row(
-                    Modifier
-                        .background(color = MaterialTheme.colorScheme.errorContainer)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text("Nema interneta", color = MaterialTheme.colorScheme.onErrorContainer)
-                }
-            }
-        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
-
-        if (loading == true && isRefreshing == false) {
-            LinearProgressIndicator(
-                Modifier
-                    .fillMaxWidth()
-                    .zIndex(2f),
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
 
         Box(
             modifier = Modifier
@@ -121,7 +101,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
                         modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 16.dp)
                     )
                 }
-                LazyColumn {
+                LazyColumn(Modifier.fillMaxSize()) {
                     if (!allYears.isNullOrEmpty()) {
                         item {
                             val list = allYears.sortedByDescending { it.first }
@@ -157,7 +137,6 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
 
                             HorizontalPager(verticalAlignment = Alignment.Top, state = pagerState) { page ->
                                 YearView(list[page].second)
-
                             }
                         }
                     } else {

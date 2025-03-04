@@ -1,9 +1,7 @@
 package com.tstudioz.fax.fme.feature.studomat.services
 
 import android.util.Log
-import com.franmontiel.persistentcookiejar.ClearableCookieJar
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -33,7 +31,7 @@ class StudomatService(private val client: OkHttpClient) {
         }
     }
 
-    fun getYears(): NetworkServiceResult.StudomatResult {
+    fun getYearNames(): NetworkServiceResult.StudomatResult {
 
         val request = Request.Builder()
             .url("https://www.isvu.hr/studomat/hr/studiranje/upisanegodine")
@@ -55,7 +53,7 @@ class StudomatService(private val client: OkHttpClient) {
         }
     }
 
-    fun getChosenYear(href: String): NetworkServiceResult.StudomatResult {
+    fun getYearSubjects(href: String): NetworkServiceResult.StudomatResult {
         val request = Request.Builder()
             .url("https://www.isvu.hr$href")
             .build()

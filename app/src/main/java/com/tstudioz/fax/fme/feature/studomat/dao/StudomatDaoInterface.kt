@@ -8,7 +8,7 @@ interface StudomatDaoInterface {
 
     suspend fun insertYears(years: List<Year>)
 
-    suspend fun read(year: String): List<StudomatSubject>
+    suspend fun read(): List<StudomatSubject>
 
-    suspend fun readYears(): List<Year>
+    suspend fun readYearNames(): List<Year>
 }

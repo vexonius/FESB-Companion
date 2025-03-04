@@ -1,26 +1,22 @@
 package com.tstudioz.fax.fme.feature.studomat.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,75 +33,18 @@ import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 
 
 @Composable
-fun SubjectView(subject: StudomatSubject) {
-
-    var expanded: Boolean by remember { mutableStateOf(false) }
-
-    Card(
-        onClick = { expanded = !expanded },
-        modifier = Modifier
-            .padding(8.dp)
-            .wrapContentHeight(),
-    ) {
-        Column(
-            Modifier.background(MaterialTheme.colorScheme.surfaceDim)
-        ) {
-            Column(
-                Modifier
-                    .background(color = colorResource(id = R.color.endeavour))
-                    .padding(4.dp, 2.dp, 4.dp, 2.dp)
-            ) {
-                Spacer(modifier = Modifier.height(4.dp))
-                PredmetText(text = "Predmet: ", value = subject.name.trim() ?: "", isTitle = true)
-            }
-            Column(
-                Modifier.padding(4.dp, 0.dp, 0.dp, 8.dp)
-            ) {
-                if (expanded) {
-                    PredmetText(
-                        text = stringResource(id = R.string.elective_group), value = subject.electiveGroup ?: ""
-                    )
-                    PredmetText(text = stringResource(id = R.string.semester), value = subject.semester ?: "")
-                    PredmetText(text = stringResource(id = R.string.lectures), value = subject.lectures ?: "")
-                    PredmetText(text = stringResource(id = R.string.exercises), value = subject.exercises ?: "")
-                    PredmetText(text = stringResource(id = R.string.ects_enrolled), value = subject.ectsEnrolled ?: "")
-                    PredmetText(text = stringResource(id = R.string.is_taken), value = subject.isTaken ?: "")
-                    PredmetText(
-                        text = stringResource(id = R.string.status),
-                        value = subject.status ?: "",
-                        isPassed = subject.isPassed
-                    )
-                    PredmetText(text = stringResource(id = R.string.grade), value = subject.grade ?: "")
-                    PredmetText(text = stringResource(id = R.string.exam_date), value = subject.examDate ?: "")
-                } else {
-                    PredmetText(text = stringResource(id = R.string.semester), value = subject.semester ?: "")
-                    PredmetText(text = stringResource(id = R.string.ects_enrolled), value = subject.ectsEnrolled ?: "")
-                    PredmetText(
-                        text = stringResource(id = R.string.status),
-                        value = subject.status ?: "",
-                        isPassed = subject.isPassed
-                    )
-                    PredmetText(text = stringResource(id = R.string.grade), value = subject.grade ?: "")
-                }
-
-            }
-        }
-    }
-}
-
-@Composable
 fun YearView(list: List<StudomatSubject>) {
     Column(
         modifier = Modifier
             .padding(24.dp, 12.dp)
             .clip(RoundedCornerShape(30.dp))
-            .background(color = colorResource(id = R.color.raisin_black))
-            .padding(24.dp, 24.dp, 24.dp, 24.dp)
+            .background(colorResource(id = R.color.raisin_black))
+            .padding(24.dp)
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
         Text(
-            text = "Upisani predmeti",
+            text = stringResource(R.string.enrolled_subjects),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Left,
@@ -113,32 +52,62 @@ fun YearView(list: List<StudomatSubject>) {
         )
         list.forEachIndexed { index, it ->
             if (index != 0) HorizontalDivider()
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(0.dp, 8.dp)
-                    .wrapContentHeight(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = it.name,
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Left
-                )
-                Text(
-                    text = it.grade.takeUnless { it.contains("podatak") } ?: "-",
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Right
-                )
+            val opened = remember { mutableStateOf(false) }
+            Column(Modifier.clickable { opened.value = !opened.value }) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .clickable { opened.value = !opened.value }
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .wrapContentHeight(),
+                ) {
+                    Text(
+                        text = it.name,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Left
+                    )
+                    Text(
+                        text = it.grade.takeUnless { it.contains("podatak") } ?: "-",
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Right
+                    )
+                }
+                if (opened.value) SubjectView(it)
             }
         }
     }
 }
 
+@Composable
+fun SubjectView(subject: StudomatSubject) {
+    Column(Modifier.padding(4.dp, 0.dp, 0.dp, 8.dp)) {
+        PredmetText(text = stringResource(id = R.string.elective_group), value = subject.electiveGroup)
+        PredmetText(text = stringResource(id = R.string.semester), value = subject.semester)
+        PredmetText(text = stringResource(id = R.string.lectures), value = subject.lectures)
+        PredmetText(text = stringResource(id = R.string.exercises), value = subject.exercises)
+        PredmetText(text = stringResource(id = R.string.ects_enrolled), value = subject.ectsEnrolled)
+        PredmetText(text = stringResource(id = R.string.is_taken), value = subject.isTaken)
+        PredmetText(text = stringResource(id = R.string.status), value = subject.status, isPassed = subject.isPassed)
+        PredmetText(text = stringResource(id = R.string.grade), value = subject.grade)
+        PredmetText(text = stringResource(id = R.string.exam_date), value = subject.examDate)
+    }
+}
 
 @Composable
-fun PredmetText(text: String, value: String, isTitle: Boolean = false, isPassed: Boolean = false) {
+fun PredmetText(text: String, value: String, isPassed: Boolean = false) {
+    val gradeModifier = if (isPassed) {
+        Modifier
+            .wrapContentSize()
+            .clip(RoundedCornerShape(12.dp, 12.dp, 12.dp, 12.dp))
+            .background(colorResource(id = R.color.pass_green))
+            .padding(8.dp, 4.dp, 16.dp, 4.dp)
+    } else {
+        Modifier
+            .wrapContentSize()
+            .padding(8.dp, 4.dp, 16.dp, 4.dp)
+    }
     Row(
         Modifier
             .fillMaxWidth()
@@ -150,45 +119,16 @@ fun PredmetText(text: String, value: String, isTitle: Boolean = false, isPassed:
             text = text,
             modifier = Modifier
                 .wrapContentSize()
-                .padding(16.dp, 8.dp, 8.dp, 8.dp),
-            fontSize = if (isTitle) 16.sp else 14.sp,
+                .padding(16.dp, 0.dp, 8.dp, 0.dp),
+            fontSize = 14.sp,
             textAlign = TextAlign.Left
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = value, modifier = if (isPassed) {
-                Modifier
-                    .wrapContentSize()
-                    .clip(RoundedCornerShape(12.dp, 0.dp, 0.dp, 12.dp))
-                    .background(colorResource(id = R.color.pass_green))
-                    .padding(8.dp, 8.dp, 16.dp, 8.dp)
-            } else {
-                Modifier
-                    .wrapContentSize()
-                    .padding(8.dp, 8.dp, 16.dp, 8.dp)
-            }, fontSize = if (isTitle) 16.sp else 14.sp, textAlign = TextAlign.Right
-        )
-    }
-
-}
-
-@Preview
-@Composable
-fun PredmetComposePrev() {
-    AppTheme {
-        SubjectView(
-            StudomatSubject(
-                "Predmet",
-                "Izborna grupa",
-                "Semestar",
-                "Predavanja",
-                "Vježbe",
-                "ECTS upisano",
-                "Polaže se",
-                "obavljen",
-                "Ocjena",
-                "Datum ispitnog roka"
-            )
+            text = value,
+            modifier = gradeModifier,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Right
         )
     }
 }
