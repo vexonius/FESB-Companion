@@ -26,7 +26,7 @@ android {
             keyAlias = System.getenv("RELEASE_KEY_ALIAS")
             keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
         }
-        create("release_local") {
+        create("releaseDebug") {
             val localProperties = Properties().apply { load(File(rootDir, "local.properties").inputStream()) }
             storeFile = file("./../keystore.jks")
             storePassword = localProperties.getProperty("RELEASE_SIGNING_PASSWORD")
@@ -42,10 +42,10 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
 
-        create("releaseLocal") {
+        create("releaseDebug") {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release_local")
+            signingConfig = signingConfigs.getByName("releaseDebug")
         }
 
         debug {
