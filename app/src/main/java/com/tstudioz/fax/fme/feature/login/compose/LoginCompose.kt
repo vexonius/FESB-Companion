@@ -46,6 +46,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
+import com.tstudioz.fax.fme.compose.theme_dark_errorContainer
+import com.tstudioz.fax.fme.compose.theme_dark_onErrorContainer
+import com.tstudioz.fax.fme.compose.theme_dark_onSurface
 import com.tstudioz.fax.fme.feature.login.models.TextFieldModel
 
 @Composable
@@ -95,8 +99,8 @@ fun LoginCompose(
             SnackbarHost(hostState = snackbarHostState) {
                 Snackbar(
                     it,
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    containerColor = theme_dark_errorContainer,
+                    contentColor = theme_dark_onErrorContainer,
                     shape = RoundedCornerShape(10.dp)
                 )
             }
@@ -138,9 +142,9 @@ fun LoginCompose(
 @Composable
 fun CustomTextField(textFieldModel: TextFieldModel) {
     val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-        focusedLabelColor = MaterialTheme.colorScheme.secondaryContainer,
-        cursorColor = MaterialTheme.colorScheme.secondaryContainer,
+        focusedBorderColor = theme_dark_secondaryContainer,
+        focusedLabelColor = theme_dark_secondaryContainer,
+        cursorColor = theme_dark_secondaryContainer,
     )
     val textFieldShape = RoundedCornerShape(10.dp)
 
@@ -184,14 +188,14 @@ fun ButtonCircularLoading(
             } else {
                 Button(
                     onClick = onDone,
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondaryContainer),
+                    colors = ButtonDefaults.buttonColors(theme_dark_secondaryContainer),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Text(
                         text = stringResource(id = R.string.login_action_submit),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = theme_dark_onSurface
                     )
                 }
             }

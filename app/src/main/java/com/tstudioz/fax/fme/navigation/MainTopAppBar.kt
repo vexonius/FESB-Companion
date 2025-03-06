@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.routing.HomeRouter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,7 +39,7 @@ fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetabl
                 )
             } else {
                 TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    containerColor = theme_dark_secondaryContainer,
                     titleContentColor = Color.White
                 )
             },

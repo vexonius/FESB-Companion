@@ -15,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -37,6 +36,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.accentBlue
+import com.tstudioz.fax.fme.compose.theme_dark_primaryContainer
+import com.tstudioz.fax.fme.compose.theme_dark_onSurface
+import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 import com.tstudioz.fax.fme.feature.attendance.ShownSemester
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -132,11 +135,11 @@ fun FilterButton(
             .padding(vertical = 8.dp)
             .clip(RoundedCornerShape(10.dp))
             .clickable { onClick() }
-            .background(color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.primaryContainer),
+            .background(color = if (selected) theme_dark_secondaryContainer else theme_dark_primaryContainer),
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = theme_dark_onSurface,
             modifier = Modifier.padding(12.dp, 6.dp),
             fontSize = 14.sp
         )

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,7 +21,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.compose.accentRed
+import com.tstudioz.fax.fme.compose.theme_dark_primaryContainer
 import com.tstudioz.fax.fme.compose.accentGreen
 import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 
@@ -34,7 +35,7 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
         modifier = Modifier
             .padding(24.dp, 8.dp)
             .clip(RoundedCornerShape(30.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(theme_dark_primaryContainer)
             .padding(24.dp)
     ) {
         Text(
@@ -80,7 +81,7 @@ fun AttendanceProgressBar(
     radius: Dp = 10.dp
 ) {
     val green = accentGreen
-    val off = MaterialTheme.colorScheme.surface
+    val off = theme_dark_surface
     val red = accentRed
     Row {
         Canvas(
