@@ -1,12 +1,16 @@
 package com.tstudioz.fax.fme.compose
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 
 //private val LightColors = lightColorScheme(
 //    primary = theme_light_primary,
@@ -148,21 +152,43 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+data class ContentColors(
+    val primary: Color,
+    val secondary: Color,
+    val tertiary: Color
+)
+
+@SuppressLint("CompositionLocalNaming")
+val AppComposition = staticCompositionLocalOf {
+    ContentColors(
+        primary = Color.Unspecified,
+        secondary = Color.Unspecified,
+        tertiary = Color.Unspecified
+    )
+}
+
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable() () -> Unit
 ) {
-//    val colors = if (!useDarkTheme) {
-//        LightColors
-//    } else {
-//        DarkColors
-//    }
-
-    MaterialTheme(
-        colorScheme = darkScheme,
-        content = content,
-        typography = Typography(),
-        shapes = Shapes,
+    val contentColors = ContentColors(
+        primary = Color(0xFFFFFFFF),
+        secondary = Color(0xFFDDDDDD),
+        tertiary = Color(0xFFAAAAAA)
     )
+
+    CompositionLocalProvider(AppComposition.provides(contentColors)) {
+        MaterialTheme(
+            colorScheme = darkScheme,
+            content = content,
+            typography = Typography(),
+            shapes = Shapes
+        )
+    }
 }
+
+val MaterialTheme.contentColors: ContentColors
+    @Composable
+    @ReadOnlyComposable
+    get() = AppComposition.current
