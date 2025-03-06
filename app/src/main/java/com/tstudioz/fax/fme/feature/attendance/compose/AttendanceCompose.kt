@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -36,9 +37,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.accentBlue
+import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.compose.theme_dark_primaryContainer
-import com.tstudioz.fax.fme.compose.theme_dark_onSurface
 import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 import com.tstudioz.fax.fme.feature.attendance.ShownSemester
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
@@ -64,13 +64,10 @@ fun AttendanceCompose(attendanceViewModel: AttendanceViewModel) {
         }
     }
 
-    AppTheme {
-        if (items.isNotEmpty()) {
-            CreateAttendanceListView(attendanceViewModel, snackbarHostState)
-        } else {
-            EmptyView()
-        }
-
+    if (items.isNotEmpty()) {
+        CreateAttendanceListView(attendanceViewModel, snackbarHostState)
+    } else {
+        EmptyView()
     }
 }
 
@@ -82,7 +79,8 @@ fun EmptyView() {
         modifier = Modifier.fillMaxSize()
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.width(64.dp)
+            modifier = Modifier.width(64.dp),
+            color = MaterialTheme.contentColors.tertiary
         )
     }
 }
@@ -106,7 +104,8 @@ fun CreateAttendanceListView(attendanceViewModel: AttendanceViewModel, snackbarH
                 text = stringResource(id = R.string.tab_attendance),
                 modifier = Modifier.padding(32.dp, 40.dp, 0.dp, 8.dp),
                 fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.contentColors.primary
             )
             Row(
                 Modifier.padding(horizontal = 32.dp)
@@ -139,7 +138,7 @@ fun FilterButton(
     ) {
         Text(
             text = text,
-            color = theme_dark_onSurface,
+            color = MaterialTheme.contentColors.primary,
             modifier = Modifier.padding(12.dp, 6.dp),
             fontSize = 14.sp
         )

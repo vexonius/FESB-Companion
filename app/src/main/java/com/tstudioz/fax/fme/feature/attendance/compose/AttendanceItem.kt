@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,12 +26,12 @@ import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.compose.accentRed
 import com.tstudioz.fax.fme.compose.theme_dark_primaryContainer
 import com.tstudioz.fax.fme.compose.accentGreen
+import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 
 
 @Composable
 fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
-
     Column(
         modifier = Modifier
             .padding(24.dp, 8.dp)
@@ -42,13 +43,15 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
             text = attendanceItems.firstOrNull()?.`class` ?: "",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.contentColors.primary
         )
         attendanceItems.forEach { attendanceItem ->
             Column {
                 Text(
                     attendanceItem.type,
                     fontSize = 14.sp,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.contentColors.primary
                 )
                 Column {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -65,7 +68,8 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
                             attendanceItem.required
                         ),
                         fontSize = 12.sp,
-                        modifier = Modifier.padding(vertical = 4.dp)
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = MaterialTheme.contentColors.secondary
                     )
                 }
             }

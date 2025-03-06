@@ -55,6 +55,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
@@ -228,7 +229,7 @@ fun PopulatedIksicaView(
         Column(modifier = Modifier
             .offset { IntOffset(0, sheetOffset.intValue) }
             .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-            .background(theme_dark_surface)
+            .background(MaterialTheme.colorScheme.primaryContainer)
         ) {
             if (model.receipts.isEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
@@ -252,6 +253,7 @@ fun TopBarIksica() {
         Text(
             text = stringResource(id = R.string.tab_iksica),
             fontSize = 30.sp,
+            color = MaterialTheme.contentColors.primary,
             modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 16.dp)
         )
     }
@@ -263,6 +265,7 @@ fun TransactionsText() {
         text = stringResource(id = R.string.transactions),
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
+        color = MaterialTheme.contentColors.primary,
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 30.dp, 16.dp, 24.dp)
@@ -280,7 +283,7 @@ fun EmptyIksicaView(text: String) {
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.contentColors.secondary
         )
     }
 }

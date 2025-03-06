@@ -68,6 +68,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 import com.tstudioz.fax.fme.compose.lust
@@ -287,7 +288,7 @@ fun NotesCompose(
                 text = stringResource(id = R.string.notes),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(sidePadding, 5.dp, sidePadding, 0.dp),
-                color = theme_dark_secondary
+                color = MaterialTheme.contentColors.secondary
             )
         }
         Column(
@@ -314,7 +315,7 @@ fun NotesCompose(
                     Text(
                         text = stringResource(id = R.string.add_note),
                         fontSize = 16.sp,
-                        color = theme_dark_onSurface,
+                        color = MaterialTheme.contentColors.primary,
                         modifier = Modifier
                             .padding(start = 10.dp)
                     )
@@ -336,7 +337,8 @@ fun NotesCompose(
                                 Text(
                                     text = stringResource(id = R.string.enter_note),
                                     fontSize = 16.sp,
-                                    modifier = Modifier.padding(0.dp)
+                                    modifier = Modifier.padding(0.dp),
+                                    color = MaterialTheme.contentColors.primary
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
@@ -345,7 +347,11 @@ fun NotesCompose(
                         Row(modifier = Modifier.align(Alignment.End)) {
                             OutlinedButton(
                                 onClick = { openDialog.value = false }
-                            ) { Text(stringResource(id = R.string.cancel_note)) }
+                            ) {
+                                Text(
+                                    stringResource(id = R.string.cancel_note),
+                                    color = MaterialTheme.contentColors.tertiary)
+                            }
                             Spacer(modifier = Modifier.width(8.dp))
                             OutlinedButton(onClick = {
                                 message.value = editMessage.value
@@ -360,7 +366,11 @@ fun NotesCompose(
                                     )
                                 )
                             }
-                            ) { Text(stringResource(id = R.string.save_note)) }
+                            ) {
+                                Text(
+                                    stringResource(id = R.string.save_note),
+                                    color = MaterialTheme.colorScheme.secondaryContainer)
+                            }
                         }
                     }
 
@@ -432,7 +442,8 @@ fun NoteItem(
             text = note.noteTekst ?: "",
             fontSize = 16.sp,
             modifier = Modifier.padding(10.dp),
-            textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None
+            textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None,
+            color = MaterialTheme.contentColors.primary
         )
     }
 }
@@ -461,7 +472,7 @@ fun TodayTimetableCompose(
             Text(
                 text = stringResource(id = R.string.todaysEvents),
                 fontSize = 13.sp,
-                color = theme_dark_secondary
+                color = MaterialTheme.contentColors.secondary
             )
         }
 
@@ -490,7 +501,7 @@ fun TodayTimetableCompose(
                     fontSize = 18.sp,
                     modifier = Modifier
                         .padding(top = 15.dp, bottom = 10.dp),
-                    color = theme_dark_onSurface
+                    color = MaterialTheme.contentColors.secondary
                 )
             }
 
@@ -504,7 +515,7 @@ fun TimetableItem(event: Event) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .background(theme_dark_surface)
+            .background(color = MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
     ) {
@@ -538,7 +549,7 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
                 text = stringResource(id = R.string.prehrana),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 7.dp),
-                color = theme_dark_secondary
+                color = MaterialTheme.contentColors.secondary
             )
         }
         val context = LocalContext.current

@@ -43,7 +43,7 @@ import androidx.compose.ui.graphics.Color
 //    scrim = theme_light_scrim,
 //)
 
-private val DarkColors = darkColorScheme(
+private val colors = darkColorScheme(
     primary = theme_dark_primary,
     onPrimary = theme_dark_onPrimary,
     primaryContainer = theme_dark_primaryContainer,
@@ -97,13 +97,13 @@ fun AppTheme(
 ) {
     val contentColors = ContentColors(
         primary = Color(0xFFFFFFFF),
-        secondary = Color(0xFFDDDDDD),
+        secondary = Color(0xFFC3C3C3),
         tertiary = Color(0xFFAAAAAA)
     )
 
     CompositionLocalProvider(AppComposition.provides(contentColors)) {
         MaterialTheme(
-            colorScheme = darkScheme,
+            colorScheme = colors,
             content = content,
             typography = Typography(),
             shapes = Shapes

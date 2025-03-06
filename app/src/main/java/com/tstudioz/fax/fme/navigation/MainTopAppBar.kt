@@ -66,18 +66,19 @@ fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetabl
                             modifier = Modifier.size(30.dp)
                         )
                     }
-                }
-                IconButton(
-                    onClick = { router.routeToSettings() },
-                    colors = IconButtonDefaults.iconButtonColors().copy(
-                        contentColor = Color.White
-                    )
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.settings_icon),
-                        contentDescription = stringResource(id = R.string.settings),
-                        modifier = Modifier.size(30.dp)
-                    )
+                } else if (currentDestination == "Home") {
+                    IconButton(
+                        onClick = { router.routeToSettings() },
+                        colors = IconButtonDefaults.iconButtonColors().copy(
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.settings_icon),
+                            contentDescription = stringResource(id = R.string.settings),
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
                 }
             },
         )

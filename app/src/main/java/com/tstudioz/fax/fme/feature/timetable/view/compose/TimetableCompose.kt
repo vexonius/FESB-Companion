@@ -53,6 +53,7 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.compose.eventCardBackground
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
@@ -228,7 +229,7 @@ fun BottomSheetCalendar(
                 .padding(24.dp, 16.dp)
         ) {
             TextButton(hideSheet) {
-                Text(stringResource(id = R.string.cancelChoosingWeek), color = Color.Gray)
+                Text(stringResource(id = R.string.cancelChoosingWeek), color = MaterialTheme.contentColors.tertiary)
             }
             TextButton({
                 selection?.let {
@@ -236,7 +237,7 @@ fun BottomSheetCalendar(
                     hideSheet()
                 }
             }) {
-                Text(stringResource(id = R.string.chooseChoosingWeek))
+                Text(stringResource(id = R.string.chooseChoosingWeek), color = MaterialTheme.colorScheme.secondaryContainer)
             }
         }
     }
