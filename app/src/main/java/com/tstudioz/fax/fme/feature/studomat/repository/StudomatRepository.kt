@@ -7,7 +7,7 @@ import com.tstudioz.fax.fme.feature.studomat.data.parseCurrentYear
 import com.tstudioz.fax.fme.feature.studomat.data.parseStudent
 import com.tstudioz.fax.fme.feature.studomat.data.parseYears
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
-import com.tstudioz.fax.fme.feature.studomat.models.Year
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -24,7 +24,7 @@ class StudomatRepository(
         return when (val result = studomatService.getYearNames()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetYears = parseYears(result.data)
-                studomatDao.insertYears(resultGetYears)
+                //studomatDao.insertYears(resultGetYears)
                 Log.d("StudomatRepository", "getYears: $resultGetYears")
                 StudomatRepositoryResult.StudentAndYearsResult.Success(resultGetYears, student)
             }
@@ -36,14 +36,14 @@ class StudomatRepository(
         }
     }
 
-    suspend fun getYear(year: Year): StudomatRepositoryResult.ChosenYearResult {
+    suspend fun getYear(year: StudomatYearInfo): StudomatRepositoryResult.ChosenYearResult {
         return when (val data = studomatService.getYearSubjects(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
-                val resultGetChosenYear = parseCurrentYear(data.data)
-                studomatDao.insert(resultGetChosenYear.first)
-                sharedPreferences.edit().putString("gen" + year.title, resultGetChosenYear.second).apply()
-                Log.d("StudomatRepository", "getOdabranuGodinu: ${resultGetChosenYear.first}")
-                StudomatRepositoryResult.ChosenYearResult.Success(resultGetChosenYear)
+                val parsedSubjects = parseCurrentYear(data.data, year)
+                studomatDao.insert(parsedSubjects.second)
+                //studomatDao.insertYears(listOf(parsedSubjects.first))
+                Log.d("StudomatRepository", "getOdabranuGodinu: $parsedSubjects")
+                StudomatRepositoryResult.ChosenYearResult.Success(parsedSubjects)
             }
 
             is NetworkServiceResult.StudomatResult.Failure -> {
@@ -53,7 +53,11 @@ class StudomatRepository(
         }
     }
 
-    suspend fun readYearNames(): List<Year> {
+    suspend fun insertYears(years: List<StudomatYearInfo>) {
+        studomatDao.insertYears(years)
+    }
+
+    suspend fun readYearNames(): List<StudomatYearInfo> {
         return studomatDao.readYearNames()
     }
 

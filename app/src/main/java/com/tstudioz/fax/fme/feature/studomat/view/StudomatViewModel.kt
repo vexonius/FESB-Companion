@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.feature.studomat.models.Student
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
-import com.tstudioz.fax.fme.feature.studomat.models.Year
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.networking.NetworkUtils
@@ -22,11 +22,11 @@ class StudomatViewModel(
 
     val isRefreshing = MutableLiveData(false)
 
-    val allYears = MutableLiveData<List<Pair<String, List<StudomatSubject>>>>(emptyList())
+    val studomatData = MutableLiveData<List<Pair<StudomatYearInfo, List<StudomatSubject>>>>(emptyList())
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
     private var loadedTxt = MutableLiveData(StudomatState.UNSET)
     private var student = MutableLiveData(Student())
-    private var yearNames = MutableLiveData<List<Year>>(emptyList())
+    private var yearNames = MutableLiveData<List<StudomatYearInfo>>(emptyList())
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
@@ -46,10 +46,17 @@ class StudomatViewModel(
 
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            val yearNamesRealm = repository.readYearNames().sortedByDescending { it.title }
+            val yearNamesRealm = repository.readYearNames().sortedByDescending { it.year }
             yearNames.postValue(yearNamesRealm)
-            val yearsRealmSubjects = repository.read().sortedByStudomat().groupBy { it.year }
-            allYears.postValue(yearsRealmSubjects.toList())
+            val yearsRealmSubjects = repository.read().sortedByStudomat().groupBy { it.year to it.course }
+
+            val groupedData = yearNamesRealm.mapNotNull { yearInfo ->
+                yearsRealmSubjects[yearInfo.year to yearInfo.courseName]?.let { subjectsForYearAndCourse ->
+                    yearInfo to subjectsForYearAndCourse
+                }
+            }
+
+            studomatData.postValue(groupedData)
         }
     }
 
@@ -77,17 +84,22 @@ class StudomatViewModel(
         }
     }
 
-    fun fetchAllYears(freshYears: List<Year> = yearNames.value ?: emptyList(), pulldownTriggered: Boolean = false) {
+    fun fetchAllYears(
+        freshYears: List<StudomatYearInfo> = yearNames.value ?: emptyList(),
+        pulldownTriggered: Boolean = false
+    ) {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (pulldownTriggered) {
                 isRefreshing.postValue(true)
             }
-            val allYearsTemp = mutableListOf<Pair<String, List<StudomatSubject>>>()
-            freshYears.forEach { year ->
-                if (networkUtils.isNetworkAvailable()) {
+            if (networkUtils.isNetworkAvailable()) {
+                val allYearsTemp = mutableListOf<Pair<StudomatYearInfo, List<StudomatSubject>>>()
+                val yearInfoTemp = mutableListOf<StudomatYearInfo>()
+                freshYears.forEach { year ->
                     when (val result = repository.getYear(year)) {
                         is StudomatRepositoryResult.ChosenYearResult.Success -> {
-                                allYearsTemp.add(year.title to result.data.first.sortedByStudomat())
+                            allYearsTemp.add(result.data.first to result.data.second.sortedByStudomat())
+                            yearInfoTemp.add(result.data.first)
                         }
 
                         is StudomatRepositoryResult.ChosenYearResult.Failure -> {
@@ -95,8 +107,10 @@ class StudomatViewModel(
                         }
                     }
                 }
+                studomatData.postValue(allYearsTemp)
+                yearNames.postValue(yearInfoTemp)
+                repository.insertYears(yearInfoTemp)
             }
-            allYears.postValue(allYearsTemp)
             if (pulldownTriggered) {
                 isRefreshing.postValue(false)
             }

@@ -7,6 +7,7 @@ import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRealm
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import com.tstudioz.fax.fme.feature.menza.models.MenzaRealm
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import io.realm.kotlin.RealmConfiguration
 
 class DatabaseManager(private val keystoreManager: KeystoreManagerInterface): DatabaseManagerInterface {
@@ -21,6 +22,7 @@ class DatabaseManager(private val keystoreManager: KeystoreManagerInterface): Da
                 EventRealm::class,
                 StudomatSubject::class,
                 Year::class,
+                StudomatYearInfo::class,
                 ReceiptRealm::class,
                 StudentDataRealm::class))
             .name("default.realm")

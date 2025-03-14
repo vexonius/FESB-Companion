@@ -14,11 +14,12 @@ open class StudomatSubject(
     var grade: String = "",
     var examDate: String = "",
     var year: String = "",
+    var course: String = "",
     var isPassed: Boolean = false
 ) : RealmObject {
-    constructor() : this("", "", "", "", "", "", "", "", "", "", "", false)
+    constructor() : this("", "", "", "", "", "", "", "", "", "", "", "", false)
 
     override fun toString(): String {
-        return "StudomatSubject(name='$name', semester='$semester', lectures='$lectures', exercises='$exercises', ectsEnrolled='$ectsEnrolled', \nisTaken='$isTaken', status='$status', grade='$grade', examDate='$examDate', year='$year')\n"
+        return "StudomatSubject(name='$name', electiveGroup='$electiveGroup', semester='$semester', lectures='$lectures', exercises='$exercises', ectsEnrolled='$ectsEnrolled', isTaken='$isTaken', status='$status', grade='$grade', examDate='$examDate', year='$year', course='$course', isPassed=$isPassed)"
     }
 }

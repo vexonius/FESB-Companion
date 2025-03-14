@@ -6,17 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -51,7 +48,7 @@ import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 @Composable
 fun StudomatCompose(studomatViewModel: StudomatViewModel) {
 
-    val allYears = studomatViewModel.allYears.observeAsState().value
+    val studomatData = studomatViewModel.studomatData.observeAsState().value
     val snackbarHostState = remember { studomatViewModel.snackbarHostState }
     val isRefreshing = studomatViewModel.isRefreshing.observeAsState().value
     val pullRefreshState =
@@ -102,15 +99,15 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
                     )
                 }
                 LazyColumn(Modifier.fillMaxSize()) {
-                    if (!allYears.isNullOrEmpty()) {
+                    if (!studomatData.isNullOrEmpty()) {
                         item {
-                            val list = allYears.sortedByDescending { it.first }
+                            val list = studomatData.sortedByDescending { it.first.year }
                             val pagerState = rememberPagerState(pageCount = { list.size })
                             val pageCount = list.size
 
                             Column {
                                 Text(
-                                    text = list[pagerState.currentPage].first,
+                                    text = list[pagerState.currentPage].first.courseName,
                                     fontSize = 20.sp,
                                     modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp)
                                 )

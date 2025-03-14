@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.feature.studomat.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -18,11 +19,11 @@ class StudomatDao(private val dbManager: DatabaseManagerInterface) :StudomatDaoI
         }
     }
 
-    override suspend fun insertYears(years: List<Year>) {
+    override suspend fun insertYears(years: List<StudomatYearInfo>) {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         realm.write {
-            delete(Year::class)
+            delete(query(StudomatYearInfo::class).find())
             years.forEach {
                 this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
             }
@@ -36,10 +37,10 @@ class StudomatDao(private val dbManager: DatabaseManagerInterface) :StudomatDaoI
         return result.sortedBy { it.name }
     }
 
-    override suspend fun readYearNames(): List<Year> {
+    override suspend fun readYearNames(): List<StudomatYearInfo> {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
-        val result = realm.query(Year::class).find()
+        val result = realm.query(StudomatYearInfo::class).find()
 
-        return result.sortedBy { it.title }
+        return result.sortedBy { it.year }
     }
 }
