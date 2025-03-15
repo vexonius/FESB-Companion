@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -24,6 +26,13 @@ android {
             keyAlias = System.getenv("RELEASE_KEY_ALIAS")
             keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
         }
+        create("releaseDebug") {
+            val localProperties = Properties().apply { load(File(rootDir, "local.properties").inputStream()) }
+            storeFile = file("./../keystore.jks")
+            storePassword = localProperties.getProperty("RELEASE_SIGNING_PASSWORD")
+            keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+            keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+        }
     }
 
     buildTypes {
@@ -31,6 +40,12 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
+        }
+
+        create("releaseDebug") {
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("releaseDebug")
         }
 
         debug {
