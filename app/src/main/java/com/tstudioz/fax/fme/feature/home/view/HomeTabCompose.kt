@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.VerticalDivider
@@ -345,7 +346,7 @@ fun NotesCompose(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(modifier = Modifier.align(Alignment.End)) {
-                            OutlinedButton(
+                            TextButton(
                                 onClick = { openDialog.value = false }
                             ) {
                                 Text(
@@ -353,7 +354,7 @@ fun NotesCompose(
                                     color = MaterialTheme.contentColors.tertiary)
                             }
                             Spacer(modifier = Modifier.width(8.dp))
-                            OutlinedButton(onClick = {
+                            TextButton(onClick = {
                                 message.value = editMessage.value
                                 openDialog.value = false
                                 editMessage.value = ""
@@ -713,54 +714,3 @@ fun Modifier.angledGradientBackground(colors: List<Color>, degrees: Float, halfH
             size = size
         )
     }
-
-
-@Composable
-fun CustomDialog(
-    message: MutableState<String>,
-    openDialog: MutableState<Boolean>,
-    editMessage: MutableState<String>
-) {
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.background)
-            .padding(8.dp),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-        ) {
-            Text(text = stringResource(id = R.string.enter_note))
-            Spacer(modifier = Modifier.height(8.dp))
-            TextField(
-                value = editMessage.value,
-                onValueChange = { editMessage.value = it },
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background),
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Button(
-                onClick = {
-                    openDialog.value = false
-                }
-            ) {
-                Text(stringResource(id = R.string.cancel_note))
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(
-                onClick = {
-                    message.value = editMessage.value
-                    openDialog.value = false
-                }
-            ) {
-                Text(stringResource(id = R.string.save_note))
-            }
-        }
-    }
-}
