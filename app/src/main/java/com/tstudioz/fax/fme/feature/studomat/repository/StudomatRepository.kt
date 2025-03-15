@@ -15,7 +15,6 @@ import com.tstudioz.fax.fme.models.NetworkServiceResult
 class StudomatRepository(
     private val studomatService: StudomatService,
     private val studomatDao: StudomatDao,
-    private val sharedPreferences: SharedPreferences
 ) {
 
     suspend fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
@@ -24,7 +23,6 @@ class StudomatRepository(
         return when (val result = studomatService.getYearNames()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetYears = parseYears(result.data)
-                //studomatDao.insertYears(resultGetYears)
                 Log.d("StudomatRepository", "getYears: $resultGetYears")
                 StudomatRepositoryResult.StudentAndYearsResult.Success(resultGetYears, student)
             }
@@ -41,7 +39,7 @@ class StudomatRepository(
             is NetworkServiceResult.StudomatResult.Success -> {
                 val parsedSubjects = parseCurrentYear(data.data, year)
                 studomatDao.insert(parsedSubjects.second)
-                //studomatDao.insertYears(listOf(parsedSubjects.first))
+                studomatDao.insertYears(listOf(parsedSubjects.first))
                 Log.d("StudomatRepository", "getOdabranuGodinu: $parsedSubjects")
                 StudomatRepositoryResult.ChosenYearResult.Success(parsedSubjects)
             }
@@ -53,15 +51,7 @@ class StudomatRepository(
         }
     }
 
-    suspend fun insertYears(years: List<StudomatYearInfo>) {
-        studomatDao.insertYears(years)
-    }
-
-    suspend fun readYearNames(): List<StudomatYearInfo> {
-        return studomatDao.readYearNames()
-    }
-
-    suspend fun read(): List<StudomatSubject> {
-        return studomatDao.read()
+    suspend fun readData(): List<Pair<StudomatYearInfo, List<StudomatSubject>>> {
+        return studomatDao.readData()
     }
 }

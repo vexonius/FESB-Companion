@@ -12,4 +12,6 @@ interface StudomatDaoInterface {
     suspend fun read(): List<StudomatSubject>
 
     suspend fun readYearNames(): List<StudomatYearInfo>
+
+    suspend fun readData(): List<Pair<StudomatYearInfo, List<StudomatSubject>>>
 }

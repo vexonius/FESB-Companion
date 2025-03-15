@@ -52,14 +52,14 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
     val snackbarHostState = remember { studomatViewModel.snackbarHostState }
     val isRefreshing = studomatViewModel.isRefreshing.observeAsState().value
     val pullRefreshState =
-        rememberPullRefreshState(isRefreshing == true, { studomatViewModel.fetchAllYears(pulldownTriggered = true) })
+        rememberPullRefreshState(isRefreshing == true, { studomatViewModel.getStudomatData(pulldownTriggered = true) })
 
 
     val lifecycleState = LocalLifecycleOwner.current.lifecycle.currentState
     LaunchedEffect(lifecycleState) {
         when (lifecycleState) {
             Lifecycle.State.RESUMED -> {
-                studomatViewModel.fetchAllYears()
+                studomatViewModel.getStudomatData()
             }
 
             else -> {}

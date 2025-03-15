@@ -1,13 +1,13 @@
 package com.tstudioz.fax.fme.feature.studomat.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
+import com.tstudioz.fax.fme.feature.studomat.data.sortedByStudomat
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
-import com.tstudioz.fax.fme.feature.studomat.models.Year
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 
-class StudomatDao(private val dbManager: DatabaseManagerInterface) :StudomatDaoInterface {
+class StudomatDao(private val dbManager: DatabaseManagerInterface) : StudomatDaoInterface {
     override suspend fun insert(subjects: List<StudomatSubject>) {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
@@ -23,8 +23,8 @@ class StudomatDao(private val dbManager: DatabaseManagerInterface) :StudomatDaoI
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         realm.write {
-            delete(query(StudomatYearInfo::class).find())
             years.forEach {
+                delete(query(StudomatYearInfo::class, "year==$0 AND courseName==$1", it.year, it.courseName).find())
                 this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
             }
         }
@@ -42,5 +42,19 @@ class StudomatDao(private val dbManager: DatabaseManagerInterface) :StudomatDaoI
         val result = realm.query(StudomatYearInfo::class).find()
 
         return result.sortedBy { it.year }
+    }
+
+    override suspend fun readData(): List<Pair<StudomatYearInfo, List<StudomatSubject>>> {
+        val yearsRealmSubjects = read()
+            .sortedByStudomat()
+            .groupBy { it.year to it.course }
+        val groupedData = readYearNames()
+            .sortedByDescending { it.year }
+            .mapNotNull { yearInfo ->
+                yearsRealmSubjects[yearInfo.year to yearInfo.courseName]?.let { subjectsForYearAndCourse ->
+                    yearInfo to subjectsForYearAndCourse
+                }
+            }
+        return groupedData
     }
 }
