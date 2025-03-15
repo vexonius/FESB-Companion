@@ -159,7 +159,7 @@ fun ScheduleHeader(
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
 ) {
     Row(
-        modifier = modifier.background(color = theme_dark_primaryContainer)
+        modifier = modifier.background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
         val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
         repeat(numDays) { i ->

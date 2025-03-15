@@ -35,7 +35,7 @@ fun CircularIndicator(size: Dp = 45.dp) {
         Box(
             Modifier
                 .clip(shape = CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceDim )
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(size/5)
         ) {
             CircularProgressIndicator(

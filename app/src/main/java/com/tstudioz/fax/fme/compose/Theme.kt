@@ -73,7 +73,14 @@ private val colors = darkColorScheme(
     surfaceTint = theme_dark_surfaceTint,
     outlineVariant = theme_dark_outlineVariant,
     scrim = theme_dark_scrim,
-)
+    surfaceDim = theme_dark_surfaceDimDark,
+    surfaceBright = theme_dark_surfaceBrightDark,
+    surfaceContainerLowest = theme_dark_surfaceContainerLowestDark,
+    surfaceContainerLow = theme_dark_surfaceContainerLowDark,
+    surfaceContainer = theme_dark_surfaceContainerDark,
+    surfaceContainerHigh = theme_dark_surfaceContainerHighDark,
+    surfaceContainerHighest = theme_dark_surfaceContainerHighestDark,
+    )
 
 data class ContentColors(
     val primary: Color,

@@ -42,7 +42,7 @@ fun BottomSheetIksica(
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = { toggleShowItem() },
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onBackground,
         windowInsets = WindowInsets(0.dp),
         dragHandle = { },
@@ -56,7 +56,7 @@ fun IksicaReceiptDetailed(
     receipt: Receipt?
 ) {
     LazyColumn(
-        Modifier.background(MaterialTheme.colorScheme.background)
+        Modifier.background(MaterialTheme.colorScheme.surface)
     ) {
         item {
             Column(
