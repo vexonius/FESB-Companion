@@ -229,7 +229,7 @@ fun PopulatedIksicaView(
         Column(modifier = Modifier
             .offset { IntOffset(0, sheetOffset.intValue) }
             .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(MaterialTheme.colorScheme.surface)
         ) {
             if (model.receipts.isEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))

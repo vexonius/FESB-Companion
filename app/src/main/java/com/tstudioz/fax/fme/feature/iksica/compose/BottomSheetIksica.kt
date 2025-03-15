@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
 import com.tstudioz.fax.fme.feature.iksica.roundToTwo
@@ -42,7 +43,7 @@ fun BottomSheetIksica(
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = { toggleShowItem() },
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onBackground,
         windowInsets = WindowInsets(0.dp),
         dragHandle = { },
@@ -67,12 +68,22 @@ fun IksicaReceiptDetailed(
             ) {
                 Text(
                     text = stringResource(id = R.string.transaction_details),
+                    color = MaterialTheme.contentColors.primary,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 10.dp)
                 )
-                Text(text = receipt?.restaurant ?: "", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(text = (receipt?.dateString ?: "") + ", " + (receipt?.time ?: ""), fontSize = 15.sp)
+                Text(
+                    text = receipt?.restaurant ?: "",
+                    color = MaterialTheme.contentColors.secondary,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = (receipt?.dateString ?: "") + ", " + (receipt?.time ?: ""),
+                    color = MaterialTheme.contentColors.secondary,
+                    fontSize = 15.sp
+                )
             }
         }
         items(receipt?.receiptDetails ?: emptyList()) {
@@ -89,22 +100,37 @@ fun IksicaReceiptDetailed(
             ) {
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                     Column(horizontalAlignment = Alignment.End) {
-                        Text(text = stringResource(id = R.string.transaction_total), fontSize = 16.sp)
-                        Text(text = stringResource(id = R.string.transaction_subsidized), fontSize = 16.sp)
-                        Text(text = stringResource(id = R.string.transaction_paid), fontSize = 16.sp)
+                        Text(
+                            text = stringResource(id = R.string.transaction_total),
+                            fontSize = 16.sp,
+                            color = MaterialTheme.contentColors.primary
+                            )
+                        Text(
+                            text = stringResource(id = R.string.transaction_subsidized),
+                            fontSize = 16.sp,
+                            color = MaterialTheme.contentColors.secondary
+                            )
+                        Text(
+                            text = stringResource(id = R.string.transaction_paid),
+                            fontSize = 16.sp,
+                            color = MaterialTheme.contentColors.secondary,
+                            )
                     }
                     Spacer(modifier = Modifier.width(20.dp))
                     Column {
                         Text(
                             text = receipt?.receiptAmount?.roundToTwo() + stringResource(R.string.currency),
+                            color = MaterialTheme.contentColors.primary,
                             fontSize = 16.sp
                         )
                         Text(
                             text = receipt?.subsidizedAmount?.roundToTwo() + stringResource(R.string.currency),
+                            color = MaterialTheme.contentColors.primary,
                             fontSize = 16.sp
                         )
                         Text(
                             text = receipt?.paidAmount?.roundToTwo() + stringResource(R.string.currency),
+                            color = MaterialTheme.contentColors.primary,
                             fontSize = 16.sp
                         )
                     }
@@ -116,22 +142,27 @@ fun IksicaReceiptDetailed(
 }
 
 @Composable
-fun IksicaItemDetailed(
-    item: ReceiptItem
-) {
-
+fun IksicaItemDetailed(item: ReceiptItem) {
     Row(
         Modifier
             .fillMaxWidth()
             .padding(20.dp, 5.dp, 15.dp, 5.dp)
     ) {
 
-        Text(text = stringResource(R.string.amount_x, item.amount.toString()), fontWeight = FontWeight.Bold)
+        Text(
+            text = stringResource(R.string.amount_x, item.amount.toString()),
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.contentColors.primary
+        )
         Spacer(modifier = Modifier.width(6.dp))
         Column(Modifier.fillMaxWidth()) {
             Row(Modifier.fillMaxWidth()) {
                 Row(modifier = Modifier.weight(0.7f)) {
-                    Text(text = item.articleName, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = item.articleName,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.contentColors.primary
+                        )
                 }
                 Text(
                     text = item.total.toBigDecimal().minus(item.subsidizedAmount.toBigDecimal())
@@ -141,15 +172,15 @@ fun IksicaItemDetailed(
                         .padding(start = 10.dp)
                 )
             }
-            Row {
+            Column {
                 Text(
                     text = stringResource(R.string.price_of_item, item.price.toString()) + stringResource(R.string.currency),
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.contentColors.tertiary
                 )
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
                     text = stringResource(R.string.subsidized_price_of_item, item.subsidizedAmount.toString()) + stringResource(R.string.currency),
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.contentColors.tertiary
                 )
             }
         }
