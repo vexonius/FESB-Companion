@@ -23,9 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
@@ -69,20 +69,20 @@ fun IksicaReceiptDetailed(
                 Text(
                     text = stringResource(id = R.string.transaction_details),
                     color = MaterialTheme.contentColors.primary,
-                    fontSize = 24.sp,
+                    style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 10.dp)
                 )
                 Text(
                     text = receipt?.restaurant ?: "",
                     color = MaterialTheme.contentColors.secondary,
-                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = (receipt?.dateString ?: "") + ", " + (receipt?.time ?: ""),
                     color = MaterialTheme.contentColors.secondary,
-                    fontSize = 15.sp
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }
@@ -102,36 +102,36 @@ fun IksicaReceiptDetailed(
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
                             text = stringResource(id = R.string.transaction_total),
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.contentColors.primary
-                            )
+                        )
                         Text(
                             text = stringResource(id = R.string.transaction_subsidized),
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.contentColors.secondary
-                            )
+                        )
                         Text(
                             text = stringResource(id = R.string.transaction_paid),
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.contentColors.secondary,
-                            )
+                        )
                     }
                     Spacer(modifier = Modifier.width(20.dp))
                     Column {
                         Text(
                             text = receipt?.receiptAmount?.roundToTwo() + stringResource(R.string.currency),
                             color = MaterialTheme.contentColors.primary,
-                            fontSize = 16.sp
+                            style = MaterialTheme.typography.titleMedium
                         )
                         Text(
                             text = receipt?.subsidizedAmount?.roundToTwo() + stringResource(R.string.currency),
                             color = MaterialTheme.contentColors.primary,
-                            fontSize = 16.sp
+                            style = MaterialTheme.typography.titleMedium
                         )
                         Text(
                             text = receipt?.paidAmount?.roundToTwo() + stringResource(R.string.currency),
                             color = MaterialTheme.contentColors.primary,
-                            fontSize = 16.sp
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }
@@ -151,36 +151,46 @@ fun IksicaItemDetailed(item: ReceiptItem) {
 
         Text(
             text = stringResource(R.string.amount_x, item.amount.toString()),
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.contentColors.primary
+            color = MaterialTheme.contentColors.primary,
+            style = MaterialTheme.typography.titleSmall
         )
         Spacer(modifier = Modifier.width(6.dp))
         Column(Modifier.fillMaxWidth()) {
             Row(Modifier.fillMaxWidth()) {
-                Row(modifier = Modifier.weight(0.7f)) {
-                    Text(
-                        text = item.articleName,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.contentColors.primary
-                        )
-                }
                 Text(
-                    text = item.total.toBigDecimal().minus(item.subsidizedAmount.toBigDecimal())
-                        .times(item.amount.toBigDecimal()).toString() + stringResource(R.string.currency),
+                    text = item.articleName,
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.weight(0.7f)
+                )
+                Text(
+                    text = item.total.toBigDecimal()
+                        .minus(item.subsidizedAmount.toBigDecimal())
+                        .times(item.amount.toBigDecimal())
+                        .toString() + stringResource(R.string.currency),
                     modifier = Modifier
                         .weight(0.20f)
-                        .padding(start = 10.dp)
+                        .padding(start = 10.dp),
+                    style = MaterialTheme.typography.titleSmall,
+                    textAlign = TextAlign.End
                 )
             }
             Column {
                 Text(
-                    text = stringResource(R.string.price_of_item, item.price.toString()) + stringResource(R.string.currency),
-                    color = MaterialTheme.contentColors.tertiary
+                    text = stringResource(
+                        R.string.price_of_item,
+                        item.price.toString()
+                    ) + stringResource(R.string.currency),
+                    color = MaterialTheme.contentColors.tertiary,
+                    style = MaterialTheme.typography.bodySmall
                 )
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
-                    text = stringResource(R.string.subsidized_price_of_item, item.subsidizedAmount.toString()) + stringResource(R.string.currency),
-                    color = MaterialTheme.contentColors.tertiary
+                    text = stringResource(
+                        R.string.subsidized_price_of_item,
+                        item.subsidizedAmount.toString()
+                    ) + stringResource(R.string.currency),
+                    color = MaterialTheme.contentColors.tertiary,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }

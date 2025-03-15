@@ -252,9 +252,9 @@ fun TopBarIksica() {
     ) {
         Text(
             text = stringResource(id = R.string.tab_iksica),
-            fontSize = 30.sp,
+            style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.contentColors.primary,
-            modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 16.dp)
+            modifier = Modifier.padding(16.dp)
         )
     }
 }

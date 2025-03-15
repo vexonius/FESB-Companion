@@ -47,6 +47,13 @@ val CustomTypography = Typography(
         lineHeight = 24.sp,
         color = Color.White
     ),
+    headlineLarge = TextStyle( // Heading 4
+        fontFamily = InterFont,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = 19.sp,
+        color = Color.White
+    ),
     headlineMedium = TextStyle( // Heading 4
         fontFamily = InterFont,
         fontWeight = FontWeight.SemiBold,
@@ -57,6 +64,27 @@ val CustomTypography = Typography(
     headlineSmall = TextStyle( // Heading 5
         fontFamily = InterFont,
         fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 17.sp,
+        color = Color.White
+    ),
+    titleLarge = TextStyle( // Button 1
+        fontFamily = InterFont,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        lineHeight = 22.sp,
+        color = Color.White
+    ),
+    titleMedium = TextStyle( // Button 2
+        fontFamily = InterFont,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        lineHeight = 19.sp,
+        color = Color.White
+    ),
+    titleSmall = TextStyle( // Button 3
+        fontFamily = InterFont,
+        fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 17.sp,
         color = Color.White
@@ -101,27 +129,6 @@ val CustomTypography = Typography(
         fontWeight = FontWeight.SemiBold,
         fontSize = 12.sp,
         lineHeight = 15.sp,
-        color = Color.White
-    ),
-    titleLarge = TextStyle( // Button 1
-        fontFamily = InterFont,
-        fontWeight = FontWeight.Medium,
-        fontSize = 18.sp,
-        lineHeight = 22.sp,
-        color = Color.White
-    ),
-    titleMedium = TextStyle( // Button 2
-        fontFamily = InterFont,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        lineHeight = 19.sp,
-        color = Color.White
-    ),
-    titleSmall = TextStyle( // Button 3
-        fontFamily = InterFont,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 17.sp,
         color = Color.White
     )
 )

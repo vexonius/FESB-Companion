@@ -44,6 +44,7 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
             Text(
                 receipt.restaurant.trim(),
                 color = MaterialTheme.contentColors.primary,
+                style = MaterialTheme.typography.titleSmall,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(0.80f)
             )
@@ -52,7 +53,7 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
                     id = R.string.minus_amount, receipt.subsidizedAmount.roundToTwo()
                 ) + stringResource(id = R.string.currency),
                 color = MaterialTheme.contentColors.primary,
-                fontSize = 15.sp,
+                style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.weight(0.20f),
                 textAlign = TextAlign.End,
             )
@@ -61,9 +62,9 @@ fun IksicaItem(receipt: Receipt, onClick: () -> Unit) {
             Row {
                 val today = LocalDate.now()
                 val daysAgo = ChronoUnit.DAYS.between(receipt.date, today).daysAgoText(LocalContext.current)
-                Text(daysAgo, color = MaterialTheme.contentColors.tertiary)
+                Text(daysAgo, color = MaterialTheme.contentColors.tertiary, style = MaterialTheme.typography.bodySmall)
                 Spacer(modifier = Modifier.width(2.dp))
-                Text(receipt.time, color = MaterialTheme.contentColors.tertiary)
+                Text(receipt.time, color = MaterialTheme.contentColors.tertiary, style = MaterialTheme.typography.bodySmall)
             }
         }
     }
