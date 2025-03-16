@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.studomat.repository
 
-import android.content.SharedPreferences
 import android.util.Log
 import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
 import com.tstudioz.fax.fme.feature.studomat.data.parseCurrentYear
@@ -16,6 +15,10 @@ class StudomatRepository(
     private val studomatService: StudomatService,
     private val studomatDao: StudomatDao,
 ) {
+
+    fun loadCookieToWebview() {
+        studomatService.loadCookieToWebview()
+    }
 
     suspend fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
         val student = parseStudent(studomatService.getStudomatData())

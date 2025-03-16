@@ -84,6 +84,8 @@
     <string name="exam_date">Datum ispitnog roka:</string>
 
     <string name="enrolled_subjects">Upisani predmeti</string>
+    <string name="open_webview">Upravljaj kolegijima i prijavi ispite online</string>
+    <string name="no_data">Nema podataka za prikazati.</string>
 
 
     <string name="weather_temp">%1$.0f°</string>

@@ -80,3 +80,4 @@ val gradientColors = listOf(
     Color(0xFFDD3742),
     Color(0xFFA344DE)
 )
+val studomatBlue = Color(0xFF0066cc)

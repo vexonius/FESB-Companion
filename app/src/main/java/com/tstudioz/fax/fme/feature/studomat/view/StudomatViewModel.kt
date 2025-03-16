@@ -41,6 +41,8 @@ class StudomatViewModel(
     }
 
     fun getStudomatData(pulldownTriggered: Boolean = false, getSubjects: Boolean = true) {
+        repository.loadCookieToWebview()
+
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (networkUtils.isNetworkAvailable()) {
                 if (pulldownTriggered) isRefreshing.postValue(true)
