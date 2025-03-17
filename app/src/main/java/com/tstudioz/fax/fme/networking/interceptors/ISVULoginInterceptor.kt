@@ -27,7 +27,7 @@ class ISVULoginInterceptor(
 
     private suspend fun refreshSession(){
         val realmModel = userDao.getUser()
-        val user = User(realmModel.username, realmModel.password)
+        val user = User(realmModel)
 
         studomatLoginService.getSamlRequest()
         studomatLoginService.sendSamlResponseToAAIEDU()

@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.login.services
 
+import android.util.Log
 import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
@@ -7,6 +8,7 @@ import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.jsoup.Jsoup
 
 class UserService(private val client: OkHttpClient) : UserServiceInterface {
 
@@ -24,11 +26,12 @@ class UserService(private val client: OkHttpClient) : UserServiceInterface {
 
         val response = client.newCall(request).execute()
         val url = response.request.url
+        val nameOfUser = Jsoup.parse(response.body?.string()).select(".welcomeBack h2").text()
 
         response.close()
 
         return if (url == targetUrl) {
-            NetworkServiceResult.LoginResult.Success(User(username, password))}
+            NetworkServiceResult.LoginResult.Success(User(nameOfUser, username, password))}
         else {
             NetworkServiceResult.LoginResult.Failure(Throwable("Error during login"))}
     }

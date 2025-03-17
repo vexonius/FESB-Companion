@@ -35,6 +35,8 @@
     <string name="login_safe_data">Tvoji podaci su sigurni i ne dijele se s trećim stranama.</string>
 
     <string name="weather_icon_desc">Ikona vremena</string>
+    <string name="hi_user">Bok %1$s</string>
+    <string name="weather_info">U %1$s je trenutno %2$s (%3$.1f°C)</string>
 
     <string name="notes">PODSJETNICI</string>
 

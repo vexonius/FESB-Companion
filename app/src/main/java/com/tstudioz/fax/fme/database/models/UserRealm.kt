@@ -4,6 +4,7 @@ import io.realm.kotlin.types.RealmObject
 
 open class UserRealm : RealmObject {
 
+    var fullName: String = ""
     var username: String = ""
     var password: String = ""
 

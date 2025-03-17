@@ -36,7 +36,7 @@ class HomeViewModel(
     private val noteRepository: NoteRepositoryInterface,
     private val weatherRepository: WeatherRepositoryInterface,
     private val timeTableRepository: TimeTableRepositoryInterface,
-    private val userRepository: UserRepositoryInterface
+    private val userRepository: UserRepositoryInterface,
 ) : AndroidViewModel(application) {
 
     private val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
@@ -44,7 +44,7 @@ class HomeViewModel(
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
     private val _weatherDisplay = MutableLiveData<WeatherDisplay>()
     private val _notes = MutableLiveData<List<Note>>()
-
+    val nameOfUser = MutableLiveData<String>()
     val weatherDisplay: LiveData<WeatherDisplay> = _weatherDisplay
     val notes: LiveData<List<Note>> = _notes
     val events: LiveData<List<Event>> = timeTableRepository.events.asLiveData()
@@ -57,6 +57,13 @@ class HomeViewModel(
     init {
         getNotes()
         getForecast()
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            val name = userRepository.getCurrentUser().fullName.split(" ") .firstOrNull() ?: ""
+            nameOfUser.postValue(name.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault())
+                else it.toString()
+            })
+        }
     }
 
     private fun getForecast() {
