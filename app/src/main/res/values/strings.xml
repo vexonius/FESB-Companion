@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">FESB Companion</string>
     <string name="getRest">Odmori se, danas nemaš obaveza!</string>
-    <string name="todaysEvents">DANAŠNJA PREDAVANJA</string>
+    <string name="todaysEvents">Današnji raspored</string>
     <string name="prehrana">PREHRANA</string>
 
     // tabs

@@ -1,9 +1,10 @@
 package com.tstudioz.fax.fme.feature.home.view
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import android.view.LayoutInflater
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,14 +19,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
@@ -38,12 +36,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,28 +53,32 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.notesContainer
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
+import com.tstudioz.fax.fme.util.testEvents
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.compose.koinViewModel
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -88,7 +90,7 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-val sidePadding = 20.dp
+val sidePadding = 24.dp
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class)
 @Composable
@@ -114,7 +116,8 @@ fun HomeTabCompose(
                 homeViewModel.fetchDailyTimetable()
                 menzaViewModel.getMenza()
             }
-            else ->{}
+
+            else -> {}
         }
     }
 
@@ -155,6 +158,7 @@ fun HomeTabCompose(
                     }
                     item {
                         TodayTimetableCompose(
+                            //testEvents
                             events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
                                 ?: emptyList()
                         )
@@ -171,98 +175,18 @@ fun WeatherCompose(
     weather: WeatherDisplay
 ) {
     Column(
-        modifier = Modifier.background(colorResource(id = R.color.dark_cyan)),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.padding(32.dp, 54.dp, 0.dp, 0.dp),
+        horizontalAlignment = Alignment.Start
     ) {
-        Row(
-            modifier = Modifier
-                .wrapContentSize()
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val context = LocalContext.current
-            Image(
-                painter = painterResource(
-                    id = context.resources.getIdentifier(
-                        weather.icon,
-                        "drawable",
-                        context.packageName
-                    )
-                ),
-                contentDescription = stringResource(R.string.weather_icon_desc),
-                modifier = Modifier
-                    .weight(0.45f, false)
-                    .aspectRatio(1f)
-                    .padding(10.dp)
-            )
-            Column(
-                modifier = Modifier.weight(0.55f, false),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = weather.location,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(3.dp),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = String.format(Locale.US, stringResource(R.string.weather_temp), weather.temperature),
-                    fontSize = 64.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = weather.summary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Row {
-                    Box(Modifier.weight(.3f, false)) {
-                        WeatherItem(
-                            text = String.format(
-                                Locale.US,
-                                stringResource(R.string.weather_wind),
-                                weather.wind
-                            ), id = R.drawable.wind
-                        )
-                    }
-                    Box(Modifier.weight(.3f, false)) {
-                        WeatherItem(
-                            text = String.format(
-                                Locale.US,
-                                stringResource(R.string.weather_humidity),
-                                weather.humidity
-                            ), id = R.drawable.vlaga
-                        )
-                    }
-                    Box(Modifier.weight(.3f, false)) {
-                        WeatherItem(
-                            text = String.format(
-                                Locale.US,
-                                stringResource(R.string.weather_precip_chance),
-                                weather.precipChance
-                            ), id = R.drawable.oborine
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun WeatherItem(text: String, id: Int) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(5.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = id),
-            contentDescription = stringResource(id = R.string.weather_icon_desc),
-            modifier = Modifier.size(20.dp)
+        Text(
+            text = "Bok Stipe",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold
         )
-        Text(text = text, fontSize = 12.sp)
+        Text(
+            text = "U " + weather.location + "u je trenutno " + weather.summary.lowercase(Locale.getDefault()) + " (" + weather.temperature + "°C)",
+            fontSize = 11.sp,
+        )
     }
 }
 
@@ -274,109 +198,107 @@ fun NotesCompose(
     deleteNote: (note: Note) -> Unit = { }
 ) {
     Column(
-        modifier = Modifier,
+        modifier = Modifier
+            .padding(24.dp, 12.dp)
+            .clip(RoundedCornerShape(30.dp))
+            .background(notesContainer)
+            .padding(24.dp, 12.dp),
         verticalArrangement = Arrangement.Center,
     ) {
         Row {
             Text(
                 text = stringResource(id = R.string.notes),
-                fontSize = 13.sp,
-                modifier = Modifier.padding(sidePadding, 5.dp, sidePadding, 0.dp),
-                color = colorResource(id = R.color.shady_blue)
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp)
             )
         }
-        Column(
-            modifier = Modifier
-                .background(colorResource(id = R.color.colorPrimaryDark))
-                .fillMaxWidth()
-                .padding(sidePadding, 0.dp)
-        ) {
-            val editMessage = remember { mutableStateOf("") }
-            val message = remember { mutableStateOf("") }
-            val openDialog = remember { mutableStateOf(false) }
-            if (!openDialog.value) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp)
-                        .clickable { openDialog.value = true }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.add_new),
-                        contentDescription = stringResource(id = R.string.add_note),
-                        modifier = Modifier.size(25.dp)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.add_note),
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .padding(start = 10.dp)
-                    )
-                }
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+        val editMessage = remember { mutableStateOf("") }
+        val message = remember { mutableStateOf("") }
+        val openDialog = remember { mutableStateOf(false) }
+        if (!openDialog.value) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onClick() }) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        TextField(
-                            value = editMessage.value,
-                            onValueChange = { editMessage.value = it },
-                            singleLine = true,
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
-                                unfocusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
-                            ),
-                            placeholder = {
-                                Text(
-                                    text = stringResource(id = R.string.enter_note),
-                                    fontSize = 16.sp,
-                                    modifier = Modifier.padding(0.dp)
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Row(modifier = Modifier.align(Alignment.End)) {
-                            OutlinedButton(
-                                onClick = { openDialog.value = false }
-                            ) { Text(stringResource(id = R.string.cancel_note)) }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            OutlinedButton(onClick = {
-                                message.value = editMessage.value
-                                openDialog.value = false
-                                editMessage.value = ""
-                                insertNote(
-                                    Note(
-                                        noteTekst = message.value,
-                                        checked = false,
-                                        dateCreated = LocalDateTime.now(),
-                                        id = UUID.randomUUID().toString(),
-                                    )
-                                )
-                            }
-                            ) { Text(stringResource(id = R.string.save_note)) }
-                        }
-                    }
-
-                }
-            }
-            notes.forEach { note ->
-                NoteItem(
-                    note = note,
-                    isDone = remember { mutableStateOf(note.checked ?: false) },
-                    delete = { deleteNote(note) },
-                    markDone = { isDone ->
-                        insertNote(
-                            Note(
-                                noteTekst = note.noteTekst,
-                                checked = isDone,
-                                dateCreated = note.dateCreated,
-                                id = note.id
-                            )
-                        )
-                    }
+                    .padding(vertical = 10.dp)
+                    .clickable { openDialog.value = true }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.add_new),
+                    contentDescription = stringResource(id = R.string.add_note),
+                    modifier = Modifier.size(25.dp)
+                )
+                Text(
+                    text = stringResource(id = R.string.add_note),
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
                 )
             }
+        } else {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    TextField(
+                        value = editMessage.value,
+                        onValueChange = { editMessage.value = it },
+                        singleLine = true,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
+                            unfocusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
+                        ),
+                        placeholder = {
+                            Text(
+                                text = stringResource(id = R.string.enter_note),
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(0.dp)
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(modifier = Modifier.align(Alignment.End)) {
+                        OutlinedButton(
+                            onClick = { openDialog.value = false }
+                        ) { Text(stringResource(id = R.string.cancel_note)) }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        OutlinedButton(onClick = {
+                            message.value = editMessage.value
+                            openDialog.value = false
+                            editMessage.value = ""
+                            insertNote(
+                                Note(
+                                    noteTekst = message.value,
+                                    checked = false,
+                                    dateCreated = LocalDateTime.now(),
+                                    id = UUID.randomUUID().toString(),
+                                )
+                            )
+                        }
+                        ) { Text(stringResource(id = R.string.save_note)) }
+                    }
+                }
+
+            }
+        }
+        notes.sortedByDescending { it.dateCreated }.forEach { note ->
+            key(note.id) {
+            NoteItem(
+                note = note,
+                delete = { deleteNote(note) },
+                markDone = { isDone ->
+                    insertNote(
+                        Note(
+                            noteTekst = note.noteTekst,
+                            checked = isDone,
+                            dateCreated = note.dateCreated,
+                            id = note.id
+                        )
+                    )
+                }
+            )
+        }
         }
     }
 }
@@ -385,16 +307,17 @@ fun NotesCompose(
 @Composable
 fun NoteItem(
     note: Note,
-    isDone: MutableState<Boolean>,
     markDone: (isDone: Boolean) -> Unit = { },
     delete: () -> Unit = { }
 ) {
+    val isDone = remember { mutableStateOf(note.checked ?:false) }
     val longClicked = remember { mutableStateOf(false) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
             .combinedClickable(onLongClick = { longClicked.value = !longClicked.value }) {}
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
@@ -440,27 +363,18 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
 }
 
 @Composable
-fun TodayTimetableCompose(
-    events: List<Event>
-) {
+fun TodayTimetableCompose(events: List<Event>) {
     Column(
-        modifier = Modifier.padding(horizontal = sidePadding),
+        modifier = Modifier.padding(24.dp, 12.dp),
         verticalArrangement = Arrangement.Center,
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
-                .padding(top = 7.dp)
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = stringResource(id = R.string.todaysEvents),
-                fontSize = 13.sp,
-                color = colorResource(id = R.color.shady_blue)
-            )
-        }
+        Text(
+            text = stringResource(id = R.string.todaysEvents),
+            fontSize = 13.sp,
+        )
 
         if (events.isNotEmpty()) {
-            events.forEach() { event ->
+            events.forEach { event ->
                 TimetableItem(event)
             }
         } else {
@@ -494,120 +408,126 @@ fun TodayTimetableCompose(
 
 @Composable
 fun TimetableItem(event: Event) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-        modifier = Modifier
-            .background(colorResource(id = R.color.colorPrimaryDark))
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min),
+    Column(
+        Modifier.padding(0.dp, 5.dp),
     ) {
-        VerticalDivider(
-            color = event.color,
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(20.dp),
-            thickness = 20.dp
-        )
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .padding(10.dp, 5.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = event.name, fontSize = 21.sp, fontWeight = FontWeight.Bold)
-            val formatter = DateTimeFormatter.ofPattern("HH:mm")
-            val range = event.start.format(formatter) + " - " + event.end.format(formatter)
-            Row {
-                Text(text = "$range ∙ ${event.eventType.value} ∙ ${event.classroom}", fontSize = 13.sp)
+            val time = Duration.between(event.start, event.end).toMinutes() / 60f*6
+            Canvas(modifier = Modifier.size(Dp(time * 5.dp.value) + 5.dp, 10.dp)) {
+                val radius = 5.dp.toPx()
+                val width = (radius * time - radius).coerceAtLeast(radius)
+                drawLine(
+                    color = event.color,
+                    start = Offset(radius, radius),
+                    end = Offset(width, radius),
+                    strokeWidth = radius * 2,
+                    cap = StrokeCap.Round,
+                )
             }
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = event.eventType.value,
+                fontSize = 12.sp,
+            )
+            Text(
+                text = " • " + event.classroom,
+                fontSize = 12.sp,
+            )
+        }
+        Row {
+            Text(
+                text = event.start.toLocalTime()
+                    .format(DateTimeFormatter.ofPattern("HH:mm")),
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = event.name,
+                fontSize = 16.sp
+            )
         }
     }
 }
 
 @Composable
 fun CardsCompose(menzaShow: MutableState<Boolean>) {
-    Column(Modifier.padding(horizontal = sidePadding)) {
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = stringResource(id = R.string.prehrana),
-                fontSize = 13.sp,
-                modifier = Modifier.padding(top = 7.dp),
-                color = colorResource(id = R.color.shady_blue)
-            )
-        }
+    Row(Modifier.padding(horizontal = sidePadding)) {
         val context = LocalContext.current
-        CardCompose(
-            stringResource(id = R.string.menza_title),
-            stringResource(id = R.string.menza_desc),
-            colorResource(id = R.color.welcome2),
-            colorResource(id = R.color.welcome2),
-            onClick = {
-                menzaShow.value = true
-            })
-        CardCompose(
-            stringResource(id = R.string.ugovori_title),
-            stringResource(id = R.string.ugovori_desc),
-            colorResource(id = R.color.green_blue),
-            colorResource(id = R.color.lust),
-            onClick = {
-                val appPackageName = "com.ugovori.studentskiugovori"
-                val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
-                if (intent != null) {
-                    context.startActivity(intent)
-                } else {
-                    try {
-                        context.startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("market://details?id=$appPackageName")
+        Box(
+            Modifier
+                .weight(0.5f)
+        ) {
+            CardCompose(
+                stringResource(id = R.string.menza_title),
+                stringResource(id = R.string.menza_desc),
+                colorResource(id = R.color.welcome2),
+                colorResource(id = R.color.welcome2),
+                onClick = {
+                    menzaShow.value = true
+                })
+        }
+        Box(
+            Modifier
+                .weight(0.5f)
+        ) {
+            CardCompose(
+                stringResource(id = R.string.ugovori_title),
+                stringResource(id = R.string.ugovori_desc),
+                colorResource(id = R.color.green_blue),
+                colorResource(id = R.color.lust),
+                onClick = {
+                    val appPackageName = "com.ugovori.studentskiugovori"
+                    val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
+                    if (intent != null) {
+                        context.startActivity(intent)
+                    } else {
+                        try {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("market://details?id=$appPackageName")
+                                )
                             )
-                        )
-                    } catch (ex: ActivityNotFoundException) {
-                        context.startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+                        } catch (ex: ActivityNotFoundException) {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+                                )
                             )
-                        )
+                        }
                     }
                 }
-            })
+            )
+        }
     }
 }
 
 @Composable
 fun CardCompose(title: String, description: String, color1: Color, color2: Color, onClick: () -> Unit = { }) {
-    Box(
+    Column(
         modifier = Modifier
             .clickable { onClick() }
-            .padding(vertical = 5.dp)
-            .height(140.dp)
-            .fillMaxWidth()
+            .padding(horizontal = 5.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .height(200.dp)
             .angledGradientBackground(
                 colors = listOf(color1, color2),
                 degrees = 60f,
                 true
             )
+            .padding(15.dp)
     ) {
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { context ->
-                LayoutInflater.from(context).inflate(R.layout.particle_card, null, false)
-            }
+        Text(
+            text = title,
+            fontSize = 24.sp,
         )
-        Column {
-            Text(
-                text = title,
-                fontSize = 32.sp,
-                modifier = Modifier.padding(20.dp, 20.dp, 0.dp, 0.dp),
-                lineHeight = 37.sp
-            )
-            Text(
-                text = description,
-                fontSize = 13.sp,
-                modifier = Modifier.padding(20.dp, 0.dp, 0.dp, 0.dp)
-            )
-        }
+        Text(
+            text = description,
+            fontSize = 13.sp,
+        )
     }
 }
 
