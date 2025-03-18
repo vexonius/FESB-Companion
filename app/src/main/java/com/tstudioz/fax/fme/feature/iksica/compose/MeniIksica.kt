@@ -46,7 +46,7 @@ fun MeniComposeIksica(menies: Menza?) {
             .padding(16.dp)
     ) {
         Text(
-            text = "FESB",
+            text = menies?.name?:"",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(16.dp, 8.dp, 0.dp, 0.dp)

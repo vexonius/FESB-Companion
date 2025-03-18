@@ -6,14 +6,14 @@ import org.jsoup.Jsoup
 
 class CamerasRepository(private val camerasService: CamerasServiceInterface) : CamerasRepositoryInterface {
 
-    override suspend fun getImage(path: String): HttpUrl {
+    override suspend fun getImages(path: String): HttpUrl? {
         return when (val result = camerasService.getCameraImageUrls(path)) {
             is CamerasResult.GetCamerasResult.Success -> {
 
                 val hrefs = parseImageUrls(result.data)
                 if (hrefs.isEmpty()) {
                     Log.e("image", "No images found")
-                    throw Exception("No images found")
+                    return null
                 }
                 HttpUrl.Builder()
                     .scheme("https")

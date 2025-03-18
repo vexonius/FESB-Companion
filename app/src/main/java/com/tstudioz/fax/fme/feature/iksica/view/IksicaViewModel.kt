@@ -8,8 +8,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
@@ -42,20 +42,18 @@ class IksicaViewModel(
     private val _viewState = MutableLiveData<IksicaViewState>(IksicaViewState.Initial)
     val viewState: LiveData<IksicaViewState> = _viewState
 
-    private val _imageUrl = MutableLiveData<HttpUrl?>(null)
-    val imageUrl: LiveData<HttpUrl?> = _imageUrl
+    private val _images = MutableLiveData<List<Pair<String, HttpUrl?>>?>(null)
+    val images: LiveData<List<Pair<String, HttpUrl?>>?> = _images
 
-    private val _imageName = MutableLiveData<String?>(null)
-    val imageName: LiveData<String?> = _imageName
+    private val _menza = MutableLiveData<Map<String, Menza?>>()
+    val menza: LiveData<Map<String, Menza?>> = _menza
 
-    private val _menza = MutableLiveData<Menza?>()
-    val menza: LiveData<Menza?> = _menza
+    val menzaOpened: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val mapOfCameras = mapOf(
-        "nothin1" to "B8_27_EB_33_5C_A8",
+        /*"nothin1" to "B8_27_EB_33_5C_A8",
         "nothin2" to "B8_27_EB_40_18_25",
         "nothin3" to "b8_27_eb_27_10_43",
-        "nothin4" to "b8_27_eb_47_b4_60",
         "nothin5" to "b8_27_eb_62_eb_61",
         "nothin6" to "b8_27_eb_69_c3_d3",
         "nothin7" to "b8_27_eb_84_6b_7f",
@@ -63,15 +61,16 @@ class IksicaViewModel(
         "nothin9" to "b8_27_eb_96_25_80",
         "nothin10" to "b8_27_eb_99_71_4a",
         "nothin12" to "b8_27_eb_ca_18_85",
-        "nothin13" to "b8_27_eb_f6_28_58",
+        "nothin13" to "b8_27_eb_f6_28_58",*/
 
+        "kampus" to "b8_27_eb_aa_ed_1c",
+        "efst" to "b8_27_eb_d4_79_96",
+        "fgag" to "b8_27_eb_ff_a3_7c",
+        "fesb_vrh" to "b8_27_eb_d1_4b_4a",
+        "medicina" to "b8_27_eb_47_b4_60",
         "hostel" to "b8_27_eb_56_1c_fa",
         "indeks" to "b8_27_eb_82_01_dd",
-        "kampus" to "b8_27_eb_aa_ed_1c",
         "fesb_stop" to "b8_27_eb_ac_55_f5",
-        "fesb_vrh" to "b8_27_eb_d1_4b_4a",
-        "efst" to "b8_27_eb_d4_79_96",
-        "fgag" to "b8_27_eb_ff_a3_7c"
     )
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -83,6 +82,7 @@ class IksicaViewModel(
 
     init {
         loadReceiptsFromCache()
+        loadMenzaAndImages()
     }
 
     private fun loadReceiptsFromCache() {
@@ -138,45 +138,45 @@ class IksicaViewModel(
         }
     }
 
-    fun runImageMenza(place:String, name:String) {
-        clearImage()
-        getImage(place)
-        fetchMenza(place, name)
+    fun loadMenzaAndImages() {
+        getImages()
+        fetchMenza()
     }
 
-    private fun getImage(page: String) {
+    private fun getImages() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _imageUrl.postValue(mapOfCameras[page]?.let { camerasRepository.getImage(it) })
+            _images.postValue(mapOfCameras.map { it.key to camerasRepository.getImages(it.value) })
         }
     }
 
-    private fun fetchMenza(place:String, name:String) {
+    private fun fetchMenza() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            when (val menza = menzaRepository.fetchMenzaDetails(place,false)) {
-                is MenzaResult.Success -> {
-                    _menza.postValue(menza.data)
-                    setImageName(name)
-                }
+            _menza.postValue(
+                mapOfCameras.mapValues {
+                    when (val menza = menzaRepository.fetchMenzaDetails(it.key, false)) {
+                        is MenzaResult.Success -> {
+                            if (menza.data == null) {
+                                snackbarHostState.showSnackbar("Greška prilikom dohvaćanja menze")
+                                null
+                            } else menza.data
+                        }
 
-                is MenzaResult.Failure -> {
-                    snackbarHostState.showSnackbar("Greška prilikom dohvaćanja menze")
+                        is MenzaResult.Failure -> {
+                            snackbarHostState.showSnackbar("Greška prilikom dohvaćanja menze")
+                            null
+                        }
+                    }
                 }
-            }
+            )
         }
     }
 
-    fun setImageName(name: String?){
-        _imageName.postValue(name)
+    fun openMenza() {
+        menzaOpened.postValue(true)
     }
 
-    fun closeImageMenza(){
-        clearImage()
-        _menza.postValue(null)
-    }
-
-    private fun clearImage() {
-        _imageUrl.value = null
-        _imageName.value=null
+    fun closeMenza() {
+        menzaOpened.postValue(false)
     }
 
     fun hideReceiptDetails() {
