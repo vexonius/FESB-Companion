@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.routing.HomeRouter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,11 +27,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun MainTopAppBar(
-    router: HomeRouter,
-    navController: NavHostController,
-    timetableViewModel: TimetableViewModel
-) {
+fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetableViewModel: TimetableViewModel) {
     val currentDestination =
         navController.currentBackStackEntryAsState().value?.destination?.route?.split(".")?.lastOrNull() ?: ""
     if (currentDestination != "Iksica" && currentDestination != "Attendance") {
@@ -50,16 +44,13 @@ fun MainTopAppBar(
                 )
             },
             title = {
-                val tabName =
-                    topLevelRoutes.find { it.route.toString() == currentDestination }?.nameId?.let { stringResource(it) }
-                        ?: ""
                 Text(
-                    tabName,
+                    topLevelRoutes.find {
+                        it.route.toString() == currentDestination
+                    }?.nameId?.let { stringResource(it) } ?: "",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-
-
             },
             actions = {
                 if (currentDestination == "TimeTable") {
