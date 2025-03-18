@@ -49,9 +49,7 @@ fun TodayTimetableCompose(events: List<Event>) {
         )
 
         if (events.isNotEmpty()) {
-            events.sortedBy { it.start.toLocalTime() }.groupBy { it.start.toLocalDate() }.values.toList()[1] .forEach { event ->
-                TimetableItem(event)
-            }
+            events.forEach { event -> TimetableItem(event) }
         } else {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
