@@ -80,3 +80,5 @@ val gradientColors = listOf(
     Color(0xFFDD3742),
     Color(0xFFA344DE)
 )
+
+val dividerColor = Color(0xFF3B3B3B)

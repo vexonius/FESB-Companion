@@ -1,12 +1,15 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -33,6 +36,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -105,7 +109,6 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             iksicaViewModel.getReceipts()
             iksicaViewModel.loadMenzaAndImages()
         }
-
     }
 
     DisposableEffect(lifecycleState) {
@@ -118,12 +121,18 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         }
     }
 
-    if(iksicaViewModel.menzaOpened.observeAsState().value == true) {
-        val state = rememberPagerState(pageCount = { imageUrl?.size ?: 0 })
-        HorizontalPager(state) {
-            val meni = menzas?.get(imageUrl?.get(it)?.first)
-            val imageUrlOne = imageUrl?.get(it)?.second
-            ImageView(iksicaViewModel, imageUrlOne, meni)
+    if (iksicaViewModel.menzaOpened.observeAsState().value == true) {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            val pageCount = iksicaViewModel.mapOfCameras.size
+            val state = rememberPagerState(
+                initialPage = (pageCount.div(2)),
+                pageCount = { pageCount }
+            )
+            HorizontalPager(state) {
+                val meni = menzas?.get(imageUrl?.get(it)?.first)
+                val imageUrlOne = imageUrl?.get(it)?.second
+                ImageView(iksicaViewModel, imageUrlOne, meni)
+            }
         }
         return
     }
@@ -298,7 +307,11 @@ fun TopBarIksica(
                 contentDescription = null,
                 modifier = Modifier
                     .clickable {
-                        iksicaViewModel?.openMenza()
+
+                        with(iksicaViewModel) {
+                            this?.openMenza()
+                            this?.getImageUrlsApproximately()
+                        }
                     }
                     .padding(16.dp, 16.dp, 16.dp, 16.dp)
                     .size(30.dp), tint = Color.White
@@ -346,33 +359,21 @@ fun ImageView(
     }
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .background(colorResource(R.color.chinese_black))
-            .zIndex(10F),
+            .background(colorResource(R.color.chinese_black)),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        /*Icon(
-            Icons.AutoMirrored.Default.ArrowBack, "",
-            Modifier
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { iksicaViewModel.closeImageMenza() }
-                .padding(7.dp)
-                .size(26.dp)
-        )*/
         Card(
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
                 .padding(24.dp, 53.dp, 24.dp, 24.dp)
         ) {
+            AnimatedVisibility(true, enter = fadeIn()) {
             imageUrl?.let { Rotatable90Image(imageUrl = it, contentDescription = "Menza") }
+            }
             //imageUrl?.let { RotatableZoomableImage(imageUrl = it, "Menza") }
         }
         MeniComposeIksica(menza)
-        BackHandler {
-            iksicaViewModel.closeMenza()
-        }
     }
 }

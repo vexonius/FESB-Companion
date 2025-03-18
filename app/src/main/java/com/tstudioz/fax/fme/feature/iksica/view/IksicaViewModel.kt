@@ -22,6 +22,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @InternalCoroutinesApi
 class IksicaViewModel(
@@ -50,7 +52,7 @@ class IksicaViewModel(
 
     val menzaOpened: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private val mapOfCameras = mapOf(
+    val mapOfCameras = mapOf(
         /*"nothin1" to "B8_27_EB_33_5C_A8",
         "nothin2" to "B8_27_EB_40_18_25",
         "nothin3" to "b8_27_eb_27_10_43",
@@ -62,16 +64,30 @@ class IksicaViewModel(
         "nothin10" to "b8_27_eb_99_71_4a",
         "nothin12" to "b8_27_eb_ca_18_85",
         "nothin13" to "b8_27_eb_f6_28_58",*/
-
+        "fesb_stop" to "b8_27_eb_ac_55_f5",
+        "medicina" to "b8_27_eb_47_b4_60",
+        "hostel" to "b8_27_eb_56_1c_fa",
+        "indeks" to "b8_27_eb_82_01_dd",
         "kampus" to "b8_27_eb_aa_ed_1c",
         "efst" to "b8_27_eb_d4_79_96",
         "fgag" to "b8_27_eb_ff_a3_7c",
         "fesb_vrh" to "b8_27_eb_d1_4b_4a",
-        "medicina" to "b8_27_eb_47_b4_60",
-        "hostel" to "b8_27_eb_56_1c_fa",
-        "indeks" to "b8_27_eb_82_01_dd",
-        "fesb_stop" to "b8_27_eb_ac_55_f5",
     )
+
+    fun getImageUrlsApproximately() {
+        _images.value = mapOfCameras.map {
+            it.key to HttpUrl.Builder()
+                .scheme("https")
+                .host("camerasfiles.dbtouch.com")
+                .addPathSegment("images")
+                .addPathSegment(it.value)
+                .addPathSegment(
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH'i'mm'i00.jpg'"))
+                )
+                .build()
+        }
+
+    }
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
@@ -82,7 +98,7 @@ class IksicaViewModel(
 
     init {
         loadReceiptsFromCache()
-        loadMenzaAndImages()
+        //loadMenzaAndImages()
     }
 
     private fun loadReceiptsFromCache() {
@@ -139,7 +155,7 @@ class IksicaViewModel(
     }
 
     fun loadMenzaAndImages() {
-        getImages()
+        //getImages()
         fetchMenza()
     }
 
@@ -173,6 +189,7 @@ class IksicaViewModel(
 
     fun openMenza() {
         menzaOpened.postValue(true)
+        loadMenzaAndImages()
     }
 
     fun closeMenza() {

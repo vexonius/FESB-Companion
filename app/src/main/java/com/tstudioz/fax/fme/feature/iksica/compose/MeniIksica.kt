@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -17,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,12 +28,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.dividerColor
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
 import com.tstudioz.fax.fme.feature.menza.models.Menu
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 
 @Composable
 fun MeniComposeIksica(menies: Menza?) {
+
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val mealModifier = Modifier
         .padding(bottom = 16.dp)
         .clip(RoundedCornerShape(15.dp))
@@ -37,13 +44,16 @@ fun MeniComposeIksica(menies: Menza?) {
         .border(1.dp, colorResource(R.color.quartz), RoundedCornerShape(16.dp))
         .padding(24.dp, 8.dp)
         .fillMaxWidth()
+
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
-            .clip(RoundedCornerShape(30.dp))
+            .clip(RoundedCornerShape(30.dp,30.dp,0.dp,0.dp))
             .background(colorResource(R.color.raisin_black))
             .padding(16.dp)
+            .heightIn(min = screenHeight.times(0.7f))
+
     ) {
         Text(
             text = menies?.name?:"",
@@ -84,11 +94,11 @@ fun MeniComposeIksica(menies: Menza?) {
 }
 
 @Composable
-fun MeniItem(meni: Menu, mealModifier: Modifier) {
+fun MeniItem(meni: Menu, modifier: Modifier) {
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
-        modifier = mealModifier
+        modifier = modifier
     )
     {
         Text(
@@ -157,9 +167,10 @@ fun MeniTextIksica(text: String, divider: Boolean = true) {
         Text(
             text = text,
             fontSize = 16.sp,
+            modifier = Modifier.padding(vertical = 5.dp)
         )
         if (divider) {
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 1.dp)
+            HorizontalDivider(color = dividerColor, thickness = 1.dp)
         }
     }
 }
