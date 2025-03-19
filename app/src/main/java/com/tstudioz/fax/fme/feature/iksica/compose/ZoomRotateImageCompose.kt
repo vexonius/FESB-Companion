@@ -1,21 +1,34 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
+import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.bumptech.glide.Glide
+import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import kotlin.math.PI
 import kotlin.math.abs
@@ -108,12 +121,64 @@ fun RotatableZoomableImage(imageUrl: HttpUrl, contentDescription: String) {
 }
 
 @Composable
+fun GlideImage(url: String, contentDescription: String, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(url) {
+        withContext(Dispatchers.IO) {
+            val futureTarget = Glide.with(context)
+                .asBitmap()
+                .load(url)
+                .submit()
+
+            try {
+                bitmap = futureTarget.get()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    bitmap?.let {
+        Image(bitmap = it.asImageBitmap(), contentDescription = contentDescription, modifier = modifier)
+    } ?: CircularProgressIndicator()
+}
+
+@Composable
 fun Rotatable90Image(imageUrl: HttpUrl, contentDescription: String) {
     val scale = remember { mutableFloatStateOf(1f) }
     val rotationState = remember { mutableFloatStateOf(0f) }
     val aspectRatio = remember { mutableFloatStateOf(16 / 9f) }
 
-    AsyncImage(
+    GlideImage(url = imageUrl.toString(), contentDescription = contentDescription, modifier = Modifier
+        .aspectRatio(aspectRatio.floatValue.coerceIn(9 / 16f..16 / 9f))
+        .animateContentSize()
+        .graphicsLayer(
+            scaleX = maxOf(.5f, minOf(3f, scale.floatValue)),
+            scaleY = maxOf(.5f, minOf(3f, scale.floatValue)),
+            rotationZ = rotationState.floatValue,
+        )
+        .clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+        ) {
+            if (aspectRatio.floatValue != 16 / 9f)
+                aspectRatio.floatValue = 16 / 9f
+            else
+                aspectRatio.floatValue = 9 / 16f
+            if (rotationState.floatValue == 0f)
+                rotationState.floatValue = 90f
+            else
+                rotationState.floatValue = 0f
+            if (scale.floatValue == 1f)
+                scale.floatValue = 1.77f
+            else
+                scale.floatValue = 1f
+        })
+
+
+    /*AsyncImage(
         model = imageUrl,
         contentDescription = contentDescription,
         modifier = Modifier
@@ -141,5 +206,5 @@ fun Rotatable90Image(imageUrl: HttpUrl, contentDescription: String) {
                 else
                     scale.floatValue = 1f
             }
-    )
+    )*/
 }

@@ -20,9 +20,12 @@ import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @InternalCoroutinesApi
@@ -52,6 +55,8 @@ class IksicaViewModel(
 
     val menzaOpened: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    private var updateUrlsJob: Job? = null
+
     val mapOfCameras = mapOf(
         /*"nothin1" to "B8_27_EB_33_5C_A8",
         "nothin2" to "B8_27_EB_40_18_25",
@@ -73,21 +78,6 @@ class IksicaViewModel(
         "fgag" to "b8_27_eb_ff_a3_7c",
         "fesb_vrh" to "b8_27_eb_d1_4b_4a",
     )
-
-    fun getImageUrlsApproximately() {
-        _images.value = mapOfCameras.map {
-            it.key to HttpUrl.Builder()
-                .scheme("https")
-                .host("camerasfiles.dbtouch.com")
-                .addPathSegment("images")
-                .addPathSegment(it.value)
-                .addPathSegment(
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH'i'mm'i00.jpg'"))
-                )
-                .build()
-        }
-
-    }
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
@@ -187,12 +177,46 @@ class IksicaViewModel(
         }
     }
 
+    fun getImageUrlsApproximately() {
+        _images.value = mapOfCameras.map {
+            val nowSecs = LocalTime.now().minusSeconds(20).second.div(5).times(5).toString().padStart(2, '0')
+            val nowMins = LocalTime.now().minusSeconds(20).minute
+            it.key to HttpUrl.Builder()
+                .scheme("https")
+                .host("camerasfiles.dbtouch.com")
+                .addPathSegment("images")
+                .addPathSegment(it.value)
+                .addPathSegment(
+                    LocalDateTime.now().format(
+                        DateTimeFormatter.ofPattern(if (it.key != "fesb_vrh") "yyyy-MM-dd_HH'i'mm'i00.jpg'" else "yyyy-MM-dd_HH'i'$nowMins'i$nowSecs.jpg'")
+                    )
+                )
+                .build()
+        }
+
+    }
+
     fun openMenza() {
         menzaOpened.postValue(true)
         loadMenzaAndImages()
     }
 
+    fun updateMenzaUrls() {
+        updateUrlsJob = viewModelScope.launch {
+            while (true) {
+                delay(999)
+                if (LocalTime.now().second.mod(5) == 4)
+                    getImageUrlsApproximately()
+            }
+        }
+    }
+
+    private fun cancelUpdateUrlsJob() {
+        updateUrlsJob?.cancel()
+    }
+
     fun closeMenza() {
+        cancelUpdateUrlsJob()
         menzaOpened.postValue(false)
     }
 

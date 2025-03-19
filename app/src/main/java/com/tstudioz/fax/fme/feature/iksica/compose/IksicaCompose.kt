@@ -59,6 +59,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -307,7 +308,6 @@ fun TopBarIksica(
                 contentDescription = null,
                 modifier = Modifier
                     .clickable {
-
                         with(iksicaViewModel) {
                             this?.openMenza()
                             this?.getImageUrlsApproximately()
@@ -354,6 +354,7 @@ fun ImageView(
     imageUrl: HttpUrl?,
     menza: Menza?
 ) {
+    iksicaViewModel.updateMenzaUrls()
     BackHandler {
         iksicaViewModel.closeMenza()
     }
@@ -374,6 +375,12 @@ fun ImageView(
             }
             //imageUrl?.let { RotatableZoomableImage(imageUrl = it, "Menza") }
         }
+        Text(
+            text = imageUrl.toString(),
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp)
+        )
         MeniComposeIksica(menza)
     }
 }
