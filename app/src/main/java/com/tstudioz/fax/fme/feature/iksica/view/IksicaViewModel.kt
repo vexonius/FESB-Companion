@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
+import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
@@ -21,12 +22,16 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import kotlin.system.measureTimeMillis
 
 @InternalCoroutinesApi
 class IksicaViewModel(
@@ -47,36 +52,65 @@ class IksicaViewModel(
     private val _viewState = MutableLiveData<IksicaViewState>(IksicaViewState.Initial)
     val viewState: LiveData<IksicaViewState> = _viewState
 
-    private val _images = MutableLiveData<List<Pair<String, HttpUrl?>>?>(null)
-    val images: LiveData<List<Pair<String, HttpUrl?>>?> = _images
+    private val _images = MutableLiveData<List<Pair<MenzaLocation, HttpUrl?>>?>(null)
+    val images: LiveData<List<Pair<MenzaLocation, HttpUrl?>>?> = _images
 
-    private val _menza = MutableLiveData<Map<String, Menza?>>()
-    val menza: LiveData<Map<String, Menza?>> = _menza
+    private val _menza = MutableLiveData<List<Pair<MenzaLocation, Menza?>>>()
+    val menza: LiveData<List<Pair<MenzaLocation, Menza?>>> = _menza
 
     val menzaOpened: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private var updateUrlsJob: Job? = null
 
-    val mapOfCameras = mapOf(
-        /*"nothin1" to "B8_27_EB_33_5C_A8",
-        "nothin2" to "B8_27_EB_40_18_25",
-        "nothin3" to "b8_27_eb_27_10_43",
-        "nothin5" to "b8_27_eb_62_eb_61",
-        "nothin6" to "b8_27_eb_69_c3_d3",
-        "nothin7" to "b8_27_eb_84_6b_7f",
-        "nothin8" to "b8_27_eb_92_2f_df",
-        "nothin9" to "b8_27_eb_96_25_80",
-        "nothin10" to "b8_27_eb_99_71_4a",
-        "nothin12" to "b8_27_eb_ca_18_85",
-        "nothin13" to "b8_27_eb_f6_28_58",*/
-        "fesb_stop" to "b8_27_eb_ac_55_f5",
-        "medicina" to "b8_27_eb_47_b4_60",
-        "hostel" to "b8_27_eb_56_1c_fa",
-        "indeks" to "b8_27_eb_82_01_dd",
-        "kampus" to "b8_27_eb_aa_ed_1c",
-        "efst" to "b8_27_eb_d4_79_96",
-        "fgag" to "b8_27_eb_ff_a3_7c",
-        "fesb_vrh" to "b8_27_eb_d1_4b_4a",
+    val map = listOf(
+        MenzaLocation(
+            name = "STOP",
+            address = "Ruđera Boškovića 32, Split",
+            meniName = "fesb_stop",
+            cameraName = "b8_27_eb_ac_55_f5",
+        ),
+        MenzaLocation(
+            name = "Medicinski Fakultet",
+            address = "Šoltanska 2, Split",
+            meniName = "medicina",
+            cameraName = "b8_27_eb_47_b4_60",
+        ),
+        MenzaLocation(
+            name = "Hostel Spinut",
+            address = "Spinutska ulica 2, Split",
+            meniName = "hostel",
+            cameraName = "b8_27_eb_56_1c_fa",
+        ),
+        MenzaLocation(
+            name = "Indeks",
+            address = "Svačićeva 8, Split",
+            meniName = "indeks",
+            cameraName = "b8_27_eb_82_01_dd",
+        ),
+        MenzaLocation(
+            name = "Kampus",
+            address = "Cvite Fiskovića 3, Split",
+            meniName = "kampus",
+            cameraName = "b8_27_eb_aa_ed_1c",
+        ),
+        MenzaLocation(
+            name = "Ekonomski Fakultet",
+            address = "Cvite Fiskovića 5, Split",
+            meniName = "efst",
+            cameraName = "b8_27_eb_d4_79_96",
+        ),
+        MenzaLocation(
+            name = "FGAG",
+            address = "Ul. Matice hrvatske 15, Split",
+            meniName = "fgag",
+            cameraName = "b8_27_eb_ff_a3_7c",
+        ),
+        MenzaLocation(
+            name = "FESB",
+            address = "Ruđera Boškovića 32, Split",
+            meniName = "fesb_vrh",
+            cameraName = "b8_27_eb_d1_4b_4a",
+        ),
     )
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -88,7 +122,7 @@ class IksicaViewModel(
 
     init {
         loadReceiptsFromCache()
-        //loadMenzaAndImages()
+        fetchMenza()
     }
 
     private fun loadReceiptsFromCache() {
@@ -144,75 +178,90 @@ class IksicaViewModel(
         }
     }
 
-    fun loadMenzaAndImages() {
-        //getImages()
-        fetchMenza()
-    }
-
-    private fun getImages() {
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _images.postValue(mapOfCameras.map { it.key to camerasRepository.getImages(it.value) })
-        }
-    }
-
     private fun fetchMenza() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _menza.postValue(
-                mapOfCameras.mapValues {
-                    when (val menza = menzaRepository.fetchMenzaDetails(it.key, false)) {
-                        is MenzaResult.Success -> {
-                            if (menza.data == null) {
-                                snackbarHostState.showSnackbar("Greška prilikom dohvaćanja menze")
-                                null
-                            } else menza.data
-                        }
-
-                        is MenzaResult.Failure -> {
+            _menza.postValue(map.map {
+                it to when (val menza = menzaRepository.fetchMenzaDetails(it.meniName, false)) {
+                    is MenzaResult.Success -> {
+                        if (menza.data == null) {
                             snackbarHostState.showSnackbar("Greška prilikom dohvaćanja menze")
                             null
-                        }
+                        } else menza.data
+                    }
+
+                    is MenzaResult.Failure -> {
+                        snackbarHostState.showSnackbar("Greška prilikom dohvaćanja menze")
+                        null
                     }
                 }
-            )
+            })
+            Log.d("Menza", "Menza fetched")
         }
     }
 
-    fun getImageUrlsApproximately() {
-        _images.value = mapOfCameras.map {
-            val nowSecs = LocalTime.now().minusSeconds(20).second.div(5).times(5).toString().padStart(2, '0')
-            val nowMins = LocalTime.now().minusSeconds(20).minute
-            it.key to HttpUrl.Builder()
+    private fun getImageUrlsReal(onlyFesb: Boolean = false) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            if (!onlyFesb) {
+                _images.postValue(map.map { async { it to camerasRepository.getImages(it.cameraName) } }.awaitAll())
+            } else {
+                _images.postValue(map.map { location ->
+                    location to if (location.meniName == "fesb_vrh") { camerasRepository.getImages(location.cameraName) }
+                    else { _images.value?.find { it.first == location }?.second }
+                })
+            }
+        }
+    }
+
+
+    private fun getImageUrlsApproximately() {
+        _images.value = map.map {
+            val twentySecsAgo = LocalTime.now().minusMinutes(1)
+            val nowSecs = twentySecsAgo.second.div(5).times(5).toString().padStart(2, '0')
+            val nowMins = twentySecsAgo.minute.toString().padStart(2, '0')
+            val nowHours = twentySecsAgo.hour.toString().padStart(2, '0')
+            val filename = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern(
+                        if (it.meniName == "fesb_vrh") "yyyy-MM-dd_'$nowHours''i'$nowMins'i$nowSecs.jpg'"
+                        else "yyyy-MM-dd_HH'i${nowMins}i00.jpg'"
+                    )
+                )
+            it to HttpUrl.Builder()
                 .scheme("https")
                 .host("camerasfiles.dbtouch.com")
                 .addPathSegment("images")
-                .addPathSegment(it.value)
-                .addPathSegment(
-                    LocalDateTime.now().format(
-                        DateTimeFormatter.ofPattern(if (it.key != "fesb_vrh") "yyyy-MM-dd_HH'i'mm'i00.jpg'" else "yyyy-MM-dd_HH'i'$nowMins'i$nowSecs.jpg'")
-                    )
-                )
+                .addPathSegment(it.cameraName)
+                .addPathSegment(filename)
                 .build()
         }
 
     }
 
-    fun openMenza() {
-        menzaOpened.postValue(true)
-        loadMenzaAndImages()
-    }
-
     fun updateMenzaUrls() {
+        //getImageUrlsReal()
+        getImageUrlsApproximately()
         updateUrlsJob = viewModelScope.launch {
-            while (true) {
+            while (isActive) {
+                val now = LocalTime.now().second
+                if (now.mod(5) == 4) {
+                    Log.d("images", "Fetching images FESB")
+                    getImageUrlsReal(onlyFesb = true)
+                }
+                if (now.mod(20) == 0) {
+                    Log.d("images", "Fetching images all")
+                    getImageUrlsReal()
+                }
                 delay(999)
-                if (LocalTime.now().second.mod(5) == 4)
-                    getImageUrlsApproximately()
             }
         }
     }
 
     private fun cancelUpdateUrlsJob() {
         updateUrlsJob?.cancel()
+    }
+
+    fun openMenza() {
+        menzaOpened.postValue(true)
+        fetchMenza()
     }
 
     fun closeMenza() {

@@ -29,7 +29,11 @@ data class Menu(
     val salad: String,
     val dessert: String,
     val price: String,
-)
+){
+    fun isNotEmpty(): Boolean {
+        return soupOrTea.isNotEmpty() || mainCourse.isNotEmpty() || sideDish.isNotEmpty() || salad.isNotEmpty() || dessert.isNotEmpty()
+    }
+}
 @Serializable
 data class MeniSpecial(
     val type: String,

@@ -41,18 +41,20 @@ fun parseMenza(jsonString: String): Menza? {
                     dessert = it[6],
                     price = price
                 )
-                menza.menies.add(meni)
+                if (meni.isNotEmpty()) menza.menies.add(meni)
             } else if (it[0].contains("JELO PO IZBORU") && it.size == 2) {
                 val name = it[1].split(Regex(" (?=\\d)")).firstOrNull() ?: ""
                 val price = checkAndFixPrice(it[1].split(" ").lastOrNull() ?: "")
-                menza.meniesSpecial.add(
-                    MeniSpecial(
-                        type = it[0],
-                        mealTime = mealTimeTest(it[0]),
-                        meal = name,
-                        price = price
+                if (name.isNotEmpty()) {
+                    menza.meniesSpecial.add(
+                        MeniSpecial(
+                            type = it[0],
+                            mealTime = mealTimeTest(it[0]),
+                            meal = name,
+                            price = price
+                        )
                     )
-                )
+                }
             }
         }
         return menza

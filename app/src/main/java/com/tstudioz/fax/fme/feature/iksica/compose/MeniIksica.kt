@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -19,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -29,13 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.dividerColor
+import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
 import com.tstudioz.fax.fme.feature.menza.models.Menu
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 
 @Composable
-fun MeniComposeIksica(menies: Menza?) {
-
+fun MeniComposeIksica(meni: Pair<MenzaLocation, Menza?>?) {
+    val menzaLocation = meni?.first
+    val menies = meni?.second
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val mealModifier = Modifier
         .padding(bottom = 16.dp)
@@ -49,20 +48,20 @@ fun MeniComposeIksica(menies: Menza?) {
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
-            .clip(RoundedCornerShape(30.dp,30.dp,0.dp,0.dp))
+            .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
             .background(colorResource(R.color.raisin_black))
             .padding(16.dp)
             .heightIn(min = screenHeight.times(0.7f))
 
     ) {
         Text(
-            text = menies?.name?:"",
+            text = menzaLocation?.name ?: "",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(16.dp, 8.dp, 0.dp, 0.dp)
         )
         Text(
-            text = "Restoran Kampus, Ul. Ruđera Boškovića 32",
+            text = menzaLocation?.address ?: "",
             fontSize = 15.sp,
             modifier = Modifier.padding(16.dp, 0.dp, 0.dp, 24.dp)
         )
@@ -124,11 +123,11 @@ fun MeniItem(meni: Menu, modifier: Modifier) {
 }
 
 @Composable
-fun MeniSpecialIksica(meni: List<MeniSpecial>, mealModifier: Modifier) {
+fun MeniSpecialIksica(meni: List<MeniSpecial>, modifier: Modifier) {
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
-        modifier = mealModifier
+        modifier = modifier
     ) {
         Text(
             text = stringResource(id = R.string.meals_by_choice),
@@ -136,7 +135,8 @@ fun MeniSpecialIksica(meni: List<MeniSpecial>, mealModifier: Modifier) {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 10.dp),
         )
-        meni.forEach {
+        meni.forEachIndexed { index, it ->
+            if (index != 0) HorizontalDivider(color = dividerColor, thickness = 1.dp)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -155,7 +155,6 @@ fun MeniSpecialIksica(meni: List<MeniSpecial>, mealModifier: Modifier) {
                     modifier = Modifier.weight(0.2f),
                 )
             }
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 1.dp)
         }
         Spacer(modifier = Modifier.height(10.dp))
     }

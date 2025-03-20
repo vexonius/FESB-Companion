@@ -1,15 +1,12 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -21,9 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -31,7 +26,6 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +43,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,7 +54,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -68,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
@@ -75,10 +70,8 @@ import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
-import com.tstudioz.fax.fme.feature.menza.models.Menza
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import okhttp3.HttpUrl
 
 @OptIn(
     InternalCoroutinesApi::class,
@@ -108,31 +101,34 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     LaunchedEffect(lifecycleState) {
         if (lifecycleState == Lifecycle.State.RESUMED) {
             iksicaViewModel.getReceipts()
-            iksicaViewModel.loadMenzaAndImages()
-        }
-    }
-
-    DisposableEffect(lifecycleState) {
-        onDispose {
-            if (lifecycleState == Lifecycle.State.CREATED) {
-                coroutineScope.launch {
-                    listState.scrollToItem(0)
-                }
-            }
         }
     }
 
     if (iksicaViewModel.menzaOpened.observeAsState().value == true) {
+        DisposableEffect(lifecycleState) {
+            Log.d("IksicaCompose", "lifecycleState changed: $lifecycleState")
+            if (lifecycleState == Lifecycle.State.RESUMED) {
+                iksicaViewModel.updateMenzaUrls()
+                Log.d("IksicaCompose", "Menza image getting started")
+            }
+            onDispose {
+                if (iksicaViewModel.menzaOpened.value == true) {
+                    iksicaViewModel.closeMenza()
+                    Log.d("IksicaCompose", "Menza image getting stopped")
+                }
+                Log.d("IksicaCompose", "lifecycleState changed1: $lifecycleState")
+            }
+        }
         Surface(modifier = Modifier.fillMaxSize()) {
-            val pageCount = iksicaViewModel.mapOfCameras.size
+            val pageCount = iksicaViewModel.map.size
             val state = rememberPagerState(
                 initialPage = (pageCount.div(2)),
                 pageCount = { pageCount }
             )
             HorizontalPager(state) {
-                val meni = menzas?.get(imageUrl?.get(it)?.first)
-                val imageUrlOne = imageUrl?.get(it)?.second
-                ImageView(iksicaViewModel, imageUrlOne, meni)
+                val meni = menzas?.get(it)
+                val imageUrlOne = imageUrl?.get(it)
+                ImageMeniView(iksicaViewModel, imageUrlOne, meni)
             }
         }
         return
@@ -149,6 +145,15 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                 BottomSheetIksica(receiptSelected.data) { iksicaViewModel.hideReceiptDetails() }
         }
     ) {
+        DisposableEffect(lifecycleState) {
+            onDispose {
+                if (lifecycleState == Lifecycle.State.CREATED) {
+                    coroutineScope.launch {
+                        listState.scrollToItem(0)
+                    }
+                }
+            }
+        }
         Box(Modifier.fillMaxWidth()) {
             PullRefreshIndicator(
                 isRefreshing, pullRefreshState, Modifier
@@ -274,7 +279,9 @@ fun PopulatedIksicaView(
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransakcijeText()
-                LazyColumn(state = listState) {
+                LazyColumn(
+                    state = listState
+                ) {
                     items(model.receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }
@@ -310,7 +317,6 @@ fun TopBarIksica(
                     .clickable {
                         with(iksicaViewModel) {
                             this?.openMenza()
-                            this?.getImageUrlsApproximately()
                         }
                     }
                     .padding(16.dp, 16.dp, 16.dp, 16.dp)
@@ -344,43 +350,5 @@ fun EmptyIksicaView(text: String) {
         Text(
             text = text, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
-    }
-}
-
-@OptIn(InternalCoroutinesApi::class)
-@Composable
-fun ImageView(
-    iksicaViewModel: IksicaViewModel,
-    imageUrl: HttpUrl?,
-    menza: Menza?
-) {
-    iksicaViewModel.updateMenzaUrls()
-    BackHandler {
-        iksicaViewModel.closeMenza()
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .background(colorResource(R.color.chinese_black)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Card(
-            shape = RoundedCornerShape(15.dp),
-            modifier = Modifier
-                .padding(24.dp, 53.dp, 24.dp, 24.dp)
-        ) {
-            AnimatedVisibility(true, enter = fadeIn()) {
-            imageUrl?.let { Rotatable90Image(imageUrl = it, contentDescription = "Menza") }
-            }
-            //imageUrl?.let { RotatableZoomableImage(imageUrl = it, "Menza") }
-        }
-        Text(
-            text = imageUrl.toString(),
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 20.sp,
-            modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp)
-        )
-        MeniComposeIksica(menza)
     }
 }
