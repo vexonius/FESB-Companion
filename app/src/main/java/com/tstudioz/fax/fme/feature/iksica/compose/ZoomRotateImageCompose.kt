@@ -1,37 +1,23 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
 import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.util.Log
 import android.view.OrientationEventListener
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getSystemService
 import com.tstudioz.fax.fme.util.GlideImage
 import okhttp3.HttpUrl
 import kotlin.math.PI
@@ -112,11 +98,12 @@ fun RotatableZoomableImage(imageUrl: HttpUrl, contentDescription: String) {
     )
 
 }
+
 enum class Orientation { PORTRAIT, LANDSCAPE_LEFT, LANDSCAPE_RIGHT }
 
 @Composable
 fun Rotatable90Image(imageUrl: String, contentDescription: String) {
-    val ratio = 627/353f
+    val ratio = 627 / 353f
 
     val scale = remember { mutableFloatStateOf(1f) }
     val rotationState = remember { mutableFloatStateOf(0f) }
@@ -124,7 +111,7 @@ fun Rotatable90Image(imageUrl: String, contentDescription: String) {
     val manualRotation = remember { mutableStateOf(false) }
     val orientation = remember { mutableStateOf(Orientation.PORTRAIT) }
 
-    fun rotate(to:Orientation = orientation.value) {
+    fun rotate(to: Orientation = orientation.value) {
         if (to == Orientation.PORTRAIT) {
             orientation.value = Orientation.PORTRAIT
             aspectRatio.floatValue = ratio
@@ -134,8 +121,7 @@ fun Rotatable90Image(imageUrl: String, contentDescription: String) {
             if (to == Orientation.LANDSCAPE_LEFT) {
                 orientation.value = Orientation.LANDSCAPE_LEFT
                 rotationState.floatValue = 90f
-            }
-            else {
+            } else {
                 orientation.value = Orientation.LANDSCAPE_RIGHT
                 rotationState.floatValue = -90f
             }
@@ -162,8 +148,10 @@ fun Rotatable90Image(imageUrl: String, contentDescription: String) {
             indication = null
         ) {
             manualRotation.value = !manualRotation.value
-            rotate(if (manualRotation.value) Orientation.LANDSCAPE_LEFT
-            else Orientation.PORTRAIT)
+            rotate(
+                if (manualRotation.value) Orientation.LANDSCAPE_LEFT
+                else Orientation.PORTRAIT
+            )
         })
 }
 
@@ -181,6 +169,7 @@ fun DeviceOrientationListener(applicationContext: Context, onOrientationChanged:
                     onOrientationChanged(Orientation.LANDSCAPE_LEFT)
                 }
             }
+
             override fun enable() {
                 super.enable()
                 onOrientationChanged(Orientation.PORTRAIT)
@@ -192,4 +181,4 @@ fun DeviceOrientationListener(applicationContext: Context, onOrientationChanged:
             orientationEventListener.disable()
         }
     }
- }
+}
