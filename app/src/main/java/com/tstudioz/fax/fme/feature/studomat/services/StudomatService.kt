@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.feature.studomat.services
 
 import android.util.Log
 import android.webkit.CookieManager
+import android.webkit.WebView
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import okhttp3.HttpUrl
@@ -11,16 +12,15 @@ import org.jsoup.Jsoup
 
 class StudomatService(private val client: OkHttpClient) {
 
-    fun loadCookieToWebview() {
+    fun loadCookieToWebview(webView: WebView) {
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptCookie(true)
+        val cookie = "JSESSIONID=" + client.cookieJar.loadForRequest(targetUrl).find { it.name == "JSESSIONID" }?.value
 
-        cookieManager.setCookie(
-            "https://www.isvu.hr/studomat/hr",
-            client.cookieJar.loadForRequest(targetUrl).find { it.name == "JSESSIONID" }?.value
-        )
+        cookieManager.setCookie("https://www.isvu.hr/studomat/hr/", cookie)
 
         cookieManager.flush()
+        webView.loadUrl("https://www.isvu.hr/studomat/hr/ispit/ponudapredmetazaprijavuispita")
     }
 
     fun getStudomatData(): String {

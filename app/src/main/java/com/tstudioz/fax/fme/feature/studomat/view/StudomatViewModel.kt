@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.studomat.view
 
+import android.webkit.WebView
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,13 +15,16 @@ import com.tstudioz.fax.fme.networking.NetworkUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.SortedMap
 
 
 class StudomatViewModel(
     private val repository: StudomatRepository,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
-
+    /**
+     * LiveData for refreshing state used for PullToRefresh
+     */
     val isRefreshing = MutableLiveData(false)
     val studomatData = MutableLiveData<List<Pair<StudomatYearInfo, List<StudomatSubject>>>>(emptyList())
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
@@ -40,8 +44,10 @@ class StudomatViewModel(
         getStudomatData(getSubjects = false)
     }
 
+    /**
+     * Fetches student info and year names and the links for year pages from studomat
+     */
     fun getStudomatData(pulldownTriggered: Boolean = false, getSubjects: Boolean = true) {
-        repository.loadCookieToWebview()
 
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (networkUtils.isNetworkAvailable()) {
@@ -64,6 +70,9 @@ class StudomatViewModel(
         }
     }
 
+    /**
+     * Fetches subjects from each year from studomat
+     */
     private fun fetchAllYears(
         freshYears: List<StudomatYearInfo> = yearNames.value ?: emptyList(),
         pulldownTriggered: Boolean = false
@@ -89,5 +98,12 @@ class StudomatViewModel(
             }
             if (pulldownTriggered) isRefreshing.postValue(false)
         }
+    }
+
+    /**
+     * Load cookies to webview and navigate to studomat exams page
+     */
+    fun loadCookieToWebview(webView: WebView) {
+        repository.loadCookieToWebview(webView)
     }
 }

@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.studomat.compose
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -94,7 +95,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
     ) { innerPadding ->
 
         if (openedWebview.value) {
-            WebViewScreen()
+            WebViewScreen(studomatViewModel)
             return@Scaffold
         }
         Box(
@@ -236,19 +237,21 @@ fun StudomatContent(studomatData: List<Pair<StudomatYearInfo, List<StudomatSubje
     }
 }
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewScreen() {
+fun WebViewScreen(studomatViewModel: StudomatViewModel) {
     AndroidView(
         factory = { context ->
-            WebView(context).apply {
+            val webview = WebView(context).apply {
                 settings.javaScriptEnabled = true
                 webViewClient = WebViewClient()
 
                 settings.loadWithOverviewMode = true
                 settings.useWideViewPort = true
                 settings.setSupportZoom(true)
-                loadUrl("https://www.isvu.hr/studomat/hr/ispit/ponudapredmetazaprijavuispita")
             }
+            studomatViewModel.loadCookieToWebview(webview)
+            webview
         },
         modifier = Modifier.background(Color.Black).fillMaxSize(),
     )
