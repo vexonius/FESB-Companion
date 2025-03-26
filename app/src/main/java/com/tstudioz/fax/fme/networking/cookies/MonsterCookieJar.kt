@@ -65,10 +65,12 @@ class MonsterCookieJar(
         return authCookies.isNotEmpty()
     }
 
-    fun clearCookiesForUrl(url: HttpUrl) {
-        val cookies = loadForRequest(url)
-        persistor.removeAll(cookies)
-        cache.removeAll { cookies.contains(it) }
+    fun clearISVUCookie() {
+        val cookie = persistor.loadAll().filter{
+            it.name == authCookieISVU
+        }
+        persistor.removeAll(cookie)
+        cache.removeAll { cookie.contains(it) }
     }
 
     companion object {
