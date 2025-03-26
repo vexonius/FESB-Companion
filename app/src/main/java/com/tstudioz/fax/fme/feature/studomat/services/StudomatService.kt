@@ -35,7 +35,7 @@ class StudomatService(private val client: OkHttpClient) {
 
         return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            (client.cookieJar as MonsterCookieJar).clearCookiesForUrl(request.url)
+            clearSession()
             throw Throwable("Not logged in!")
         } else if (isSuccessful) {
             Log.d("StudomatService", "getStudomatData: ${body.substring(0, 100)}")
@@ -58,7 +58,7 @@ class StudomatService(private val client: OkHttpClient) {
 
         return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            (client.cookieJar as MonsterCookieJar).clearCookiesForUrl(request.url)
+            clearSession()
             throw Throwable("Not logged in!")
         } else if (body != "") {
             Log.d("StudomatService", "getUpisaneGodine: ${body.substring(0, 100)}")
@@ -80,7 +80,7 @@ class StudomatService(private val client: OkHttpClient) {
 
         return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            (client.cookieJar as MonsterCookieJar).clearCookiesForUrl(request.url)
+            clearSession()
             throw Throwable("Not logged in!")
         } else if (isSuccessful) {
             Log.d("StudomatService", "getTrenutnuGodinuData: ${body.substring(0, 100)}")
@@ -90,6 +90,8 @@ class StudomatService(private val client: OkHttpClient) {
             NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get current year data!"))
         }
     }
+
+    private fun clearSession() = (client.cookieJar as MonsterCookieJar).clearISVUCookie()
 
     companion object {
         private const val SCHEME = "https"
