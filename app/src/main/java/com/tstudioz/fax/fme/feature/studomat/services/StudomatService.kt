@@ -13,13 +13,15 @@ import org.jsoup.Jsoup
 class StudomatService(private val client: OkHttpClient) {
 
     fun loadCookieToWebview(webView: WebView) {
+        val cookie = (client.cookieJar as MonsterCookieJar).getISVUCookieForWebView()
         val cookieManager = CookieManager.getInstance()
-        cookieManager.setAcceptCookie(true)
-        val cookie = "JSESSIONID=" + client.cookieJar.loadForRequest(targetUrl).find { it.name == "JSESSIONID" }?.value
 
-        cookieManager.setCookie("https://www.isvu.hr/studomat/hr/", cookie)
+        with(cookieManager) {
+            setAcceptCookie(true)
+            setCookie("https://www.isvu.hr/studomat/hr/", cookie)
+            flush()
+        }
 
-        cookieManager.flush()
         webView.loadUrl("https://www.isvu.hr/studomat/hr/ispit/ponudapredmetazaprijavuispita")
     }
 
@@ -33,11 +35,9 @@ class StudomatService(private val client: OkHttpClient) {
         val isSuccessful = response.isSuccessful
         response.close()
 
-        return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
-            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            clearSession()
-            throw Throwable("Not logged in!")
-        } else if (isSuccessful) {
+        checkIfLoggedIn(body)
+
+        return if (isSuccessful && body != "") {
             Log.d("StudomatService", "getStudomatData: ${body.substring(0, 100)}")
             body
         } else {
@@ -56,11 +56,9 @@ class StudomatService(private val client: OkHttpClient) {
         val isSuccessful = response.isSuccessful
         response.close()
 
-        return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
-            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            clearSession()
-            throw Throwable("Not logged in!")
-        } else if (body != "") {
+        checkIfLoggedIn(body)
+
+        return if (isSuccessful && body != "") {
             Log.d("StudomatService", "getUpisaneGodine: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
         } else {
@@ -78,16 +76,22 @@ class StudomatService(private val client: OkHttpClient) {
         val isSuccessful = response.isSuccessful
         response.close()
 
-        return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
-            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            clearSession()
-            throw Throwable("Not logged in!")
-        } else if (isSuccessful) {
+        checkIfLoggedIn(body)
+
+        return if (isSuccessful && body != "") {
             Log.d("StudomatService", "getTrenutnuGodinuData: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
         } else {
             Log.d("StudomatService", "getTrenutnuGodinuData: Couldn't get current year data!")
             NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get current year data!"))
+        }
+    }
+
+    private fun checkIfLoggedIn(body: String) {
+        if (Jsoup.parse(body).title() == "Studomat - Prijava") {
+            Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            clearSession()
+            throw Throwable("Not logged in!")
         }
     }
 
