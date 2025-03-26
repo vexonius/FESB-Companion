@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.feature.studomat.compose
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 
 
@@ -39,7 +41,7 @@ fun YearView(list: List<StudomatSubject>) {
             .padding(24.dp, 12.dp)
             .clip(RoundedCornerShape(30.dp))
             .background(colorResource(id = R.color.raisin_black))
-            .padding(24.dp)
+            .padding(12.dp, 24.dp)
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
@@ -48,34 +50,35 @@ fun YearView(list: List<StudomatSubject>) {
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Left,
-            modifier = Modifier.padding(0.dp, 4.dp, 0.dp, 16.dp)
+            modifier = Modifier.padding(12.dp, 4.dp, 12.dp, 16.dp)
         )
         list.forEachIndexed { index, it ->
-            if (index != 0) HorizontalDivider()
             val opened = remember { mutableStateOf(false) }
-            Column(Modifier.clickable { opened.value = !opened.value }) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .clickable { opened.value = !opened.value }
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .wrapContentHeight(),
-                ) {
-                    Text(
-                        text = it.name,
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Left
-                    )
-                    Text(
-                        text = it.grade.takeUnless { it.contains("podatak") } ?: "-",
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Right
-                    )
-                }
-                if (opened.value) SubjectView(it)
+            if (index != 0) HorizontalDivider(Modifier.padding(horizontal = 12.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable { opened.value = !opened.value }
+                    .padding(12.dp, 8.dp)
+                    .fillMaxWidth(),
+            ) {
+                Text(
+                    text = it.name,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Left
+                )
+                Text(
+                    text = if (it.isPassed) it.grade else "-",
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Right
+                )
             }
+            if (opened.value) {
+                Box(Modifier.noRippleClickable { opened.value = !opened.value }) { SubjectView(it) }
+            }
+
         }
     }
 }
@@ -100,7 +103,7 @@ fun PredmetText(text: String, value: String, isPassed: Boolean = false) {
     val gradeModifier = if (isPassed) {
         Modifier
             .wrapContentSize()
-            .clip(RoundedCornerShape(12.dp, 12.dp, 12.dp, 12.dp))
+            .clip(RoundedCornerShape(10.dp))
             .background(colorResource(id = R.color.pass_green))
             .padding(8.dp, 4.dp, 16.dp, 4.dp)
     } else {
