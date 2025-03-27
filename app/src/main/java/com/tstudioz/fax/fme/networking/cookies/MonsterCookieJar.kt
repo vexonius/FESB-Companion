@@ -74,9 +74,10 @@ class MonsterCookieJar(
         cache.removeAll { cookie.contains(it) }
     }
 
-    fun getISVUCookieForWebView(): String {
+    fun getISVUCookieForWebView(): String? {
         val cookie = loadForRequest(StudomatService.targetUrl).find { it.name == authCookieISVU }
-        return cookie?.name + "=" + cookie?.value
+        return if (cookie != null) cookie.name + "=" + cookie.value
+        else null
     }
 
     companion object {

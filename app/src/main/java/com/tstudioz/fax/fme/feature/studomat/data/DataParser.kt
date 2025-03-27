@@ -9,8 +9,8 @@ fun parseYears(body: String): List<StudomatYearInfo> {
     val data = Jsoup.parse(body)
     val listOfYears = data.select(".price-table__item").map { element ->
         StudomatYearInfo().apply {
-            courseName = element.select(".price-table__title p")[1].text() ?: ""
-            year = element.select(".price-table__title p")[0].text() ?: ""
+            courseName = element.select(".price-table__title p").getOrNull(1)?.text() ?: ""
+            academicYear = element.select(".price-table__title p").getOrNull(0)?.text() ?: ""
             href = element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
         }
 
@@ -36,7 +36,7 @@ fun parseCurrentYear(body: String, yearInfo: StudomatYearInfo): Pair<StudomatYea
         courseName = course
         studyProgram = table.select("td:contains(Upisani studij(i)) + td").text()
         parallelStudy = table.select("td:contains(Paralelni studij) + td").text()
-        academicYear = table.select("td:contains(Nastavna godina) + td").text().toIntOrNull() ?: 0
+        yearOfCourse = table.select("td:contains(Nastavna godina) + td").text().toIntOrNull() ?: 0
         enrollmentIndicator = table.select("td:contains(Indikator upisa) + td").text()
         payment = table.select("td:contains(Plaćanje) + td").text() == "Da"
         fundingBasis = table.select("td:contains(Temelj financiranja) + td").text()

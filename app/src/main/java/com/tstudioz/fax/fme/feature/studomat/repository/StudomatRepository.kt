@@ -1,12 +1,12 @@
 package com.tstudioz.fax.fme.feature.studomat.repository
 
 import android.util.Log
-import android.webkit.WebView
 import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
 import com.tstudioz.fax.fme.feature.studomat.data.parseCurrentYear
 import com.tstudioz.fax.fme.feature.studomat.data.parseStudent
 import com.tstudioz.fax.fme.feature.studomat.data.parseYears
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatYear
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
@@ -17,9 +17,7 @@ class StudomatRepository(
     private val studomatDao: StudomatDao,
 ) {
 
-    fun loadCookieToWebview(webView: WebView) {
-        studomatService.loadCookieToWebview(webView)
-    }
+    fun fetchISVUCookie():String? = studomatService.fetchISVUCookie()
 
     suspend fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
         val student = parseStudent(studomatService.getStudomatData())
@@ -55,7 +53,7 @@ class StudomatRepository(
         }
     }
 
-    suspend fun readData(): List<Pair<StudomatYearInfo, List<StudomatSubject>>> {
+    suspend fun readData(): List<StudomatYear> {
         return studomatDao.readData()
     }
 }

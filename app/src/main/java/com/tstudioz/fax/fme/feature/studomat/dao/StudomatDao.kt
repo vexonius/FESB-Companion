@@ -1,8 +1,9 @@
 package com.tstudioz.fax.fme.feature.studomat.dao
 
 import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.feature.studomat.data.sortedByStudomat
+import com.tstudioz.fax.fme.feature.studomat.data.sortedByNameAndSemester
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatYear
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -24,7 +25,7 @@ class StudomatDao(private val dbManager: DatabaseManagerInterface) : StudomatDao
 
         realm.write {
             years.forEach {
-                delete(query(StudomatYearInfo::class, "year==$0 AND courseName==$1", it.year, it.courseName).find())
+                delete(query(StudomatYearInfo::class, "academicYear==$0 AND courseName==$1", it.academicYear, it.courseName).find())
                 this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
             }
         }
@@ -41,20 +42,19 @@ class StudomatDao(private val dbManager: DatabaseManagerInterface) : StudomatDao
         val realm = Realm.open(dbManager.getDefaultConfiguration())
         val result = realm.query(StudomatYearInfo::class).find()
 
-        return result.sortedBy { it.year }
+        return result.sortedBy { it.academicYear }
     }
 
-    override suspend fun readData(): List<Pair<StudomatYearInfo, List<StudomatSubject>>> {
+    override suspend fun readData(): List<StudomatYear> {
         val yearsRealmSubjects = read()
-            .sortedByStudomat()
+            .sortedByNameAndSemester()
             .groupBy { it.year to it.course }
-        val groupedData = readYearNames()
-            .sortedByDescending { it.year }
+        return readYearNames()
+            .sortedByDescending { it.academicYear }
             .mapNotNull { yearInfo ->
-                yearsRealmSubjects[yearInfo.year to yearInfo.courseName]?.let { subjectsForYearAndCourse ->
-                    yearInfo to subjectsForYearAndCourse
+                yearsRealmSubjects[yearInfo.academicYear to yearInfo.courseName]?.let { subjectsForYearAndCourse ->
+                    StudomatYear(yearInfo, subjectsForYearAndCourse)
                 }
             }
-        return groupedData
     }
 }

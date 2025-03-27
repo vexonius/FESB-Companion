@@ -1,13 +1,12 @@
 package com.tstudioz.fax.fme.feature.studomat.view
 
-import android.webkit.WebView
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.feature.studomat.data.sortedByStudomat
+import com.tstudioz.fax.fme.feature.studomat.data.sortedByNameAndSemester
 import com.tstudioz.fax.fme.feature.studomat.models.Student
-import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatYear
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
@@ -15,7 +14,6 @@ import com.tstudioz.fax.fme.networking.NetworkUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.SortedMap
 
 
 class StudomatViewModel(
@@ -26,7 +24,7 @@ class StudomatViewModel(
      * LiveData for refreshing state used for PullToRefresh
      */
     val isRefreshing = MutableLiveData(false)
-    val studomatData = MutableLiveData<List<Pair<StudomatYearInfo, List<StudomatSubject>>>>(emptyList())
+    val studomatData = MutableLiveData<List<StudomatYear>>(emptyList())
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
     private var student = MutableLiveData(Student())
     private var yearNames = MutableLiveData<List<StudomatYearInfo>>(emptyList())
@@ -80,11 +78,11 @@ class StudomatViewModel(
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (pulldownTriggered) isRefreshing.postValue(true)
             if (networkUtils.isNetworkAvailable()) {
-                val allYearsTemp = mutableListOf<Pair<StudomatYearInfo, List<StudomatSubject>>>()
+                val allYearsTemp = mutableListOf<StudomatYear>()
                 freshYears.forEach { year ->
                     when (val result = repository.getYear(year)) {
                         is StudomatRepositoryResult.ChosenYearResult.Success -> {
-                            allYearsTemp.add(result.data.first to result.data.second.sortedByStudomat())
+                            allYearsTemp.add(StudomatYear(result.data.first, result.data.second.sortedByNameAndSemester()))
                         }
 
                         is StudomatRepositoryResult.ChosenYearResult.Failure -> {
@@ -92,7 +90,7 @@ class StudomatViewModel(
                         }
                     }
                 }
-                val yearsInfo = allYearsTemp.map { it.first }
+                val yearsInfo = allYearsTemp.map { it.yearInfo }
                 studomatData.postValue(allYearsTemp)
                 yearNames.postValue(yearsInfo)
             }
@@ -101,9 +99,7 @@ class StudomatViewModel(
     }
 
     /**
-     * Load cookies to webview and navigate to studomat exams page
+     * Get JSESSIONID cookie for webview
      */
-    fun loadCookieToWebview(webView: WebView) {
-        repository.loadCookieToWebview(webView)
-    }
+    fun fetchISVUCookie():String? = repository.fetchISVUCookie()
 }

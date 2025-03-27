@@ -6,7 +6,7 @@ open class StudomatYearInfo : RealmObject {
     var courseName: String = ""
     var studyProgram: String = ""
     var parallelStudy: String = ""
-    var academicYear: Int = 0
+    var yearOfCourse: Int = 0
     var enrollmentIndicator: String = ""
     var payment: Boolean = false
     var fundingBasis: String = ""
@@ -14,10 +14,10 @@ open class StudomatYearInfo : RealmObject {
     var studentRightsValidUntil: String = ""
     var enrollmentDate: String = ""
     var enrollmentCompleted: Boolean = false
-    var year: String = ""
+    var academicYear: String = ""
     var href: String = ""
 
     override fun toString(): String {
-        return "StudomatYearInfo(courseName='$courseName', studyProgram='$studyProgram', parallelStudy='$parallelStudy', academicYear=$academicYear, enrollmentIndicator='$enrollmentIndicator', payment=$payment, fundingBasis='$fundingBasis', universityCenter='$universityCenter', studentRightsValidUntil='$studentRightsValidUntil', enrollmentDate='$enrollmentDate', enrollmentCompleted=$enrollmentCompleted, year='$year', href='$href')"
+        return "StudomatYearInfo(courseName='$courseName', studyProgram='$studyProgram', parallelStudy='$parallelStudy', academicYear=$yearOfCourse, enrollmentIndicator='$enrollmentIndicator', payment=$payment, fundingBasis='$fundingBasis', universityCenter='$universityCenter', studentRightsValidUntil='$studentRightsValidUntil', enrollmentDate='$enrollmentDate', enrollmentCompleted=$enrollmentCompleted, year='$academicYear', href='$href')"
     }
 }
