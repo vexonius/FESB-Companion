@@ -37,6 +37,8 @@ fun ImageMeniView(
     imageUrl: Pair<MenzaLocation, HttpUrl?>?,
     menza: Pair<MenzaLocation, Menza?>?
 ) {
+    val imgUrl =
+        if (imageUrl?.second != null && imageUrl.first == menza?.first) imageUrl.second else null
     BackHandler {
         iksicaViewModel.closeMenza()
     }
@@ -54,21 +56,24 @@ fun ImageMeniView(
         ) {
             AnimatedVisibility(true, enter = fadeIn(), modifier = Modifier) {
                 Rotatable90Image(
-                    imageUrl = imageUrl?.second.toString(),
+                    imageUrl = imgUrl?.toString(),
                     contentDescription = "Menza"
                 )
+
                 //imageUrl?.let { RotatableZoomableImage(imageUrl = it, "Menza") }
 
-                formatTime(imageUrl?.second.toString())?.let {
-                    Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        fontSize = 10.sp,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(bottomEnd = 15.dp))
-                            .background(Color.Black.copy(alpha = 0.25f))
-                            .padding(8.dp, 2.dp)
-                    )
+                imgUrl?.toString()?.let { url->
+                    formatTime(url)?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            fontSize = 10.sp,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(bottomEnd = 15.dp))
+                                .background(Color.Black.copy(alpha = 0.25f))
+                                .padding(8.dp, 2.dp)
+                        )
+                    }
                 }
             }
         }

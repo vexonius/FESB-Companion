@@ -43,7 +43,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,7 +61,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
@@ -105,30 +103,25 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     }
 
     if (iksicaViewModel.menzaOpened.observeAsState().value == true) {
-        DisposableEffect(lifecycleState) {
-            Log.d("IksicaCompose", "lifecycleState changed: $lifecycleState")
-            if (lifecycleState == Lifecycle.State.RESUMED) {
-                iksicaViewModel.updateMenzaUrls()
-                Log.d("IksicaCompose", "Menza image getting started")
-            }
-            onDispose {
-                if (iksicaViewModel.menzaOpened.value == true) {
-                    iksicaViewModel.closeMenza()
-                    Log.d("IksicaCompose", "Menza image getting stopped")
-                }
-                Log.d("IksicaCompose", "lifecycleState changed1: $lifecycleState")
-            }
-        }
         Surface(modifier = Modifier.fillMaxSize()) {
-            val pageCount = iksicaViewModel.map.size
+            val map = iksicaViewModel.map
+            val pageCount = map.size
             val state = rememberPagerState(
                 initialPage = (pageCount.div(2)),
                 pageCount = { pageCount }
             )
+            DisposableEffect(lifecycleState) {
+                onDispose {
+                    iksicaViewModel.closeMenza()
+                    Log.d("IksicaCompose", "Menza image getting stopped")
+                }
+            }
+            LaunchedEffect(state.settledPage) {
+                iksicaViewModel.updateMenzaUrl(map[state.settledPage])
+            }
             HorizontalPager(state) {
                 val meni = menzas?.get(it)
-                val imageUrlOne = imageUrl?.get(it)
-                ImageMeniView(iksicaViewModel, imageUrlOne, meni)
+                ImageMeniView(iksicaViewModel, imageUrl, meni)
             }
         }
         return
@@ -270,10 +263,11 @@ fun PopulatedIksicaView(
             }
         }
 
-        Column(modifier = Modifier
-            .offset { IntOffset(0, sheetOffset.intValue) }
-            .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-            .background(colorResource(R.color.chinese_black))
+        Column(
+            modifier = Modifier
+                .offset { IntOffset(0, sheetOffset.intValue) }
+                .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
+                .background(colorResource(R.color.chinese_black))
         ) {
             if (model.receipts.isEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))

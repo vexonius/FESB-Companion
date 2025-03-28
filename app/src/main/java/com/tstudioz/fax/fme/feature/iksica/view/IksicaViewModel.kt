@@ -22,8 +22,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -31,7 +29,6 @@ import okhttp3.HttpUrl
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import kotlin.system.measureTimeMillis
 
 @InternalCoroutinesApi
 class IksicaViewModel(
@@ -52,8 +49,8 @@ class IksicaViewModel(
     private val _viewState = MutableLiveData<IksicaViewState>(IksicaViewState.Initial)
     val viewState: LiveData<IksicaViewState> = _viewState
 
-    private val _images = MutableLiveData<List<Pair<MenzaLocation, HttpUrl?>>?>(null)
-    val images: LiveData<List<Pair<MenzaLocation, HttpUrl?>>?> = _images
+    private val _images = MutableLiveData<Pair<MenzaLocation, HttpUrl?>?>(null)
+    val images: LiveData<Pair<MenzaLocation, HttpUrl?>?> = _images
 
     private val _menza = MutableLiveData<List<Pair<MenzaLocation, Menza?>>>()
     val menza: LiveData<List<Pair<MenzaLocation, Menza?>>> = _menza
@@ -199,63 +196,54 @@ class IksicaViewModel(
         }
     }
 
-    private fun getImageUrlsReal(onlyFesb: Boolean = false) {
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            if (!onlyFesb) {
-                _images.postValue(map.map { async { it to camerasRepository.getImages(it.cameraName) } }.awaitAll())
-            } else {
-                _images.postValue(map.map { location ->
-                    location to if (location.meniName == "fesb_vrh") { camerasRepository.getImages(location.cameraName) }
-                    else { _images.value?.find { it.first == location }?.second }
-                })
-            }
-        }
-    }
 
-
-    private fun getImageUrlsApproximately() {
-        _images.value = map.map {
-            val twentySecsAgo = LocalTime.now().minusMinutes(1)
-            val nowSecs = twentySecsAgo.second.div(5).times(5).toString().padStart(2, '0')
-            val nowMins = twentySecsAgo.minute.toString().padStart(2, '0')
-            val nowHours = twentySecsAgo.hour.toString().padStart(2, '0')
-            val filename = LocalDateTime.now().format(
-                    DateTimeFormatter.ofPattern(
-                        if (it.meniName == "fesb_vrh") "yyyy-MM-dd_'$nowHours''i'$nowMins'i$nowSecs.jpg'"
-                        else "yyyy-MM-dd_HH'i${nowMins}i00.jpg'"
-                    )
-                )
-            it to HttpUrl.Builder()
+    private fun getImageUrlApproximately(location: MenzaLocation) {
+        val minuteAgo = LocalDateTime.now().minusMinutes(30)
+        val nowSecs = minuteAgo.second.div(5).times(5).toString().padStart(2, '0')
+        val filename = minuteAgo.format(
+            DateTimeFormatter.ofPattern(
+                if (location.meniName == "fesb_vrh") "yyyy-MM-dd_HH'i'mm'i$nowSecs.jpg'"
+                else "yyyy-MM-dd_HH'i'mm'i00.jpg'"
+            )
+        )
+        _images.value =
+            location to HttpUrl.Builder()
                 .scheme("https")
                 .host("camerasfiles.dbtouch.com")
                 .addPathSegment("images")
-                .addPathSegment(it.cameraName)
+                .addPathSegment(location.cameraName)
                 .addPathSegment(filename)
                 .build()
-        }
 
     }
 
-    fun updateMenzaUrls() {
-        //getImageUrlsReal()
-        getImageUrlsApproximately()
+    private fun getImageUrl(location: MenzaLocation) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            _images.postValue(location to camerasRepository.getImages(location.cameraName))
+        }
+    }
+
+    fun updateMenzaUrl(location: MenzaLocation) {
+        _images.value = null
+        updateUrlsJob?.cancel()
+
+        val interval = if (location.meniName == "fesb_vrh") 5 else 20
+
         updateUrlsJob = viewModelScope.launch {
+            getImageUrlApproximately(location)
+            getImageUrl(location)
             while (isActive) {
                 val now = LocalTime.now().second
-                if (now.mod(5) == 4) {
-                    Log.d("images", "Fetching images FESB")
-                    getImageUrlsReal(onlyFesb = true)
-                }
-                if (now.mod(20) == 0) {
-                    Log.d("images", "Fetching images all")
-                    getImageUrlsReal()
+                if (now.mod(interval) == 4) {
+                    Log.d("images", "Fetching images " + location.name + " interval " + interval)
+                    getImageUrl(location)
                 }
                 delay(999)
             }
         }
     }
 
-    private fun cancelUpdateUrlsJob() {
+    private fun cancelUpdateUrlJob() {
         updateUrlsJob?.cancel()
     }
 
@@ -265,7 +253,7 @@ class IksicaViewModel(
     }
 
     fun closeMenza() {
-        cancelUpdateUrlsJob()
+        cancelUpdateUrlJob()
         menzaOpened.postValue(false)
     }
 

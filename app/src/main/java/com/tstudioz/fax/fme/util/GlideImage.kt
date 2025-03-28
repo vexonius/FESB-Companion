@@ -27,14 +27,20 @@ import kotlinx.coroutines.withContext
 
 
 @Composable
-fun GlideImage(model: String, contentDescription: String, modifier: Modifier = Modifier) {
+fun GlideImage(model: String?, contentDescription: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
 
+
     LaunchedEffect(model) {
+        if (model == null) {
+            return@LaunchedEffect
+        }
         withContext(Dispatchers.IO) {
-            val futureTarget = Glide.with(context)
-                .asBitmap().diskCacheStrategy(DiskCacheStrategy.NONE)
+            val futureTarget = Glide
+                .with(context)
+                .asBitmap()
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .load(model)
                 .submit()

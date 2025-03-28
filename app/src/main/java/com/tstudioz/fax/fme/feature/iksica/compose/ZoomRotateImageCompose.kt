@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
 import android.content.Context
+import android.util.Log
 import android.view.OrientationEventListener
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -102,7 +103,8 @@ fun RotatableZoomableImage(imageUrl: HttpUrl, contentDescription: String) {
 enum class Orientation { PORTRAIT, LANDSCAPE_LEFT, LANDSCAPE_RIGHT }
 
 @Composable
-fun Rotatable90Image(imageUrl: String, contentDescription: String) {
+fun Rotatable90Image(imageUrl: String?, contentDescription: String) {
+
     val ratio = 627 / 353f
 
     val scale = remember { mutableFloatStateOf(1f) }
