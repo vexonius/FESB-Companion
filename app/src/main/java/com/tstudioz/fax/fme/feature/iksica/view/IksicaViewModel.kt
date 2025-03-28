@@ -198,7 +198,7 @@ class IksicaViewModel(
 
 
     private fun getImageUrlApproximately(location: MenzaLocation) {
-        val minuteAgo = LocalDateTime.now().minusMinutes(30)
+        val minuteAgo = LocalDateTime.now().minusMinutes(1)
         val nowSecs = minuteAgo.second.div(5).times(5).toString().padStart(2, '0')
         val filename = minuteAgo.format(
             DateTimeFormatter.ofPattern(
