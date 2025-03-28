@@ -21,7 +21,7 @@ data class Menza(
 @Serializable
 data class Menu(
     val type: String,
-    val mealTime: String,
+    val mealTime: MealTime,
     val name: String,
     val soupOrTea: String,
     val mainCourse: String,
@@ -37,10 +37,15 @@ data class Menu(
 @Serializable
 data class MeniSpecial(
     val type: String,
-    val mealTime: String,
+    val mealTime: MealTime,
     val meal: String,
     val price: String,
 )
+
+enum class MealTime(val value: String) {
+    LUNCH("RUČAK"),
+    DINNER("VEČERA"),
+}
 
 open class MenzaRealm(
     var menza: String? = null

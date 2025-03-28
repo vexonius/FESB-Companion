@@ -101,6 +101,12 @@
     <string name="hostel">Hostel</string>
     <string name="medicina">Medicina</string>
     <string name="indeks">Indeks</string>
+    <string name="soup">Juha</string>
+    <string name="beverage">Napitak</string>
+    <string name="main_course">Glavno jelo</string>
+    <string name="side_dish">Prilog</string>
+    <string name="salad">Salata</string>
+    <string name="dessert">Desert</string>
 
     // Settings
     <string name="category_user">KORISNIK</string>

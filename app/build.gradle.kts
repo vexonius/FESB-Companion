@@ -153,6 +153,9 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
    // implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
+    //horizontal pager
+    implementation("com.tbuonomo:dotsindicator:5.1.0")
+
 }
 
 configurations.all {

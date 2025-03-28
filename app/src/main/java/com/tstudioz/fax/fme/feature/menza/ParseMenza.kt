@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.menza
 
 import android.util.Log
+import com.tstudioz.fax.fme.feature.menza.models.MealTime
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
 import com.tstudioz.fax.fme.feature.menza.models.Menu
 import com.tstudioz.fax.fme.feature.menza.models.Menza
@@ -77,4 +78,4 @@ fun checkAndFixPrice(pricee: String): String {
     return price
 }
 
-fun mealTimeTest(title: String) = if (title[0] == 'R') "RUČAK" else if (title[0] == 'V') "VEČERA" else ""
+fun mealTimeTest(title: String) = if (title[0] == 'R') MealTime.LUNCH else if (title[0] == 'V') MealTime.DINNER else MealTime.LUNCH

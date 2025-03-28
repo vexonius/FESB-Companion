@@ -62,6 +62,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.tbuonomo.viewpagerdotsindicator.compose.DotsIndicator
+import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
+import com.tbuonomo.viewpagerdotsindicator.compose.type.BalloonIndicatorType
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
@@ -119,9 +122,30 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             LaunchedEffect(state.settledPage) {
                 iksicaViewModel.updateMenzaUrl(map[state.settledPage])
             }
-            HorizontalPager(state) {
-                val meni = menzas?.get(it)
-                ImageMeniView(iksicaViewModel, imageUrl, meni)
+            Column {
+                Row(
+                    horizontalArrangement = Arrangement.Center, modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colorResource(R.color.chinese_black))
+                        .padding(0.dp,24.dp,0.dp,24.dp)
+                ) {
+                    DotsIndicator(
+                        dotCount = pageCount,
+                        type = BalloonIndicatorType(
+                            dotsGraphic = DotGraphic(
+                                color = Color.White,
+                                size = 6.dp
+                            ),
+                            balloonSizeFactor = 1.7f
+                        ),
+                        dotSpacing = 20.dp,
+                        pagerState = state
+                    )
+                }
+                HorizontalPager(state) {
+                    val meni = menzas?.get(it)
+                    ImageMeniView(iksicaViewModel, imageUrl, meni)
+                }
             }
         }
         return

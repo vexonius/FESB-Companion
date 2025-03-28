@@ -37,8 +37,8 @@ fun ImageMeniView(
     imageUrl: Pair<MenzaLocation, HttpUrl?>?,
     menza: Pair<MenzaLocation, Menza?>?
 ) {
-    val imgUrl =
-        if (imageUrl?.second != null && imageUrl.first == menza?.first) imageUrl.second else null
+    val imgUrl = if (imageUrl?.second != null && imageUrl.first == menza?.first) imageUrl.second
+    else null
     BackHandler {
         iksicaViewModel.closeMenza()
     }
@@ -52,7 +52,7 @@ fun ImageMeniView(
         Card(
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
-                .padding(24.dp, 53.dp, 24.dp, 24.dp)
+                .padding(24.dp,12.dp,24.dp,24.dp)
         ) {
             AnimatedVisibility(true, enter = fadeIn(), modifier = Modifier) {
                 Rotatable90Image(
