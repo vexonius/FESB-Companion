@@ -12,12 +12,14 @@ class MenzaRepository(
     private val menzaNetworkService: MenzaServiceInterface,
     private val menzaDao: MenzaDaoInterface,
 ) : MenzaRepositoryInterface {
-    override suspend fun fetchMenzaDetails(place:String, insert:Boolean): MenzaResult {
+    override suspend fun fetchMenzaDetails(place: String, insert: Boolean): MenzaResult {
         return when (val result = menzaNetworkService.fetchMenza(place)) {
             is NetworkServiceResult.MenzaResult.Success -> {
                 val parsed = parseMenza(result.data)
                 if (parsed != null) {
-                    if (insert){menzaDao.insert(parsed)}
+                    if (insert) {
+                        menzaDao.insert(parsed)
+                    }
                     MenzaResult.Success(parsed)
                 } else {
                     Log.e(this.javaClass.canonicalName, "Menies parsing error")

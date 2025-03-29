@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
+import com.tstudioz.fax.fme.feature.iksica.menzaLocations
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
@@ -58,57 +59,6 @@ class IksicaViewModel(
     val menzaOpened: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private var updateUrlsJob: Job? = null
-
-    val map = listOf(
-        MenzaLocation(
-            name = "STOP",
-            address = "Ruđera Boškovića 32, Split",
-            meniName = "fesb_stop",
-            cameraName = "b8_27_eb_ac_55_f5",
-        ),
-        MenzaLocation(
-            name = "Medicinski Fakultet",
-            address = "Šoltanska 2, Split",
-            meniName = "medicina",
-            cameraName = "b8_27_eb_47_b4_60",
-        ),
-        MenzaLocation(
-            name = "Hostel Spinut",
-            address = "Spinutska ulica 2, Split",
-            meniName = "hostel",
-            cameraName = "b8_27_eb_56_1c_fa",
-        ),
-        MenzaLocation(
-            name = "Indeks",
-            address = "Svačićeva 8, Split",
-            meniName = "indeks",
-            cameraName = "b8_27_eb_82_01_dd",
-        ),
-        MenzaLocation(
-            name = "Kampus",
-            address = "Cvite Fiskovića 3, Split",
-            meniName = "kampus",
-            cameraName = "b8_27_eb_aa_ed_1c",
-        ),
-        MenzaLocation(
-            name = "Ekonomski Fakultet",
-            address = "Cvite Fiskovića 5, Split",
-            meniName = "efst",
-            cameraName = "b8_27_eb_d4_79_96",
-        ),
-        MenzaLocation(
-            name = "FGAG",
-            address = "Ul. Matice hrvatske 15, Split",
-            meniName = "fgag",
-            cameraName = "b8_27_eb_ff_a3_7c",
-        ),
-        MenzaLocation(
-            name = "FESB",
-            address = "Ruđera Boškovića 32, Split",
-            meniName = "fesb_vrh",
-            cameraName = "b8_27_eb_d1_4b_4a",
-        ),
-    )
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
@@ -177,13 +127,10 @@ class IksicaViewModel(
 
     private fun fetchMenza() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _menza.postValue(map.map {
+            _menza.postValue(menzaLocations.map {
                 it to when (val menza = menzaRepository.fetchMenzaDetails(it.meniName, false)) {
                     is MenzaResult.Success -> {
-                        if (menza.data == null) {
-                            snackbarHostState.showSnackbar("Greška prilikom dohvaćanja menze")
-                            null
-                        } else menza.data
+                        menza.data
                     }
 
                     is MenzaResult.Failure -> {

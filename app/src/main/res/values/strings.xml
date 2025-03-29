@@ -93,14 +93,6 @@
     <string name="meni_price">%1$s €</string>
     <string name="meals_by_choice">JELA PO IZBORU</string>
     <string name="menza_no_data">Nije postavljen jelovnik za današnji dan.</string>
-    <string name="kampus">Kampus</string>
-    <string name="fesb_vrh">FESB</string>
-    <string name="fesb_stop">STOP</string>
-    <string name="efst">Efst</string>
-    <string name="fgag">Fgag</string>
-    <string name="hostel">Hostel</string>
-    <string name="medicina">Medicina</string>
-    <string name="indeks">Indeks</string>
     <string name="soup">Juha</string>
     <string name="beverage">Napitak</string>
     <string name="main_course">Glavno jelo</string>
@@ -170,6 +162,4 @@
     <string name="group">Grupa</string>
     <string name="classroom">Učionica</string>
     <string name="time_range">%1$s - %2$s</string>
-
-
 </resources>

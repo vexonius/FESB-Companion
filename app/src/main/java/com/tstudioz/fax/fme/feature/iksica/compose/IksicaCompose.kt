@@ -66,6 +66,7 @@ import com.tbuonomo.viewpagerdotsindicator.compose.DotsIndicator
 import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
 import com.tbuonomo.viewpagerdotsindicator.compose.type.BalloonIndicatorType
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.iksica.menzaLocations
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -107,8 +108,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
     if (iksicaViewModel.menzaOpened.observeAsState().value == true) {
         Surface(modifier = Modifier.fillMaxSize()) {
-            val map = iksicaViewModel.map
-            val pageCount = map.size
+            val pageCount = menzaLocations.size
             val state = rememberPagerState(
                 initialPage = (pageCount.div(2)),
                 pageCount = { pageCount }
@@ -120,7 +120,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                 }
             }
             LaunchedEffect(state.settledPage) {
-                iksicaViewModel.updateMenzaUrl(map[state.settledPage])
+                iksicaViewModel.updateMenzaUrl(menzaLocations[state.settledPage])
             }
             Column {
                 Row(
