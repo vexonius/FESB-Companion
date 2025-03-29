@@ -30,10 +30,10 @@ class UserDao(private val dbManager: DatabaseManagerInterface): UserDaoInterface
         realm.close()
     }
 
-    override suspend fun getUser(): UserRealm {
+    override suspend fun getUser(): UserRealm? {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
-        return realm.query<UserRealm>().find().first()
+        return realm.query<UserRealm>().find().firstOrNull()
     }
 
     override suspend fun deleteAllUserData() {

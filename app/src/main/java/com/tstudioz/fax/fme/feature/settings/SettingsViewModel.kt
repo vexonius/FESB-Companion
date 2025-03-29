@@ -2,6 +2,7 @@ package com.tstudioz.fax.fme.feature.settings
 
 import android.app.Application
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.settings.model.EmailModalModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -20,9 +22,11 @@ class SettingsViewModel(
     val username: MutableLiveData<String> = MutableLiveData()
     val version: MutableLiveData<String> = MutableLiveData()
     val displayLicences = MutableLiveData(false)
-
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Log.e("Settings", throwable.message.toString())
+    }
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             username.postValue(userRepository.getCurrentUserName())
             version.postValue(getBuildVersion())
         }
@@ -34,7 +38,7 @@ class SettingsViewModel(
      * router will route to login screen
      */
     fun logout() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             userRepository.deleteAllUserData()
         }
     }
