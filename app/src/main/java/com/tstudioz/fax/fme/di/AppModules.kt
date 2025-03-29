@@ -2,7 +2,6 @@ package com.tstudioz.fax.fme.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
@@ -13,11 +12,11 @@ import com.tstudioz.fax.fme.database.KeystoreManager
 import com.tstudioz.fax.fme.database.KeystoreManagerInterface
 import com.tstudioz.fax.fme.feature.settings.SettingsViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
+import com.tstudioz.fax.fme.networking.NetworkUtils
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
 import com.tstudioz.fax.fme.networking.session.SessionDelegate
 import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
-import com.tstudioz.fax.fme.networking.NetworkUtils
 import com.tstudioz.fax.fme.routing.AppRouter
 import com.tstudioz.fax.fme.routing.HomeRouter
 import com.tstudioz.fax.fme.routing.LoginRouter
@@ -28,7 +27,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.binds
 import org.koin.dsl.module
