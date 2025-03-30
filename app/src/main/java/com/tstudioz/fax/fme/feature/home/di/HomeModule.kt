@@ -25,5 +25,5 @@ val homeModule = module {
 
 
 fun getNoteDao(db:AppDatabase): NoteDao {
-    return db.NoteRoom()
+    return db.noteRoom()
 }

@@ -1,19 +1,18 @@
 package com.tstudioz.fax.fme.feature.login.dao
 
-import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.UserRealm
-import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.DeletedObject
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.Companion.REPLACE
+import androidx.room.Query
+import com.tstudioz.fax.fme.common.user.models.UserRoom
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 
-class UserDao(private val dbManager: DatabaseManagerInterface): UserDaoInterface {
+/*
+class UserDao1(private val dbManager: DatabaseManagerInterface): UserDaoInterface {
 
     override fun observeUserChanges(): Flow<Unit> {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
-        val user = realm.query(UserRealm::class).first()
+        val user = realm.query(UserRoom::class).first()
 
         return user
             .asFlow()
@@ -22,7 +21,7 @@ class UserDao(private val dbManager: DatabaseManagerInterface): UserDaoInterface
             .map {  }
     }
 
-    override suspend fun insert(user: UserRealm) {
+    override suspend fun insert(user: UserRoom) {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         realm.write { copyToRealm(user) }
@@ -30,10 +29,10 @@ class UserDao(private val dbManager: DatabaseManagerInterface): UserDaoInterface
         realm.close()
     }
 
-    override suspend fun getUser(): UserRealm {
+    override suspend fun getUser(): UserRoom {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
-        return realm.query<UserRealm>().find().first()
+        return realm.query<UserRoom>().find().first()
     }
 
     override suspend fun deleteAllUserData() {
@@ -44,4 +43,21 @@ class UserDao(private val dbManager: DatabaseManagerInterface): UserDaoInterface
         }
     }
 
+}
+*/
+
+@Dao
+interface UserDao{
+
+    @Insert(onConflict = REPLACE)
+    fun insert(user: UserRoom)
+
+    @Query("SELECT * FROM userroom")
+    fun getUser(): UserRoom
+
+    @Query("DELETE FROM userroom")
+    fun deleteAllUserData()
+
+    @Query("SELECT * FROM userroom LIMIT 1")
+    fun observeUserChanges(): Flow<UserRoom?>
 }

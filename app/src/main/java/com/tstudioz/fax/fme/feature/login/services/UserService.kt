@@ -10,10 +10,10 @@ import okhttp3.Request
 
 class UserService(private val client: OkHttpClient) : UserServiceInterface {
 
-    override suspend fun loginUser(username: String, password: String): NetworkServiceResult.LoginResult {
+    override suspend fun loginUser(user:User): NetworkServiceResult.LoginResult {
         val requestBody = FormBody.Builder()
-            .add("Username", username)
-            .add("Password", password)
+            .add("Username", user.username)
+            .add("Password", user.password)
             .add("IsRememberMeChecked", "true")
             .build()
 
@@ -28,7 +28,7 @@ class UserService(private val client: OkHttpClient) : UserServiceInterface {
         response.close()
 
         return if (url == targetUrl) {
-            NetworkServiceResult.LoginResult.Success(User(username, password))}
+            NetworkServiceResult.LoginResult.Success(user)}
         else {
             NetworkServiceResult.LoginResult.Failure(Throwable("Error during login"))}
     }

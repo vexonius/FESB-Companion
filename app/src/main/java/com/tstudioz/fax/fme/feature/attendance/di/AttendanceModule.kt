@@ -3,14 +3,12 @@ package com.tstudioz.fax.fme.feature.attendance.di
 import android.app.Application
 import androidx.room.Room
 import com.tstudioz.fax.fme.database.AppDatabase
-import com.tstudioz.fax.fme.database.models.NoteRoom
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDao
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepository
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceService
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.feature.attendance.view.AttendanceViewModel
-import com.tstudioz.fax.fme.feature.home.dao.NoteDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.core.module.dsl.viewModel
@@ -36,5 +34,5 @@ fun getRoomDatabase(application: Application): AppDatabase {
 }
 
 fun getAttendanceDao(db:AppDatabase): AttendanceDao {
-    return db.AttendanceDaoRoom()
+    return db.attendanceDaoRoom()
 }

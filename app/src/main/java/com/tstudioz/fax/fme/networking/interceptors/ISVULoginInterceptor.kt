@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.networking.interceptors
 
 import com.tstudioz.fax.fme.common.user.models.User
-import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
+import com.tstudioz.fax.fme.feature.login.dao.UserDao
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatLoginServiceInterface
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import kotlinx.coroutines.CompletableDeferred
@@ -15,7 +15,7 @@ import okhttp3.Response
 class ISVULoginInterceptor(
     private val cookieJar: MonsterCookieJar,
     private val studomatLoginService: StudomatLoginServiceInterface,
-    private val userDao: UserDaoInterface
+    private val userDao: UserDao
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -39,8 +39,7 @@ class ISVULoginInterceptor(
         val refreshJob = CompletableDeferred<Unit>().also { ongoingRefresh = it }
         loginMutex.withLock {
             try {
-                val realmModel = userDao.getUser()
-                val user = User(realmModel.username, realmModel.password)
+                val user = User(userDao.getUser())
                 with(studomatLoginService) {
                     getSamlRequest()
                     sendSamlResponseToAAIEDU()

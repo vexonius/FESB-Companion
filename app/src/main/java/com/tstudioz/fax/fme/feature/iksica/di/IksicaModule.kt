@@ -43,5 +43,5 @@ fun provideISSPPortalClient(
 
 
 fun getIksicaDao(db:AppDatabase): IksicaDao {
-    return db.IksicaDao()
+    return db.iksicaDao()
 }
