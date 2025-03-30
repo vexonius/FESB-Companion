@@ -1,7 +1,5 @@
 package com.tstudioz.fax.fme.feature.iksica.models
 
-import io.realm.kotlin.ext.toRealmList
-
 data class StudentData(
     val imageUrl: String?,
     val nameSurname: String,
@@ -13,11 +11,10 @@ data class StudentData(
     val rightsFrom: String,
     val rightsTo: String,
     val balance: Double,
-    val spentToday: Double,
-    var receipts: List<Receipt>
+    val spentToday: Double
 ) {
 
-    constructor(model: StudentDataRealm) : this(
+    constructor(model: StudentDataRoom) : this(
         imageUrl = model.imageUrl,
         rightsLevel = model.rightsLevel,
         dailySupport = model.dailySupport,
@@ -28,19 +25,12 @@ data class StudentData(
         oib = model.oib,
         jmbag = model.jmbag,
         balance = model.balance,
-        spentToday = model.spentToday,
-        receipts = model.receipts.map { it.fromRealmObject() }
+        spentToday = model.spentToday
     )
 
-    fun with(receipts: List<Receipt>): StudentData {
-        val model = this
-        model.receipts = receipts
-
-        return model
-    }
-
-    fun toRealmModel(): StudentDataRealm =
-         StudentDataRealm(
+    fun toRoomModel(): StudentDataRoom =
+         StudentDataRoom(
+             "1",
             this.imageUrl,
             this.nameSurname,
             this.rightsLevel,
@@ -51,8 +41,7 @@ data class StudentData(
             this.rightsFrom,
             this.rightsTo,
             this.balance,
-            this.spentToday,
-            this.receipts.map { it.toRealmObject() }.toRealmList()
+            this.spentToday
         )
 
     companion object {
@@ -67,8 +56,7 @@ data class StudentData(
             rightsFrom = "",
             rightsTo = "",
             balance = 0.0,
-            spentToday = 0.0,
-            receipts = emptyList()
+            spentToday = 0.0
         )
     }
 }

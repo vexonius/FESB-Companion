@@ -145,6 +145,14 @@ dependencies {
     //weather deserialise
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("com.google.code.gson:gson:2.11.0")
+
+    val room_version = "2.6.1"
+
+    implementation("androidx.room:room-runtime:$room_version")
+
+    // If this project only uses Java source, use the Java annotationProcessor
+    // No additional plugins are necessary
+    kapt("androidx.room:room-compiler:$room_version")
 }
 
 configurations.all {

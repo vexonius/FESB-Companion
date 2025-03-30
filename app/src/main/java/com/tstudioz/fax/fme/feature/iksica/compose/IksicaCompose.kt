@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,11 +31,9 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -59,8 +56,8 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
@@ -82,7 +79,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val nestedSheetState = rememberNestedSheetState(composableHeight = 999, sheetOffset = 999)
 
     val receiptSelected = iksicaViewModel.receiptSelected.observeAsState().value
-    val studentData = iksicaViewModel.studentData.observeAsState().value
+    val iksicaData = iksicaViewModel.iksicaData.observeAsState().value
     val viewState = iksicaViewModel.viewState.observeAsState().value ?: IksicaViewState.Loading
 
     val isRefreshing = viewState is IksicaViewState.Fetching || viewState is IksicaViewState.Loading
@@ -152,9 +149,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     }
 
     PopupBox(showPopup = showPopup.value, onClickOutside = { showPopup.value = !showPopup.value }) {
-        if (studentData != null) {
-            CardIksicaPopupContent(studentData)
-        }
+        iksicaData?.studentData?.let { CardIksicaPopupContent(it) }
     }
 }
 
@@ -177,7 +172,7 @@ fun EmptyIksicaView() {
 
 @Composable
 fun PopulatedIksicaView(
-    model: StudentData,
+    model: IksicaData,
     listState: LazyListState,
     nestedSheetState: NestedSheetState,
     onCardClick: () -> Unit,
@@ -223,22 +218,28 @@ fun PopulatedIksicaView(
             TopBarIksica()
 
             Box(Modifier.fillMaxWidth()) {
-                ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) {
+                ElevatedCardIksica(
+                    model.studentData.nameSurname,
+                    model.studentData.cardNumber,
+                    model.studentData.balance
+                ) {
                     onCardClick()
                 }
             }
         }
-        Column(modifier = Modifier
-            .offset { IntOffset(0, sheetOffset.intValue) }
-            .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-            .background(colorResource(R.color.chinese_black))
+        Column(
+            modifier = Modifier
+                .offset { IntOffset(0, sheetOffset.intValue) }
+                .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
+                .background(colorResource(R.color.chinese_black))
         ) {
-            if (model.receipts.isEmpty()) {
+            val receipts = model.receipts
+            if (receipts.isNullOrEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransakcijeText()
                 LazyColumn(state = listState) {
-                    items(model.receipts) {
+                    items(receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }
                 }

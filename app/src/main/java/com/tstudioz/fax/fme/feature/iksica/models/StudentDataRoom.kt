@@ -1,10 +1,12 @@
 package com.tstudioz.fax.fme.feature.iksica.models
 
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmObject
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-class StudentDataRealm(
+@Entity
+data class StudentDataRoom(
+    @PrimaryKey
+    var id:String,
     var imageUrl: String?,
     var nameSurname: String,
     var rightsLevel: String,
@@ -16,21 +18,21 @@ class StudentDataRealm(
     var rightsTo: String,
     var balance: Double,
     var spentToday: Double,
-    var receipts: RealmList<ReceiptRealm>
-) : RealmObject {
+) {
 
     constructor() : this(
-        imageUrl = "",
-        "",
-        "",
-        0.0,
-        "",
         "",
         "",
         "",
         "",
         0.0,
+        "",
+        "",
+        "",
+        "",
+        "",
         0.0,
-        realmListOf())
+        0.0
+    )
 }
 

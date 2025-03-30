@@ -45,11 +45,10 @@ fun parseStudentInfo(body: String): StudentData {
         oib = oib ?: "",
         jmbag = jmbag ?: "",
         cardNumber = number ?: "",
-        rightsFrom = rightsFrom ?: "",
-        rightsTo = rightsTo ?: "",
+        rightsFrom = rightsFrom ,
+        rightsTo = rightsTo ,
         balance = balance.toDoubleOrNull() ?: 0.0,
         spentToday = spentToday.toDoubleOrNull() ?: 0.0,
-        receipts = realmListOf()
     )
     return studentData
 }
