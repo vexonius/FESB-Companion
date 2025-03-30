@@ -8,6 +8,9 @@ import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 
 @Dao
 interface AttendanceDao{
+    @Query("DELETE FROM attendanceentryroom")
+    fun deleteAll()
+
     @Insert(onConflict = REPLACE)
     fun insert(attendance: List<AttendanceEntry>)
 

@@ -69,6 +69,7 @@ class AttendanceRepository(
     }
 
     override suspend fun insertAttendance(attendance: List<AttendanceEntry>) {
+        attendanceDao.deleteAll()
         attendanceDao.insert(attendance)
     }
 
