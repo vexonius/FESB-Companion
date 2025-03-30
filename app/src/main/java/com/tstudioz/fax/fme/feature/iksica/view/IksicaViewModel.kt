@@ -180,12 +180,11 @@ class IksicaViewModel(
             getImageUrlApproximately(location)
             getImageUrl(location)
             while (isActive) {
-                val now = LocalTime.now().second
-                if (now.mod(interval) == 4) {
+                if (LocalTime.now().second.mod(interval) == 4) {
                     Log.d("images", "Fetching images " + location.name + " interval " + interval)
                     getImageUrl(location)
                 }
-                delay(999)
+                delay(1000L)
             }
         }
     }

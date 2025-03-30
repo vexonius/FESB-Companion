@@ -11,7 +11,7 @@ class CamerasService(private val client: OkHttpClient) : CamerasServiceInterface
             .scheme("https")
             .host("camerasfiles.dbtouch.com")
             .addPathSegment("images")
-            .addPathSegment(path)
+            .addPathSegments("$path/") //adding a / at the end, otherwise it will redirect to the page that has a / (so this saves a network call)
             .build()
         val request = Request.Builder()
             .url(url)
