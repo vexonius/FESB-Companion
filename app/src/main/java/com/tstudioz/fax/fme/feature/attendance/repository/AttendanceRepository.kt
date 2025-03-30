@@ -16,14 +16,6 @@ class AttendanceRepository(
     private val parseAttendance: ParseAttendance = ParseAttendance()
 ) : AttendanceRepositoryInterface {
 
-    /* fun read(): List<List<AttendanceEntry>> {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-        val result = realm.query(AttendanceEntry::class).find()
-        val grouped = result.groupBy { it.`class` }.values.toList()
-
-        return grouped.sortedBy { it.first().`class` }.sortedBy { it.first().semester }
-    }*/
-
     override suspend fun fetchAttendance(): NetworkServiceResult.AttendanceParseResult {
         when (val list = attendanceService.fetchAllAttendance()) {
             is NetworkServiceResult.AttendanceFetchResult.Success -> {
