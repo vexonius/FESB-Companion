@@ -4,10 +4,10 @@ import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
 
 val menzaLocations = listOf(
     MenzaLocation(
-        name = "STOP",
-        address = "Ruđera Boškovića 32, Split",
-        meniName = "fesb_stop",
-        cameraName = "b8_27_eb_ac_55_f5",
+        name = "Restoran S.O.S.",
+        address = "Kopilica ul. 5, Split",
+        meniName = "kopilica",
+        cameraName = "",
     ),
     MenzaLocation(
         name = "Medicinski Fakultet",
@@ -51,4 +51,10 @@ val menzaLocations = listOf(
         meniName = "fesb_vrh",
         cameraName = "b8_27_eb_d1_4b_4a",
     ),
+    /*MenzaLocation(
+        name = "STOP",
+        address = "Ruđera Boškovića 32, Split",
+        meniName = "fesb_stop",
+        cameraName = "b8_27_eb_ac_55_f5", //curently closed
+    ),*/
 )

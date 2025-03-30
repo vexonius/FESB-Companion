@@ -1,16 +1,17 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
@@ -47,22 +49,20 @@ fun ImageMeniView(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .background(colorResource(R.color.chinese_black)),
-        horizontalAlignment = Alignment.Start,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Card(
-            shape = RoundedCornerShape(15.dp),
+        Box(
             modifier = Modifier
-                .padding(24.dp,12.dp,24.dp,24.dp)
+                .padding(24.dp, 12.dp, 24.dp, 24.dp)
+                .clip(RoundedCornerShape(15.dp))
         ) {
-            AnimatedVisibility(true, enter = fadeIn(), modifier = Modifier) {
+            if (menza?.first?.cameraName?.isNotEmpty() == true) {
                 Rotatable90Image(
                     imageUrl = imgUrl?.toString(),
                     contentDescription = "Menza"
                 )
-
                 //imageUrl?.let { RotatableZoomableImage(imageUrl = it, "Menza") }
-
-                imgUrl?.toString()?.let { url->
+                imgUrl?.toString()?.let { url ->
                     formatTime(url)?.let {
                         Text(
                             text = it,
@@ -75,6 +75,18 @@ fun ImageMeniView(
                         )
                     }
                 }
+            } else {
+                Icon(
+                    painter = painterResource(id = R.drawable.no_camera),
+                    contentDescription = "Camera",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(15.dp))
+                        .padding(8.dp, 2.dp)
+                        .size(40.dp)
+                )
             }
         }
         MeniComposeIksica(menza)
