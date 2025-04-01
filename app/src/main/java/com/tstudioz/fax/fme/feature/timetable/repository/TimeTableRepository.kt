@@ -85,6 +85,7 @@ class TimeTableRepository(
     }
 
     private suspend fun insert(classes: List<Event>) {
+        timeTableDao.deleteAll()
         timeTableDao.insert(classes.map{it.toRoomObject()})
     }
 
