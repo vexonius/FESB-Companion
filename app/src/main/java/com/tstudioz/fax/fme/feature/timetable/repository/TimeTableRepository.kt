@@ -2,7 +2,7 @@ package com.tstudioz.fax.fme.feature.timetable.repository
 
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
-import com.tstudioz.fax.fme.feature.timetable.dao.interfaces.TimeTableDaoInterface
+import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
 import com.tstudioz.fax.fme.feature.timetable.parseTimetable
 import com.tstudioz.fax.fme.feature.timetable.parseTimetableInfo
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
@@ -18,7 +18,7 @@ import java.time.LocalDate
 
 class TimeTableRepository(
     private val timetableService: TimetableServiceInterface,
-    private val timeTableDao: TimeTableDaoInterface
+    private val timeTableDao: TimeTableDao
 ) : TimeTableRepositoryInterface {
 
     private val _events: MutableSharedFlow<List<Event>> = MutableSharedFlow(1)
@@ -73,19 +73,19 @@ class TimeTableRepository(
     }
 
     override suspend fun getCachedEvents(): List<Event> {
-        return timeTableDao.getEvents()
+        return timeTableDao.getEvents().map { it.fromRoomObject() }
     }
 
     private fun observeEventsFromCache() {
         CoroutineScope(Dispatchers.IO).launch {
-            timeTableDao.getEventsAsync().collect {
-                _events.emit(it)
+            timeTableDao.getEventsAsync().collect { events->
+                _events.emit(events.map { it.fromRoomObject() })
             }
         }
     }
 
     private suspend fun insert(classes: List<Event>) {
-        timeTableDao.insert(classes)
+        timeTableDao.insert(classes.map{it.toRoomObject()})
     }
 
     companion object {

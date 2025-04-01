@@ -3,7 +3,7 @@ package com.tstudioz.fax.fme.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.tstudioz.fax.fme.common.user.models.UserRoom
-import com.tstudioz.fax.fme.database.models.EventRealm
+import com.tstudioz.fax.fme.database.models.EventRoom
 import com.tstudioz.fax.fme.database.models.NoteRoom
 import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDao
 import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
@@ -14,6 +14,7 @@ import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRoom
 import com.tstudioz.fax.fme.feature.login.dao.UserDao
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
+import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
 import io.realm.kotlin.RealmConfiguration
 
 class DatabaseManager(private val keystoreManager: KeystoreManagerInterface) :
@@ -22,7 +23,6 @@ class DatabaseManager(private val keystoreManager: KeystoreManagerInterface) :
     override fun getDefaultConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder(
             setOf(
-                EventRealm::class,
                 StudomatSubject::class,
                 Year::class
             )
@@ -36,7 +36,7 @@ class DatabaseManager(private val keystoreManager: KeystoreManagerInterface) :
 }
 
 @Database(
-    entities = [UserRoom::class, AttendanceEntry::class, NoteRoom::class, StudentDataRoom::class, ReceiptRoom::class],
+    entities = [UserRoom::class, AttendanceEntry::class, NoteRoom::class, StudentDataRoom::class, ReceiptRoom::class, EventRoom::class],
     version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -44,4 +44,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun attendanceDaoRoom(): AttendanceDao
     abstract fun noteRoom(): NoteDao
     abstract fun iksicaDao(): IksicaDao
+    abstract fun timetableDao(): TimeTableDao
 }
