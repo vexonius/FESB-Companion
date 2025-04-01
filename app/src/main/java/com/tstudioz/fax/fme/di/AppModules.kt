@@ -45,7 +45,7 @@ val module = module {
     single<OkHttpClient>(named("FESBPortalClient")) { provideFESBPortalClient(get(),get(named("FESBInterceptor"))) }
     single<SessionDelegateInterface> { SessionDelegate(get(), get()) }
     single<KeystoreManagerInterface> { KeystoreManager(get()) }
-    single<DatabaseManagerInterface> { DatabaseManager(get(), get()) }
+    single<DatabaseManagerInterface> { DatabaseManager(get()) }
     single<SharedPreferences> { encryptedSharedPreferences(androidContext()) }
     viewModel { TimetableViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(androidApplication(), get()) }

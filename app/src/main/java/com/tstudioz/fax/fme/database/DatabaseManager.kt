@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.database
 
-import android.app.Application
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.tstudioz.fax.fme.common.user.models.UserRoom
@@ -13,18 +12,16 @@ import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDao
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRoom
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRoom
 import com.tstudioz.fax.fme.feature.login.dao.UserDao
-import com.tstudioz.fax.fme.feature.menza.models.MenzaRealm
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 import io.realm.kotlin.RealmConfiguration
 
-class DatabaseManager(private val keystoreManager: KeystoreManagerInterface, private val application: Application) :
+class DatabaseManager(private val keystoreManager: KeystoreManagerInterface) :
     DatabaseManagerInterface {
 
     override fun getDefaultConfiguration(): RealmConfiguration {
         return RealmConfiguration.Builder(
             setOf(
-                MenzaRealm::class,
                 EventRealm::class,
                 StudomatSubject::class,
                 Year::class

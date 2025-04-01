@@ -7,6 +7,4 @@ interface MenzaRepositoryInterface {
 
     suspend fun fetchMenzaDetails(): MenzaResult
 
-    suspend fun readMenza(): Menza?
-
 }

@@ -2,7 +2,7 @@ package com.tstudioz.fax.fme.feature.attendance.models
 
 import androidx.room.Entity
 
-@Entity(tableName = "attendanceentryroom")
+@Entity
 data class AttendanceEntry(
     @androidx.room.PrimaryKey
     var id: String = "",
