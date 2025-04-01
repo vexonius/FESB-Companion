@@ -2,13 +2,10 @@ package com.tstudioz.fax.fme.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
-import com.tstudioz.fax.fme.database.DatabaseManager
-import com.tstudioz.fax.fme.database.DatabaseManagerInterface
 import com.tstudioz.fax.fme.database.KeystoreManager
 import com.tstudioz.fax.fme.database.KeystoreManagerInterface
 import com.tstudioz.fax.fme.feature.settings.SettingsViewModel
@@ -45,7 +42,6 @@ val module = module {
     single<OkHttpClient>(named("FESBPortalClient")) { provideFESBPortalClient(get(),get(named("FESBInterceptor"))) }
     single<SessionDelegateInterface> { SessionDelegate(get(), get()) }
     single<KeystoreManagerInterface> { KeystoreManager(get()) }
-    single<DatabaseManagerInterface> { DatabaseManager(get()) }
     single<SharedPreferences> { encryptedSharedPreferences(androidContext()) }
     viewModel { TimetableViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(androidApplication(), get()) }

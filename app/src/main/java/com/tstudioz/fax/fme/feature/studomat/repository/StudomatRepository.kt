@@ -24,6 +24,7 @@ class StudomatRepository(
         return when (val result = studomatService.getYears()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetYears = parseYears(result.data)
+                studomatDao.deleteYears()
                 studomatDao.insertYears(resultGetYears)
                 Log.d("StudomatRepository", "getYears: $resultGetYears")
                 StudomatRepositoryResult.StudentAndYearsResult.Success(resultGetYears, student)
@@ -40,6 +41,7 @@ class StudomatRepository(
         return when (val data = studomatService.getChosenYear(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetChosenYear = parseCurrentYear(data.data)
+                studomatDao.deleteAll(resultGetChosenYear.first.firstOrNull()?.year ?: "")
                 studomatDao.insert(resultGetChosenYear.first)
                 sharedPreferences.edit().putString("gen" + year.title, resultGetChosenYear.second).apply()
                 Log.d("StudomatRepository", "getOdabranuGodinu: ${resultGetChosenYear.first}")
@@ -53,12 +55,12 @@ class StudomatRepository(
         }
     }
 
-    suspend fun readYears(): List<Year> {
-        return studomatDao.readYears()
+    fun readYears(): List<Year> {
+        return studomatDao.readYears().sortedBy { it.title }
     }
 
-    suspend fun read(year: String): List<StudomatSubject> {
-        return studomatDao.read(year)
+    fun read(year: String): List<StudomatSubject> {
+        return studomatDao.read(year).sortedBy { it.name }
     }
 
 }

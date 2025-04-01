@@ -58,12 +58,6 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
                             }
                             item {
                                 LicenceItem(
-                                    title = stringResource(id = R.string.realm_title),
-                                    supportText = stringResource(id = R.string.realm_desc)
-                                )
-                            }
-                            item {
-                                LicenceItem(
                                     title = stringResource(id = R.string.privacy_policy_title),
                                     supportText = stringResource(id = R.string.privacy_policy_desc)
                                 )

@@ -7,7 +7,6 @@ import android.util.Base64
 import com.tstudioz.fax.fme.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.util.SPKey
-import io.realm.kotlin.RealmConfiguration
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

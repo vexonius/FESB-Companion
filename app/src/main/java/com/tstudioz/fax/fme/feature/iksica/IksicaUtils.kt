@@ -5,7 +5,6 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptItem
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
-import io.realm.kotlin.ext.realmListOf
 import org.jsoup.Jsoup
 import java.math.RoundingMode
 import java.time.LocalDate

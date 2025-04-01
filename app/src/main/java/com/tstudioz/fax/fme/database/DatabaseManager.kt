@@ -12,31 +12,22 @@ import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDao
 import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRoom
 import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRoom
 import com.tstudioz.fax.fme.feature.login.dao.UserDao
+import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
-import io.realm.kotlin.RealmConfiguration
-
-class DatabaseManager(private val keystoreManager: KeystoreManagerInterface) :
-    DatabaseManagerInterface {
-
-    override fun getDefaultConfiguration(): RealmConfiguration {
-        return RealmConfiguration.Builder(
-            setOf(
-                StudomatSubject::class,
-                Year::class
-            )
-        )
-            .name("default.realm")
-            .schemaVersion(1)
-            //.encryptionKey(keystoreManager.getOrCreateEncryptionKey())
-            .deleteRealmIfMigrationNeeded()
-            .build()
-    }
-}
 
 @Database(
-    entities = [UserRoom::class, AttendanceEntry::class, NoteRoom::class, StudentDataRoom::class, ReceiptRoom::class, EventRoom::class],
+    entities = [
+        UserRoom::class,
+        AttendanceEntry::class,
+        NoteRoom::class,
+        StudentDataRoom::class,
+        ReceiptRoom::class,
+        EventRoom::class,
+        StudomatSubject::class,
+        Year::class
+               ],
     version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -45,4 +36,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun noteRoom(): NoteDao
     abstract fun iksicaDao(): IksicaDao
     abstract fun timetableDao(): TimeTableDao
+    abstract fun studomatDao(): StudomatDao
 }

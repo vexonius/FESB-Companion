@@ -4,7 +4,6 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("io.realm.kotlin") version "1.16.0"
     kotlin("plugin.serialization") version "2.0.0"
 }
 
@@ -116,7 +115,6 @@ dependencies {
     val lifecycleVersion = "2.8.0"
     implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("io.realm.kotlin:library-base:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     // Android Studio Preview support

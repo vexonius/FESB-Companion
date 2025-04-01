@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.studomat.di
 
+import com.tstudioz.fax.fme.database.AppDatabase
 import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatLoginService
@@ -20,7 +21,7 @@ val studomatModule = module {
     single<OkHttpClient>(named("clientStudomat")) { provideISVUPortalClient(get(), get()) }
     single { StudomatService(get(named("clientStudomat"))) }
     single { StudomatRepository(get(), get(), get()) }
-    single { StudomatDao(get()) }
+    single { getStudomatDao(get()) }
     viewModel { StudomatViewModel(get(), get(), get()) }
 }
 fun provideISVUPortalClient(
@@ -33,4 +34,8 @@ fun provideISVUPortalClient(
         .addInterceptor(interceptor)
         .cookieJar(monsterCookieJar)
         .build()
+}
+
+fun getStudomatDao(db: AppDatabase): StudomatDao {
+    return db.studomatDao()
 }
