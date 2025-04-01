@@ -13,7 +13,6 @@ import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
-import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -50,7 +49,11 @@ class IksicaViewModel(
     private fun loadReceiptsFromCache() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             _viewState.postValue(IksicaViewState.Loading)
-            val model = repository.getCache() ?: return@launch
+            val model = repository.getCache()
+            if (model == null) {
+                _viewState.postValue(IksicaViewState.Empty)
+                return@launch
+            }
 
             _viewState.postValue(IksicaViewState.Success(model))
             _studentData.postValue(model)
