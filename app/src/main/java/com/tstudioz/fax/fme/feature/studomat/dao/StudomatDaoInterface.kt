@@ -6,9 +6,7 @@ import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import com.tstudioz.fax.fme.feature.studomat.models.Year
 
 interface StudomatDaoInterface {
-    suspend fun insert(subjects: List<StudomatSubject>)
-
-    suspend fun insertYears(years: List<StudomatYearInfo>)
+    suspend fun insert(year: StudomatYear)
 
     suspend fun read(): List<StudomatSubject>
 

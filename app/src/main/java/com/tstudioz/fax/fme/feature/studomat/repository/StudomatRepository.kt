@@ -17,7 +17,7 @@ class StudomatRepository(
     private val studomatDao: StudomatDao,
 ) {
 
-    fun fetchISVUCookie():String? = studomatService.fetchISVUCookie()
+    fun fetchISVUCookie(): String? = studomatService.fetchISVUCookie()
 
     suspend fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
         val student = parseStudent(studomatService.getStudomatData())
@@ -40,8 +40,6 @@ class StudomatRepository(
         return when (val data = studomatService.getYearSubjects(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val parsedSubjects = parseCurrentYear(data.data, year)
-                studomatDao.insert(parsedSubjects.second)
-                studomatDao.insertYears(listOf(parsedSubjects.first))
                 Log.d("StudomatRepository", "getOdabranuGodinu: $parsedSubjects")
                 StudomatRepositoryResult.ChosenYearResult.Success(parsedSubjects)
             }
@@ -53,7 +51,7 @@ class StudomatRepository(
         }
     }
 
-    suspend fun readData(): List<StudomatYear> {
-        return studomatDao.readData()
-    }
+    suspend fun insert(year: StudomatYear)  = studomatDao.insert(year)
+
+    suspend fun readData(): List<StudomatYear> = studomatDao.readData()
 }

@@ -24,7 +24,7 @@ class StudomatService(private val client: OkHttpClient) {
 
         checkIfLoggedIn(body)
 
-        return if (isSuccessful && body != "") {
+        return if (isSuccessful && body.isNotEmpty()) {
             Log.d("StudomatService", "getStudomatData: ${body.substring(0, 100)}")
             body
         } else {
@@ -45,7 +45,7 @@ class StudomatService(private val client: OkHttpClient) {
 
         checkIfLoggedIn(body)
 
-        return if (isSuccessful && body != "") {
+        return if (isSuccessful && body.isNotEmpty()) {
             Log.d("StudomatService", "getUpisaneGodine: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
         } else {
@@ -65,7 +65,7 @@ class StudomatService(private val client: OkHttpClient) {
 
         checkIfLoggedIn(body)
 
-        return if (isSuccessful && body != "") {
+        return if (isSuccessful && body.isNotEmpty()) {
             Log.d("StudomatService", "getTrenutnuGodinuData: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
         } else {

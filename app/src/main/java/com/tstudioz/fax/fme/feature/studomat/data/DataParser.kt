@@ -59,7 +59,7 @@ fun parseCurrentYear(body: String, yearInfo: StudomatYearInfo): Pair<StudomatYea
             tr.selectFirst("td[data-title=Status:]")?.text() ?: "",
             tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "",
             tr.selectFirst("td[data-title=Datum ispitnog roka:]")?.text() ?: "",
-            data.title().substringAfter("godinu ") ?: "",
+            data.title().substringAfter("godinu "),
             course = course,
             (tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "") in listOf("2", "3", "4", "5"),
         )

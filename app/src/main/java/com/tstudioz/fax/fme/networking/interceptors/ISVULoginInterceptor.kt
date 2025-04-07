@@ -18,18 +18,19 @@ class ISVULoginInterceptor(
     private val userDao: UserDaoInterface
 ) : Interceptor {
 
+    private val loginMutex = Mutex()
+    @Volatile private var ongoingRefresh: CompletableDeferred<Unit>? = null
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val request: Request = chain.request()
 
-        if (!cookieJar.isISVUTokenValid()) {
+        if (!cookieJar.isISVUTokenValid() || loginMutex.isLocked) {
             runBlocking { refreshSession() }
         }
 
         return chain.proceed(request)
     }
 
-    private val loginMutex = Mutex()
-    @Volatile private var ongoingRefresh: CompletableDeferred<Unit>? = null
 
     private suspend fun refreshSession() {
         if (loginMutex.isLocked) {

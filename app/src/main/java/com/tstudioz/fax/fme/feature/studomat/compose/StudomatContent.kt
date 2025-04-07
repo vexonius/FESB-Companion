@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -47,10 +46,10 @@ fun StudomatContent(studomatData: List<StudomatYear>, onClick: () -> Unit = {}) 
             .fillMaxSize()
     ) {
         val list = studomatData.sortedByDescending { it.yearInfo.academicYear }
-        val pagerState = rememberPagerState(pageCount = { list.size })
         val pageCount = list.size
+        val pagerState = rememberPagerState(pageCount = { pageCount })
 
-        YearTitle(list[pagerState.currentPage].yearInfo)
+        list.getOrNull(pagerState.currentPage)?.yearInfo?.let { YearTitle(it) }
         DotIndicatorsStudomat(pageCount, pagerState)
 
         HorizontalPager(verticalAlignment = Alignment.Top, state = pagerState) { page ->
@@ -69,7 +68,7 @@ fun StudomatContent(studomatData: List<StudomatYear>, onClick: () -> Unit = {}) 
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.open_icon),
-                        contentDescription = "webview",
+                        contentDescription = stringResource(R.string.webview),
                         modifier = Modifier.padding(0.dp, 0.dp, 4.dp, 0.dp)
                     )
                     Text(

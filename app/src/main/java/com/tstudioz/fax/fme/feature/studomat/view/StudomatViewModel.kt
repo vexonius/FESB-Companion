@@ -13,6 +13,8 @@ import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositor
 import com.tstudioz.fax.fme.networking.NetworkUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 
@@ -79,19 +81,27 @@ class StudomatViewModel(
             if (pulldownTriggered) isRefreshing.postValue(true)
             if (networkUtils.isNetworkAvailable()) {
                 val allYearsTemp = mutableListOf<StudomatYear>()
-                freshYears.forEach { year ->
-                    when (val result = repository.getYear(year)) {
-                        is StudomatRepositoryResult.ChosenYearResult.Success -> {
-                            allYearsTemp.add(StudomatYear(result.data.first, result.data.second.sortedByNameAndSemester()))
-                        }
+                freshYears.map { year ->
+                    async {
+                        when (val result = repository.getYear(year)) {
+                            is StudomatRepositoryResult.ChosenYearResult.Success -> {
+                                val populatedYear = StudomatYear(
+                                    result.data.first,
+                                    result.data.second.sortedByNameAndSemester()
+                                )
+                                allYearsTemp.add(populatedYear)
+                                launch { repository.insert(populatedYear) }
+                            }
 
-                        is StudomatRepositoryResult.ChosenYearResult.Failure -> {
-                            snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+                            is StudomatRepositoryResult.ChosenYearResult.Failure -> {
+                                snackbarHostState.showSnackbar("Greška prilikom dohvaćanja podataka")
+                            }
                         }
                     }
-                }
-                val yearsInfo = allYearsTemp.map { it.yearInfo }
-                studomatData.postValue(allYearsTemp)
+                }.awaitAll()
+                val allYearsSorted = allYearsTemp.sortedByDescending { it.yearInfo.academicYear }
+                val yearsInfo = allYearsSorted.map { it.yearInfo }
+                studomatData.postValue(allYearsSorted)
                 yearNames.postValue(yearsInfo)
             }
             if (pulldownTriggered) isRefreshing.postValue(false)
@@ -101,5 +111,5 @@ class StudomatViewModel(
     /**
      * Get JSESSIONID cookie for webview
      */
-    fun fetchISVUCookie():String? = repository.fetchISVUCookie()
+    fun fetchISVUCookie(): String? = repository.fetchISVUCookie()
 }

@@ -9,24 +9,19 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 
 class StudomatDao(private val dbManager: DatabaseManagerInterface) : StudomatDaoInterface {
-    override suspend fun insert(subjects: List<StudomatSubject>) {
+    override suspend fun insert(year: StudomatYear) {
         val realm = Realm.open(dbManager.getDefaultConfiguration())
 
         realm.write {
-            delete(query(StudomatSubject::class, "year==$0", subjects.firstOrNull()?.year).find())
-            subjects.forEach {
-                this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
-            }
-        }
-    }
-
-    override suspend fun insertYears(years: List<StudomatYearInfo>) {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-
-        realm.write {
-            years.forEach {
+            year.yearInfo.let {
                 delete(query(StudomatYearInfo::class, "academicYear==$0 AND courseName==$1", it.academicYear, it.courseName).find())
                 this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
+            }
+            year.subjects.let{
+                delete(query(StudomatSubject::class, "year==$0", it.firstOrNull()?.year).find())
+                it.forEach {
+                    this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
+                }
             }
         }
     }
