@@ -84,9 +84,6 @@ class LoginViewModel(
             if (userExists || sharedPreferences[SPKey.LOGGED_IN, false]) {
                 loggedIn.value = Unit
             }
-            if (!userExists) {
-                repository.deleteAllUserData()
-            }
         }
     }
 

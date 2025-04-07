@@ -38,7 +38,7 @@ class UserRepository(
     override suspend fun getCurrentUserName(): String {
         when (val model = userDao.getUser()) {
             null -> {
-                logout()
+                deleteAllUserData()
                 throw IllegalStateException("User not found in database")
             }
 
@@ -49,7 +49,7 @@ class UserRepository(
     override suspend fun getCurrentUser(): UserRealm? {
         return when (val model = userDao.getUser()) {
             null -> {
-                logout()
+                deleteAllUserData()
                 null
             }
 
@@ -63,9 +63,6 @@ class UserRepository(
         sharedPreferences[SPKey.LOGGED_IN] = false
     }
 
-    suspend fun logout() {
-        deleteAllUserData()
-    }
 
     companion object {
         private val TAG = this.javaClass.canonicalName
