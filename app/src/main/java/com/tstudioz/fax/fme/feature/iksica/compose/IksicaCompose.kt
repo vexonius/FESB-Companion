@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,6 +66,7 @@ import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
 import com.tbuonomo.viewpagerdotsindicator.compose.type.BalloonIndicatorType
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.menzaLocations
+import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -101,9 +101,8 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val menzas = iksicaViewModel.menza.observeAsState().value
 
     LaunchedEffect(lifecycleState) {
-        if (lifecycleState == Lifecycle.State.RESUMED) {
-            iksicaViewModel.getReceipts()
-        }
+        if (lifecycleState == Lifecycle.State.RESUMED) iksicaViewModel.getReceipts()
+
     }
 
     if (iksicaViewModel.menzaOpened.observeAsState().value == true) {
@@ -150,6 +149,16 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         }
         return
     }
+
+    DisposableEffect(lifecycleState) {
+        onDispose {
+            if (lifecycleState == Lifecycle.State.CREATED) {
+                coroutineScope.launch {
+                    listState.scrollToItem(0)
+                }
+            }
+        }
+    }
     BottomSheetScaffold(
         sheetPeekHeight = 0.dp,
         modifier = Modifier
@@ -160,17 +169,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
         sheetContent = {
             if (receiptSelected is IksicaReceiptState.Success)
                 BottomSheetIksica(receiptSelected.data) { iksicaViewModel.hideReceiptDetails() }
-        }
-    ) {
-        DisposableEffect(lifecycleState) {
-            onDispose {
-                if (lifecycleState == Lifecycle.State.CREATED) {
-                    coroutineScope.launch {
-                        listState.scrollToItem(0)
-                    }
-                }
-            }
-        }
+        }) {
         Box(Modifier.fillMaxWidth()) {
             PullRefreshIndicator(
                 isRefreshing, pullRefreshState, Modifier
@@ -280,26 +279,20 @@ fun PopulatedIksicaView(
         }) {
             TopBarIksica(Icons.Default.Info, iksicaViewModel)
 
-            Box(Modifier.fillMaxWidth()) {
-                ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) {
-                    onCardClick()
-                }
-            }
+            ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) { onCardClick() }
         }
-
         Column(
             modifier = Modifier
                 .offset { IntOffset(0, sheetOffset.intValue) }
                 .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
                 .background(colorResource(R.color.chinese_black))
+                .noRippleClickable {}
         ) {
             if (model.receipts.isEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransakcijeText()
-                LazyColumn(
-                    state = listState
-                ) {
+                LazyColumn(Modifier.fillMaxSize(), state = listState) {
                     items(model.receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }
@@ -366,7 +359,8 @@ fun EmptyIksicaView(text: String) {
         verticalAlignment = Alignment.Top
     ) {
         Text(
-            text = text, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            text = text,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
     }
 }
