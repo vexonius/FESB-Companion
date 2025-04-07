@@ -36,13 +36,14 @@ fun NoteItem(
     markDone: (isDone: Boolean) -> Unit = { },
     delete: () -> Unit = { }
 ) {
-    val isDone = remember { mutableStateOf(note.checked ?: false) }
+    val isDone = remember { mutableStateOf(note.checked == true) }
     val longClicked = remember { mutableStateOf(false) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
+            .padding(vertical = 10.dp)
             .clip(RoundedCornerShape(20.dp))
             .combinedClickable(onLongClick = { longClicked.value = !longClicked.value }) {}
             .fillMaxWidth()
@@ -53,7 +54,8 @@ fun NoteItem(
                 painter = painterResource(id = R.drawable.trash_can_icon),
                 contentDescription = stringResource(id = R.string.delete_note_desc),
                 modifier = Modifier
-                    .size(25.dp)
+                    .size(2.dp)
+                    .padding(2.dp)
                     .noRippleClickable {
                         longClicked.value = !longClicked.value
                         delete()
@@ -74,7 +76,7 @@ fun NoteItem(
         Text(
             text = note.noteTekst ?: "",
             fontSize = 16.sp,
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(horizontal = 10.dp),
             textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None
         )
     }

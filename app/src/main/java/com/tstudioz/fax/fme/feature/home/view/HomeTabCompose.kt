@@ -48,6 +48,7 @@ import com.tstudioz.fax.fme.feature.home.compose.TodayTimetableCompose
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
+import com.tstudioz.fax.fme.util.testEvents
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -69,7 +70,6 @@ fun HomeTabCompose(
     val insertNote: (note: Note) -> Unit = homeViewModel::insert
     val deleteNote: (note: Note) -> Unit = homeViewModel::delete
     val menzaShow = remember { mutableStateOf(false) }
-    val openDialog = remember { mutableStateOf(false) }
 
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
 
@@ -114,7 +114,6 @@ fun HomeTabCompose(
                     item {
                         NotesCompose(
                             notes = notes.observeAsState().value ?: emptyList(),
-                            onClick = { openDialog.value = !openDialog.value },
                             insertNote,
                             deleteNote
                         )

@@ -83,9 +83,9 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
 fun CardCompose(title: String, description: String, color1: Color, color2: Color, onClick: () -> Unit = { }) {
     Column(
         modifier = Modifier
-            .clickable { onClick() }
             .padding(horizontal = 5.dp)
             .clip(RoundedCornerShape(10.dp))
+            .clickable { onClick() }
             .height(200.dp)
             .angledGradientBackground(
                 colors = listOf(color1, color2),

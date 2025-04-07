@@ -39,7 +39,6 @@ import java.util.UUID
 @Composable
 fun NotesCompose(
     notes: List<Note> = listOf(),
-    onClick: () -> Unit,
     insertNote: (note: Note) -> Unit = { },
     deleteNote: (note: Note) -> Unit = { }
 ) {
@@ -68,6 +67,7 @@ fun NotesCompose(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp)
+                    .clip(RoundedCornerShape(20.dp))
                     .clickable { openDialog.value = true }) {
                 Icon(
                     painter = painterResource(id = R.drawable.add_new),
@@ -82,9 +82,7 @@ fun NotesCompose(
                 )
             }
         } else {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onClick() }) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     TextField(
                         value = editMessage.value,
