@@ -19,8 +19,6 @@ class UserRepository(
     private val sessionDelegate: SessionDelegateInterface
 ) : UserRepositoryInterface {
 
-    private val router by inject<AppRouter>(AppRouter::class.java)
-
     override suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult {
         return when (val result = userService.loginUser(username, password)) {
             is NetworkServiceResult.LoginResult.Success -> {
@@ -48,11 +46,11 @@ class UserRepository(
         }
     }
 
-    override suspend fun getCurrentUser(): UserRealm {
-        when (val model = userDao.getUser()) {
+    override suspend fun getCurrentUser(): UserRealm? {
+        return when (val model = userDao.getUser()) {
             null -> {
                 logout()
-                throw IllegalStateException("User not found in database")
+                null
             }
 
             else -> return model
@@ -67,7 +65,6 @@ class UserRepository(
 
     suspend fun logout() {
         deleteAllUserData()
-        router.routeToLogin()
     }
 
     companion object {

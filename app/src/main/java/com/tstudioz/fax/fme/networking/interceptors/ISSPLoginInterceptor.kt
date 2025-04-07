@@ -1,8 +1,8 @@
 package com.tstudioz.fax.fme.networking.interceptors
 
-import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaLoginServiceInterface
+import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
@@ -15,7 +15,7 @@ import okhttp3.Response
 class ISSPLoginInterceptor(
     private val cookieJar: MonsterCookieJar,
     private val iksicaLoginService: IksicaLoginServiceInterface,
-    private val userRepository: UserRepositoryInterface
+    private val userDao: UserDaoInterface
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -41,7 +41,7 @@ class ISSPLoginInterceptor(
         val refreshJob = CompletableDeferred<Unit>().also { ongoingRefresh = it }
         loginMutex.withLock {
             try {
-                val realmModel = userRepository.getCurrentUser()
+                val realmModel = userDao.getUser() ?: throw IllegalStateException("User not found in database")
                 val user = User(realmModel.username, realmModel.password)
                 with(iksicaLoginService) {
                     getAuthState()

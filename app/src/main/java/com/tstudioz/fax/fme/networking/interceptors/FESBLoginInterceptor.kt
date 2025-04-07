@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.networking.interceptors
 
-import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
+import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import kotlinx.coroutines.runBlocking
@@ -12,7 +12,7 @@ import java.io.IOException
 class FESBLoginInterceptor(
     private val cookieJar: MonsterCookieJar,
     private val userService: UserServiceInterface,
-    private val userRepository: UserRepositoryInterface
+    private val userDao: UserDaoInterface
 ) : Interceptor {
 
     @Throws(IOException::class)
@@ -32,7 +32,7 @@ class FESBLoginInterceptor(
     }
 
     private suspend fun refreshSession() {
-        val user = userRepository.getCurrentUser()
+        val user = userDao.getUser() ?: throw IllegalStateException("User not found in database")
         userService.loginUser(user.username, user.password)
     }
 

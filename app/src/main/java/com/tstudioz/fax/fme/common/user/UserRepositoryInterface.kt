@@ -9,7 +9,7 @@ interface UserRepositoryInterface {
 
     suspend fun getCurrentUserName(): String
 
-    suspend fun getCurrentUser(): UserRealm
+    suspend fun getCurrentUser(): UserRealm?
 
     suspend fun deleteAllUserData()
 

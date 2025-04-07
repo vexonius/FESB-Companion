@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.feature.login.services
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import kotlinx.coroutines.flow.Flow
 
 interface UserServiceInterface {
 

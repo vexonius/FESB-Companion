@@ -2,7 +2,6 @@ package com.tstudioz.fax.fme.feature.login.services
 
 import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient

@@ -68,7 +68,7 @@ class LoginViewModel(
     }
 
     private fun showSnackbar(message: String) {
-        viewModelScope.launch(Dispatchers.Main) {
+        viewModelScope.launch(Dispatchers.Main + handler) {
             snackbarHostState.showSnackbar(message)
         }
     }
@@ -79,8 +79,14 @@ class LoginViewModel(
     }
 
     fun checkIfLoggedIn() {
-        if (sharedPreferences[SPKey.LOGGED_IN, false]) {
-            loggedIn.value = Unit
+        viewModelScope.launch(Dispatchers.Main + handler) {
+            val userExists = repository.getCurrentUser() != null
+            if (userExists || sharedPreferences[SPKey.LOGGED_IN, false]) {
+                loggedIn.value = Unit
+            }
+            if (!userExists) {
+                repository.deleteAllUserData()
+            }
         }
     }
 
