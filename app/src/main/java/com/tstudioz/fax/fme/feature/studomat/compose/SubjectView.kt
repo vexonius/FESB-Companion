@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.passGreen
 import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 
@@ -41,14 +43,13 @@ fun YearView(list: List<StudomatSubject>) {
         modifier = Modifier
             .padding(24.dp, 12.dp)
             .clip(RoundedCornerShape(30.dp))
-            .background(colorResource(id = R.color.raisin_black))
+            .background(MaterialTheme.colorScheme.background)
             .padding(12.dp, 24.dp)
             .fillMaxWidth()
     ) {
         Text(
             text = stringResource(R.string.enrolled_subjects),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Left,
             modifier = Modifier.padding(12.dp, 4.dp, 12.dp, 16.dp)
         )
@@ -61,7 +62,7 @@ fun SubjectsList(list: List<StudomatSubject>) {
 
     list.forEachIndexed { index, it ->
         val opened = remember { mutableStateOf(false) }
-        if (index != 0) HorizontalDivider(Modifier.padding(horizontal = 12.dp))
+        if (index != 0) HorizontalDivider(Modifier.padding(horizontal = 12.dp), color = MaterialTheme.colorScheme.outline)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -73,12 +74,12 @@ fun SubjectsList(list: List<StudomatSubject>) {
         ) {
             Text(
                 text = it.name,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Left
             )
             Text(
                 text = if (it.isPassed) it.grade else "-",
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Right
             )
         }
@@ -113,7 +114,7 @@ fun SubjectText(text: String, value: String, isPassed: Boolean = false) {
         Modifier
             .wrapContentSize()
             .clip(RoundedCornerShape(10.dp))
-            .background(colorResource(id = R.color.pass_green))
+            .background(passGreen)
             .padding(8.dp, 4.dp, 16.dp, 4.dp)
     } else {
         Modifier
@@ -132,14 +133,14 @@ fun SubjectText(text: String, value: String, isPassed: Boolean = false) {
             modifier = Modifier
                 .wrapContentSize()
                 .padding(16.dp, 0.dp, 8.dp, 0.dp),
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Left
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = value,
             modifier = gradeModifier,
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Right
         )
     }

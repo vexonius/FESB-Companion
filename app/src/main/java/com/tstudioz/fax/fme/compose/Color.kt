@@ -70,3 +70,4 @@ val welcome2 = Color(0xFF20D2BB)
 
 // Timetable
 val eventCardBackground = Color(0xFF232323)
+val passGreen = Color(0xFF02b010)

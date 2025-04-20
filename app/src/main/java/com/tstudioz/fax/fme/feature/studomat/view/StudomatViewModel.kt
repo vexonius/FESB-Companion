@@ -74,7 +74,7 @@ class StudomatViewModel(
      * Fetches subjects from each year from studomat
      */
     private fun fetchAllYears(
-        freshYears: List<StudomatYearInfo> = yearNames.value ?: emptyList(),
+        freshYears: List<StudomatYearInfo>,
         pulldownTriggered: Boolean = false
     ) {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {

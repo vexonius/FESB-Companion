@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,13 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tbuonomo.viewpagerdotsindicator.compose.DotsIndicator
 import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
 import com.tbuonomo.viewpagerdotsindicator.compose.type.BalloonIndicatorType
@@ -40,11 +38,7 @@ import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 
 @Composable
 fun StudomatContent(studomatData: List<StudomatYear>, onClick: () -> Unit = {}) {
-    Column(
-        Modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxSize()
-    ) {
+    Column(Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
         val list = studomatData.sortedByDescending { it.yearInfo.academicYear }
         val pageCount = list.size
         val pagerState = rememberPagerState(pageCount = { pageCount })
@@ -60,7 +54,7 @@ fun StudomatContent(studomatData: List<StudomatYear>, onClick: () -> Unit = {}) 
                         .padding(24.dp, 12.dp)
                         .clip(RoundedCornerShape(30.dp))
                         .clickable { onClick() }
-                        .background(colorResource(id = R.color.raisin_black))
+                        .background(MaterialTheme.colorScheme.background)
                         .padding(24.dp)
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -73,7 +67,7 @@ fun StudomatContent(studomatData: List<StudomatYear>, onClick: () -> Unit = {}) 
                     )
                     Text(
                         text = stringResource(id = R.string.open_webview),
-                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Left,
                     )
                 }
@@ -92,14 +86,13 @@ fun YearTitle(yearInfo: StudomatYearInfo) {
     ) {
         Text(
             text = yearInfo.courseName,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp)
         )
         Text(
             text = yearInfo.academicYear,
-            fontSize = 15.sp,
+            style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(16.dp, 4.dp, 16.dp, 0.dp)
         )
     }
