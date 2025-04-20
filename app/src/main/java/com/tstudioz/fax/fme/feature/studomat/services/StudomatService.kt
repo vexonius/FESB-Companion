@@ -1,9 +1,8 @@
 package com.tstudioz.fax.fme.feature.studomat.services
 
 import android.util.Log
-import com.franmontiel.persistentcookiejar.ClearableCookieJar
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import okhttp3.FormBody
+import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -23,6 +22,7 @@ class StudomatService(private val client: OkHttpClient) {
 
         return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
+            clearSession()
             throw Throwable("Not logged in!")
         } else if (isSuccessful) {
             Log.d("StudomatService", "getStudomatData: ${body.substring(0, 100)}")
@@ -45,7 +45,8 @@ class StudomatService(private val client: OkHttpClient) {
 
         return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
+            clearSession()
+            throw Throwable("Not logged in!")
         } else if (body != "") {
             Log.d("StudomatService", "getUpisaneGodine: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
@@ -66,7 +67,8 @@ class StudomatService(private val client: OkHttpClient) {
 
         return if (isSuccessful && Jsoup.parse(body).title() == "Studomat - Prijava") {
             Log.d("StudomatService", "getStudomatData: Couldn't get Studomat data!")
-            NetworkServiceResult.StudomatResult.Failure(Throwable("Not logged in!"))
+            clearSession()
+            throw Throwable("Not logged in!")
         } else if (isSuccessful) {
             Log.d("StudomatService", "getTrenutnuGodinuData: ${body.substring(0, 100)}")
             NetworkServiceResult.StudomatResult.Success(body)
@@ -75,6 +77,8 @@ class StudomatService(private val client: OkHttpClient) {
             NetworkServiceResult.StudomatResult.Failure(Throwable("Couldn't get current year data!"))
         }
     }
+
+    private fun clearSession() = (client.cookieJar as MonsterCookieJar).clearISVUCookie()
 
     companion object {
         private const val SCHEME = "https"

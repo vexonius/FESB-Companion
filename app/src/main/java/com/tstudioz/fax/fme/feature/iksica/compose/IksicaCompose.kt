@@ -5,11 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -55,6 +52,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
 import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
@@ -106,7 +104,6 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     BottomSheetScaffold(
         sheetPeekHeight = 0.dp,
         modifier = Modifier
-            .padding(WindowInsets.navigationBars.asPaddingValues())
             .pullRefresh(pullRefreshState)
             .nestedScroll(TopAppBarDefaults.pinnedScrollBehavior().nestedScrollConnection),
         scaffoldState = scaffoldState,
@@ -220,22 +217,20 @@ fun PopulatedIksicaView(
         }) {
             TopBarIksica()
 
-            Box(Modifier.fillMaxWidth()) {
-                ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) {
-                    onCardClick()
-                }
-            }
+            ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) { onCardClick() }
         }
-        Column(modifier = Modifier
-            .offset { IntOffset(0, sheetOffset.intValue) }
-            .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-            .background(MaterialTheme.colorScheme.surface)
+        Column(
+            modifier = Modifier
+                .offset { IntOffset(0, sheetOffset.intValue) }
+                .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .noRippleClickable {}
         ) {
             if (model.receipts.isEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransactionsText()
-                LazyColumn(state = listState) {
+                LazyColumn(Modifier.fillMaxSize(), state = listState) {
                     items(model.receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }

@@ -65,6 +65,14 @@ class MonsterCookieJar(
         return authCookies.isNotEmpty()
     }
 
+    fun clearISVUCookie() {
+        val cookie = persistor.loadAll().filter{
+            it.name == authCookieISVU
+        }
+        persistor.removeAll(cookie)
+        cache.removeAll { cookie.contains(it) }
+    }
+
     companion object {
 
         const val authCookieFESB = "Fesb.AuthCookie"

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -17,12 +19,23 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val localPropFileExists = File(rootDir, "local.properties").isFile
+
     signingConfigs {
         create("release") {
             storeFile = file("./../keystore.jks")
             storePassword = System.getenv("RELEASE_SIGNING_PASSWORD")
             keyAlias = System.getenv("RELEASE_KEY_ALIAS")
             keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+        }
+        if (localPropFileExists) {
+            create("releaseDebug") {
+                val localProperties = Properties().apply { load(File(rootDir, "local.properties").inputStream()) }
+                storeFile = file("./../keystore.jks")
+                storePassword = localProperties.getProperty("RELEASE_SIGNING_PASSWORD")
+                keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+                keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+            }
         }
     }
 
@@ -31,6 +44,14 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
+        }
+
+        if (localPropFileExists) {
+            create("releaseDebug") {
+                isMinifyEnabled = true
+                proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+                signingConfig = signingConfigs.getByName("releaseDebug")
+            }
         }
 
         debug {
