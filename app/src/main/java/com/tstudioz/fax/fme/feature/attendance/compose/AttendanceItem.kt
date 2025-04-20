@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,30 +22,36 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.theme_dark_surface
+import com.tstudioz.fax.fme.compose.accentRed
+import com.tstudioz.fax.fme.compose.theme_dark_primaryContainer
+import com.tstudioz.fax.fme.compose.accentGreen
+import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 
 
 @Composable
 fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
-
     Column(
         modifier = Modifier
             .padding(24.dp, 8.dp)
             .clip(RoundedCornerShape(30.dp))
-            .background(colorResource(id = R.color.raisin_black))
+            .background(theme_dark_primaryContainer)
             .padding(24.dp)
     ) {
         Text(
             text = attendanceItems.firstOrNull()?.`class` ?: "",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.contentColors.primary
         )
         attendanceItems.forEach { attendanceItem ->
             Column {
                 Text(
                     attendanceItem.type,
                     fontSize = 14.sp,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.contentColors.primary
                 )
                 Column {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -62,7 +68,8 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
                             attendanceItem.required
                         ),
                         fontSize = 12.sp,
-                        modifier = Modifier.padding(vertical = 4.dp)
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = MaterialTheme.contentColors.secondary
                     )
                 }
             }
@@ -77,9 +84,9 @@ fun AttendanceProgressBar(
     absent: Int,
     radius: Dp = 10.dp
 ) {
-    val green = colorResource(id = R.color.ufo_green)
-    val off = colorResource(id = R.color.chinese_black)
-    val red = colorResource(id = R.color.crayola)
+    val green = accentGreen
+    val off = theme_dark_surface
+    val red = accentRed
     Row {
         Canvas(
             Modifier

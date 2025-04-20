@@ -43,7 +43,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -54,6 +53,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
+import com.tstudioz.fax.fme.compose.contentColors
+import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -222,13 +223,13 @@ fun PopulatedIksicaView(
             modifier = Modifier
                 .offset { IntOffset(0, sheetOffset.intValue) }
                 .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-                .background(colorResource(R.color.chinese_black))
+                .background(MaterialTheme.colorScheme.surface)
                 .noRippleClickable {}
         ) {
             if (model.receipts.isEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
-                TransakcijeText()
+                TransactionsText()
                 LazyColumn(Modifier.fillMaxSize(), state = listState) {
                     items(model.receipts) {
                         IksicaItem(it) { onItemClick(it) }
@@ -246,18 +247,20 @@ fun TopBarIksica() {
     ) {
         Text(
             text = stringResource(id = R.string.tab_iksica),
-            fontSize = 30.sp,
-            modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 16.dp)
+            style = MaterialTheme.typography.displayMedium,
+            color = MaterialTheme.contentColors.primary,
+            modifier = Modifier.padding(16.dp)
         )
     }
 }
 
 @Composable
-fun TransakcijeText() {
+fun TransactionsText() {
     Text(
         text = stringResource(id = R.string.transactions),
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
+        color = MaterialTheme.contentColors.primary,
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 30.dp, 16.dp, 24.dp)
@@ -275,7 +278,7 @@ fun EmptyIksicaView(text: String) {
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.contentColors.secondary
         )
     }
 }

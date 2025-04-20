@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.VerticalDivider
@@ -56,7 +57,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +69,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.contentColors
+import com.tstudioz.fax.fme.compose.theme_dark_surface
+import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
+import com.tstudioz.fax.fme.compose.lust
+import com.tstudioz.fax.fme.compose.theme_dark_onSurface
+import com.tstudioz.fax.fme.compose.theme_dark_secondary
+import com.tstudioz.fax.fme.compose.welcome2
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
@@ -171,7 +178,7 @@ fun WeatherCompose(
     weather: WeatherDisplay
 ) {
     Column(
-        modifier = Modifier.background(colorResource(id = R.color.dark_cyan)),
+        modifier = Modifier.background(theme_dark_secondaryContainer),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -282,12 +289,12 @@ fun NotesCompose(
                 text = stringResource(id = R.string.notes),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(sidePadding, 5.dp, sidePadding, 0.dp),
-                color = colorResource(id = R.color.shady_blue)
+                color = MaterialTheme.contentColors.secondary
             )
         }
         Column(
             modifier = Modifier
-                .background(colorResource(id = R.color.colorPrimaryDark))
+                .background(theme_dark_surface)
                 .fillMaxWidth()
                 .padding(sidePadding, 0.dp)
         ) {
@@ -309,6 +316,7 @@ fun NotesCompose(
                     Text(
                         text = stringResource(id = R.string.add_note),
                         fontSize = 16.sp,
+                        color = MaterialTheme.contentColors.primary,
                         modifier = Modifier
                             .padding(start = 10.dp)
                     )
@@ -323,25 +331,30 @@ fun NotesCompose(
                             onValueChange = { editMessage.value = it },
                             singleLine = true,
                             colors = TextFieldDefaults.colors(
-                                focusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
-                                unfocusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
+                                focusedContainerColor = theme_dark_surface,
+                                unfocusedContainerColor = theme_dark_surface,
                             ),
                             placeholder = {
                                 Text(
                                     text = stringResource(id = R.string.enter_note),
                                     fontSize = 16.sp,
-                                    modifier = Modifier.padding(0.dp)
+                                    modifier = Modifier.padding(0.dp),
+                                    color = MaterialTheme.contentColors.primary
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(modifier = Modifier.align(Alignment.End)) {
-                            OutlinedButton(
+                            TextButton(
                                 onClick = { openDialog.value = false }
-                            ) { Text(stringResource(id = R.string.cancel_note)) }
+                            ) {
+                                Text(
+                                    stringResource(id = R.string.cancel_note),
+                                    color = MaterialTheme.contentColors.tertiary)
+                            }
                             Spacer(modifier = Modifier.width(8.dp))
-                            OutlinedButton(onClick = {
+                            TextButton(onClick = {
                                 message.value = editMessage.value
                                 openDialog.value = false
                                 editMessage.value = ""
@@ -354,7 +367,11 @@ fun NotesCompose(
                                     )
                                 )
                             }
-                            ) { Text(stringResource(id = R.string.save_note)) }
+                            ) {
+                                Text(
+                                    stringResource(id = R.string.save_note),
+                                    color = MaterialTheme.colorScheme.secondaryContainer)
+                            }
                         }
                     }
 
@@ -426,7 +443,8 @@ fun NoteItem(
             text = note.noteTekst ?: "",
             fontSize = 16.sp,
             modifier = Modifier.padding(10.dp),
-            textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None
+            textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None,
+            color = MaterialTheme.contentColors.primary
         )
     }
 }
@@ -455,7 +473,7 @@ fun TodayTimetableCompose(
             Text(
                 text = stringResource(id = R.string.todaysEvents),
                 fontSize = 13.sp,
-                color = colorResource(id = R.color.shady_blue)
+                color = MaterialTheme.contentColors.secondary
             )
         }
 
@@ -484,7 +502,7 @@ fun TodayTimetableCompose(
                     fontSize = 18.sp,
                     modifier = Modifier
                         .padding(top = 15.dp, bottom = 10.dp),
-                    color = colorResource(id = R.color.shady_blue)
+                    color = MaterialTheme.contentColors.secondary
                 )
             }
 
@@ -498,7 +516,7 @@ fun TimetableItem(event: Event) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .background(colorResource(id = R.color.colorPrimaryDark))
+            .background(color = MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
     ) {
@@ -532,23 +550,23 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
                 text = stringResource(id = R.string.prehrana),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 7.dp),
-                color = colorResource(id = R.color.shady_blue)
+                color = MaterialTheme.contentColors.secondary
             )
         }
         val context = LocalContext.current
         CardCompose(
             stringResource(id = R.string.menza_title),
             stringResource(id = R.string.menza_desc),
-            colorResource(id = R.color.welcome2),
-            colorResource(id = R.color.welcome2),
+            welcome2,
+            welcome2,
             onClick = {
                 menzaShow.value = true
             })
         CardCompose(
             stringResource(id = R.string.ugovori_title),
             stringResource(id = R.string.ugovori_desc),
-            colorResource(id = R.color.green_blue),
-            colorResource(id = R.color.lust),
+            theme_dark_secondaryContainer,
+            lust,
             onClick = {
                 val appPackageName = "com.ugovori.studentskiugovori"
                 val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
@@ -696,56 +714,3 @@ fun Modifier.angledGradientBackground(colors: List<Color>, degrees: Float, halfH
             size = size
         )
     }
-
-
-@Composable
-fun CustomDialog(
-    message: MutableState<String>,
-    openDialog: MutableState<Boolean>,
-    editMessage: MutableState<String>
-) {
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.background)
-            .padding(8.dp),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-        ) {
-            Text(text = stringResource(id = R.string.enter_note))
-            Spacer(modifier = Modifier.height(8.dp))
-            TextField(
-                value = editMessage.value,
-                onValueChange = { editMessage.value = it },
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-
-                    ),
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Button(
-                onClick = {
-                    openDialog.value = false
-                }
-            ) {
-                Text(stringResource(id = R.string.cancel_note))
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(
-                onClick = {
-                    message.value = editMessage.value
-                    openDialog.value = false
-                }
-            ) {
-                Text(stringResource(id = R.string.save_note))
-            }
-        }
-    }
-}

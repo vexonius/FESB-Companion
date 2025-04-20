@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.contentColors
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
@@ -47,14 +49,14 @@ fun SimpleCalendarTitle(
         )
         Text(
             modifier = Modifier
-                .weight(1f)
-                .testTag("MonthTitle"),
+                .weight(1f),
             text = currentMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
                 .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                 + " " + currentMonth.year.toString(),
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,
+            color = MaterialTheme.contentColors.primary
         )
         CalendarNavigationIcon(
             icon = painterResource(id = R.drawable.ic_chevron_right),
