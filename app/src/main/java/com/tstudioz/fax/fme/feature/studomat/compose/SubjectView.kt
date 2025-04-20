@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.feature.studomat.compose
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,13 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.passGreen
 import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
@@ -62,7 +57,10 @@ fun SubjectsList(list: List<StudomatSubject>) {
 
     list.forEachIndexed { index, it ->
         val opened = remember { mutableStateOf(false) }
-        if (index != 0) HorizontalDivider(Modifier.padding(horizontal = 12.dp), color = MaterialTheme.colorScheme.outline)
+        if (index != 0) HorizontalDivider(
+            Modifier.padding(horizontal = 12.dp),
+            color = MaterialTheme.colorScheme.outline
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -91,10 +89,7 @@ fun SubjectsList(list: List<StudomatSubject>) {
 @Composable
 fun SubjectView(subject: StudomatSubject) {
     Column(
-        Modifier
-            .padding(12.dp, 0.dp, 12.dp, 12.dp)
-            .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(10.dp))
-            .padding(2.dp, 8.dp)
+        Modifier.padding(14.dp, 8.dp, 14.dp, 20.dp)
     ) {
         SubjectText(text = stringResource(id = R.string.elective_group), value = subject.electiveGroup)
         SubjectText(text = stringResource(id = R.string.semester), value = subject.semester)

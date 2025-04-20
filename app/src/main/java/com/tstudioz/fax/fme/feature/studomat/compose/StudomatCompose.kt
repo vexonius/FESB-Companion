@@ -11,6 +11,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
@@ -80,7 +81,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
             Column {
                 Text(
                     text = stringResource(id = R.string.tab_studomat),
-                    fontSize = 30.sp,
+                    style = MaterialTheme.typography.displayMedium,
                     modifier = Modifier.padding(16.dp)
                 )
                 if (!studomatData.isNullOrEmpty()) {

@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.feature.studomat.compose
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +39,11 @@ import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 
 @Composable
 fun StudomatContent(studomatData: List<StudomatYear>, onClick: () -> Unit = {}) {
-    Column(Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
+    Column(
+        Modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxSize()
+    ) {
         val list = studomatData.sortedByDescending { it.yearInfo.academicYear }
         val pageCount = list.size
         val pagerState = rememberPagerState(pageCount = { pageCount })
@@ -84,12 +89,22 @@ fun YearTitle(yearInfo: StudomatYearInfo) {
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(
-            text = yearInfo.courseName,
-            style = MaterialTheme.typography.headlineLarge,
-            textAlign = TextAlign.Center,
+        Box(
+            contentAlignment = Alignment.BottomCenter,
             modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp)
-        )
+        ) {
+            // Empty text for vertical alignment purposes.
+            Text(
+                "\n",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = yearInfo.courseName,
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+            )
+        }
         Text(
             text = yearInfo.academicYear,
             style = MaterialTheme.typography.titleSmall,
