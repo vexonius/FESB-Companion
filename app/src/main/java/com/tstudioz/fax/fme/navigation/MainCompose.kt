@@ -47,11 +47,11 @@ fun MainCompose(startDestination: Any, router: HomeRouter) {
 }
 
 val topLevelRoutes = listOf(
-    TopLevelRoute(R.string.tab_iksica, Iksica, R.drawable.iksica),
-    TopLevelRoute(R.string.tab_attendance, Attendance, R.drawable.attend),
-    TopLevelRoute(R.string.tab_home, Home, R.drawable.command_line),
-    TopLevelRoute(R.string.tab_timetable, TimeTable, R.drawable.cal),
-    TopLevelRoute(R.string.tab_studomat, Studomat, R.drawable.studomat_icon),
+    TopLevelRoute(R.string.tab_iksica, Iksica, R.drawable.icon_iksica),
+    TopLevelRoute(R.string.tab_attendance, Attendance, R.drawable.icon_attendance),
+    TopLevelRoute(R.string.tab_home, Home, R.drawable.icon_home),
+    TopLevelRoute(R.string.tab_timetable, TimeTable, R.drawable.icon_timetable),
+    TopLevelRoute(R.string.tab_studomat, Studomat, R.drawable.icon_studomat),
 )
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
@@ -136,8 +136,7 @@ fun NavbarPreview() {
                     },
                     selected = true,
                     alwaysShowLabel = false,
-                    onClick = {
-                    }
+                    onClick = {}
                 )
             }
         }

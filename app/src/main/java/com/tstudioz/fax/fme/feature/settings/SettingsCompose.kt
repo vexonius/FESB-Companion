@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -18,8 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.accentBlue
+import com.tstudioz.fax.fme.compose.theme_dark_outline
+import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
+import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.routing.SettingsRouter
 import org.koin.androidx.compose.koinViewModel
 
@@ -38,6 +42,7 @@ val listItemStartPadding = 16.dp
 fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: SettingsRouter) {
     AppTheme {
         BottomSheetScaffold(
+            containerColor = theme_dark_surface,
             modifier = Modifier.fillMaxSize(),
             sheetPeekHeight = 0.dp,
             sheetContent = {
@@ -75,7 +80,9 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
             })
         {
             Column(
-                modifier = Modifier.padding(it)
+                Modifier
+                    .padding(it)
+                    .verticalScroll(rememberScrollState())
             ) {
                 CategoryTitle(title = stringResource(id = R.string.category_user))
                 SettingsItem(
@@ -133,7 +140,7 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
 
 @Composable
 fun CategoryTitle(title: String) {
-    HorizontalDivider()
+    HorizontalDivider(color = theme_dark_outline)
     Box(
         modifier = Modifier
             .padding(
@@ -147,7 +154,7 @@ fun CategoryTitle(title: String) {
         Text(
             text = title,
             modifier = Modifier.padding(start = leftPadding),
-            color = colorResource(id = R.color.blue_nice),
+            color = theme_dark_secondaryContainer,
             fontSize = 17.sp,
             fontWeight = FontWeight.Bold
         )
