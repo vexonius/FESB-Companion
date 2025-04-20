@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.util
 
-import com.tstudioz.fax.fme.compose.blueNice
-import com.tstudioz.fax.fme.compose.redNice
+import com.tstudioz.fax.fme.compose.accentBlue
+import com.tstudioz.fax.fme.compose.accentRed
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimetableType
 import java.time.LocalDateTime
@@ -11,7 +11,7 @@ val testEvents = listOf(
         id = "532059",
         name = "Kriptografija i mrežna sigurnost",
         shortName = "KIMS",
-        color = redNice,
+        color = accentRed,
         colorId = 2131099687,
         professor = "Čagalj Mario",
         eventType = TimetableType.PREDAVANJE,
@@ -25,7 +25,7 @@ val testEvents = listOf(
         id = "534198",
         name = "Metode optimizacije",
         shortName = "MO",
-        color = redNice,
+        color = accentRed,
         colorId = 2131100480,
         professor = "Bašić Martina",
         eventType = TimetableType.LABORATORIJSKA_VJEZBA,
@@ -39,7 +39,7 @@ val testEvents = listOf(
         id = "532144",
         name = "Podržano strojno učenje",
         shortName = "PSU",
-        color = blueNice,
+        color = accentBlue,
         colorId = 2131099687,
         professor = "Vasilj Josip",
         eventType = TimetableType.PREDAVANJE,
@@ -53,7 +53,7 @@ val testEvents = listOf(
         id = "532084",
         name = "Metode optimizacije",
         shortName = "MO",
-        color = blueNice,
+        color = accentBlue,
         colorId = 2131099687,
         professor = "Marasović Jadranka",
         eventType = TimetableType.PREDAVANJE,
@@ -67,7 +67,7 @@ val testEvents = listOf(
         id = "532120",
         name = "IP komunikacije",
         shortName = "IK",
-        color = blueNice,
+        color = accentBlue,
         colorId = 2131099687,
         professor = "Russo Mladen",
         eventType = TimetableType.PREDAVANJE,
@@ -81,7 +81,7 @@ val testEvents = listOf(
         id = "538989",
         name = "Podržano strojno učenje",
         shortName = "PSU",
-        color = redNice,
+        color = accentRed,
         colorId = 2131100480,
         professor = "Vasilj Josip",
         eventType = TimetableType.LABORATORIJSKA_VJEZBA,
@@ -95,7 +95,7 @@ val testEvents = listOf(
         id = "535595",
         name = "Jezici i prevoditelji",
         shortName = "JIP",
-        color = redNice,
+        color = accentRed,
         colorId = 2131100480,
         professor = "Sikora Marjan",
         eventType = TimetableType.LABORATORIJSKA_VJEZBA,
@@ -109,7 +109,7 @@ val testEvents = listOf(
         id = "535336",
         name = "IP komunikacije",
         shortName = "IK",
-        color = redNice,
+        color = accentRed,
         colorId = 2131100480,
         professor = "Meter Davor",
         eventType = TimetableType.LABORATORIJSKA_VJEZBA,

@@ -143,7 +143,7 @@ fun WeatherCompose(
     ) {
         Text(
             text = stringResource(id = R.string.hi_user, nameOfUser),
-            fontSize = 22.sp,
+            style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold
         )
         Text(
@@ -153,7 +153,7 @@ fun WeatherCompose(
                 weather.summary.lowercase(Locale.getDefault()),
                 weather.temperature
             ),
-            fontSize = 11.sp,
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }

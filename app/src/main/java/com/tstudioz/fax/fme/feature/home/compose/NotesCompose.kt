@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -24,12 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.notesContainer
 import com.tstudioz.fax.fme.database.models.Note
@@ -53,9 +52,9 @@ fun NotesCompose(
         Row {
             Text(
                 text = stringResource(id = R.string.notes),
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp)
+                modifier = Modifier.padding(top = 5.dp)
             )
         }
         val editMessage = remember { mutableStateOf("") }
@@ -76,9 +75,8 @@ fun NotesCompose(
                 )
                 Text(
                     text = stringResource(id = R.string.add_note),
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .padding(start = 10.dp)
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 10.dp)
                 )
             }
         } else {
@@ -89,14 +87,14 @@ fun NotesCompose(
                         onValueChange = { editMessage.value = it },
                         singleLine = true,
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
-                            unfocusedContainerColor = colorResource(id = R.color.colorPrimaryDark),
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            cursorColor = MaterialTheme.colorScheme.onSurface,
                         ),
                         placeholder = {
                             Text(
                                 text = stringResource(id = R.string.enter_note),
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(0.dp)
+                                style = MaterialTheme.typography.bodyMedium,
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),

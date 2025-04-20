@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -23,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,7 +44,7 @@ fun TodayTimetableCompose(events: List<Event>) {
     ) {
         Text(
             text = stringResource(id = R.string.todaysEvents),
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(12.dp, 0.dp),
         )
 
@@ -68,10 +68,9 @@ fun TodayTimetableCompose(events: List<Event>) {
                 )
                 Text(
                     text = stringResource(id = R.string.getRest),
-                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
                         .padding(top = 15.dp, bottom = 10.dp),
-                    color = colorResource(id = R.color.shady_blue)
                 )
             }
 

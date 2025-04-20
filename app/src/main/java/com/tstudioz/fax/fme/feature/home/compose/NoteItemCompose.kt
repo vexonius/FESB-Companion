@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -75,7 +76,7 @@ fun NoteItem(
         }
         Text(
             text = note.noteTekst ?: "",
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 10.dp),
             textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None
         )

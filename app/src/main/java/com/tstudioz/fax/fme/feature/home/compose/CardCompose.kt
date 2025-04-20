@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -22,6 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.lust
+import com.tstudioz.fax.fme.compose.welcome2
 import com.tstudioz.fax.fme.feature.home.view.sidePadding
 import com.tstudioz.fax.fme.feature.iksica.compose.angledGradientBackground
 
@@ -36,8 +39,8 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
             CardCompose(
                 stringResource(id = R.string.menza_title),
                 stringResource(id = R.string.menza_desc),
-                colorResource(id = R.color.welcome2),
-                colorResource(id = R.color.welcome2),
+                welcome2,
+                welcome2,
                 onClick = {
                     menzaShow.value = true
                 })
@@ -49,8 +52,8 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
             CardCompose(
                 stringResource(id = R.string.ugovori_title),
                 stringResource(id = R.string.ugovori_desc),
-                colorResource(id = R.color.green_blue),
-                colorResource(id = R.color.lust),
+                MaterialTheme.colorScheme.secondaryContainer,
+                lust,
                 onClick = {
                     val appPackageName = "com.ugovori.studentskiugovori"
                     val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
@@ -96,11 +99,11 @@ fun CardCompose(title: String, description: String, color1: Color, color2: Color
     ) {
         Text(
             text = title,
-            fontSize = 24.sp,
+            style = MaterialTheme.typography.titleLarge
         )
         Text(
             text = description,
-            fontSize = 13.sp,
+            style = MaterialTheme.typography.titleSmall
         )
     }
 }
