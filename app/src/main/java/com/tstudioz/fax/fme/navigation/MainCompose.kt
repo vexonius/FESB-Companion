@@ -47,10 +47,10 @@ fun MainCompose(startDestination: Any, router: HomeRouter) {
 }
 
 val topLevelRoutes = listOf(
-    TopLevelRoute(R.string.tab_iksica, Iksica, R.drawable.icon_card),
-    TopLevelRoute(R.string.tab_attendance, Attendance, R.drawable.icon_chart),
+    TopLevelRoute(R.string.tab_iksica, Iksica, R.drawable.icon_iksica),
+    TopLevelRoute(R.string.tab_attendance, Attendance, R.drawable.icon_attendance),
     TopLevelRoute(R.string.tab_home, Home, R.drawable.icon_home),
-    TopLevelRoute(R.string.tab_timetable, TimeTable, R.drawable.icon_calendar),
+    TopLevelRoute(R.string.tab_timetable, TimeTable, R.drawable.icon_timetable),
     TopLevelRoute(R.string.tab_studomat, Studomat, R.drawable.icon_studomat),
 )
 
