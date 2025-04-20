@@ -55,6 +55,18 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
     Scaffold(
         modifier = Modifier.pullRefresh(pullRefreshState),
         contentWindowInsets = WindowInsets(0.dp),
+        bottomBar = {
+            if (studomatViewModel.offline) {
+                Row(
+                    Modifier
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text("Nema interneta", color = MaterialTheme.colorScheme.onErrorContainer)
+                }
+            }
+        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
 
