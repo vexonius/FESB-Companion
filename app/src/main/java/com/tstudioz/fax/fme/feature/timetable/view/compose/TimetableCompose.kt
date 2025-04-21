@@ -67,7 +67,6 @@ import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -77,11 +76,11 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
 
     val showDayEvent = timetableViewModel.currentEventShown
     val shownWeekChooseMenu = timetableViewModel.shownWeekChooseMenu.observeAsState(initial = false).value
-    val lessonsToShow = timetableViewModel.events
+    val lessonsToShow = timetableViewModel.displayEvents
     val shownWeek = timetableViewModel.mondayOfSelectedWeek
     val daysInPeriods = timetableViewModel.daysInPeriods.value ?: emptyMap()
     val monthData = timetableViewModel.monthData
-    val fetchUserTimetable = { selectedDate: LocalDate -> timetableViewModel.fetchUserTimetable(selectedDate) }
+    val filterUserTimeTable = { selectedDate: LocalDate -> timetableViewModel.setMondayOfSelectedWeek(selectedDate) }
     val showEvent = { it: Event -> timetableViewModel.showEvent(it) }
     val showWeekChooseMenu = { it: Boolean -> timetableViewModel.showWeekChooseMenu(it) }
     val hideEvent = { timetableViewModel.hideEvent() }
@@ -96,7 +95,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
         when (lifecycleState) {
             Lifecycle.State.RESUMED -> {
                 timetableViewModel.resetToCurrentWeek()
-                timetableViewModel.fetchUserTimetable()
+                timetableViewModel.fetchCurrentYearUserTimetable()
             }
 
             else -> {}
@@ -129,7 +128,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                         BottomSheetCalendar(
                             monthData = it,
                             daysInPeriods = daysInPeriods,
-                            fetchUserTimetable = fetchUserTimetable,
+                            fetchUserTimetable = filterUserTimeTable,
                             coroutineScope = coroutineScope,
                             hideSheet = {
                                 coroutineScope.launch {

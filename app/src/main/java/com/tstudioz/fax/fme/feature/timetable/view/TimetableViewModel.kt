@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.feature.timetable.view
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -40,6 +41,8 @@ class TimetableViewModel(
     private var _events = MutableLiveData(timeTableRepository.events.asLiveData().value ?: emptyList())
     var events: LiveData<List<Event>> = _events
 
+    val displayEvents = MediatorLiveData<List<Event>>()
+
     private val _daysInPeriods = MutableLiveData<Map<LocalDate, TimeTableInfo>>(mutableMapOf())
     val daysInPeriods: LiveData<Map<LocalDate, TimeTableInfo>> = _daysInPeriods
 
@@ -66,38 +69,44 @@ class TimetableViewModel(
 
     init {
         fetchTimetableAgenda()
+        fetchCurrentYearUserTimetable()
+        displayEvents.addSource(events) { updateDisplayEvents() }
+        displayEvents.addSource(_mondayOfSelectedWeek) { updateDisplayEvents() }
+    }
+
+    private fun updateDisplayEvents() {
+        val eventsValue = events.value ?: return
+        val monday = _mondayOfSelectedWeek.value ?: return
+
+        displayEvents.value = eventsValue.filter { event ->
+            val eventStart = event.start.toLocalDate()
+            eventStart.isAfter(monday.minusDays(1)) && eventStart.isBefore(monday.plusDays(7))
+        }
     }
 
     fun resetToCurrentWeek() {
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            timeTableRepository.events.collect { _events.postValue(it) }
-        }
         _mondayOfSelectedWeek.postValue(
             LocalDate.now().let { it.minusDays((it.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()) })
     }
 
-    fun fetchUserTimetable() {
+    fun fetchCurrentYearUserTimetable() {
         if (networkUtils.isNetworkAvailable()) {
             val today = LocalDate.now()
-            val startDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
-            val endDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
-            fetchUserTimetable(startDate, endDate, startDate, shouldCache = true)
-        }
-    }
-
-    fun fetchUserTimetable(date: LocalDate) {
-        if (networkUtils.isNetworkAvailable()) {
-            val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
-            val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
-            _mondayOfSelectedWeek.value = startDate
-            fetchUserTimetable(startDate, endDate, startDate)
+            if (today.isBefore(LocalDate.of(today.year, 9, 22))) {
+                val startDate: LocalDate = LocalDate.of(today.year - 1, 9, 22)
+                val endDate: LocalDate = LocalDate.of(today.year, 10, 1)
+                fetchUserTimetable(startDate, endDate,shouldCache = true)
+            } else {
+                val startDate: LocalDate = LocalDate.of(today.year, 9, 20)
+                val endDate: LocalDate = LocalDate.of(today.year + 1, 10, 1)
+                fetchUserTimetable(startDate, endDate, shouldCache = true)
+            }
         }
     }
 
     private fun fetchUserTimetable(
         startDate: LocalDate,
         endDate: LocalDate,
-        shownWeekMonday: LocalDate,
         shouldCache: Boolean = false
     ) {
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
@@ -107,7 +116,6 @@ class TimetableViewModel(
         viewModelScope.launch(Dispatchers.IO + handler) {
             val username = userRepository.getCurrentUserName()
             val items = timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, shouldCache)
-            _mondayOfSelectedWeek.postValue(shownWeekMonday)
             _events.postValue(items)
         }
     }
@@ -119,6 +127,10 @@ class TimetableViewModel(
         viewModelScope.launch(Dispatchers.IO + handler) {
             _daysInPeriods.postValue(timeTableRepository.fetchTimeTableCalendar(startDate, endDate))
         }
+    }
+
+    fun setMondayOfSelectedWeek(date: LocalDate) {
+        _mondayOfSelectedWeek.value = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
     }
 
     fun showWeekChooseMenu(value: Boolean = true) {
