@@ -17,43 +17,24 @@ data class Receipt(
     val authorised: String,
     val url: String,
     var receiptDetails: List<ReceiptItem>? = null
-)
-
-fun Receipt.toRoomObject(): ReceiptRoom {
-    val receipt = this
-    val rlm = ReceiptRoom().apply {
-        restaurant = receipt.restaurant
-        date = receipt.date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-        dateString = receipt.dateString
-        time = receipt.time
-        receiptAmount = receipt.receiptAmount
-        subsidizedAmount = receipt.subsidizedAmount
-        paidAmount = receipt.paidAmount
-        authorised = receipt.authorised
-        href = receipt.url
-    }
-    return rlm
-}
-
-fun ReceiptRoom.fromRoomObject(): Receipt {
-    val receiptRealm = this
-    return Receipt(
-        restaurant = receiptRealm.restaurant ?: "",
-        date = LocalDate.parse(receiptRealm.date, DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-        dateString = receiptRealm.dateString ?: "",
-        time = receiptRealm.time ?: "",
-        receiptAmount = receiptRealm.receiptAmount ?: 0.0,
-        subsidizedAmount = receiptRealm.subsidizedAmount ?: 0.0,
-        paidAmount = receiptRealm.paidAmount ?: 0.0,
-        authorised = receiptRealm.authorised ?: "",
-        url = receiptRealm.href ?: ""
+) {
+    constructor(model: ReceiptRoom) : this(
+        restaurant = model.restaurant ?: "",
+        date = LocalDate.parse(model.date, DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+        dateString = model.dateString ?: "",
+        time = model.time ?: "",
+        receiptAmount = model.receiptAmount ?: 0.0,
+        subsidizedAmount = model.subsidizedAmount ?: 0.0,
+        paidAmount = model.paidAmount ?: 0.0,
+        authorised = model.authorised ?: "",
+        url = model.href ?: ""
     )
 }
 
 @Entity
-data class ReceiptRoom (
+data class ReceiptRoom(
     @PrimaryKey
-    var id : String = UUID.randomUUID().toString(),
+    var id: String = UUID.randomUUID().toString(),
     var restaurant: String? = null,
     var date: String? = null,
     var dateString: String? = null,
@@ -63,4 +44,16 @@ data class ReceiptRoom (
     var paidAmount: Double? = null,
     var authorised: String? = null,
     var href: String? = null
-)
+) {
+    constructor(model: Receipt) : this() {
+        restaurant = model.restaurant
+        date = model.date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+        dateString = model.dateString
+        time = model.time
+        receiptAmount = model.receiptAmount
+        subsidizedAmount = model.subsidizedAmount
+        paidAmount = model.paidAmount
+        authorised = model.authorised
+        href = model.url
+    }
+}

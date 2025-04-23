@@ -9,12 +9,12 @@ import com.tstudioz.fax.fme.database.models.NoteRoom
 
 
 @Dao
-interface NoteDao{
+interface NoteDao {
     @Query("SELECT * FROM noteroom")
     fun getNotes(): List<NoteRoom>
 
     @Insert(onConflict = REPLACE)
-    fun insert(note:NoteRoom)
+    fun insert(note: NoteRoom)
 
     @Delete
     fun delete(note: NoteRoom)

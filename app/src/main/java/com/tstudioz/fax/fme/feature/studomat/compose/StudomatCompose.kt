@@ -71,7 +71,8 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
             Lifecycle.State.RESUMED -> {
                 studomatViewModel.selectedYear.value?.let { studomatViewModel.getChosenYear(it) }
             }
-            else ->{}
+
+            else -> {}
         }
     }
 

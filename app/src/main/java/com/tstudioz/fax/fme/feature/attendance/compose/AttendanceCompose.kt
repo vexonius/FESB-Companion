@@ -108,10 +108,12 @@ fun CreateAttendanceListView(attendanceViewModel: AttendanceViewModel, snackbarH
             Row(
                 Modifier.padding(horizontal = 32.dp)
             ) {
-                FilterButton(selected = shownSemester == ShownSemester.FIRST,
+                FilterButton(
+                    selected = shownSemester == ShownSemester.FIRST,
                     text = stringResource(id = R.string.first_semester),
                     onClick = { attendanceViewModel.showSemester(ShownSemester.FIRST) })
-                FilterButton(selected = shownSemester == ShownSemester.SECOND,
+                FilterButton(
+                    selected = shownSemester == ShownSemester.SECOND,
                     text = stringResource(id = R.string.second_semester),
                     onClick = { attendanceViewModel.showSemester(ShownSemester.SECOND) })
             }

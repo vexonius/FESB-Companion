@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class StudentDataRoom(
     @PrimaryKey
-    var id:String,
+    var id: String,
     var imageUrl: String?,
     var nameSurname: String,
     var rightsLevel: String,
@@ -20,19 +20,23 @@ data class StudentDataRoom(
     var spentToday: Double,
 ) {
 
-    constructor() : this(
-        "",
-        "",
-        "",
-        "",
-        0.0,
-        "",
-        "",
-        "",
-        "",
-        "",
-        0.0,
-        0.0
+    constructor(model: StudentData) : this(
+        ID,
+        model.imageUrl,
+        model.nameSurname,
+        model.rightsLevel,
+        model.dailySupport,
+        model.oib,
+        model.jmbag,
+        model.cardNumber,
+        model.rightsFrom,
+        model.rightsTo,
+        model.balance,
+        model.spentToday
     )
+
+    companion object {
+        const val ID = "1"
+    }
 }
 

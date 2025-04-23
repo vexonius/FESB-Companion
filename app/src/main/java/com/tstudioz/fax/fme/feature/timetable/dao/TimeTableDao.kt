@@ -8,7 +8,7 @@ import com.tstudioz.fax.fme.database.models.EventRoom
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface TimeTableDao{
+interface TimeTableDao {
     @Query("DELETE FROM eventroom")
     fun deleteAll()
 

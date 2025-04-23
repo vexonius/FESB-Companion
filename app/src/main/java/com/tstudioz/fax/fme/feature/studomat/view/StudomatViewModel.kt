@@ -54,7 +54,8 @@ class StudomatViewModel(
             years.postValue(yearsRealm)
             subjectList.postValue(latestYearSubjects)
             generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
-        }}
+        }
+    }
 
 
     private fun initStudomat() {

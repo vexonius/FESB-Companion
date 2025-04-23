@@ -29,29 +29,35 @@ data class Event(
     val recurringUntil: String = "",
     val studyCode: String = "",
 ) {
-    fun toRoomObject(): EventRoom {
-        return EventRoom(
-            id = this.id,
-            name = this.name,
-            shortName = this.shortName,
-            colorId = this.colorId,
-            professor = this.professor,
-            eventType = this.eventType.name,
-            groups = this.groups,
-            classroom = this.classroom,
-            start = this.start.toString(),
-            end = this.end.toString(),
-            description = this.description,
-            recurring = this.recurring,
-            recurringType = this.recurringType.name,
-            recurringUntil = this.recurringUntil,
-            studyCode = this.studyCode,
-        )
-    }
+
+    constructor(model: EventRoom) : this(
+        id = model.id,
+        name = model.name ?: "",
+        shortName = model.shortName ?: "",
+        colorId = model.colorId ?: 0,
+        color = Color(model.colorId ?: 0),
+        professor = model.professor ?: "",
+        eventType = model.eventType?.let {
+            try {
+                TimetableType.valueOf(it)
+            } catch (error: IllegalArgumentException) {
+                TimetableType.OTHER
+            }
+        } ?: TimetableType.OTHER,
+        groups = model.groups ?: "",
+        classroom = model.classroom ?: "",
+        start = LocalDateTime.parse(model.start),
+        end = LocalDateTime.parse(model.end),
+        description = model.description,
+        recurring = model.recurring == true,
+        recurringType = Recurring.valueOf(model.recurringType ?: ""),
+        recurringUntil = model.recurringUntil ?: "",
+        studyCode = model.studyCode ?: ""
+    )
 }
 
 @Entity
-data class EventRoom (
+data class EventRoom(
     @PrimaryKey
     var id: String = "",
     var name: String? = null,
@@ -68,34 +74,24 @@ data class EventRoom (
     var recurringType: String? = null,
     var recurringUntil: String? = null,
     var studyCode: String? = null,
-)
-{
-    fun fromRoomObject(): Event {
-        return Event(
-            id = this.id,
-            name = this.name ?: "",
-            shortName = this.shortName ?: "",
-            colorId = this.colorId ?: 0,
-            color = Color(this.colorId ?: 0),
-            professor = this.professor ?: "",
-            eventType = this.eventType?.let {
-                try {
-                    TimetableType.valueOf(it)
-                } catch (error: IllegalArgumentException) {
-                    TimetableType.OTHER
-                }
-            } ?: TimetableType.OTHER,
-            groups = this.groups ?: "",
-            classroom = this.classroom ?: "",
-            start = LocalDateTime.parse(this.start),
-            end = LocalDateTime.parse(this.end),
-            description = this.description,
-            recurring = this.recurring ?: false,
-            recurringType = Recurring.valueOf(this.recurringType ?: ""),
-            recurringUntil = this.recurringUntil ?: "",
-            studyCode = this.studyCode ?: ""
-        )
-    }
+) {
+    constructor(model: Event) : this(
+        id = model.id,
+        name = model.name,
+        shortName = model.shortName,
+        colorId = model.colorId,
+        professor = model.professor,
+        eventType = model.eventType.value,
+        groups = model.groups,
+        classroom = model.classroom,
+        start = model.start.toString(),
+        end = model.end.toString(),
+        description = model.description,
+        recurring = model.recurring,
+        recurringType = model.recurringType.name,
+        recurringUntil = model.recurringUntil,
+        studyCode = model.studyCode
+    )
 }
 
 enum class Recurring {

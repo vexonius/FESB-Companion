@@ -9,7 +9,17 @@ data class UserRoom(
     var id: Int = 0,
     var username: String = "",
     var password: String = ""
-)
+) {
+    constructor(model: User) : this(
+        id = 0,
+        username = model.username,
+        password = model.password
+    )
+
+    companion object {
+        const val ID = 0
+    }
+}
 
 data class User(
     var username: String,
@@ -20,11 +30,6 @@ data class User(
 
     val email: String
         get() = "$username@fesb.hr"
-
-    fun toRoomModel(): UserRoom = UserRoom().also {
-        it.username = username
-        it.password = password
-    }
 
 }
 

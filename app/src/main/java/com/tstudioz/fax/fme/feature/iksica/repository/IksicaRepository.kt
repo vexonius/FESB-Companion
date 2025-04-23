@@ -3,12 +3,12 @@ package com.tstudioz.fax.fme.feature.iksica.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDao
-import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
+import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRoom
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
-import com.tstudioz.fax.fme.feature.iksica.models.fromRoomObject
-import com.tstudioz.fax.fme.feature.iksica.models.toRoomObject
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRoom
 import com.tstudioz.fax.fme.feature.iksica.parseDetaljeRacuna
 import com.tstudioz.fax.fme.feature.iksica.parseRacuni
 import com.tstudioz.fax.fme.feature.iksica.parseStudentInfo
@@ -23,13 +23,13 @@ class IksicaRepository(
     override suspend fun getCardDataAndReceipts(): IksicaResult.CardAndReceiptsResult {
         val studentInfo = getStudentInfo()
 
-        when(val receiptsResult = getReceipts(studentInfo.oib)) {
+        when (val receiptsResult = getReceipts(studentInfo.oib)) {
             is IksicaResult.ReceiptsResult.Success -> {
                 val receipts = receiptsResult.data
                 insert(receipts)
                 insert(studentInfo)
 
-                return IksicaResult.CardAndReceiptsResult.Success(IksicaData(studentInfo,receipts))
+                return IksicaResult.CardAndReceiptsResult.Success(IksicaData(studentInfo, receipts))
             }
 
             is IksicaResult.ReceiptsResult.Failure -> {
@@ -55,18 +55,20 @@ class IksicaRepository(
     }
 
     override suspend fun insert(model: StudentData) {
-        iksicaDao.insert(model.toRoomModel())
+        iksicaDao.insert(StudentDataRoom(model))
     }
 
     override suspend fun insert(model: List<Receipt>) {
         iksicaDao.deleteAll()
-        iksicaDao.insert(model.map { it.toRoomObject() })
+        iksicaDao.insert(model.map { ReceiptRoom(it) })
     }
 
     override suspend fun getCache(): IksicaData? {
         val model = iksicaDao.readData()
-        if (model==null) return null
-        val receipts = iksicaDao.readReceipts()?.map{it.fromRoomObject()}
+        if (model == null) return null
+
+        val receipts = iksicaDao.readReceipts()?.map { Receipt(it) }
+
         return IksicaData(StudentData(model), receipts)
     }
 

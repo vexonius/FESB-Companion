@@ -7,7 +7,7 @@ import androidx.room.Query
 import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 
 @Dao
-interface AttendanceDao{
+interface AttendanceDao {
     @Query("DELETE FROM attendanceentry")
     fun deleteAll()
 

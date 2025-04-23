@@ -11,8 +11,6 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
-import com.tstudioz.fax.fme.database.models.toNote
-import com.tstudioz.fax.fme.database.models.toNoteRoom
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.codeToDisplay
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface

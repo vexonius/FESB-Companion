@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.menza.di
 
-import com.tstudioz.fax.fme.database.AppDatabase
 import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepository
 import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import com.tstudioz.fax.fme.feature.menza.service.MenzaService

@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.timetable.repository
 
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.database.models.EventRoom
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
 import com.tstudioz.fax.fme.feature.timetable.parseTimetable
@@ -52,6 +53,7 @@ class TimeTableRepository(
 
                 return events
             }
+
             is NetworkServiceResult.TimeTableResult.Failure -> {
                 throw Exception("Timetable fetching error")
             }
@@ -73,20 +75,20 @@ class TimeTableRepository(
     }
 
     override suspend fun getCachedEvents(): List<Event> {
-        return timeTableDao.getEvents().map { it.fromRoomObject() }
+        return timeTableDao.getEvents().map { Event(it) }
     }
 
     private fun observeEventsFromCache() {
         CoroutineScope(Dispatchers.IO).launch {
-            timeTableDao.getEventsAsync().collect { events->
-                _events.emit(events.map { it.fromRoomObject() })
+            timeTableDao.getEventsAsync().collect { events ->
+                _events.emit(events.map { Event(it) })
             }
         }
     }
 
     private suspend fun insert(classes: List<Event>) {
         timeTableDao.deleteAll()
-        timeTableDao.insert(classes.map{it.toRoomObject()})
+        timeTableDao.insert(classes.map { EventRoom(it) })
     }
 
     companion object {

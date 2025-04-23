@@ -42,17 +42,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Event
-import com.tstudioz.fax.fme.database.models.TimetableType
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -91,21 +87,22 @@ fun BasicEvent(
     val bottomRadius =
         if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 8.dp
 
-    Column(modifier = modifier
-        .fillMaxSize()
-        .padding(2.dp)
-        .clipToBounds()
-        .background(
-            event.color,
-            shape = RoundedCornerShape(
-                topStart = topRadius,
-                topEnd = topRadius,
-                bottomEnd = bottomRadius,
-                bottomStart = bottomRadius,
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(2.dp)
+            .clipToBounds()
+            .background(
+                event.color,
+                shape = RoundedCornerShape(
+                    topStart = topRadius,
+                    topEnd = topRadius,
+                    bottomEnd = bottomRadius,
+                    bottomStart = bottomRadius,
+                )
             )
-        )
-        .padding(4.dp)
-        .clickable { onClick(positionedEvent.event) }) {
+            .padding(4.dp)
+            .clickable { onClick(positionedEvent.event) }) {
         Text(
             text = event.name,
             style = MaterialTheme.typography.bodySmall,
@@ -386,7 +383,8 @@ fun Schedule(
 
         }
         Column(modifier = modifier) {
-            ScheduleHeader(minDate = minDate,
+            ScheduleHeader(
+                minDate = minDate,
                 maxDate = maxDate,
                 dayWidth = dayWidth,
                 dayHeader = dayHeader,
@@ -399,7 +397,8 @@ fun Schedule(
                     .weight(1f)
                     .align(Alignment.Start)
             ) {
-                ScheduleSidebar(hourHeight = hourHeight,
+                ScheduleSidebar(
+                    hourHeight = hourHeight,
                     minTime = minTime,
                     maxTime = maxTime,
                     label = timeLabel,

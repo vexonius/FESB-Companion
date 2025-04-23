@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.common.user
 import android.content.SharedPreferences
 import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
+import com.tstudioz.fax.fme.common.user.models.UserRoom
 import com.tstudioz.fax.fme.feature.login.dao.UserDao
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -21,7 +22,7 @@ class UserRepository(
         return when (val result = userService.loginUser(user)) {
             is NetworkServiceResult.LoginResult.Success -> {
                 val user = result.data
-                userDao.insert(user.toRoomModel())
+                userDao.insert(UserRoom(user))
                 sharedPreferences[SPKey.LOGGED_IN] = true
 
                 UserRepositoryResult.LoginResult.Success(result.data)

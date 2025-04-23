@@ -37,6 +37,6 @@ fun Note.toNoteRoom(): NoteRoom {
         id = note.id ?: UUID.randomUUID().toString()
         dateCreated = note.dateCreated?.let { it.toString() }
         noteTekst = note.noteTekst
-        checked = note.checked ?: false
+        checked = note.checked == true
     }
 }

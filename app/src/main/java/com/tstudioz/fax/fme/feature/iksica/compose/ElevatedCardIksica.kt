@@ -46,35 +46,38 @@ fun ElevatedCardIksica(
     val cornersRadius = 30.dp
     val glowingRadius = 100.dp
 
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .padding(24.dp, 30.dp, 24.dp, 50.dp)
-        .aspectRatio(1.586f)
-        .drawBehind {
-            val canvasSize = size
-            drawContext.canvas.nativeCanvas.apply {
-                drawRoundRect(0f,
-                    0f,
-                    canvasSize.width, canvasSize.height,
-                    cornersRadius.toPx(), cornersRadius.toPx(),
-                    Paint().apply {
-                        isAntiAlias = true
-                        setShadowLayer(glowingRadius.toPx(), 0f, 0f, glowingColor.toArgb())
-                    })
-                drawRoundRect(0f,
-                    0f,
-                    canvasSize.width, canvasSize.height,
-                    cornersRadius.toPx(), cornersRadius.toPx(),
-                    Paint().apply {
-                        isAntiAlias = true
-                        setShadowLayer((glowingRadius / 4).toPx(), 0f, 0f, glowingColor.toArgb())
-                    })
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp, 30.dp, 24.dp, 50.dp)
+            .aspectRatio(1.586f)
+            .drawBehind {
+                val canvasSize = size
+                drawContext.canvas.nativeCanvas.apply {
+                    drawRoundRect(
+                        0f,
+                        0f,
+                        canvasSize.width, canvasSize.height,
+                        cornersRadius.toPx(), cornersRadius.toPx(),
+                        Paint().apply {
+                            isAntiAlias = true
+                            setShadowLayer(glowingRadius.toPx(), 0f, 0f, glowingColor.toArgb())
+                        })
+                    drawRoundRect(
+                        0f,
+                        0f,
+                        canvasSize.width, canvasSize.height,
+                        cornersRadius.toPx(), cornersRadius.toPx(),
+                        Paint().apply {
+                            isAntiAlias = true
+                            setShadowLayer((glowingRadius / 4).toPx(), 0f, 0f, glowingColor.toArgb())
+                        })
+                }
             }
-        }
-        .clip(shape = RoundedCornerShape(cornersRadius))
-        .angledGradientBackground(
-            colors = gradientColors, degrees = 32f
-        )) {
+            .clip(shape = RoundedCornerShape(cornersRadius))
+            .angledGradientBackground(
+                colors = gradientColors, degrees = 32f
+            )) {
         Column(
             Modifier.clickable { onClick() },
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -141,7 +144,10 @@ fun CardIksicaPopupContent(studentInfo: StudentData) {
                 .width(300.dp)
         ) {
             CardIksicaPopupRow(leftText = stringResource(R.string.name_label), rightText = studentInfo.nameSurname)
-            CardIksicaPopupRow(leftText = stringResource(R.string.rights_level_label), rightText = studentInfo.rightsLevel)
+            CardIksicaPopupRow(
+                leftText = stringResource(R.string.rights_level_label),
+                rightText = studentInfo.rightsLevel
+            )
             CardIksicaPopupRow(
                 leftText = stringResource(R.string.daily_support_label), rightText = stringResource(
                     id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", studentInfo.dailySupport)
@@ -149,8 +155,14 @@ fun CardIksicaPopupContent(studentInfo: StudentData) {
             )
             CardIksicaPopupRow(leftText = stringResource(R.string.oib_label), rightText = studentInfo.oib)
             CardIksicaPopupRow(leftText = stringResource(R.string.jmbag_label), rightText = studentInfo.jmbag)
-            CardIksicaPopupRow(leftText = stringResource(R.string.card_number_label), rightText = studentInfo.cardNumber)
-            CardIksicaPopupRow(leftText = stringResource(R.string.rights_from_label), rightText = studentInfo.rightsFrom)
+            CardIksicaPopupRow(
+                leftText = stringResource(R.string.card_number_label),
+                rightText = studentInfo.cardNumber
+            )
+            CardIksicaPopupRow(
+                leftText = stringResource(R.string.rights_from_label),
+                rightText = studentInfo.rightsFrom
+            )
             CardIksicaPopupRow(leftText = stringResource(R.string.right_until_label), rightText = studentInfo.rightsTo)
             CardIksicaPopupRow(
                 leftText = stringResource(R.string.card_balance_label), rightText = stringResource(

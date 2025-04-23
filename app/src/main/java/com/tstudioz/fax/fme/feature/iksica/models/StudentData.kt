@@ -28,22 +28,6 @@ data class StudentData(
         spentToday = model.spentToday
     )
 
-    fun toRoomModel(): StudentDataRoom =
-         StudentDataRoom(
-             "1",
-            this.imageUrl,
-            this.nameSurname,
-            this.rightsLevel,
-            this.dailySupport,
-            this.oib,
-            this.jmbag,
-            this.cardNumber,
-            this.rightsFrom,
-            this.rightsTo,
-            this.balance,
-            this.spentToday
-        )
-
     companion object {
         val empty = StudentData(
             imageUrl = null,

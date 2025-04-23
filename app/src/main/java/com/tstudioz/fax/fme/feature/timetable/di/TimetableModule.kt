@@ -15,6 +15,6 @@ val timetableModule = module {
     single<TimeTableRepositoryInterface> { TimeTableRepository(get(), get()) }
 }
 
-fun getTimeTableDao(db:AppDatabase): TimeTableDao {
+fun getTimeTableDao(db: AppDatabase): TimeTableDao {
     return db.timetableDao()
 }

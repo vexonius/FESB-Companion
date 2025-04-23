@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 class SessionDelegate(
     private val cookieJar: MonsterCookieJar,
     private val userDao: UserDao
-): SessionDelegateInterface {
+) : SessionDelegateInterface {
 
     override val onUserDeleted: Flow<Boolean>
         get() = userDao.observeUserChanges().map { it == null }

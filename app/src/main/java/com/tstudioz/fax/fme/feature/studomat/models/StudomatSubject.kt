@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class StudomatSubject(
     @PrimaryKey
-    var id:String= "",
+    var id: String = "",
     var name: String = "",
     var electiveGroup: String = "",
     var semester: String = "",

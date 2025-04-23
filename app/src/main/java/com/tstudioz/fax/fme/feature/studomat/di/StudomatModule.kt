@@ -17,17 +17,18 @@ import java.util.concurrent.TimeUnit
 
 val studomatModule = module {
     single<ISVULoginInterceptor> { ISVULoginInterceptor(get(), get(), get()) }
-    single<StudomatLoginServiceInterface>{ StudomatLoginService(get()) }
+    single<StudomatLoginServiceInterface> { StudomatLoginService(get()) }
     single<OkHttpClient>(named("clientStudomat")) { provideISVUPortalClient(get(), get()) }
     single { StudomatService(get(named("clientStudomat"))) }
     single { StudomatRepository(get(), get(), get()) }
     single { getStudomatDao(get()) }
     viewModel { StudomatViewModel(get(), get(), get()) }
 }
+
 fun provideISVUPortalClient(
     monsterCookieJar: MonsterCookieJar,
     interceptor: ISVULoginInterceptor,
-) : OkHttpClient {
+): OkHttpClient {
     return OkHttpClient.Builder()
         .callTimeout(15, TimeUnit.SECONDS)
         .connectTimeout(15, TimeUnit.SECONDS)

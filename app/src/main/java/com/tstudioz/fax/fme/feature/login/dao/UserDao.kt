@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 @Dao
-interface UserDao{
+interface UserDao {
 
     @Insert(onConflict = REPLACE)
     fun insert(user: UserRoom)

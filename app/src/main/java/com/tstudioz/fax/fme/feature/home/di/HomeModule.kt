@@ -11,12 +11,12 @@ import com.tstudioz.fax.fme.feature.home.services.WeatherServiceInterface
 import com.tstudioz.fax.fme.feature.home.view.HomeViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.koin.androidApplication
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 @OptIn(InternalCoroutinesApi::class)
 val homeModule = module {
-    single<NoteDao>{getNoteDao(get())}
+    single<NoteDao> { getNoteDao(get()) }
     single<NoteRepositoryInterface> { NoteRepository(get()) }
     single<WeatherServiceInterface> { WeatherService(get()) }
     single<WeatherRepositoryInterface> { WeatherRepository(get()) }
@@ -24,6 +24,6 @@ val homeModule = module {
 }
 
 
-fun getNoteDao(db:AppDatabase): NoteDao {
+fun getNoteDao(db: AppDatabase): NoteDao {
     return db.noteRoom()
 }

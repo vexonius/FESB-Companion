@@ -27,7 +27,7 @@ import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
         EventRoom::class,
         StudomatSubject::class,
         Year::class
-               ],
+    ],
     version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
