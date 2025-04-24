@@ -22,5 +22,5 @@ val attendanceModule = module {
 }
 
 fun getAttendanceDao(db: AppDatabase): AttendanceDao {
-    return db.attendanceDaoRoom()
+    return db.attendanceDao()
 }

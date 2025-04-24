@@ -30,29 +30,29 @@ data class Event(
     val studyCode: String = "",
 ) {
 
-    constructor(model: EventRoom) : this(
-        id = model.id,
-        name = model.name ?: "",
-        shortName = model.shortName ?: "",
-        colorId = model.colorId ?: 0,
-        color = Color(model.colorId ?: 0),
-        professor = model.professor ?: "",
-        eventType = model.eventType?.let {
+    constructor(eventRoom: EventRoom) : this(
+        id = eventRoom.id,
+        name = eventRoom.name ?: "",
+        shortName = eventRoom.shortName ?: "",
+        colorId = eventRoom.colorId ?: 0,
+        color = Color(eventRoom.colorId ?: 0),
+        professor = eventRoom.professor ?: "",
+        eventType = eventRoom.eventType?.let {
             try {
                 TimetableType.valueOf(it)
             } catch (error: IllegalArgumentException) {
                 TimetableType.OTHER
             }
         } ?: TimetableType.OTHER,
-        groups = model.groups ?: "",
-        classroom = model.classroom ?: "",
-        start = LocalDateTime.parse(model.start),
-        end = LocalDateTime.parse(model.end),
-        description = model.description,
-        recurring = model.recurring == true,
-        recurringType = Recurring.valueOf(model.recurringType ?: ""),
-        recurringUntil = model.recurringUntil ?: "",
-        studyCode = model.studyCode ?: ""
+        groups = eventRoom.groups ?: "",
+        classroom = eventRoom.classroom ?: "",
+        start = LocalDateTime.parse(eventRoom.start),
+        end = LocalDateTime.parse(eventRoom.end),
+        description = eventRoom.description,
+        recurring = eventRoom.recurring == true,
+        recurringType = Recurring.valueOf(eventRoom.recurringType ?: ""),
+        recurringUntil = eventRoom.recurringUntil ?: "",
+        studyCode = eventRoom.studyCode ?: ""
     )
 }
 
@@ -75,22 +75,22 @@ data class EventRoom(
     var recurringUntil: String? = null,
     var studyCode: String? = null,
 ) {
-    constructor(model: Event) : this(
-        id = model.id,
-        name = model.name,
-        shortName = model.shortName,
-        colorId = model.colorId,
-        professor = model.professor,
-        eventType = model.eventType.value,
-        groups = model.groups,
-        classroom = model.classroom,
-        start = model.start.toString(),
-        end = model.end.toString(),
-        description = model.description,
-        recurring = model.recurring,
-        recurringType = model.recurringType.name,
-        recurringUntil = model.recurringUntil,
-        studyCode = model.studyCode
+    constructor(event: Event) : this(
+        id = event.id,
+        name = event.name,
+        shortName = event.shortName,
+        colorId = event.colorId,
+        professor = event.professor,
+        eventType = event.eventType.value,
+        groups = event.groups,
+        classroom = event.classroom,
+        start = event.start.toString(),
+        end = event.end.toString(),
+        description = event.description,
+        recurring = event.recurring,
+        recurringType = event.recurringType.name,
+        recurringUntil = event.recurringUntil,
+        studyCode = event.studyCode
     )
 }
 

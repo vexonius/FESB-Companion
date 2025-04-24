@@ -79,4 +79,4 @@ fun getSharedPreferences(androidContext: Context): SharedPreferences {
 }
 
 const val SHARED_PREFS_NAME = "shared_prefs"
-const val DATABASE_NAME = "database-name"
+const val DATABASE_NAME = "fesbCompanionDatabase"

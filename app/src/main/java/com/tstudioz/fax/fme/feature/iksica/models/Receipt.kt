@@ -18,16 +18,16 @@ data class Receipt(
     val url: String,
     var receiptDetails: List<ReceiptItem>? = null
 ) {
-    constructor(model: ReceiptRoom) : this(
-        restaurant = model.restaurant ?: "",
-        date = LocalDate.parse(model.date, DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-        dateString = model.dateString ?: "",
-        time = model.time ?: "",
-        receiptAmount = model.receiptAmount ?: 0.0,
-        subsidizedAmount = model.subsidizedAmount ?: 0.0,
-        paidAmount = model.paidAmount ?: 0.0,
-        authorised = model.authorised ?: "",
-        url = model.href ?: ""
+    constructor(receiptRoom: ReceiptRoom) : this(
+        restaurant = receiptRoom.restaurant ?: "",
+        date = LocalDate.parse(receiptRoom.date, DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+        dateString = receiptRoom.dateString ?: "",
+        time = receiptRoom.time ?: "",
+        receiptAmount = receiptRoom.receiptAmount ?: 0.0,
+        subsidizedAmount = receiptRoom.subsidizedAmount ?: 0.0,
+        paidAmount = receiptRoom.paidAmount ?: 0.0,
+        authorised = receiptRoom.authorised ?: "",
+        url = receiptRoom.href ?: ""
     )
 }
 
@@ -45,15 +45,15 @@ data class ReceiptRoom(
     var authorised: String? = null,
     var href: String? = null
 ) {
-    constructor(model: Receipt) : this() {
-        restaurant = model.restaurant
-        date = model.date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-        dateString = model.dateString
-        time = model.time
-        receiptAmount = model.receiptAmount
-        subsidizedAmount = model.subsidizedAmount
-        paidAmount = model.paidAmount
-        authorised = model.authorised
-        href = model.url
+    constructor(receipt: Receipt) : this() {
+        restaurant = receipt.restaurant
+        date = receipt.date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+        dateString = receipt.dateString
+        time = receipt.time
+        receiptAmount = receipt.receiptAmount
+        subsidizedAmount = receipt.subsidizedAmount
+        paidAmount = receipt.paidAmount
+        authorised = receipt.authorised
+        href = receipt.url
     }
 }

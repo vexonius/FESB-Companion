@@ -20,19 +20,19 @@ data class StudentDataRoom(
     var spentToday: Double,
 ) {
 
-    constructor(model: StudentData) : this(
-        ID,
-        model.imageUrl,
-        model.nameSurname,
-        model.rightsLevel,
-        model.dailySupport,
-        model.oib,
-        model.jmbag,
-        model.cardNumber,
-        model.rightsFrom,
-        model.rightsTo,
-        model.balance,
-        model.spentToday
+    constructor(studentData: StudentData) : this(
+        id = ID,
+        imageUrl = studentData.imageUrl,
+        nameSurname = studentData.nameSurname,
+        rightsLevel = studentData.rightsLevel,
+        dailySupport = studentData.dailySupport,
+        oib = studentData.oib,
+        jmbag = studentData.jmbag,
+        cardNumber = studentData.cardNumber,
+        rightsFrom = studentData.rightsFrom,
+        rightsTo = studentData.rightsTo,
+        balance = studentData.balance,
+        spentToday = studentData.spentToday
     )
 
     companion object {

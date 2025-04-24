@@ -32,8 +32,8 @@ import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
-    abstract fun attendanceDaoRoom(): AttendanceDao
-    abstract fun noteRoom(): NoteDao
+    abstract fun attendanceDao(): AttendanceDao
+    abstract fun noteDao(): NoteDao
     abstract fun iksicaDao(): IksicaDao
     abstract fun timetableDao(): TimeTableDao
     abstract fun studomatDao(): StudomatDao

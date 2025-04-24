@@ -10,10 +10,10 @@ data class UserRoom(
     var username: String = "",
     var password: String = ""
 ) {
-    constructor(model: User) : this(
-        id = 0,
-        username = model.username,
-        password = model.password
+    constructor(user: User) : this(
+        id = ID,
+        username = user.username,
+        password = user.password
     )
 
     companion object {
@@ -26,7 +26,7 @@ data class User(
     var password: String
 ) {
 
-    constructor(model: UserRoom) : this(model.username, model.password)
+    constructor(userRoom: UserRoom) : this(userRoom.username, userRoom.password)
 
     val email: String
         get() = "$username@fesb.hr"

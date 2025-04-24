@@ -14,18 +14,18 @@ data class StudentData(
     val spentToday: Double
 ) {
 
-    constructor(model: StudentDataRoom) : this(
-        imageUrl = model.imageUrl,
-        rightsLevel = model.rightsLevel,
-        dailySupport = model.dailySupport,
-        nameSurname = model.nameSurname,
-        rightsTo = model.rightsTo,
-        rightsFrom = model.rightsFrom,
-        cardNumber = model.cardNumber,
-        oib = model.oib,
-        jmbag = model.jmbag,
-        balance = model.balance,
-        spentToday = model.spentToday
+    constructor(studentDataRoom: StudentDataRoom) : this(
+        imageUrl = studentDataRoom.imageUrl,
+        rightsLevel = studentDataRoom.rightsLevel,
+        dailySupport = studentDataRoom.dailySupport,
+        nameSurname = studentDataRoom.nameSurname,
+        rightsTo = studentDataRoom.rightsTo,
+        rightsFrom = studentDataRoom.rightsFrom,
+        cardNumber = studentDataRoom.cardNumber,
+        oib = studentDataRoom.oib,
+        jmbag = studentDataRoom.jmbag,
+        balance = studentDataRoom.balance,
+        spentToday = studentDataRoom.spentToday
     )
 
     companion object {
