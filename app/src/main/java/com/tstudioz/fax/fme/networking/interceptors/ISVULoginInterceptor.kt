@@ -31,10 +31,6 @@ class ISVULoginInterceptor(
         return chain.proceed(request)
     }
 
-    private val loginMutex = Mutex()
-    @Volatile
-    private var ongoingRefresh: CompletableDeferred<Unit>? = null
-
     private suspend fun refreshSession() {
         if (loginMutex.isLocked) {
             ongoingRefresh?.await()

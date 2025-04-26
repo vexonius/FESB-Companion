@@ -5,6 +5,7 @@ import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
 import com.tstudioz.fax.fme.feature.studomat.data.parseCurrentYear
 import com.tstudioz.fax.fme.feature.studomat.data.parseStudent
 import com.tstudioz.fax.fme.feature.studomat.data.parseYears
+import com.tstudioz.fax.fme.feature.studomat.data.sortedByNameAndSemester
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYear
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
@@ -19,7 +20,7 @@ class StudomatRepository(
 
     fun fetchISVUCookie(): String? = studomatService.fetchISVUCookie()
 
-    suspend fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
+    fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
         val student = parseStudent(studomatService.getStudomatData())
 
         return when (val result = studomatService.getYearNames()) {
@@ -38,7 +39,7 @@ class StudomatRepository(
         }
     }
 
-    suspend fun getYear(year: StudomatYearInfo): StudomatRepositoryResult.ChosenYearResult {
+    fun getYear(year: StudomatYearInfo): StudomatRepositoryResult.ChosenYearResult {
         return when (val data = studomatService.getYearSubjects(year.href)) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val parsedSubjects = parseCurrentYear(data.data, year)
@@ -53,7 +54,19 @@ class StudomatRepository(
         }
     }
 
-    suspend fun insert(year: StudomatYear)  = studomatDao.insert(year)
+    fun insert(year: StudomatYear) {
+        year.subjects.firstOrNull()?.year?.let { studomatDao.deleteAll(it) }
+        studomatDao.insert(year.subjects)
+        studomatDao.insertYears(listOf(year.yearInfo))
+    }
 
-    suspend fun readData(): List<StudomatYear> = studomatDao.readData()
+    fun readData(): List<StudomatYear> {
+        val years = studomatDao.readYears().sortedBy { it.academicYear }
+        val subjects = studomatDao.read().sortedByNameAndSemester().groupBy { it.year  }
+        return years.mapNotNull { yearInfo ->
+            subjects[yearInfo.academicYear]?.let { subjectsForYearAndCourse ->
+                StudomatYear(yearInfo, subjectsForYearAndCourse)
+            }
+        }
+    }
 }

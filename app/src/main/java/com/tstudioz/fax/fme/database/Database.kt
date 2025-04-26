@@ -14,7 +14,7 @@ import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRoom
 import com.tstudioz.fax.fme.feature.login.dao.UserDao
 import com.tstudioz.fax.fme.feature.studomat.dao.StudomatDao
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
-import com.tstudioz.fax.fme.feature.studomat.models.Year
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
 
 @Database(
@@ -26,7 +26,7 @@ import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
         ReceiptRoom::class,
         EventRoom::class,
         StudomatSubject::class,
-        Year::class
+        StudomatYearInfo::class
     ],
     version = 1
 )

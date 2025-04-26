@@ -3,21 +3,18 @@ package com.tstudioz.fax.fme.feature.studomat.data
 import com.tstudioz.fax.fme.feature.studomat.models.Student
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
-import com.tstudioz.fax.fme.feature.studomat.models.Year
 import org.jsoup.Jsoup
 
 fun parseYears(body: String): List<StudomatYearInfo> {
     val data = Jsoup.parse(body)
     val listOfYears = data.select(".price-table__item").map { element ->
-        val href = element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
-
-            StudomatYearInfo().apply {
-                id = href.split("/").lastOrNull().toString(),
+        val hrefTemp = element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
+        StudomatYearInfo().apply {
+            id = hrefTemp.split("/").lastOrNull().toString()
             courseName = element.select(".price-table__title p").getOrNull(1)?.text() ?: ""
             academicYear = element.select(".price-table__title p").getOrNull(0)?.text() ?: ""
             href = element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
         }
-
     }
     return listOfYears
 }
@@ -57,21 +54,19 @@ fun parseCurrentYear(body: String, yearInfo: StudomatYearInfo): Pair<StudomatYea
         val semester = tr.selectFirst("td[data-title=Semestar:]")?.text() ?: ""
         StudomatSubject(
             id = year + name + semester,
-            name,
-            tr.selectFirst("td[data-title=Izborna grupa:]")?.text() ?: "",
-            semester,
-            tr.selectFirst("td[data-title=Predavanja:]")?.text() ?: "",
-            tr.selectFirst("td[data-title=Vježbe:]")?.text() ?: "",
-            tr.selectFirst("td[data-title=ECTS upisano:]")?.text() ?: "",
-            tr.selectFirst("td[data-title=Polaže se:]")?.text() ?: "",
-            tr.selectFirst("td[data-title=Status:]")?.text() ?: "",
-            tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "",
-            tr.selectFirst("td[data-title=Datum ispitnog roka:]")?.text() ?: "",
-            year,
-            (tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "") in listOf("2", "3", "4", "5")
-            data.title().substringAfter("godinu "),
+            name = name,
+            electiveGroup = tr.selectFirst("td[data-title=Izborna grupa:]")?.text() ?: "",
+            semester = semester,
+            lectures = tr.selectFirst("td[data-title=Predavanja:]")?.text() ?: "",
+            exercises = tr.selectFirst("td[data-title=Vježbe:]")?.text() ?: "",
+            ectsEnrolled = tr.selectFirst("td[data-title=ECTS upisano:]")?.text() ?: "",
+            isTaken = tr.selectFirst("td[data-title=Polaže se:]")?.text() ?: "",
+            status = tr.selectFirst("td[data-title=Status:]")?.text() ?: "",
+            grade = tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "",
+            examDate = tr.selectFirst("td[data-title=Datum ispitnog roka:]")?.text() ?: "",
+            year = year,
             course = course,
-            (tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "") in listOf("2", "3", "4", "5"),
+            isPassed = (tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "") in listOf("2", "3", "4", "5"),
         )
     }
     return Pair(yearInfo, list)
