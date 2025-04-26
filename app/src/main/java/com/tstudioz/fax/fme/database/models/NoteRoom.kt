@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.database.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
+import java.time.format.DateTimeParseException
 
 data class Note(
     val id: String,
@@ -13,7 +14,13 @@ data class Note(
     constructor(noteRoom: NoteRoom) : this(
         id = noteRoom.id,
         noteTekst = noteRoom.noteTekst,
-        dateCreated = noteRoom.dateCreated.let { LocalDateTime.parse(it) },
+        dateCreated = noteRoom.dateCreated.let {
+            try {
+                LocalDateTime.parse(it)
+            } catch (e: DateTimeParseException) {
+                LocalDateTime.MIN
+            }
+        },
         checked = noteRoom.checked
     )
 }
@@ -25,7 +32,7 @@ open class NoteRoom(
     var noteTekst: String,
     var dateCreated: String,
     var checked: Boolean
-){
+) {
     constructor(note: Note) : this(
         id = note.id,
         noteTekst = note.noteTekst,

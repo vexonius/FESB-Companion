@@ -49,11 +49,11 @@ class StudomatViewModel(
 
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            val yearsRealm = repository.readYears().sortedByDescending { it.title }
-            val latestYearSubjects = repository.read(yearsRealm.firstOrNull()?.title?.substringBefore(" ") ?: "")
-            years.postValue(yearsRealm)
+            val yearsRoom = repository.readYears().sortedByDescending { it.title }
+            val latestYearSubjects = repository.read(yearsRoom.firstOrNull()?.title?.substringBefore(" ") ?: "")
+            years.postValue(yearsRoom)
             subjectList.postValue(latestYearSubjects)
-            generated.postValue(sharedPreferences.getString("gen" + yearsRealm.firstOrNull()?.title, ""))
+            generated.postValue(sharedPreferences.getString("gen" + yearsRoom.firstOrNull()?.title, ""))
         }
     }
 

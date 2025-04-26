@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class UserRoom(
     @PrimaryKey
-    var id: Int = 0,
+    var id: Int = ID,
     var username: String = "",
     var password: String = ""
 ) {
