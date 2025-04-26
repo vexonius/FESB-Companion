@@ -21,5 +21,4 @@ open class StudomatYearInfo {
     var enrollmentCompleted: Boolean = false
     var academicYear: String = ""
     var href: String = ""
-
 }
