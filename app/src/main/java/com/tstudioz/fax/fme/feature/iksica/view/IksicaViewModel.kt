@@ -49,7 +49,11 @@ class IksicaViewModel(
     private fun loadReceiptsFromCache() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             _viewState.postValue(IksicaViewState.Loading)
-            val model = repository.getCache() ?: return@launch
+            val model = repository.getCache()
+            if (model == null) {
+                _viewState.postValue(IksicaViewState.Empty)
+                return@launch
+            }
 
             _viewState.postValue(IksicaViewState.Success(model))
             _iksicaData.postValue(model)

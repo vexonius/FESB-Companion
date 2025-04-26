@@ -85,7 +85,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
             if (studomatViewModel.offline) {
                 Row(
                     Modifier
-                        .background(color = MaterialTheme.colorScheme.errorContainer)
+                        .background(MaterialTheme.colorScheme.errorContainer)
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {

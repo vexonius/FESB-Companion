@@ -5,11 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -46,7 +43,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -56,6 +52,9 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
+import com.tstudioz.fax.fme.compose.contentColors
+import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -105,7 +104,6 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     BottomSheetScaffold(
         sheetPeekHeight = 0.dp,
         modifier = Modifier
-            .padding(WindowInsets.navigationBars.asPaddingValues())
             .pullRefresh(pullRefreshState)
             .nestedScroll(TopAppBarDefaults.pinnedScrollBehavior().nestedScrollConnection),
         scaffoldState = scaffoldState,
@@ -231,13 +229,14 @@ fun PopulatedIksicaView(
             modifier = Modifier
                 .offset { IntOffset(0, sheetOffset.intValue) }
                 .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-                .background(colorResource(R.color.chinese_black))
+                .background(MaterialTheme.colorScheme.surface)
+                .noRippleClickable {}
         ) {
             val receipts = model.receipts
             if (receipts.isNullOrEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
-                TransakcijeText()
+                TransactionsText()
                 LazyColumn(state = listState) {
                     items(receipts) {
                         IksicaItem(it) { onItemClick(it) }
@@ -255,18 +254,20 @@ fun TopBarIksica() {
     ) {
         Text(
             text = stringResource(id = R.string.tab_iksica),
-            fontSize = 30.sp,
-            modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 16.dp)
+            style = MaterialTheme.typography.displayMedium,
+            color = MaterialTheme.contentColors.primary,
+            modifier = Modifier.padding(16.dp)
         )
     }
 }
 
 @Composable
-fun TransakcijeText() {
+fun TransactionsText() {
     Text(
         text = stringResource(id = R.string.transactions),
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
+        color = MaterialTheme.contentColors.primary,
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 30.dp, 16.dp, 24.dp)
@@ -284,7 +285,7 @@ fun EmptyIksicaView(text: String) {
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.contentColors.secondary
         )
     }
 }

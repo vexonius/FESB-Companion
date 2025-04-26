@@ -1,13 +1,13 @@
 package com.tstudioz.fax.fme.database.models
 
 import androidx.compose.ui.graphics.Color
+import com.tstudioz.fax.fme.compose.accentBlue
+import com.tstudioz.fax.fme.compose.accentGreen
+import com.tstudioz.fax.fme.compose.accentGrey
+import com.tstudioz.fax.fme.compose.accentPurple
+import com.tstudioz.fax.fme.compose.accentRed
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.tstudioz.fax.fme.compose.blueNice
-import com.tstudioz.fax.fme.compose.greenNice
-import com.tstudioz.fax.fme.compose.greyNice
-import com.tstudioz.fax.fme.compose.purpleNice
-import com.tstudioz.fax.fme.compose.redNice
 import java.time.LocalDateTime
 
 
@@ -111,14 +111,14 @@ enum class TimetableType(val value: String) {
 
 fun TimetableType.color(): Color {
     return when (this) {
-        TimetableType.PREDAVANJE -> blueNice
-        TimetableType.AUDITORNA_VJEZBA -> greenNice
-        TimetableType.KOLOKVIJ -> purpleNice
-        TimetableType.LABORATORIJSKA_VJEZBA -> redNice
-        TimetableType.KONSTRUKCIJSKA_VJEZBA -> greyNice
-        TimetableType.SEMINAR -> blueNice
-        TimetableType.ISPIT -> purpleNice
-        TimetableType.OTHER -> blueNice
+        TimetableType.PREDAVANJE -> accentBlue
+        TimetableType.AUDITORNA_VJEZBA -> accentGreen
+        TimetableType.KOLOKVIJ -> accentPurple
+        TimetableType.LABORATORIJSKA_VJEZBA -> accentRed
+        TimetableType.KONSTRUKCIJSKA_VJEZBA -> accentGrey
+        TimetableType.SEMINAR -> accentBlue
+        TimetableType.ISPIT -> accentPurple
+        TimetableType.OTHER -> accentBlue
     }
 }
 

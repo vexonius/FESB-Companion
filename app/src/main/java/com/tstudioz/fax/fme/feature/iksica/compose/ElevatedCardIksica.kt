@@ -27,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.compose.glowingColor
@@ -46,61 +45,45 @@ fun ElevatedCardIksica(
     val cornersRadius = 30.dp
     val glowingRadius = 100.dp
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(24.dp, 30.dp, 24.dp, 50.dp)
-            .aspectRatio(1.586f)
-            .drawBehind {
-                val canvasSize = size
-                drawContext.canvas.nativeCanvas.apply {
-                    drawRoundRect(
-                        0f,
-                        0f,
-                        canvasSize.width, canvasSize.height,
-                        cornersRadius.toPx(), cornersRadius.toPx(),
-                        Paint().apply {
-                            isAntiAlias = true
-                            setShadowLayer(glowingRadius.toPx(), 0f, 0f, glowingColor.toArgb())
-                        })
-                    drawRoundRect(
-                        0f,
-                        0f,
-                        canvasSize.width, canvasSize.height,
-                        cornersRadius.toPx(), cornersRadius.toPx(),
-                        Paint().apply {
-                            isAntiAlias = true
-                            setShadowLayer((glowingRadius / 4).toPx(), 0f, 0f, glowingColor.toArgb())
-                        })
-                }
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(24.dp, 30.dp, 24.dp, 50.dp)
+        .aspectRatio(1.586f)
+        .drawBehind {
+            val canvasSize = size
+            drawContext.canvas.nativeCanvas.apply {
+                drawRoundRect(0f,
+                    0f,
+                    canvasSize.width, canvasSize.height,
+                    cornersRadius.toPx(), cornersRadius.toPx(),
+                    Paint().apply {
+                        isAntiAlias = true
+                        setShadowLayer(glowingRadius.toPx(), 0f, 0f, glowingColor.toArgb())
+                    })
+                drawRoundRect(0f,
+                    0f,
+                    canvasSize.width, canvasSize.height,
+                    cornersRadius.toPx(), cornersRadius.toPx(),
+                    Paint().apply {
+                        isAntiAlias = true
+                        setShadowLayer((glowingRadius / 4).toPx(), 0f, 0f, glowingColor.toArgb())
+                    })
             }
-            .clip(shape = RoundedCornerShape(cornersRadius))
-            .angledGradientBackground(
-                colors = gradientColors, degrees = 32f
-            )) {
+        }
+        .clip(shape = RoundedCornerShape(cornersRadius))
+        .angledGradientBackground(colors = gradientColors, degrees = 32f)
+    ) {
         Column(
             Modifier.clickable { onClick() },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                Modifier
-                    .padding(25.dp)
-                    .weight(0.7f)
-            ) {
+            Column(Modifier
+                .padding(25.dp)
+                .weight(0.7f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(0.dp, 0.dp)
-                ) {
-                    Text(
-                        text = name, fontSize = 25.sp, fontWeight = FontWeight.Bold
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.Start
                 ) {
                     val formattedNumber = buildList {
                         add(iksicaNumber.take(6))
@@ -108,10 +91,17 @@ fun ElevatedCardIksica(
                         add(iksicaNumber.drop(8).take(10))
                         add(iksicaNumber.takeLast(1))
                     }.joinToString(" ")
-                    Text(
-                        text = formattedNumber,
-                        fontSize = 16.sp,
-                    )
+                    Column {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = formattedNumber,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
                 Row(
                     verticalAlignment = Alignment.Bottom,
@@ -122,10 +112,10 @@ fun ElevatedCardIksica(
                 ) {
                     Text(
                         text = stringResource(
-                            id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", balance)
+                            id = R.string.iksica_balance,
+                            String.format(Locale.getDefault(), "%.2f", balance)
                         ),
-                        fontSize = 25.sp,
-                        lineHeight = 25.sp,
+                        style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.ExtraBold,
                     )
                 }
@@ -184,8 +174,8 @@ fun CardIksicaPopupRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = leftText, color = MaterialTheme.colorScheme.onSurface)
-        Text(text = rightText, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = leftText, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium)
+        Text(text = rightText, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium)
     }
     if (divider) {
         HorizontalDivider(
