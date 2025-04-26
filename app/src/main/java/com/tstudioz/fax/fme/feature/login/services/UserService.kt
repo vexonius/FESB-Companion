@@ -1,9 +1,7 @@
 package com.tstudioz.fax.fme.feature.login.services
 
-import android.util.Log
 import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -12,10 +10,10 @@ import org.jsoup.Jsoup
 
 class UserService(private val client: OkHttpClient) : UserServiceInterface {
 
-    override suspend fun loginUser(username: String, password: String): NetworkServiceResult.LoginResult {
+    override suspend fun loginUser(user: User): NetworkServiceResult.LoginResult {
         val requestBody = FormBody.Builder()
-            .add("Username", username)
-            .add("Password", password)
+            .add("Username", user.username)
+            .add("Password", user.password)
             .add("IsRememberMeChecked", "true")
             .build()
 
@@ -31,9 +29,10 @@ class UserService(private val client: OkHttpClient) : UserServiceInterface {
         response.close()
 
         return if (url == targetUrl) {
-            NetworkServiceResult.LoginResult.Success(User(nameOfUser, username, password))}
-        else {
-            NetworkServiceResult.LoginResult.Failure(Throwable("Error during login"))}
+            NetworkServiceResult.LoginResult.Success(User(nameOfUser, username, password))
+        } else {
+            NetworkServiceResult.LoginResult.Failure(Throwable("Error during login"))
+        }
     }
 
     companion object {

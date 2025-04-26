@@ -12,7 +12,7 @@ sealed class StudomatRepositoryResult {
     }
 
     sealed class StudentAndYearsResult : StudomatRepositoryResult() {
-        data class Success(val data: List<Year>, val student:Student) : StudentAndYearsResult()
+        data class Success(val data: List<Year>, val student: Student) : StudentAndYearsResult()
 
         class Failure(val throwable: String) : StudentAndYearsResult()
 

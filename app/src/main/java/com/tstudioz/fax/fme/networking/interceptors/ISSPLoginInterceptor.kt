@@ -1,9 +1,8 @@
 package com.tstudioz.fax.fme.networking.interceptors
 
-import android.util.Log
 import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaLoginServiceInterface
-import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
+import com.tstudioz.fax.fme.feature.login.dao.UserDao
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
@@ -16,7 +15,7 @@ import okhttp3.Response
 class ISSPLoginInterceptor(
     private val cookieJar: MonsterCookieJar,
     private val iksicaLoginService: IksicaLoginServiceInterface,
-    private val userDao: UserDaoInterface
+    private val userDao: UserDao
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -32,7 +31,8 @@ class ISSPLoginInterceptor(
     }
 
     private val loginMutex = Mutex()
-    @Volatile private var ongoingRefresh: CompletableDeferred<Unit>? = null
+    @Volatile
+    private var ongoingRefresh: CompletableDeferred<Unit>? = null
 
     private suspend fun refreshSession() {
         if (loginMutex.isLocked) {

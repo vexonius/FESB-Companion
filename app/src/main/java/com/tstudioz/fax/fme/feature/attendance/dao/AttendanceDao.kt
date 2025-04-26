@@ -1,29 +1,19 @@
 package com.tstudioz.fax.fme.feature.attendance.dao
 
-import com.tstudioz.fax.fme.database.DatabaseManagerInterface
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.Companion.REPLACE
+import androidx.room.Query
 import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
-import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
 
-class AttendanceDao(private val dbManager: DatabaseManagerInterface) : AttendanceDaoInterface {
+@Dao
+interface AttendanceDao {
+    @Query("DELETE FROM attendanceentry")
+    fun deleteAll()
 
-    override suspend fun insert(attendance: List<AttendanceEntry>) {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
+    @Insert(onConflict = REPLACE)
+    fun insert(attendance: List<AttendanceEntry>)
 
-        realm.write {
-            delete(AttendanceEntry::class)
-            attendance.forEach {
-                this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
-            }
-        }
-    }
-
-    override suspend fun read(): List<List<AttendanceEntry>> {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-        val result = realm.query(AttendanceEntry::class).find()
-        val grouped = result.groupBy { it.`class` }.values.toList()
-
-        return grouped.sortedBy { it.first().`class` }.sortedBy { it.first().semester }
-    }
-
+    @Query("SELECT * FROM attendanceentry")
+    fun read(): List<AttendanceEntry>
 }

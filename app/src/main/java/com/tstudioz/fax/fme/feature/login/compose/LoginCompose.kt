@@ -82,8 +82,9 @@ fun LoginCompose(
         keyboardActions = KeyboardActions(onDone = { onDone() }),
         textHidden = passwordHidden,
         trailingIcon = {
-            IconButton(onClick = { passwordHidden.value = passwordHidden.value?.not() ?: false }) {
-                val iconId = if (passwordHidden.observeAsState().value == true) R.drawable.visibility_show else R.drawable.visibility_hide
+            IconButton(onClick = { passwordHidden.value = passwordHidden.value?.not() == true }) {
+                val iconId =
+                    if (passwordHidden.observeAsState().value == true) R.drawable.visibility_show else R.drawable.visibility_hide
                 Icon(
                     painter = painterResource(iconId),
                     contentDescription = "Visibility Icon",

@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
+import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
 import com.tstudioz.fax.fme.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
@@ -54,7 +55,7 @@ class LoginViewModel(
         showLoading.value = true
 
         viewModelScope.launch(Dispatchers.IO + handler) {
-            when (repository.attemptLogin(username, password)) {
+            when (repository.attemptLogin(User(username, password))) {
                 is UserRepositoryResult.LoginResult.Success -> {
                     loggedIn.postValue(Unit)
                 }
