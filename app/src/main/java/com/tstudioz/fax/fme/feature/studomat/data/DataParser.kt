@@ -3,12 +3,16 @@ package com.tstudioz.fax.fme.feature.studomat.data
 import com.tstudioz.fax.fme.feature.studomat.models.Student
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
+import com.tstudioz.fax.fme.feature.studomat.models.Year
 import org.jsoup.Jsoup
 
 fun parseYears(body: String): List<StudomatYearInfo> {
     val data = Jsoup.parse(body)
     val listOfYears = data.select(".price-table__item").map { element ->
-        StudomatYearInfo().apply {
+        val href = element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
+
+            StudomatYearInfo().apply {
+                id = href.split("/").lastOrNull().toString(),
             courseName = element.select(".price-table__title p").getOrNull(1)?.text() ?: ""
             academicYear = element.select(".price-table__title p").getOrNull(0)?.text() ?: ""
             href = element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
@@ -48,10 +52,14 @@ fun parseCurrentYear(body: String, yearInfo: StudomatYearInfo): Pair<StudomatYea
 
 
     val list: List<StudomatSubject> = data.select(".responsive-table tbody tr").map { tr ->
+        val name = tr.selectFirst("td[data-title=Naziv predmeta:]")?.text() ?: ""
+        val year = data.title().substringAfter("godinu ")
+        val semester = tr.selectFirst("td[data-title=Semestar:]")?.text() ?: ""
         StudomatSubject(
-            tr.selectFirst("td[data-title=Naziv predmeta:]")?.text() ?: "",
+            id = year + name + semester,
+            name,
             tr.selectFirst("td[data-title=Izborna grupa:]")?.text() ?: "",
-            tr.selectFirst("td[data-title=Semestar:]")?.text() ?: "",
+            semester,
             tr.selectFirst("td[data-title=Predavanja:]")?.text() ?: "",
             tr.selectFirst("td[data-title=Vježbe:]")?.text() ?: "",
             tr.selectFirst("td[data-title=ECTS upisano:]")?.text() ?: "",
@@ -59,6 +67,8 @@ fun parseCurrentYear(body: String, yearInfo: StudomatYearInfo): Pair<StudomatYea
             tr.selectFirst("td[data-title=Status:]")?.text() ?: "",
             tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "",
             tr.selectFirst("td[data-title=Datum ispitnog roka:]")?.text() ?: "",
+            year,
+            (tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "") in listOf("2", "3", "4", "5")
             data.title().substringAfter("godinu "),
             course = course,
             (tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "") in listOf("2", "3", "4", "5"),

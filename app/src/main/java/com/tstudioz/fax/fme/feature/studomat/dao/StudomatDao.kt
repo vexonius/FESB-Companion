@@ -1,55 +1,30 @@
 package com.tstudioz.fax.fme.feature.studomat.dao
 
-import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.feature.studomat.data.sortedByNameAndSemester
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.Companion.REPLACE
+import androidx.room.Query
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
-import com.tstudioz.fax.fme.feature.studomat.models.StudomatYear
-import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
-import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
+import com.tstudioz.fax.fme.feature.studomat.models.Year
 
-class StudomatDao(private val dbManager: DatabaseManagerInterface) : StudomatDaoInterface {
-    override suspend fun insert(year: StudomatYear) {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
+@Dao
+interface StudomatDao {
+    @Query("DELETE FROM Year")
+    fun deleteYears()
 
-        realm.write {
-            year.yearInfo.let {
-                delete(query(StudomatYearInfo::class, "academicYear==$0 AND courseName==$1", it.academicYear, it.courseName).find())
-                this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
-            }
-            year.subjects.let{
-                delete(query(StudomatSubject::class, "year==$0", it.firstOrNull()?.year).find())
-                it.forEach {
-                    this.copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
-                }
-            }
-        }
-    }
+    @Query("DELETE FROM StudomatSubject WHERE year = :year")
+    fun deleteAll(year: String)
 
-    override suspend fun read(): List<StudomatSubject> {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-        val result = realm.query(StudomatSubject::class).find()
+    @Insert(onConflict = REPLACE)
+    fun insertYears(years: List<Year>)
 
-        return result.sortedBy { it.name }
-    }
+    @Insert(onConflict = REPLACE)
+    fun insert(subjects: List<StudomatSubject>)
 
-    override suspend fun readYearNames(): List<StudomatYearInfo> {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-        val result = realm.query(StudomatYearInfo::class).find()
+    @Query("SELECT * FROM Year")
+    fun readYears(): List<Year>
 
-        return result.sortedBy { it.academicYear }
-    }
+    @Query("SELECT * FROM StudomatSubject WHERE year = :year")
+    fun read(year: String): List<StudomatSubject>
 
-    override suspend fun readData(): List<StudomatYear> {
-        val yearsRealmSubjects = read()
-            .sortedByNameAndSemester()
-            .groupBy { it.year to it.course }
-        return readYearNames()
-            .sortedByDescending { it.academicYear }
-            .mapNotNull { yearInfo ->
-                yearsRealmSubjects[yearInfo.academicYear to yearInfo.courseName]?.let { subjectsForYearAndCourse ->
-                    StudomatYear(yearInfo, subjectsForYearAndCourse)
-                }
-            }
-    }
 }

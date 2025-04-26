@@ -1,8 +1,8 @@
 package com.tstudioz.fax.fme.feature.iksica.repository
 
-import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
+import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 
 interface IksicaRepositoryInterface {
@@ -13,6 +13,8 @@ interface IksicaRepositoryInterface {
 
     suspend fun insert(model: StudentData)
 
-    suspend fun getCache(): StudentData?
+    suspend fun insert(model: List<Receipt>)
+
+    suspend fun getCache(): IksicaData?
 
 }

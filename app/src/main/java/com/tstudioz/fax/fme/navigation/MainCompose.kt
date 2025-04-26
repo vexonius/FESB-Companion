@@ -32,8 +32,8 @@ import com.tstudioz.fax.fme.feature.iksica.compose.IksicaCompose
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.studomat.compose.StudomatCompose
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
-import com.tstudioz.fax.fme.feature.timetable.view.compose.TimetableCompose
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
+import com.tstudioz.fax.fme.feature.timetable.view.compose.TimetableCompose
 import com.tstudioz.fax.fme.routing.HomeRouter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -43,7 +43,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MainCompose(startDestination: Any, router: HomeRouter) {
     val navController = rememberNavController()
-    AppTheme { MainNavHost(navController = navController, router = router, startDestination = startDestination ) }
+    AppTheme { MainNavHost(navController = navController, router = router, startDestination = startDestination) }
 }
 
 val topLevelRoutes = listOf(
@@ -82,7 +82,10 @@ fun MainNavHost(
             )
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = startDestination, modifier = Modifier.padding(innerPadding),
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            modifier = Modifier.padding(innerPadding),
             enterTransition = {
                 // you can change whatever you want transition
                 EnterTransition.None

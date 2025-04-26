@@ -91,6 +91,7 @@ fun makeAcronym(name: String): String {
 
     return name
 }
+
 // TODO: Improve sometime in the future
 val periodColors = mapOf(
     "Bijela" to 1,

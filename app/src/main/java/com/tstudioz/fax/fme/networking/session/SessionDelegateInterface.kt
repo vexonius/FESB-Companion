@@ -6,7 +6,7 @@ interface SessionDelegateInterface {
 
     val isSessionActive: Boolean
 
-    val onUserDeleted: Flow<Unit>
+    val onUserDeleted: Flow<Boolean>
 
     fun clearSession()
 

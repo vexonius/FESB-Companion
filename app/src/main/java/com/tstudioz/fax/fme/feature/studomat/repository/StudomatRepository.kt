@@ -25,6 +25,8 @@ class StudomatRepository(
         return when (val result = studomatService.getYearNames()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetYears = parseYears(result.data)
+                studomatDao.deleteYears()
+                studomatDao.insertYears(resultGetYears)
                 Log.d("StudomatRepository", "getYears: $resultGetYears")
                 StudomatRepositoryResult.StudentAndYearsResult.Success(resultGetYears, student)
             }

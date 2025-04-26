@@ -13,7 +13,7 @@ sealed class IksicaResult {
     }
 
     sealed class CardAndReceiptsResult : IksicaResult() {
-        data class Success(val data: StudentData) : CardAndReceiptsResult()
+        data class Success(val data: IksicaData) : CardAndReceiptsResult()
         class Failure(val throwable: Throwable) : CardAndReceiptsResult()
     }
 

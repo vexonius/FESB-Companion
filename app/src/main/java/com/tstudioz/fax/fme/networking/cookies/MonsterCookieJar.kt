@@ -67,7 +67,7 @@ class MonsterCookieJar(
     }
 
     fun clearISVUCookie() {
-        val cookie = persistor.loadAll().filter{
+        val cookie = persistor.loadAll().filter {
             it.name == authCookieISVU
         }
         persistor.removeAll(cookie)
