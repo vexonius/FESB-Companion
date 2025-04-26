@@ -40,7 +40,7 @@ fun AttendanceItem(attendanceItems: List<AttendanceEntry>) {
             .padding(24.dp)
     ) {
         Text(
-            text = attendanceItems.firstOrNull()?.`class` ?: "",
+            text = attendanceItems.firstOrNull()?.subject ?: "",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.contentColors.primary
@@ -110,7 +110,7 @@ fun PreviewAttendanceItem() {
     val attendanceItems = listOf(
         AttendanceEntry(
         ).apply {
-            `class` = "Class 1"
+            subject = "Class 1"
             type = "Type 1"
             total = 10
             attended = 5
@@ -119,7 +119,7 @@ fun PreviewAttendanceItem() {
         },
         AttendanceEntry(
         ).apply {
-            `class` = "Class 1"
+            subject = "Class 1"
             type = "Type 2"
             total = 10
             attended = 5

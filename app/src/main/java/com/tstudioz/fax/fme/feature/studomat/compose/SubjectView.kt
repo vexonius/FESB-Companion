@@ -28,10 +28,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.compose.accentGreen
+import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 
 
 @Composable
@@ -61,19 +61,30 @@ fun SubjectView(subject: StudomatSubject) {
                 Modifier.padding(4.dp, 0.dp, 0.dp, 8.dp)
             ) {
                 if (expanded) {
-                    PredmetText(text = stringResource(id = R.string.elective_group), value = subject.electiveGroup ?: "")
+                    PredmetText(
+                        text = stringResource(id = R.string.elective_group),
+                        value = subject.electiveGroup ?: ""
+                    )
                     PredmetText(text = stringResource(id = R.string.semester), value = subject.semester ?: "")
                     PredmetText(text = stringResource(id = R.string.lectures), value = subject.lectures ?: "")
                     PredmetText(text = stringResource(id = R.string.exercises), value = subject.exercises ?: "")
                     PredmetText(text = stringResource(id = R.string.ects_enrolled), value = subject.ectsEnrolled ?: "")
                     PredmetText(text = stringResource(id = R.string.is_taken), value = subject.isTaken ?: "")
-                    PredmetText(text = stringResource(id = R.string.status), value = subject.status ?: "", isPassed = subject.isPassed)
+                    PredmetText(
+                        text = stringResource(id = R.string.status),
+                        value = subject.status ?: "",
+                        isPassed = subject.isPassed
+                    )
                     PredmetText(text = stringResource(id = R.string.grade), value = subject.grade ?: "")
                     PredmetText(text = stringResource(id = R.string.exam_date), value = subject.examDate ?: "")
                 } else {
                     PredmetText(text = stringResource(id = R.string.semester), value = subject.semester ?: "")
                     PredmetText(text = stringResource(id = R.string.ects_enrolled), value = subject.ectsEnrolled ?: "")
-                    PredmetText(text = stringResource(id = R.string.status), value = subject.status ?: "", isPassed = subject.isPassed)
+                    PredmetText(
+                        text = stringResource(id = R.string.status),
+                        value = subject.status ?: "",
+                        isPassed = subject.isPassed
+                    )
                     PredmetText(text = stringResource(id = R.string.grade), value = subject.grade ?: "")
                 }
 

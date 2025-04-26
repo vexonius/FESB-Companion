@@ -24,8 +24,8 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun onBack(){
-        onBackPressedDispatcher.addCallback(this , object : OnBackPressedCallback(true) {
+    private fun onBack() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 router.popToHome()
             }
@@ -38,6 +38,7 @@ class SettingsActivity : AppCompatActivity() {
                 router.popToHome()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
