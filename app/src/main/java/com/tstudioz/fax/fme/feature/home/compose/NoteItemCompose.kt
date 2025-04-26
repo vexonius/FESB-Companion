@@ -26,7 +26,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Note
 
@@ -55,7 +54,7 @@ fun NoteItem(
                 painter = painterResource(id = R.drawable.trash_can_icon),
                 contentDescription = stringResource(id = R.string.delete_note_desc),
                 modifier = Modifier
-                    .size(2.dp)
+                    .size(25.dp)
                     .padding(2.dp)
                     .noRippleClickable {
                         longClicked.value = !longClicked.value
@@ -75,7 +74,7 @@ fun NoteItem(
             )
         }
         Text(
-            text = note.noteTekst ?: "",
+            text = note.noteTekst,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 10.dp),
             textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None

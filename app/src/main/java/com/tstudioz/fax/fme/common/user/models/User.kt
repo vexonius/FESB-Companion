@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class UserRoom(
     @PrimaryKey
     var id: Int = ID,
-    val fullName: String,
+    val fullName: String = "",
     var username: String = "",
     var password: String = ""
 ) {
@@ -29,7 +29,7 @@ data class User(
     var password: String
 ) {
 
-    constructor(userRoom: UserRealm) : this(userRoom.fullName, userRoom.username, userRoom.password)
+    constructor(userRoom: UserRoom) : this(userRoom.fullName, userRoom.username, userRoom.password)
 
     val email: String
         get() = "$username@fesb.hr"

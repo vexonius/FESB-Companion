@@ -18,8 +18,8 @@ class UserRepository(
     private val sessionDelegate: SessionDelegateInterface
 ) : UserRepositoryInterface {
 
-    override suspend fun attemptLogin(user: User): UserRepositoryResult.LoginResult {
-        return when (val result = userService.loginUser(user)) {
+    override suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult {
+        return when (val result = userService.loginUser(username, password)) {
             is NetworkServiceResult.LoginResult.Success -> {
                 val user = result.data
                 userDao.insert(UserRoom(user))
