@@ -1,14 +1,12 @@
 package com.tstudioz.fax.fme.feature.studomat.models
 
-import io.realm.kotlin.types.RealmObject
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-
-open class Year(
+@Entity
+data class Year(
+    @PrimaryKey
+    val id: String = "",
     var title: String = "",
     var href: String = ""
-): RealmObject {
-    constructor() : this("", "")
-    override fun toString(): String {
-        return "Year(title='$title', href='$href')"
-    }
-}
+)

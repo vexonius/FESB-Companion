@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,12 +60,6 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
                                 LicenceItem(
                                     title = stringResource(id = R.string.jsoup_title),
                                     supportText = stringResource(id = R.string.jsoup_desc)
-                                )
-                            }
-                            item {
-                                LicenceItem(
-                                    title = stringResource(id = R.string.realm_title),
-                                    supportText = stringResource(id = R.string.realm_desc)
                                 )
                             }
                             item {

@@ -11,8 +11,6 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
-import com.tstudioz.fax.fme.database.models.toNote
-import com.tstudioz.fax.fme.database.models.toNoteRealm
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.codeToDisplay
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
@@ -109,14 +107,14 @@ class HomeViewModel(
             _notes.value = _notes.value?.plus(note)
         }
         viewModelScope.launch(Dispatchers.IO + handler) {
-            noteRepository.insert(note.toNoteRealm())
+            noteRepository.insert(note)
         }
     }
 
     fun delete(note: Note) {
         _notes.value = _notes.value?.minus(note)
         viewModelScope.launch(Dispatchers.IO + handler) {
-            noteRepository.delete(note.toNoteRealm())
+            noteRepository.delete(note)
         }
     }
 
@@ -130,7 +128,7 @@ class HomeViewModel(
     private fun getNotes() {
         viewModelScope.launch(Dispatchers.IO + handler) {
             val notes = noteRepository.getNotes()
-            _notes.postValue(notes.map { it.toNote() })
+            _notes.postValue(notes)
         }
     }
 

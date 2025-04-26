@@ -55,8 +55,8 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
 import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.compose.theme_dark_surface
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
@@ -78,7 +78,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val nestedSheetState = rememberNestedSheetState(composableHeight = 999, sheetOffset = 999)
 
     val receiptSelected = iksicaViewModel.receiptSelected.observeAsState().value
-    val studentData = iksicaViewModel.studentData.observeAsState().value
+    val iksicaData = iksicaViewModel.iksicaData.observeAsState().value
     val viewState = iksicaViewModel.viewState.observeAsState().value ?: IksicaViewState.Loading
 
     val isRefreshing = viewState is IksicaViewState.Fetching || viewState is IksicaViewState.Loading
@@ -147,9 +147,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     }
 
     PopupBox(showPopup = showPopup.value, onClickOutside = { showPopup.value = !showPopup.value }) {
-        if (studentData != null) {
-            CardIksicaPopupContent(studentData)
-        }
+        iksicaData?.studentData?.let { CardIksicaPopupContent(it) }
     }
 }
 
@@ -172,7 +170,7 @@ fun EmptyIksicaView() {
 
 @Composable
 fun PopulatedIksicaView(
-    model: StudentData,
+    model: IksicaData,
     listState: LazyListState,
     nestedSheetState: NestedSheetState,
     onCardClick: () -> Unit,
@@ -217,7 +215,15 @@ fun PopulatedIksicaView(
         }) {
             TopBarIksica()
 
-            ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) { onCardClick() }
+            Box(Modifier.fillMaxWidth()) {
+                ElevatedCardIksica(
+                    model.studentData.nameSurname,
+                    model.studentData.cardNumber,
+                    model.studentData.balance
+                ) {
+                    onCardClick()
+                }
+            }
         }
         Column(
             modifier = Modifier
@@ -226,12 +232,13 @@ fun PopulatedIksicaView(
                 .background(MaterialTheme.colorScheme.surface)
                 .noRippleClickable {}
         ) {
-            if (model.receipts.isEmpty()) {
+            val receipts = model.receipts
+            if (receipts.isNullOrEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransactionsText()
-                LazyColumn(Modifier.fillMaxSize(), state = listState) {
-                    items(model.receipts) {
+                LazyColumn(state = listState) {
+                    items(receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }
                 }

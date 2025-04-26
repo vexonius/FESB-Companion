@@ -1,31 +1,21 @@
 package com.tstudioz.fax.fme.feature.home.dao
 
-import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.database.models.NoteRealm
-import com.tstudioz.fax.fme.feature.menza.dao.interfaces.NoteDaoInterface
-import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.query
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.Companion.REPLACE
+import androidx.room.Query
+import com.tstudioz.fax.fme.database.models.NoteRoom
 
-class NoteDao(private val dbManager: DatabaseManagerInterface) : NoteDaoInterface {
 
-    override suspend fun getNotes(): List<NoteRealm> {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-        return realm.query<NoteRealm>().find()
-    }
+@Dao
+interface NoteDao {
+    @Query("SELECT * FROM noteroom")
+    fun getNotes(): List<NoteRoom>
 
-    override suspend fun insert(note: NoteRealm) {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-        realm.write {
-            this.copyToRealm(note, updatePolicy = UpdatePolicy.ALL)
-        }
-    }
+    @Insert(onConflict = REPLACE)
+    fun insert(note: NoteRoom)
 
-    override suspend fun delete(note: NoteRealm) {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-        realm.write {
-            this.delete(this.query<NoteRealm>("id = $0", note.id).find())
-        }
-    }
-
+    @Delete
+    fun delete(note: NoteRoom)
 }

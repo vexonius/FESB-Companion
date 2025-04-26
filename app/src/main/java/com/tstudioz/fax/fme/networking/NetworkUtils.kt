@@ -3,12 +3,11 @@ package com.tstudioz.fax.fme.networking
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 
 class NetworkUtils(private val context: Context) {
     /**
-    * Check if the device is connected to the internet
-    * return true if connected, false otherwise
+     * Check if the device is connected to the internet
+     * return true if connected, false otherwise
      **/
     fun isNetworkAvailable(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

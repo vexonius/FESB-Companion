@@ -1,21 +1,35 @@
 package com.tstudioz.fax.fme.common.user.models
 
-import com.tstudioz.fax.fme.database.models.UserRealm
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
+data class UserRoom(
+    @PrimaryKey
+    var id: Int = ID,
+    var username: String = "",
+    var password: String = ""
+) {
+    constructor(user: User) : this(
+        id = ID,
+        username = user.username,
+        password = user.password
+    )
+
+    companion object {
+        const val ID = 0
+    }
+}
 
 data class User(
     var username: String,
     var password: String
 ) {
 
-    constructor(model: UserRealm) : this(model.username, model.password)
+    constructor(userRoom: UserRoom) : this(userRoom.username, userRoom.password)
 
     val email: String
         get() = "$username@fesb.hr"
-
-    fun toRealmModel(): UserRealm = UserRealm().also {
-        it.username = username
-        it.password = password
-    }
 
 }
 

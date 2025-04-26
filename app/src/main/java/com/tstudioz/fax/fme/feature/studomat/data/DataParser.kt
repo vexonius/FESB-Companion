@@ -8,9 +8,12 @@ import org.jsoup.Jsoup
 fun parseYears(body: String): List<Year> {
     val data = Jsoup.parse(body)
     val listOfYears = data.select(".price-table__item").map { element ->
+        val href = element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
+        val title = element.selectFirst(".price-table__title")?.text() ?: ""
         Year(
-            element.selectFirst(".price-table__title")?.text() ?: "",
-            element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
+            id = href.split("/").lastOrNull().toString(),
+            title,
+            href
         )
     }
     return listOfYears
@@ -28,10 +31,14 @@ fun parseStudent(body: String): Student {
 fun parseCurrentYear(body: String): Pair<List<StudomatSubject>, String> {
     val data = Jsoup.parse(body)
     val list: List<StudomatSubject> = data.select(".responsive-table tbody tr").map { tr ->
+        val name = tr.selectFirst("td[data-title=Naziv predmeta:]")?.text() ?: ""
+        val year = data.title().substringAfter("godinu ")
+        val semester = tr.selectFirst("td[data-title=Semestar:]")?.text() ?: ""
         StudomatSubject(
-            tr.selectFirst("td[data-title=Naziv predmeta:]")?.text() ?: "",
+            id = year + name + semester,
+            name,
             tr.selectFirst("td[data-title=Izborna grupa:]")?.text() ?: "",
-            tr.selectFirst("td[data-title=Semestar:]")?.text() ?: "",
+            semester,
             tr.selectFirst("td[data-title=Predavanja:]")?.text() ?: "",
             tr.selectFirst("td[data-title=Vježbe:]")?.text() ?: "",
             tr.selectFirst("td[data-title=ECTS upisano:]")?.text() ?: "",
@@ -39,7 +46,7 @@ fun parseCurrentYear(body: String): Pair<List<StudomatSubject>, String> {
             tr.selectFirst("td[data-title=Status:]")?.text() ?: "",
             tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "",
             tr.selectFirst("td[data-title=Datum ispitnog roka:]")?.text() ?: "",
-            data.title().substringAfter("godinu ") ?: "",
+            year,
             (tr.selectFirst("td[data-title=Ocjena:]")?.text() ?: "") in listOf("2", "3", "4", "5")
         )
     }
