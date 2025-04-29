@@ -87,6 +87,7 @@
     <string name="open_webview">Upravljaj kolegijima i prijavi ispite online</string>
     <string name="no_data">Nema podataka za prikazati.</string>
     <string name="webview">webview</string>
+    <string name="page_not_found">page not found</string>
 
 
     <string name="weather_temp">%1$.0f°</string>

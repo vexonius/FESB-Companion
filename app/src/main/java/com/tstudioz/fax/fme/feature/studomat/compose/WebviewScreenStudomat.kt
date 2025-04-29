@@ -6,6 +6,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +38,6 @@ fun WebViewScreen(studomatViewModel: StudomatViewModel) {
             webview.loadUrl("https://www.isvu.hr/studomat/hr/ispit/ponudapredmetazaprijavuispita")
             webview
         },
-        modifier = Modifier.background(Color.Black).fillMaxSize(),
+        modifier = Modifier.background(MaterialTheme.colorScheme.surface).fillMaxSize(),
     )
 }

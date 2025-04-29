@@ -148,8 +148,6 @@ dependencies {
     //horizontal pager
     implementation("com.tbuonomo:dotsindicator:5.1.0")
 
-
-
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")

@@ -28,7 +28,7 @@ fun EmptyStudomatView() {
     ) {
         Icon(
             painter = painterResource(id = R.drawable.no_data_icon),
-            contentDescription = "page_not_found",
+            contentDescription = stringResource(R.string.page_not_found),
             modifier = Modifier
                 .padding(12.dp, 80.dp, 12.dp, 12.dp)
                 .size(80.dp)
