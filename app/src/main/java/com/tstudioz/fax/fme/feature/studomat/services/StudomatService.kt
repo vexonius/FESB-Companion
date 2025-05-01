@@ -10,8 +10,6 @@ import org.jsoup.Jsoup
 
 class StudomatService(private val client: OkHttpClient) {
 
-    fun fetchISVUCookie():String? = (client.cookieJar as MonsterCookieJar).getISVUCookieForWebView()
-
     fun getStudomatData(): String {
 
         val request = Request.Builder()

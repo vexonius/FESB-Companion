@@ -33,6 +33,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.studomatBlue
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
+import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -45,6 +47,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
         studomatViewModel.getStudomatData(pulldownTriggered = true)
     })
     val openedWebview = remember { mutableStateOf(false) }
+    val cookieJar = koinInject<MonsterCookieJar>()
 
     val lifecycleState = LocalLifecycleOwner.current.lifecycle.currentState
     LaunchedEffect(lifecycleState) {
@@ -61,7 +64,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
 
         if (openedWebview.value) {
             BackHandler { openedWebview.value = false }
-            WebViewScreen(studomatViewModel)
+            WebViewScreen(cookieJar)
             return@Scaffold
         }
         Box(

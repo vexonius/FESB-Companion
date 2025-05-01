@@ -18,8 +18,6 @@ class StudomatRepository(
     private val studomatDao: StudomatDao,
 ) {
 
-    fun fetchISVUCookie(): String? = studomatService.fetchISVUCookie()
-
     fun getStudomatDataAndYears(): StudomatRepositoryResult.StudentAndYearsResult {
         val student = parseStudent(studomatService.getStudomatData())
 

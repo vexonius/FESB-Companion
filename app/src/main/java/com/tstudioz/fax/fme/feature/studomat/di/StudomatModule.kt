@@ -22,7 +22,7 @@ val studomatModule = module {
     single { StudomatService(get(named("clientStudomat"))) }
     single { StudomatRepository(get(), get()) }
     single { getStudomatDao(get()) }
-    viewModel { StudomatViewModel(get(), get()) }
+    viewModel { StudomatViewModel(get(), get(), get()) }
 }
 
 fun provideISVUPortalClient(

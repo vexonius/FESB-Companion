@@ -12,11 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
+import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewScreen(studomatViewModel: StudomatViewModel) {
+fun WebViewScreen(cookieJar: MonsterCookieJar) {
     AndroidView(
         factory = { context ->
             val webview = WebView(context).apply {
@@ -28,7 +29,7 @@ fun WebViewScreen(studomatViewModel: StudomatViewModel) {
                 settings.setSupportZoom(true)
             }
             val cookieManager = CookieManager.getInstance()
-            val cookie = studomatViewModel.fetchISVUCookie()
+            val cookie = cookieJar.getISVUCookieForWebView()
 
             with(cookieManager) {
                 setAcceptCookie(true)
