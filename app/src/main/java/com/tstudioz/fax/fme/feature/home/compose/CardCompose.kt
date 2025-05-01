@@ -25,13 +25,15 @@ import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.lust
 import com.tstudioz.fax.fme.compose.welcome2
+import com.tstudioz.fax.fme.feature.home.view.HomeViewModel
 import com.tstudioz.fax.fme.feature.home.view.sidePadding
 import com.tstudioz.fax.fme.feature.iksica.compose.angledGradientBackground
+import kotlinx.coroutines.InternalCoroutinesApi
 
+@OptIn(InternalCoroutinesApi::class)
 @Composable
-fun CardsCompose(menzaShow: MutableState<Boolean>) {
+fun CardsCompose(menzaShow: MutableState<Boolean>, homeViewModel: HomeViewModel) {
     Row(Modifier.padding(horizontal = sidePadding)) {
-        val context = LocalContext.current
         Box(
             Modifier
                 .weight(0.5f)
@@ -55,27 +57,7 @@ fun CardsCompose(menzaShow: MutableState<Boolean>) {
                 MaterialTheme.colorScheme.secondaryContainer,
                 lust,
                 onClick = {
-                    val appPackageName = "com.ugovori.studentskiugovori"
-                    val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
-                    if (intent != null) {
-                        context.startActivity(intent)
-                    } else {
-                        try {
-                            context.startActivity(
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("market://details?id=$appPackageName")
-                                )
-                            )
-                        } catch (ex: ActivityNotFoundException) {
-                            context.startActivity(
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-                                )
-                            )
-                        }
-                    }
+                    homeViewModel.launchStudentskiUgovoriApp()
                 }
             )
         }

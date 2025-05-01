@@ -125,7 +125,7 @@ fun HomeTabCompose(
                                 ?: emptyList()
                         )
                     }
-                    item { CardsCompose(menzaShow) }
+                    item { CardsCompose(menzaShow, homeViewModel) }
                 }
             }
         }

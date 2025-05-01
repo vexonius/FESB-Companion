@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.home.compose
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +47,8 @@ fun NotesCompose(
             .padding(24.dp, 12.dp)
             .clip(RoundedCornerShape(30.dp))
             .background(notesContainer)
-            .padding(24.dp, 12.dp),
+            .padding(24.dp, 12.dp)
+            .animateContentSize(),
         verticalArrangement = Arrangement.Center,
     ) {
         Row {

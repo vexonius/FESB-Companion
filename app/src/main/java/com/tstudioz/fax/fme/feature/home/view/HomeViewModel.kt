@@ -1,6 +1,9 @@
 package com.tstudioz.fax.fme.feature.home.view
 
 import android.app.Application
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.AndroidViewModel
@@ -27,10 +30,11 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.core.net.toUri
 
 @InternalCoroutinesApi
 class HomeViewModel(
-    application: Application,
+    private val application: Application,
     private val noteRepository: NoteRepositoryInterface,
     private val weatherRepository: WeatherRepositoryInterface,
     private val timeTableRepository: TimeTableRepositoryInterface,
@@ -150,6 +154,30 @@ class HomeViewModel(
         viewModelScope.launch(Dispatchers.IO + handler) {
             val username = userRepository.getCurrentUserName()
             timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, true)
+        }
+    }
+
+    fun launchStudentskiUgovoriApp() {
+        val appPackageName = "com.ugovori.studentskiugovori"
+        val intent = application.packageManager.getLaunchIntentForPackage(appPackageName)
+        if (intent != null) {
+            application.startActivity(intent)
+        } else {
+            try {
+                application.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        "market://details?id=$appPackageName".toUri()
+                    )
+                )
+            } catch (ex: ActivityNotFoundException) {
+                application.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        "https://play.google.com/store/apps/details?id=$appPackageName".toUri()
+                    )
+                )
+            }
         }
     }
 }
