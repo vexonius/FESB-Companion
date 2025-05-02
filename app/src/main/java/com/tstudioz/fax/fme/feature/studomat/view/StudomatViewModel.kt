@@ -2,8 +2,8 @@ package com.tstudioz.fax.fme.feature.studomat.view
 
 import android.app.Application
 import androidx.compose.material3.SnackbarHostState
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.studomat.data.sortedByNameAndSemester
@@ -21,10 +21,10 @@ import kotlinx.coroutines.launch
 
 
 class StudomatViewModel(
+    application: Application,
     private val repository: StudomatRepository,
     private val networkUtils: NetworkUtils,
-    private val application: Application,
-) : ViewModel() {
+) : AndroidViewModel(application) {
     /**
      * LiveData for refreshing state used for PullToRefresh
      */
@@ -36,7 +36,13 @@ class StudomatViewModel(
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
-        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar(application.getString(R.string.studomat_error_general)) }
+        viewModelScope.launch(Dispatchers.Main) {
+            snackbarHostState.showSnackbar(
+                getApplication<Application>().applicationContext.getString(
+                    R.string.studomat_error_general
+                )
+            )
+        }
         isRefreshing.postValue(false)
     }
 
@@ -63,7 +69,7 @@ class StudomatViewModel(
                     }
 
                     is StudomatRepositoryResult.StudentAndYearsResult.Failure -> {
-                        snackbarHostState.showSnackbar(application.getString(R.string.studomar_error))
+                        snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.studomar_error))
                     }
                 }
             } else {
@@ -97,7 +103,11 @@ class StudomatViewModel(
                             }
 
                             is StudomatRepositoryResult.ChosenYearResult.Failure -> {
-                                snackbarHostState.showSnackbar(application.getString(R.string.studomar_error))
+                                snackbarHostState.showSnackbar(
+                                    getApplication<Application>().applicationContext.getString(
+                                        R.string.studomar_error
+                                    )
+                                )
                             }
                         }
                     }
