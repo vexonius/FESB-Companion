@@ -19,5 +19,6 @@ data class StudomatSubject(
     var grade: String = "",
     var examDate: String = "",
     var year: String = "",
+    var course: String = "",
     var isPassed: Boolean = false
 )

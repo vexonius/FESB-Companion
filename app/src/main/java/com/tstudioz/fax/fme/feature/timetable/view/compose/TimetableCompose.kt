@@ -110,7 +110,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                 ModalBottomSheet(
                     sheetState = sheetStateEvent,
                     onDismissRequest = { hideEvent() },
-                    windowInsets = WindowInsets(0.dp),
+                    contentWindowInsets = { WindowInsets(0.dp) },
                     dragHandle = { },
                 ) {
                     EventBottomSheet(event)
@@ -119,8 +119,8 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                 ModalBottomSheet(
                     sheetState = sheetStateCalendar,
                     onDismissRequest = { showWeekChooseMenu(false) },
+                    contentWindowInsets = { WindowInsets(0.dp) },
                     containerColor = MaterialTheme.colorScheme.surface,
-                    windowInsets = WindowInsets(0.dp),
                     dragHandle = { },
                 ) {
                     val coroutineScope = rememberCoroutineScope()
