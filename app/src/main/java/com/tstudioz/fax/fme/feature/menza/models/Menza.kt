@@ -24,6 +24,7 @@ data class Menu(
         return soupOrTea.isNotEmpty() || mainCourse.isNotEmpty() || sideDish.isNotEmpty() || salad.isNotEmpty() || dessert.isNotEmpty()
     }
 }
+
 data class MeniSpecial(
     val type: String,
     val mealTime: MealTime,
