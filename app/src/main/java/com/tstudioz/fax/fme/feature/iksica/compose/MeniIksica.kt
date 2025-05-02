@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,7 +44,6 @@ fun MeniComposeIksica(meni: Pair<MenzaLocation, Menza?>?) {
         .padding(bottom = 16.dp)
         .clip(RoundedCornerShape(15.dp))
         .background(Color(0xFF101010))
-        //.border(1.dp, colorResource(R.color.quartz), RoundedCornerShape(16.dp))
         .padding(24.dp, 8.dp)
         .fillMaxWidth()
 
