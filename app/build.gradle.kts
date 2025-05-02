@@ -4,7 +4,6 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("io.realm.kotlin") version "1.16.0"
     kotlin("plugin.serialization") version "2.0.0"
 }
 
@@ -91,7 +90,7 @@ android {
 
 dependencies {
 
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.5")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.8")
     val koinVersion = "4.0.0"
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
@@ -117,7 +116,6 @@ dependencies {
     val lifecycleVersion = "2.8.0"
     implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("io.realm.kotlin:library-base:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     // Android Studio Preview support
@@ -147,12 +145,19 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("com.google.code.gson:gson:2.11.0")
 
-    //glide
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-
-    //horizontal pager dots indicator
+    //horizontal pager
     implementation("com.tbuonomo:dotsindicator:5.1.0")
 
+    val room_version = "2.6.1"
+
+    implementation("androidx.room:room-runtime:$room_version")
+
+    // If this project only uses Java source, use the Java annotationProcessor
+    // No additional plugins are necessary
+    kapt("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    //glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }
 
 configurations.all {

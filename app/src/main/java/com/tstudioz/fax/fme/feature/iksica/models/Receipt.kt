@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.feature.iksica.models
 
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -17,11 +17,35 @@ data class Receipt(
     val authorised: String,
     val url: String,
     var receiptDetails: List<ReceiptItem>? = null
-)
+) {
+    constructor(receiptRoom: ReceiptRoom) : this(
+        restaurant = receiptRoom.restaurant ?: "",
+        date = LocalDate.parse(receiptRoom.date, DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+        dateString = receiptRoom.dateString ?: "",
+        time = receiptRoom.time ?: "",
+        receiptAmount = receiptRoom.receiptAmount ?: 0.0,
+        subsidizedAmount = receiptRoom.subsidizedAmount ?: 0.0,
+        paidAmount = receiptRoom.paidAmount ?: 0.0,
+        authorised = receiptRoom.authorised ?: "",
+        url = receiptRoom.href ?: ""
+    )
+}
 
-fun Receipt.toRealmObject(): ReceiptRealm {
-    val receipt = this
-    val rlm = ReceiptRealm().apply {
+@Entity
+data class ReceiptRoom(
+    @PrimaryKey
+    var id: String = UUID.randomUUID().toString(),
+    var restaurant: String? = null,
+    var date: String? = null,
+    var dateString: String? = null,
+    var time: String? = null,
+    var receiptAmount: Double? = null,
+    var subsidizedAmount: Double? = null,
+    var paidAmount: Double? = null,
+    var authorised: String? = null,
+    var href: String? = null
+) {
+    constructor(receipt: Receipt) : this() {
         restaurant = receipt.restaurant
         date = receipt.date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
         dateString = receipt.dateString
@@ -32,34 +56,4 @@ fun Receipt.toRealmObject(): ReceiptRealm {
         authorised = receipt.authorised
         href = receipt.url
     }
-    return rlm
-}
-
-fun ReceiptRealm.fromRealmObject(): Receipt {
-    val receiptRealm = this
-    return Receipt(
-        restaurant = receiptRealm.restaurant ?: "",
-        date = LocalDate.parse(receiptRealm.date, DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-        dateString = receiptRealm.dateString ?: "",
-        time = receiptRealm.time ?: "",
-        receiptAmount = receiptRealm.receiptAmount ?: 0.0,
-        subsidizedAmount = receiptRealm.subsidizedAmount ?: 0.0,
-        paidAmount = receiptRealm.paidAmount ?: 0.0,
-        authorised = receiptRealm.authorised ?: "",
-        url = receiptRealm.href ?: ""
-    )
-}
-
-open class ReceiptRealm : RealmObject {
-    @PrimaryKey
-    var id : String = UUID.randomUUID().toString()
-    var restaurant: String? = null
-    var date: String? = null
-    var dateString: String? = null
-    var time: String? = null
-    var receiptAmount: Double? = null
-    var subsidizedAmount: Double? = null
-    var paidAmount: Double? = null
-    var authorised: String? = null
-    var href: String? = null
 }

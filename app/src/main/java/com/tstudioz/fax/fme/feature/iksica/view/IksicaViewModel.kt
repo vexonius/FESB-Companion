@@ -9,12 +9,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
 import com.tstudioz.fax.fme.feature.iksica.menzaLocations
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.feature.menza.MenzaResult
 import com.tstudioz.fax.fme.feature.menza.models.Menza
@@ -41,8 +41,8 @@ class IksicaViewModel(
 
     val snackbarHostState = SnackbarHostState()
 
-    private val _studentData = MutableLiveData<StudentData?>(null)
-    val studentData: LiveData<StudentData?> = _studentData
+    private val _iksicaData = MutableLiveData<IksicaData?>(null)
+    val iksicaData: LiveData<IksicaData?> = _iksicaData
 
     private val _receiptSelected = MutableLiveData<IksicaReceiptState>(IksicaReceiptState.None)
     val receiptSelected: LiveData<IksicaReceiptState> = _receiptSelected
@@ -82,18 +82,19 @@ class IksicaViewModel(
             }
 
             _viewState.postValue(IksicaViewState.Success(model))
-            _studentData.postValue(model)
+            _iksicaData.postValue(model)
         }
     }
 
     fun getReceipts() {
-        _studentData.value?.let { _viewState.value = IksicaViewState.Fetching(it) }
+        _iksicaData.value?.let { _viewState.value = IksicaViewState.Fetching(it) }
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             when (val result = repository.getCardDataAndReceipts()) {
                 is IksicaResult.CardAndReceiptsResult.Success -> {
                     val model = result.data
+
                     _viewState.postValue(IksicaViewState.Success(model))
-                    _studentData.postValue(model)
+                    _iksicaData.postValue(model)
                 }
 
                 is IksicaResult.CardAndReceiptsResult.Failure -> {

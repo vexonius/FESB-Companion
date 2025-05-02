@@ -31,10 +31,6 @@ class MenzaViewModel(
         Log.d("MenzaViewModel", "CoroutineExceptionHandler got $exception")
     }
 
-    init{
-        readMenza()
-    }
-
     fun getMenza() {
         viewModelScope.launch(Dispatchers.IO + handler) {
             when (val menza = repository.fetchMenzaDetails("fesb_vrh", true)) {
@@ -58,12 +54,6 @@ class MenzaViewModel(
                 is MenzaResult.Failure -> {
                 }
             }
-        }
-    }
-
-    private fun readMenza() {
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            _menza.postValue(repository.readMenza())
         }
     }
 }

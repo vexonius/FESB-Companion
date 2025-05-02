@@ -1,11 +1,11 @@
 package com.tstudioz.fax.fme.feature.iksica.di
 
+import com.tstudioz.fax.fme.database.AppDatabase
 import com.tstudioz.fax.fme.feature.cameras.CamerasRepository
 import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
 import com.tstudioz.fax.fme.feature.cameras.CamerasService
 import com.tstudioz.fax.fme.feature.cameras.CamerasServiceInterface
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDao
-import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDaoInterface
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepository
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaLoginService
@@ -29,10 +29,10 @@ val iksicaModule = module {
     single<OkHttpClient>(named("ISSPPortalClient")) { provideISSPPortalClient(get(), get()) }
     single<IksicaServiceInterface> { IksicaService(get(named("ISSPPortalClient"))) }
     single<IksicaRepositoryInterface> { IksicaRepository(get(), get()) }
-    single<IksicaDaoInterface> { IksicaDao(get()) }
-    viewModel { IksicaViewModel(get(), get(), get(), get()) }
     single<CamerasServiceInterface> { CamerasService(get()) }
     single<CamerasRepositoryInterface> { CamerasRepository(get()) }
+    single<IksicaDao> { getIksicaDao(get()) }
+    viewModel { IksicaViewModel(get(), get()) }
 }
 
 fun provideISSPPortalClient(
@@ -45,4 +45,8 @@ fun provideISSPPortalClient(
         .addInterceptor(interceptor)
         .cookieJar(monsterCookieJar)
         .build()
+}
+
+fun getIksicaDao(db: AppDatabase): IksicaDao {
+    return db.iksicaDao()
 }

@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.accentGreen
 import com.tstudioz.fax.fme.feature.menza.models.MealTime
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
 import com.tstudioz.fax.fme.feature.menza.models.Menu
@@ -49,7 +49,7 @@ fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = { menzaShow.value = false },
-        containerColor = colorResource(id = R.color.greenHighlight),
+        containerColor = accentGreen,
         contentColor = MaterialTheme.colorScheme.inverseOnSurface,
         dragHandle = {
             Column(

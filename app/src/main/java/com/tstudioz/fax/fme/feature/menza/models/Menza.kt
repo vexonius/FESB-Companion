@@ -1,24 +1,14 @@
 package com.tstudioz.fax.fme.feature.menza.models
 
-import io.realm.kotlin.types.RealmObject
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
-@Serializable
 data class Menza(
     val name: String,
     val datePosted: String,
     val dateFetched: String,
     var menies: MutableList<Menu>,
     var meniesSpecial: MutableList<MeniSpecial>,
-){
-    fun toRealm(): MenzaRealm{
-        return MenzaRealm(
-            Json.encodeToJsonElement(serializer(), this).toString()
-        )
-    }
-}
-@Serializable
+)
+
 data class Menu(
     val type: String,
     val mealTime: MealTime,
@@ -45,13 +35,4 @@ data class MeniSpecial(
 enum class MealTime(val value: String) {
     LUNCH("RUČAK"),
     DINNER("VEČERA"),
-}
-
-open class MenzaRealm(
-    var menza: String? = null
-) : RealmObject{
-    constructor(): this(null)
-    fun fromRealm(): Menza? {
-        return menza?.let { Json.decodeFromString(Menza.serializer(), it) }
-    }
 }

@@ -53,7 +53,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -68,8 +67,10 @@ import com.tbuonomo.viewpagerdotsindicator.compose.type.BalloonIndicatorType
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.menzaLocations
 import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
+import com.tstudioz.fax.fme.compose.contentColors
+import com.tstudioz.fax.fme.compose.theme_dark_surface
+import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
-import com.tstudioz.fax.fme.feature.iksica.models.StudentData
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewState
@@ -91,7 +92,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     val nestedSheetState = rememberNestedSheetState(composableHeight = 999, sheetOffset = 999)
 
     val receiptSelected = iksicaViewModel.receiptSelected.observeAsState().value
-    val studentData = iksicaViewModel.studentData.observeAsState().value
+    val iksicaData = iksicaViewModel.iksicaData.observeAsState().value
     val viewState = iksicaViewModel.viewState.observeAsState().value ?: IksicaViewState.Loading
 
     val isRefreshing = viewState is IksicaViewState.Fetching || viewState is IksicaViewState.Loading
@@ -208,9 +209,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     }
 
     PopupBox(showPopup = showPopup.value, onClickOutside = { showPopup.value = !showPopup.value }) {
-        if (studentData != null) {
-            CardIksicaPopupContent(studentData)
-        }
+        iksicaData?.studentData?.let { CardIksicaPopupContent(it) }
     }
 }
 
@@ -235,7 +234,7 @@ fun EmptyIksicaView() {
 @OptIn(InternalCoroutinesApi::class)
 @Composable
 fun PopulatedIksicaView(
-    model: StudentData,
+    model: IksicaData,
     listState: LazyListState,
     iksicaViewModel: IksicaViewModel,
     nestedSheetState: NestedSheetState,
@@ -280,21 +279,30 @@ fun PopulatedIksicaView(
         }) {
             TopBarIksica(Icons.Default.Info, iksicaViewModel)
 
-            ElevatedCardIksica(model.nameSurname, model.cardNumber, model.balance) { onCardClick() }
+            Box(Modifier.fillMaxWidth()) {
+                ElevatedCardIksica(
+                    model.studentData.nameSurname,
+                    model.studentData.cardNumber,
+                    model.studentData.balance
+                ) {
+                    onCardClick()
+                }
+            }
         }
         Column(
             modifier = Modifier
                 .offset { IntOffset(0, sheetOffset.intValue) }
                 .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-                .background(colorResource(R.color.chinese_black))
+                .background(MaterialTheme.colorScheme.surface)
                 .noRippleClickable {}
         ) {
-            if (model.receipts.isEmpty()) {
+            val receipts = model.receipts
+            if (receipts.isNullOrEmpty()) {
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
-                TransakcijeText()
-                LazyColumn(Modifier.fillMaxSize(), state = listState) {
-                    items(model.receipts) {
+                TransactionsText()
+                LazyColumn(state = listState) {
+                    items(receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }
                 }
@@ -318,8 +326,9 @@ fun TopBarIksica(
     ) {
         Text(
             text = stringResource(id = R.string.tab_iksica),
-            fontSize = 30.sp,
-            modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 16.dp)
+            style = MaterialTheme.typography.displayMedium,
+            color = MaterialTheme.contentColors.primary,
+            modifier = Modifier.padding(16.dp)
         )
         icon?.let {
             Icon(
@@ -339,11 +348,12 @@ fun TopBarIksica(
 }
 
 @Composable
-fun TransakcijeText() {
+fun TransactionsText() {
     Text(
         text = stringResource(id = R.string.transactions),
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
+        color = MaterialTheme.contentColors.primary,
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 30.dp, 16.dp, 24.dp)
@@ -361,7 +371,7 @@ fun EmptyIksicaView(text: String) {
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.contentColors.secondary
         )
     }
 }

@@ -17,7 +17,7 @@ class ParseAttendance {
         Jsoup.parse(body).select(".courseCategories div.courseCategory").forEach { kat ->
             val mAttendanceEntry = AttendanceEntry()
             mAttendanceEntry.semester = semester
-            mAttendanceEntry.`class` = element.select(".cellContent").first()?.text() ?: ""
+            mAttendanceEntry.subject = element.select(".cellContent").first()?.text() ?: ""
             mAttendanceEntry.type =
                 (kat.getElementsByClass("name").first()?.text() ?: "").replaceFirstChar { it.uppercase() }
             mAttendanceEntry.attended = kat.select(".attended > span.num").first()?.text()?.toInt() ?: -1
@@ -26,7 +26,7 @@ class ParseAttendance {
             mAttendanceEntry.required = (reqAttend?.split("od")?.firstOrNull()?.trim() ?: "").toIntOrNull() ?: -1
             mAttendanceEntry.total = (reqAttend?.split("od")?.last()?.trim())?.toIntOrNull() ?: -1
             mAttendanceEntry.id = UUID.nameUUIDFromBytes(
-                ("${mAttendanceEntry.attended}${mAttendanceEntry.absent}${mAttendanceEntry.`class`}" +
+                ("${mAttendanceEntry.attended}${mAttendanceEntry.absent}${mAttendanceEntry.subject}" +
                         "${mAttendanceEntry.type}${mAttendanceEntry.required}${mAttendanceEntry.total}${mAttendanceEntry.semester}").toByteArray()
             )
                 .toString()

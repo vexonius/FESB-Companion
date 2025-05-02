@@ -83,6 +83,14 @@
     <string name="grade">Ocjena:</string>
     <string name="exam_date">Datum ispitnog roka:</string>
 
+    <string name="enrolled_subjects">Upisani predmeti</string>
+    <string name="open_webview">Upravljaj kolegijima i prijavi ispite online</string>
+    <string name="no_data">Nema podataka za prikazati.</string>
+    <string name="webview">webview</string>
+    <string name="page_not_found">page not found</string>
+    <string name="studomar_error">Greška prilikom dohvaćanja podataka</string>
+    <string name="studomat_error_general">Došlo je do pogreške</string>
+
 
     <string name="weather_temp">%1$.0f°</string>
     <string name="weather_humidity">%1$.1f%%</string>

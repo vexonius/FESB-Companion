@@ -12,7 +12,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.routing.HomeRouter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,7 +30,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetableViewModel: TimetableViewModel) {
     val currentDestination =
         navController.currentBackStackEntryAsState().value?.destination?.route?.split(".")?.lastOrNull() ?: ""
-    if (currentDestination != "Iksica" && currentDestination != "Attendance") {
+    if (currentDestination != "Iksica" && currentDestination != "Attendance" && currentDestination != "Studomat") {
         TopAppBar(
             colors = if (currentDestination != "Home") {
                 TopAppBarDefaults.topAppBarColors(
@@ -39,7 +39,7 @@ fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetabl
                 )
             } else {
                 TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(id = R.color.dark_cyan),
+                    containerColor = theme_dark_secondaryContainer,
                     titleContentColor = Color.White
                 )
             },
@@ -66,18 +66,19 @@ fun MainTopAppBar(router: HomeRouter, navController: NavHostController, timetabl
                             modifier = Modifier.size(30.dp)
                         )
                     }
-                }
-                IconButton(
-                    onClick = { router.routeToSettings() },
-                    colors = IconButtonDefaults.iconButtonColors().copy(
-                        contentColor = Color.White
-                    )
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.settings_icon),
-                        contentDescription = stringResource(id = R.string.settings),
-                        modifier = Modifier.size(30.dp)
-                    )
+                } else if (currentDestination == "Home") {
+                    IconButton(
+                        onClick = { router.routeToSettings() },
+                        colors = IconButtonDefaults.iconButtonColors().copy(
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.settings_icon),
+                            contentDescription = stringResource(id = R.string.settings),
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
                 }
             },
         )
