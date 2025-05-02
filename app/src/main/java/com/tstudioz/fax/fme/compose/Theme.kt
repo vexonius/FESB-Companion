@@ -97,7 +97,6 @@ val AppComposition = staticCompositionLocalOf {
     )
 }
 
-
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
