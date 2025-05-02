@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,9 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.compose.dividerColor
 import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
 import com.tstudioz.fax.fme.feature.menza.models.MealTime
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
@@ -59,20 +58,18 @@ fun MeniComposeIksica(meni: Pair<MenzaLocation, Menza?>?) {
     ) {
         Text(
             text = menzaLocation?.name ?: "",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.displayMedium,
             modifier = Modifier.padding(16.dp, 8.dp, 0.dp, 0.dp)
         )
         Text(
             text = menzaLocation?.address ?: "",
-            fontSize = 15.sp,
+            style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(16.dp, 0.dp, 0.dp, 24.dp)
         )
         if (meni?.second?.dateFetched == meni?.second?.datePosted) {
             Text(
                 text = "Ručak",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.displayMedium,
                 modifier = Modifier.padding(16.dp, 8.dp)
             )
             menies?.menies?.filter { it.mealTime == MealTime.LUNCH }?.forEach {
@@ -83,9 +80,9 @@ fun MeniComposeIksica(meni: Pair<MenzaLocation, Menza?>?) {
             }
             Text(
                 text = "Večera",
-                fontSize = 25.sp,
+                style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 10.dp)
+                modifier = Modifier.padding(16.dp, 8.dp)
             )
             menies?.menies?.filter { it.mealTime == MealTime.DINNER }?.forEach {
                 MeniItem(it, mealModifier)
@@ -96,7 +93,6 @@ fun MeniComposeIksica(meni: Pair<MenzaLocation, Menza?>?) {
         } else {
             Column(
                 Modifier
-                    .fillMaxWidth()
                     .fillMaxSize()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -104,7 +100,7 @@ fun MeniComposeIksica(meni: Pair<MenzaLocation, Menza?>?) {
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.no_data_icon),
-                    contentDescription = "page_not_found",
+                    contentDescription = stringResource(R.string.page_not_found),
                     modifier = Modifier
                         .padding(12.dp, 80.dp, 12.dp, 12.dp)
                         .size(80.dp)
@@ -125,11 +121,11 @@ fun MeniItem(meni: Menu, modifier: Modifier) {
     {
         Text(
             text = meni.name,
-            fontSize = 25.sp,
+            style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 10.dp)
         )
-        val soupOrTea = if (meni.mealTime==MealTime.LUNCH) stringResource(R.string.soup)
+        val soupOrTea = if (meni.mealTime == MealTime.LUNCH) stringResource(R.string.soup)
         else stringResource(R.string.beverage)
 
         MeniTextIksica(meni.soupOrTea, soupOrTea)
@@ -139,7 +135,7 @@ fun MeniItem(meni: Menu, modifier: Modifier) {
         MeniTextIksica(meni.dessert, stringResource(R.string.dessert), false)
         Text(
             text = stringResource(id = R.string.meni_price, meni.price),
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.displaySmall,
             textAlign = TextAlign.End,
             modifier = Modifier
                 .fillMaxWidth()
@@ -150,56 +146,62 @@ fun MeniItem(meni: Menu, modifier: Modifier) {
 
 @Composable
 fun MeniSpecialIksica(meni: List<MeniSpecial>, modifier: Modifier) {
-    Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top,
-        modifier = modifier
-    ) {
-        Text(
-            text = stringResource(id = R.string.meals_by_choice),
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 10.dp),
-        )
-        meni.forEachIndexed { index, it ->
-            if (index != 0) HorizontalDivider(color = dividerColor, thickness = 1.dp)
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp)
-            ) {
-                Text(
-                    text = it.meal,
-                    fontSize = 16.sp,
-                    modifier = Modifier.weight(0.8f),
-                )
-                Text(
-                    text = stringResource(id = R.string.meni_price, it.price),
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.weight(0.2f),
-                )
+    if (meni.isNotEmpty()) {
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top,
+            modifier = modifier
+        ) {
+            Text(
+                text = stringResource(id = R.string.meals_by_choice),
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 10.dp),
+            )
+            meni.forEachIndexed { index, it ->
+                if (index != 0) HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 5.dp)
+                ) {
+                    Text(
+                        text = it.meal,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(0.8f),
+                    )
+                    Text(
+                        text = stringResource(id = R.string.meni_price, it.price),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(0.2f),
+                    )
+                }
             }
+            Spacer(modifier = Modifier.height(10.dp))
         }
-        Spacer(modifier = Modifier.height(10.dp))
     }
 }
 
 @Composable
 fun MeniTextIksica(text: String, type: String, divider: Boolean = true) {
     if (text.isNotEmpty()) {
-        Column (Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceBetween) {
-            Text(type, fontSize = 10.sp, color = Color.White.copy(alpha = 0.3f))
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceBetween) {
+            Text(
+                text = type,
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White.copy(alpha = 0.3f),
+                modifier = Modifier.padding(vertical = 5.dp)
+            )
             Text(
                 text = text,
-                fontSize = 16.sp,
-                lineHeight = 16.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 5.dp)
             )
         }
         if (divider) {
-            HorizontalDivider(color = dividerColor, thickness = 1.dp)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
         }
     }
 }

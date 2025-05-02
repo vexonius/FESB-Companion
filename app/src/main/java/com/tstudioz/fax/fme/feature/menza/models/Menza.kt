@@ -30,7 +30,11 @@ data class MeniSpecial(
     val mealTime: MealTime,
     val meal: String,
     val price: String,
-)
+){
+    fun isNotEmpty(): Boolean {
+        return meal.isNotEmpty() || price.isNotEmpty()
+    }
+}
 
 enum class MealTime(val value: String) {
     LUNCH("RUČAK"),
