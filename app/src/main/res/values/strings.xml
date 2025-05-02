@@ -37,6 +37,7 @@
     <string name="weather_icon_desc">Ikona vremena</string>
     <string name="hi_user">Bok %1$s</string>
     <string name="weather_info">U %1$s je trenutno %2$s (%3$.1f°C)</string>
+    <string name="weather_error">Došlo je do pogreške pri dohvaćanju vremenske prognoze</string>
 
     <string name="notes">PODSJETNICI</string>
 
@@ -158,4 +159,6 @@
     <string name="group">Grupa</string>
     <string name="classroom">Učionica</string>
     <string name="time_range">%1$s - %2$s</string>
+
+    <string name="general_error">Došlo je do pogreške</string>
 </resources>

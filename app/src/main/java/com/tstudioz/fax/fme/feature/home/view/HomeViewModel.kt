@@ -31,10 +31,11 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.core.net.toUri
+import com.tstudioz.fax.fme.R
 
 @InternalCoroutinesApi
 class HomeViewModel(
-    private val application: Application,
+    application: Application,
     private val noteRepository: NoteRepositoryInterface,
     private val weatherRepository: WeatherRepositoryInterface,
     private val timeTableRepository: TimeTableRepositoryInterface,
@@ -53,7 +54,10 @@ class HomeViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("HomeViewModel", "Caught $exception")
-        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar("Došlo je do pogreške") }
+        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar(
+            getApplication<Application>().applicationContext.getString(
+                R.string.general_error
+            )) }
     }
 
     init {
@@ -99,7 +103,7 @@ class HomeViewModel(
                     }
                 } catch (e: Exception) {
                     Log.d("HomeViewModel", "Caught $e")
-                    snackbarHostState.showSnackbar("Došlo je do pogreške pri dohvaćanju vremenske prognoze")
+                    snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.weather_error))
                 }
             } else {
                 snackbarHostState.showSnackbar("Niste povezani")
@@ -158,20 +162,21 @@ class HomeViewModel(
     }
 
     fun launchStudentskiUgovoriApp() {
+        val context = getApplication<Application>().applicationContext
         val appPackageName = "com.ugovori.studentskiugovori"
-        val intent = application.packageManager.getLaunchIntentForPackage(appPackageName)
+        val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
         if (intent != null) {
-            application.startActivity(intent)
+            context.startActivity(intent)
         } else {
             try {
-                application.startActivity(
+                context.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
                         "market://details?id=$appPackageName".toUri()
                     )
                 )
             } catch (ex: ActivityNotFoundException) {
-                application.startActivity(
+                context.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
                         "https://play.google.com/store/apps/details?id=$appPackageName".toUri()
