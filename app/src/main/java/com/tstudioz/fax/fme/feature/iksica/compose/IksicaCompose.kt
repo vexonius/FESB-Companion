@@ -20,8 +20,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -48,11 +46,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -127,7 +125,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     horizontalArrangement = Arrangement.Center, modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.background)
-                        .padding(0.dp,24.dp,0.dp,24.dp)
+                        .padding(0.dp, 24.dp, 0.dp, 24.dp)
                 ) {
                     DotsIndicator(
                         dotCount = pageCount,
@@ -179,7 +177,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             )
 
             when (viewState) {
-                is IksicaViewState.Initial, is IksicaViewState.Empty -> EmptyIksicaView()
+                is IksicaViewState.Initial, is IksicaViewState.Empty -> EmptyIksicaView(iksicaViewModel)
                 is IksicaViewState.Success -> {
                     PopulatedIksicaView(
                         viewState.data,
@@ -214,16 +212,16 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
 @OptIn(InternalCoroutinesApi::class)
 @Composable
-fun EmptyIksicaView() {
+fun EmptyIksicaView(iksicaViewModel: IksicaViewModel) {
     Column {
-        TopBarIksica()
+        TopBarIksica { iksicaViewModel.openMenza() }
         Box(Modifier.fillMaxWidth()) {
             LazyColumn(
                 Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center
             ) {
                 item {
-                    EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
+                    EmptyIksicaContent(stringResource(id = R.string.iksica_no_data))
                 }
             }
         }
@@ -276,7 +274,7 @@ fun PopulatedIksicaView(
                 sheetOffset.intValue = it.size.height
             }
         }) {
-            TopBarIksica(Icons.Default.Info, iksicaViewModel)
+            TopBarIksica { iksicaViewModel.openMenza() }
 
             Box(Modifier.fillMaxWidth()) {
                 ElevatedCardIksica(
@@ -297,7 +295,7 @@ fun PopulatedIksicaView(
         ) {
             val receipts = model.receipts
             if (receipts.isNullOrEmpty()) {
-                EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
+                EmptyIksicaContent(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransactionsText()
                 LazyColumn(state = listState) {
@@ -313,8 +311,7 @@ fun PopulatedIksicaView(
 @OptIn(InternalCoroutinesApi::class)
 @Composable
 fun TopBarIksica(
-    icon: ImageVector? = null,
-    iksicaViewModel: IksicaViewModel? = null,
+    openMenza : () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -329,20 +326,16 @@ fun TopBarIksica(
             color = MaterialTheme.contentColors.primary,
             modifier = Modifier.padding(16.dp)
         )
-        icon?.let {
-            Icon(
-                icon,
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable {
-                        with(iksicaViewModel) {
-                            this?.openMenza()
-                        }
-                    }
-                    .padding(16.dp, 16.dp, 16.dp, 16.dp)
-                    .size(30.dp), tint = Color.White
-            )
-        }
+        Icon(
+            painterResource(R.drawable.menza_camera),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable {
+                    openMenza()
+                }
+                .padding(16.dp, 16.dp, 16.dp, 16.dp)
+                .size(30.dp), tint = Color.White
+        )
     }
 }
 
@@ -360,7 +353,7 @@ fun TransactionsText() {
 }
 
 @Composable
-fun EmptyIksicaView(text: String) {
+fun EmptyIksicaContent(text: String) {
     Row(
         modifier = Modifier
             .fillMaxSize()
