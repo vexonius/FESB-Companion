@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.passGreen
-import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
+import com.tstudioz.fax.fme.feature.home.compose.noRippleClickable
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 
 
