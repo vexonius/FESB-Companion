@@ -58,6 +58,7 @@ val gradientColors = listOf(
     Color(0xFFDD3742),
     Color(0xFFA344DE)
 )
+val studomatBlue = Color(0xFF0066cc)
 
 val lust = Color(0xFFE1141B)
 
@@ -69,5 +70,6 @@ val welcome2 = Color(0xFF20D2BB)
 
 // Timetable
 val eventCardBackground = Color(0xFF232323)
+val passGreen = Color(0xFF02b010)
 
 val notesContainer = Color(0xFF00263C)

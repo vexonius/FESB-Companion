@@ -20,7 +20,7 @@ val studomatModule = module {
     single<StudomatLoginServiceInterface> { StudomatLoginService(get()) }
     single<OkHttpClient>(named("clientStudomat")) { provideISVUPortalClient(get(), get()) }
     single { StudomatService(get(named("clientStudomat"))) }
-    single { StudomatRepository(get(), get(), get()) }
+    single { StudomatRepository(get(), get()) }
     single { getStudomatDao(get()) }
     viewModel { StudomatViewModel(get(), get(), get()) }
 }
