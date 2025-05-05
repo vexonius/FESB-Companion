@@ -36,7 +36,7 @@
 
     <string name="weather_icon_desc">Ikona vremena</string>
     <string name="hi_user">Bok %1$s</string>
-    <string name="weather_info">U %1$s je trenutno %2$s (%3$.1f°C)</string>
+    <string name="weather_info">U %1$su je trenutno %2$s (%3$.1f°C)</string>
     <string name="weather_error">Došlo je do pogreške pri dohvaćanju vremenske prognoze</string>
 
     <string name="notes">PODSJETNICI</string>
@@ -122,7 +122,7 @@
     <string name="developer_names">Tino Emer i Stipe Jurković</string>
     <string name="data_privacy">Privatnost podataka</string>
     <string name="library_licenses">Licence korištenih biblioteka</string>
-    <string name="send_mail_using">Pošalji email pomoću...</string>
+    <string name="send_mail_using">Pošalji email pomoću…</string>
 
     // Iksica
     <string name="iksica_no_data">Nema podataka</string>

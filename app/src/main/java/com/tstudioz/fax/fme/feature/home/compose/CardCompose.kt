@@ -1,8 +1,5 @@
 package com.tstudioz.fax.fme.feature.home.compose
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,14 +14,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.lust
-import com.tstudioz.fax.fme.compose.welcome2
+import com.tstudioz.fax.fme.compose.meniColor
 import com.tstudioz.fax.fme.feature.home.view.HomeViewModel
 import com.tstudioz.fax.fme.feature.home.view.sidePadding
 import com.tstudioz.fax.fme.feature.iksica.compose.angledGradientBackground
@@ -41,8 +35,8 @@ fun CardsCompose(menzaShow: MutableState<Boolean>, homeViewModel: HomeViewModel)
             CardCompose(
                 stringResource(id = R.string.menza_title),
                 stringResource(id = R.string.menza_desc),
-                welcome2,
-                welcome2,
+                meniColor,
+                meniColor,
                 onClick = {
                     menzaShow.value = true
                 })

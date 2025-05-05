@@ -87,45 +87,46 @@ val weatherSymbolKeys = mapOf(
 )
 
 val codeToDisplay = mapOf(
-    1 to "clear sky",
-    2 to "fair",
-    3 to "partly cloudy",
-    4 to "cloudy",
-    40 to "light rain showers",
-    5 to "rain showers",
-    41 to "heavy rain showers",
-    24 to "light rain showers and thunder",
-    6 to "rain showers and thunder",
-    25 to "heavy rain showers and thunder",
-    42 to "light sleet showers",
-    7 to "sleet showers",
-    43 to "heavy sleet showers",
-    26 to "light sleet showers and thunder",
-    20 to "sleet showers and thunder",
-    27 to "heavy sleet showers and thunder",
-    44 to "light snow showers",
-    8 to "snow showers",
-    45 to "heavy snow showers",
-    28 to "light snow showers and thunder",
-    21 to "snow showers and thunder",
-    29 to "heavy snow showers and thunder",
-    46 to "light rain",
-    9 to "rain",
-    10 to "heavy rain",
-    30 to "light rain and thunder",
-    22 to "rain and thunder",
-    11 to "heavy rain and thunder",
-    47 to "light sleet",
-    12 to "sleet",
-    48 to "heavy sleet",
-    31 to "light sleet and thunder",
-    23 to "sleet and thunder",
-    32 to "heavy sleet and thunder",
-    49 to "light snow",
-    13 to "snow",
-    50 to "heavy snow",
-    33 to "light snow and thunder",
-    14 to "snow and thunder",
-    34 to "heavy snow and thunder",
-    15 to "fog"
+    1 to "vedro", // clear sky
+    2 to "pretežno vedro", // fair
+    3 to "djelomično oblačno", // partly cloudy
+    4 to "oblačno", // cloudy
+    40 to "slabi pljuskovi kiše", // light rain showers
+    5 to "pljuskovi kiše", // rain showers
+    41 to "jaki pljuskovi kiše", // heavy rain showers
+    24 to "slabi pljuskovi kiše s grmljavinom", // light rain showers and thunder
+    6 to "pljuskovi kiše s grmljavinom", // rain showers and thunder
+    25 to "jaki pljuskovi kiše s grmljavinom", // heavy rain showers and thunder
+    42 to "slabi pljuskovi susnježice", // light sleet showers
+    7 to "pljuskovi susnježice", // sleet showers
+    43 to "jaki pljuskovi susnježice", // heavy sleet showers
+    26 to "slabi pljuskovi susnježice s grmljavinom", // light sleet showers and thunder
+    20 to "pljuskovi susnježice s grmljavinom", // sleet showers and thunder
+    27 to "jaki pljuskovi susnježice s grmljavinom", // heavy sleet showers and thunder
+    44 to "slabi pljuskovi snijega", // light snow showers
+    8 to "pljuskovi snijega", // snow showers
+    45 to "jaki pljuskovi snijega", // heavy snow showers
+    28 to "slabi pljuskovi snijega s grmljavinom", // light snow showers and thunder
+    21 to "pljuskovi snijega s grmljavinom", // snow showers and thunder
+    29 to "jaki pljuskovi snijega s grmljavinom", // heavy snow showers and thunder
+    46 to "slaba kiša", // light rain
+    9 to "kiša", // rain
+    10 to "jaka kiša", // heavy rain
+    30 to "slaba kiša s grmljavinom", // light rain and thunder
+    22 to "kiša s grmljavinom", // rain and thunder
+    11 to "jaka kiša s grmljavinom", // heavy rain and thunder
+    47 to "slaba susnježica", // light sleet
+    12 to "susnježica", // sleet
+    48 to "jaka susnježica", // heavy sleet
+    31 to "slaba susnježica s grmljavinom", // light sleet and thunder
+    23 to "susnježica s grmljavinom", // sleet and thunder
+    32 to "jaka susnježica s grmljavinom", // heavy sleet and thunder
+    49 to "slab snijeg", // light snow
+    13 to "snijeg", // snow
+    50 to "jak snijeg", // heavy snow
+    33 to "slab snijeg s grmljavinom", // light snow and thunder
+    14 to "snijeg s grmljavinom", // snow and thunder
+    34 to "jak snijeg s grmljavinom", // heavy snow and thunder
+    15 to "magla" // fog
 )
+

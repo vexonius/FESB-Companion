@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.home.compose
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -89,9 +91,9 @@ fun NotesCompose(
                         onValueChange = { editMessage.value = it },
                         singleLine = true,
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            cursorColor = MaterialTheme.colorScheme.onSurface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            cursorColor = Color.Transparent,
                         ),
                         placeholder = {
                             Text(
@@ -103,23 +105,29 @@ fun NotesCompose(
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Row(modifier = Modifier.align(Alignment.End)) {
+
                         OutlinedButton(
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                             onClick = { openDialog.value = false }
                         ) { Text(stringResource(id = R.string.cancel_note)) }
+
                         Spacer(modifier = Modifier.width(8.dp))
-                        OutlinedButton(onClick = {
-                            message.value = editMessage.value
-                            openDialog.value = false
-                            editMessage.value = ""
-                            insertNote(
-                                Note(
-                                    noteTekst = message.value,
-                                    checked = false,
-                                    dateCreated = LocalDateTime.now(),
-                                    id = UUID.randomUUID().toString(),
+
+                        OutlinedButton(
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            onClick = {
+                                message.value = editMessage.value
+                                openDialog.value = false
+                                editMessage.value = ""
+                                insertNote(
+                                    Note(
+                                        noteTekst = message.value,
+                                        checked = false,
+                                        dateCreated = LocalDateTime.now(),
+                                        id = UUID.randomUUID().toString(),
+                                    )
                                 )
-                            )
-                        }
+                            }
                         ) { Text(stringResource(id = R.string.save_note)) }
                     }
                 }

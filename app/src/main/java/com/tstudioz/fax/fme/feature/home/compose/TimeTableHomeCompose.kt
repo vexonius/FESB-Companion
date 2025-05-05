@@ -81,6 +81,8 @@ fun TodayTimetableCompose(events: List<Event>) {
 @Composable
 fun TimetableItem(event: Event) {
 
+    val hourFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
     val expanded = remember { mutableStateOf(false) }
     Column(
         Modifier
@@ -92,10 +94,14 @@ fun TimetableItem(event: Event) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val time = Duration.between(event.start, event.end).toMinutes() / 60f * 6
+            val dividerColor = MaterialTheme.colorScheme.outline
+            val dividerWidth = 1.dp
+            val hours=  Duration.between(event.start, event.end).toMinutes() / 60f
+            val time = hours * 6
             Canvas(modifier = Modifier.size(Dp(time * 5.dp.value) + 5.dp, 10.dp)) {
                 val radius = 5.dp.toPx()
                 val width = (radius * time - radius).coerceAtLeast(radius)
+                val dividerFreq = width.div(hours)
                 drawLine(
                     color = event.color,
                     start = Offset(radius, radius),
@@ -103,6 +109,14 @@ fun TimetableItem(event: Event) {
                     strokeWidth = radius * 2,
                     cap = StrokeCap.Round,
                 )
+                for (i in 1 until hours.toInt().plus(1)) {
+                    drawLine(
+                        color = dividerColor.copy(alpha = 0.5f),
+                        start = Offset(dividerFreq * i, radius),
+                        end = Offset(dividerFreq * i + dividerWidth.toPx(), radius),
+                        strokeWidth = radius * 2,
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(4.dp))
             Text(
@@ -113,7 +127,7 @@ fun TimetableItem(event: Event) {
         Row {
             if (!expanded.value) {
                 Text(
-                    text = event.start.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    text = event.start.toLocalTime().format(hourFormatter),
                     fontSize = 16.sp,
                 )
                 Spacer(modifier = Modifier.width(10.dp))
@@ -129,8 +143,8 @@ fun TimetableItem(event: Event) {
                 Text(
                     text = stringResource(
                         R.string.time_range,
-                        event.start.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),
-                        event.end.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+                        event.start.toLocalTime().format(hourFormatter),
+                        event.end.toLocalTime().format(hourFormatter)
                     ),
                     fontSize = 12.sp
                 )
