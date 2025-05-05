@@ -119,9 +119,5 @@ data class Summary(
 data class WeatherDisplay(
     val location: String,
     val temperature: Double,
-    val humidity: Double,
-    val wind: Double,
-    val precipChance: Double,
-    val icon: String,
     val summary: String
 )

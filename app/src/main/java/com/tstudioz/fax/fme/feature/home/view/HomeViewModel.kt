@@ -93,10 +93,6 @@ class HomeViewModel(
                             WeatherDisplay(
                                 "Split",
                                 forecastInstantDetails?.airTemperature ?: 20.0,
-                                forecastInstantDetails?.relativeHumidity ?: 0.0,
-                                forecastInstantDetails?.windSpeed ?: 0.0,
-                                forecastNextOneHoursDetails?.precipitationAmount ?: 0.00,
-                                iconName,
                                 summary ?: ""
                             )
                         )
