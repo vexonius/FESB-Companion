@@ -170,4 +170,7 @@
     <string name="group">Grupa</string>
     <string name="classroom">Učionica</string>
     <string name="time_range">%1$s - %2$s</string>
+
+    <string name="lunch_title">Ručak</string>
+    <string name="dinner_title">Večera</string>
 </resources>
