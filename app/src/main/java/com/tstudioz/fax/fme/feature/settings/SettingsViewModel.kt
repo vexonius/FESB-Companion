@@ -4,12 +4,16 @@ import android.app.Application
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.settings.model.EmailModalModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
@@ -20,6 +24,7 @@ class SettingsViewModel(
     val username: MutableLiveData<String> = MutableLiveData()
     val version: MutableLiveData<String> = MutableLiveData()
     val displayLicences = MutableLiveData(false)
+    val routeToLogin = MutableStateFlow(false)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -36,6 +41,7 @@ class SettingsViewModel(
     fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
             userRepository.deleteAllUserData()
+            routeToLogin.emit(true)
         }
     }
 
