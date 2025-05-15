@@ -63,13 +63,7 @@ class HomeViewModel(
     init {
         getNotes()
         getForecast()
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            val name = userRepository.getCurrentUser().fullName.split(" ") .firstOrNull() ?: ""
-            nameOfUser.postValue(name.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(Locale.getDefault())
-                else it.toString()
-            })
-        }
+        loadUsersName()
     }
 
     private fun getForecast() {
@@ -80,10 +74,8 @@ class HomeViewModel(
                     if (weather != null) {
                         val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
                         val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
-                        val forecastNextOneHoursDetails = forecastNextOneHours?.details
                         val unparsedSummary = forecastNextOneHours?.summary?.symbolCode
                         val weatherSymbol = weatherSymbolKeys[unparsedSummary]
-                        val iconName = "_" + weatherSymbol?.first.toString() + weatherSymbol?.second
                         val summary = codeToDisplay[weatherSymbol?.first]?.replaceFirstChar {
                             if (it.isLowerCase()) it.titlecase(
                                 Locale.getDefault()
@@ -179,6 +171,16 @@ class HomeViewModel(
                     )
                 )
             }
+        }
+    }
+
+    fun loadUsersName() {
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            val name = userRepository.getCurrentUser().fullName.split(" ") .firstOrNull() ?: ""
+            nameOfUser.postValue(name.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault())
+                else it.toString()
+            })
         }
     }
 }

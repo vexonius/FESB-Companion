@@ -40,9 +40,9 @@ import java.util.UUID
 
 @Composable
 fun NotesCompose(
-    notes: List<Note> = listOf(),
-    insertNote: (note: Note) -> Unit = { },
-    deleteNote: (note: Note) -> Unit = { }
+    notes: List<Note>,
+    insertNote: (note: Note) -> Unit,
+    deleteNote: (note: Note) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -61,79 +61,7 @@ fun NotesCompose(
                 modifier = Modifier.padding(top = 5.dp)
             )
         }
-        val editMessage = remember { mutableStateOf("") }
-        val message = remember { mutableStateOf("") }
-        val openDialog = remember { mutableStateOf(false) }
-        if (!openDialog.value) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                    .clickable { openDialog.value = true }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.add_new),
-                    contentDescription = stringResource(id = R.string.add_note),
-                    modifier = Modifier.size(25.dp)
-                )
-                Text(
-                    text = stringResource(id = R.string.add_note),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
-            }
-        } else {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    TextField(
-                        value = editMessage.value,
-                        onValueChange = { editMessage.value = it },
-                        singleLine = true,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            cursorColor = Color.Transparent,
-                        ),
-                        placeholder = {
-                            Text(
-                                text = stringResource(id = R.string.enter_note),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row(modifier = Modifier.align(Alignment.End)) {
-
-                        OutlinedButton(
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                            onClick = { openDialog.value = false }
-                        ) { Text(stringResource(id = R.string.cancel_note)) }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        OutlinedButton(
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                            onClick = {
-                                message.value = editMessage.value
-                                openDialog.value = false
-                                editMessage.value = ""
-                                insertNote(
-                                    Note(
-                                        noteTekst = message.value,
-                                        checked = false,
-                                        dateCreated = LocalDateTime.now(),
-                                        id = UUID.randomUUID().toString(),
-                                    )
-                                )
-                            }
-                        ) { Text(stringResource(id = R.string.save_note)) }
-                    }
-                }
-
-            }
-        }
+        AddNoteCompose(insertNote)
         notes.sortedByDescending { it.dateCreated }.forEach { note ->
             key(note.id) {
                 NoteItem(
@@ -154,4 +82,3 @@ fun NotesCompose(
         }
     }
 }
-

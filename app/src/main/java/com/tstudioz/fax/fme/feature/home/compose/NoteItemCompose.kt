@@ -28,16 +28,18 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.database.models.Note
+import com.tstudioz.fax.fme.feature.home.compose.NoteItemState.Default
+import com.tstudioz.fax.fme.feature.home.compose.NoteItemState.Edit
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NoteItem(
     note: Note,
-    markDone: (isDone: Boolean) -> Unit = { },
-    delete: () -> Unit = { }
+    markDone: (isDone: Boolean) -> Unit,
+    delete: () -> Unit
 ) {
     val isDone = remember { mutableStateOf(note.checked == true) }
-    val longClicked = remember { mutableStateOf(false) }
+    val noteItemState = remember { mutableStateOf(NoteItemState.Default) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -45,25 +47,29 @@ fun NoteItem(
         modifier = Modifier
             .padding(vertical = 10.dp)
             .clip(RoundedCornerShape(20.dp))
-            .combinedClickable(onLongClick = { longClicked.value = !longClicked.value }) {}
+            .combinedClickable(onLongClick = {
+                noteItemState.value = noteItemState.value.Switch()
+            }) {}
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
     ) {
-        if (longClicked.value) {
-            Image(
-                painter = painterResource(id = R.drawable.trash_can_icon),
+        when (noteItemState.value) {
+            Edit -> {
+                Image(
+                        painter = painterResource(id = R.drawable.trash_can_icon),
                 contentDescription = stringResource(id = R.string.delete_note_desc),
                 modifier = Modifier
                     .size(25.dp)
                     .padding(2.dp)
                     .noRippleClickable {
-                        longClicked.value = !longClicked.value
+                        noteItemState.value = noteItemState.value.Switch()
                         delete()
                     }
-            )
-        } else {
-            Image(
-                painter = painterResource(id = if (isDone.value) R.drawable.circle_checked else R.drawable.circle_white),
+                )
+            }
+            Default -> {
+                Image(
+                        painter = painterResource(id = if (isDone.value) R.drawable.circle_checked else R.drawable.circle_white),
                 contentDescription = stringResource(id = R.string.checkmark_note_desc),
                 modifier = Modifier
                     .size(25.dp)
@@ -71,7 +77,8 @@ fun NoteItem(
                         isDone.value = !isDone.value
                         markDone(isDone.value)
                     }
-            )
+                )
+            }
         }
         Text(
             text = note.noteTekst,
@@ -80,6 +87,17 @@ fun NoteItem(
             textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None
         )
     }
+}
+
+enum class NoteItemState{
+    Default, Edit;
+    fun Switch(): NoteItemState {
+        return when (this) {
+            Default -> Edit
+            Edit -> Default
+        }
+    }
+
 }
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
