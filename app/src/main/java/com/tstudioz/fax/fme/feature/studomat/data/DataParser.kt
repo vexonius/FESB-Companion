@@ -11,7 +11,7 @@ fun parseYears(body: String): List<StudomatYearInfo> {
         val hrefTemp = element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
         StudomatYearInfo().apply {
             id = hrefTemp.split("/").lastOrNull().toString()
-            courseName = element.select(".price-table__title p").getOrNull(1)?.text() ?: ""
+            studyProgram = element.select(".price-table__title p").getOrNull(1)?.text() ?: ""
             academicYear = element.select(".price-table__title p").getOrNull(0)?.text() ?: ""
             href = element.selectFirst("a[title=Prikaži podatke o upisu]")?.attr("href") ?: ""
         }
