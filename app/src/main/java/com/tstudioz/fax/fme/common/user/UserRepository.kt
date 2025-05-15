@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
 import com.tstudioz.fax.fme.common.user.models.UserRoom
+import com.tstudioz.fax.fme.database.AppDatabase
 import com.tstudioz.fax.fme.feature.login.dao.UserDao
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -15,7 +16,8 @@ class UserRepository(
     private val userService: UserServiceInterface,
     private val userDao: UserDao,
     private val sharedPreferences: SharedPreferences,
-    private val sessionDelegate: SessionDelegateInterface
+    private val sessionDelegate: SessionDelegateInterface,
+    private val appDatabase: AppDatabase,
 ) : UserRepositoryInterface {
 
     override suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult {
@@ -44,12 +46,7 @@ class UserRepository(
 
     override suspend fun deleteAllUserData() {
         sessionDelegate.clearSession()
-        userDao.deleteAllUserData()
+        appDatabase.clearAllTables()
         sharedPreferences[SPKey.LOGGED_IN] = false
     }
-
-    companion object {
-        private val TAG = this.javaClass.canonicalName
-    }
-
 }
