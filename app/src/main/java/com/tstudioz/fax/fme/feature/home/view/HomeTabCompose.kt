@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.home.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,11 +43,11 @@ import com.tstudioz.fax.fme.feature.home.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.compose.CardsCompose
 import com.tstudioz.fax.fme.feature.home.compose.NotesCompose
 import com.tstudioz.fax.fme.feature.home.compose.TodayTimetableCompose
+import com.tstudioz.fax.fme.feature.home.getWeatherDescription
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
 import com.tstudioz.fax.fme.routing.HomeRouter
-import com.tstudioz.fax.fme.util.testEvents
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -167,7 +165,7 @@ fun WeatherCompose(
             text = stringResource(
                 R.string.weather_info,
                 weather.location,
-                weather.summary.lowercase(Locale.getDefault()),
+                getWeatherDescription(weather.summary.lowercase(Locale.getDefault())),
                 weather.temperature
             ),
             style = MaterialTheme.typography.bodySmall,

@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.feature.home.view
 
 import android.app.Application
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
@@ -16,10 +15,8 @@ import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.feature.home.WeatherDisplay
-import com.tstudioz.fax.fme.feature.home.codeToDisplay
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.repository.WeatherRepositoryInterface
-import com.tstudioz.fax.fme.feature.home.weatherSymbolKeys
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.networking.NetworkUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -70,34 +67,33 @@ class HomeViewModel(
 
     private fun getForecast() {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            if (networkUtils.isNetworkAvailable()) {
-                try {
-                    val weather = weatherRepository.fetchWeatherDetails()
-                    if (weather != null) {
-                        val forecastInstantDetails = weather.properties?.timeseries?.first()?.data?.instant?.details
-                        val forecastNextOneHours = weather.properties?.timeseries?.first()?.data?.next1Hours
-                        val unparsedSummary = forecastNextOneHours?.summary?.symbolCode
-                        val weatherSymbol = weatherSymbolKeys[unparsedSummary]
-                        val summary = codeToDisplay[weatherSymbol?.first]?.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(
-                                Locale.getDefault()
-                            ) else it.toString()
-                        }
-                        _weatherDisplay.postValue(
-                            WeatherDisplay(
-                                "Split",
-                                forecastInstantDetails?.airTemperature ?: 20.0,
-                                summary ?: ""
-                            )
-                        )
-                    }
-                } catch (e: Exception) {
-                    Log.d("HomeViewModel", "Caught $e")
-                    snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.weather_error))
-                }
-            } else {
+            if (!networkUtils.isNetworkAvailable()) {
                 snackbarHostState.showSnackbar("Niste povezani")
+                return@launch
             }
+            try {
+                weatherRepository.fetchWeatherDetails()?.let {
+                    val airTemperature =
+                        it.properties?.timeseries?.firstOrNull()
+                            ?.data?.instant?.details?.airTemperature
+                            ?: 20.0
+                    val summary =
+                        it.properties?.timeseries?.firstOrNull()
+                            ?.data?.next1Hours?.summary?.symbolCode?.split("_")
+                            ?.firstOrNull()
+                    _weatherDisplay.postValue(
+                        WeatherDisplay(
+                            "Split",
+                            airTemperature,
+                            summary ?: ""
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                Log.d("HomeViewModel", "Caught $e")
+                snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.weather_error))
+            }
+
         }
     }
 

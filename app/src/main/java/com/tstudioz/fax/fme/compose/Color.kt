@@ -74,4 +74,4 @@ val passGreen = Color(0xFF02b010)
 
 val notesContainer = Color(0xFF00263C)
 
-val noteTextColor = Color(0xFFB2C5FF)
+val noteTextColor = Color(0xFFFFFFFF)
