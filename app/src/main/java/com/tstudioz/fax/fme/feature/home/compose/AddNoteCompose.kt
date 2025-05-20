@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.home.compose
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.noteTextColor
 import com.tstudioz.fax.fme.database.models.Note
 import java.time.LocalDateTime
 import java.util.UUID
@@ -43,18 +45,21 @@ fun AddNoteCompose(insertNote: (note: Note) -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp)
+                .padding(vertical = 6.dp)
                 .clip(RoundedCornerShape(20.dp))
-                .clickable { openDialog.value = true }) {
+                .clickable { openDialog.value = true }
+                .padding(4.dp,4.dp,8.dp,4.dp)) {
             Icon(
-                painter = painterResource(id = R.drawable.add_new),
+                painter = painterResource(id = R.drawable.note_add),
                 contentDescription = stringResource(id = R.string.add_note),
-                modifier = Modifier.size(25.dp)
+                modifier = Modifier.size(20.dp),
+                tint = noteTextColor
             )
             Text(
                 text = stringResource(id = R.string.add_note),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(start = 10.dp)
+                modifier = Modifier.padding(start = 10.dp),
+                color = noteTextColor
             )
         }
     } else {

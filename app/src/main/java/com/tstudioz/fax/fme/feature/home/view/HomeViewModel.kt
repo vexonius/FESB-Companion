@@ -3,14 +3,15 @@ package com.tstudioz.fax.fme.feature.home.view
 import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
@@ -30,8 +31,6 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import androidx.core.net.toUri
-import com.tstudioz.fax.fme.R
 
 @InternalCoroutinesApi
 class HomeViewModel(
@@ -54,10 +53,13 @@ class HomeViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("HomeViewModel", "Caught $exception")
-        viewModelScope.launch(Dispatchers.Main) { snackbarHostState.showSnackbar(
-            getApplication<Application>().applicationContext.getString(
-                R.string.general_error
-            )) }
+        viewModelScope.launch(Dispatchers.Main) {
+            snackbarHostState.showSnackbar(
+                getApplication<Application>().applicationContext.getString(
+                    R.string.general_error
+                )
+            )
+        }
     }
 
     init {
@@ -152,31 +154,16 @@ class HomeViewModel(
     fun launchStudentskiUgovoriApp() {
         val context = getApplication<Application>().applicationContext
         val appPackageName = "com.ugovori.studentskiugovori"
-        val intent = context.packageManager.getLaunchIntentForPackage(appPackageName)
-        if (intent != null) {
-            context.startActivity(intent)
-        } else {
-            try {
-                context.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        "market://details?id=$appPackageName".toUri()
-                    )
-                )
-            } catch (ex: ActivityNotFoundException) {
-                context.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        "https://play.google.com/store/apps/details?id=$appPackageName".toUri()
-                    )
-                )
-            }
-        }
+        val intent = context.packageManager.getLaunchIntentForPackage(appPackageName) ?: Intent(
+            Intent.ACTION_VIEW,
+            "https://play.google.com/store/apps/details?id=$appPackageName".toUri()
+        )
+        context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
     fun loadUsersName() {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            val name = userRepository.getCurrentUser().fullName.split(" ") .firstOrNull() ?: ""
+            val name = userRepository.getCurrentUser().fullName.split(" ").firstOrNull() ?: ""
             nameOfUser.postValue(name.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(Locale.getDefault())
                 else it.toString()

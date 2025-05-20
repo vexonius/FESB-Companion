@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,11 +26,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.noteTextColor
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.feature.home.compose.NoteItemState.Default
 import com.tstudioz.fax.fme.feature.home.compose.NoteItemState.Edit
+import java.time.LocalDateTime
+import java.util.UUID
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -45,38 +51,39 @@ fun NoteItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .padding(vertical = 10.dp)
+            .padding(vertical = 6.dp)
             .clip(RoundedCornerShape(20.dp))
             .combinedClickable(onLongClick = {
-                noteItemState.value = noteItemState.value.Switch()
+                noteItemState.value = noteItemState.value.switch()
             }) {}
+            .padding(4.dp, 4.dp, 8.dp, 4.dp)
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
     ) {
         when (noteItemState.value) {
             Edit -> {
                 Image(
-                        painter = painterResource(id = R.drawable.trash_can_icon),
-                contentDescription = stringResource(id = R.string.delete_note_desc),
-                modifier = Modifier
-                    .size(25.dp)
-                    .padding(2.dp)
-                    .noRippleClickable {
-                        noteItemState.value = noteItemState.value.Switch()
-                        delete()
-                    }
+                    painter = painterResource(id = R.drawable.note_delete),
+                    contentDescription = stringResource(id = R.string.delete_note_desc),
+                    modifier = Modifier
+                        .size(20.dp)
+                        .noRippleClickable {
+                            noteItemState.value = noteItemState.value.switch()
+                            delete()
+                        }
                 )
             }
+
             Default -> {
                 Image(
-                        painter = painterResource(id = if (isDone.value) R.drawable.circle_checked else R.drawable.circle_white),
-                contentDescription = stringResource(id = R.string.checkmark_note_desc),
-                modifier = Modifier
-                    .size(25.dp)
-                    .noRippleClickable {
-                        isDone.value = !isDone.value
-                        markDone(isDone.value)
-                    }
+                    painter = painterResource(id = if (isDone.value) R.drawable.note_checked else R.drawable.note_circle),
+                    contentDescription = stringResource(id = R.string.checkmark_note_desc),
+                    modifier = Modifier
+                        .size(20.dp)
+                        .noRippleClickable {
+                            isDone.value = !isDone.value
+                            markDone(isDone.value)
+                        }
                 )
             }
         }
@@ -84,14 +91,35 @@ fun NoteItem(
             text = note.noteTekst,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 10.dp),
+            color = noteTextColor,
             textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None
         )
     }
 }
 
-enum class NoteItemState{
+@Preview
+@Composable
+fun NoteItemPreview() {
+    AppTheme {
+        Surface {
+            NoteItem(
+                note = Note(
+                    id = UUID.randomUUID().toString(),
+                    noteTekst = "Test",
+                    dateCreated = LocalDateTime.now(),
+                    checked = false
+                ),
+                markDone = {},
+                delete = {}
+            )
+        }
+    }
+}
+
+enum class NoteItemState {
     Default, Edit;
-    fun Switch(): NoteItemState {
+
+    fun switch(): NoteItemState {
         return when (this) {
             Default -> Edit
             Edit -> Default

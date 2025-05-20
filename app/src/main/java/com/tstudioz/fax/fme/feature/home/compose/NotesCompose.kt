@@ -49,8 +49,9 @@ fun NotesCompose(
             .padding(24.dp, 12.dp)
             .clip(RoundedCornerShape(30.dp))
             .background(notesContainer)
-            .padding(24.dp, 12.dp)
-            .animateContentSize(),
+            .padding(20.dp, 12.dp)
+            .animateContentSize()
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
     ) {
         Row {
@@ -68,14 +69,7 @@ fun NotesCompose(
                     note = note,
                     delete = { deleteNote(note) },
                     markDone = { isDone ->
-                        insertNote(
-                            Note(
-                                noteTekst = note.noteTekst,
-                                checked = isDone,
-                                dateCreated = note.dateCreated,
-                                id = note.id
-                            )
-                        )
+                        insertNote(note.apply { checked = isDone })
                     }
                 )
             }
