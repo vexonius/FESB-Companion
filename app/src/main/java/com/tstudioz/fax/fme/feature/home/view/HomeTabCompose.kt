@@ -43,7 +43,7 @@ import com.tstudioz.fax.fme.feature.home.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.compose.CardsCompose
 import com.tstudioz.fax.fme.feature.home.compose.NotesCompose
 import com.tstudioz.fax.fme.feature.home.compose.TodayTimetableCompose
-import com.tstudioz.fax.fme.feature.home.getWeatherDescription
+import com.tstudioz.fax.fme.feature.home.getWeatherText
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
@@ -165,7 +165,7 @@ fun WeatherCompose(
             text = stringResource(
                 R.string.weather_info,
                 weather.location,
-                getWeatherDescription(weather.summary.lowercase(Locale.getDefault())),
+                stringResource(getWeatherText(weather.summary.lowercase(Locale.getDefault()))),
                 weather.temperature
             ),
             style = MaterialTheme.typography.bodySmall,

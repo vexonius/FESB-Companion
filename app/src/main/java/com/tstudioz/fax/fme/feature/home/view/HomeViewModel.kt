@@ -72,23 +72,7 @@ class HomeViewModel(
                 return@launch
             }
             try {
-                weatherRepository.fetchWeatherDetails()?.let {
-                    val airTemperature =
-                        it.properties?.timeseries?.firstOrNull()
-                            ?.data?.instant?.details?.airTemperature
-                            ?: 20.0
-                    val summary =
-                        it.properties?.timeseries?.firstOrNull()
-                            ?.data?.next1Hours?.summary?.symbolCode?.split("_")
-                            ?.firstOrNull()
-                    _weatherDisplay.postValue(
-                        WeatherDisplay(
-                            "Split",
-                            airTemperature,
-                            summary ?: ""
-                        )
-                    )
-                }
+                weatherRepository.fetchWeatherDetails()?.let { _weatherDisplay.postValue(it) }
             } catch (e: Exception) {
                 Log.d("HomeViewModel", "Caught $e")
                 snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.weather_error))

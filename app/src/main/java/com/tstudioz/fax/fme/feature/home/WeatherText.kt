@@ -1,13 +1,10 @@
 package com.tstudioz.fax.fme.feature.home
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
+
 import com.tstudioz.fax.fme.R
 
-@Composable
-fun getWeatherDescription(key: String?): String {
-    return stringResource(
-        id = when (key) {
+fun getWeatherText(key: String?): Int {
+    return when (key) {
             "clearsky" -> R.string.weather_clearsky
             "fair" -> R.string.weather_fair
             "partlycloudy" -> R.string.weather_partlycloudy
@@ -51,5 +48,4 @@ fun getWeatherDescription(key: String?): String {
             "heavysnow" -> R.string.weather_heavysnow
             else -> R.string.weather_clearsky // fallback
         }
-    )
 }

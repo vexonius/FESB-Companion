@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.home.repository
 
 import android.util.Log
+import com.tstudioz.fax.fme.feature.home.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.WeatherFeature
 import com.tstudioz.fax.fme.feature.home.services.WeatherServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
@@ -16,15 +17,28 @@ private val json = Json {
 
 class WeatherRepository(private val weatherNetworkService: WeatherServiceInterface) : WeatherRepositoryInterface {
 
-    override suspend fun fetchWeatherDetails(): WeatherFeature? {
+    override suspend fun fetchWeatherDetails(): WeatherDisplay? {
         return when (val result = weatherNetworkService.fetchWeatherDetails()) {
             is NetworkServiceResult.WeatherResult.Success -> {
-                val test = json.decodeFromString<WeatherFeature>(result.data)
-                test
+                val weather = json.decodeFromString<WeatherFeature>(result.data)
+                val airTemperature =
+                    weather.properties?.timeseries?.firstOrNull()
+                        ?.data?.instant?.details?.airTemperature
+                        ?: 20.0
+                val summary =
+                    weather.properties?.timeseries?.firstOrNull()
+                        ?.data?.next1Hours?.summary?.symbolCode?.split("_")
+                        ?.firstOrNull() ?: ""
+
+                return WeatherDisplay(
+                    "Split",
+                    airTemperature,
+                    summary
+                )
             }
 
             is NetworkServiceResult.WeatherResult.Failure -> {
-                Log.e(this.javaClass.canonicalName, "Timetable fetching error")
+                Log.e(this.javaClass.canonicalName, "Weather fetching error")
                 null
             }
         }
