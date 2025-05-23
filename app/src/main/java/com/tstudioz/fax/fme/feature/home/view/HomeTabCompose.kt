@@ -121,7 +121,8 @@ fun HomeTabCompose(
                 homeViewModel.fetchDailyTimetable()
                 menzaViewModel.getMenza()
             }
-            else ->{}
+
+            else -> {}
         }
     }
 
@@ -322,9 +323,10 @@ fun NotesCompose(
                     )
                 }
             } else {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onClick() }) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onClick() }) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         TextField(
                             value = editMessage.value,
@@ -380,7 +382,7 @@ fun NotesCompose(
             notes.forEach { note ->
                 NoteItem(
                     note = note,
-                    isDone = remember { mutableStateOf(note.checked ?: false) },
+                    isDone = remember { mutableStateOf(note.checked == true) },
                     delete = { deleteNote(note) },
                     markDone = { isDone ->
                         insertNote(
@@ -478,7 +480,7 @@ fun TodayTimetableCompose(
         }
 
         if (events.isNotEmpty()) {
-            events.forEach() { event ->
+            events.forEach { event ->
                 TimetableItem(event)
             }
         } else {

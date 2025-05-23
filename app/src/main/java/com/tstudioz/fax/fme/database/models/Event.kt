@@ -6,8 +6,8 @@ import com.tstudioz.fax.fme.compose.accentGreen
 import com.tstudioz.fax.fme.compose.accentGrey
 import com.tstudioz.fax.fme.compose.accentPurple
 import com.tstudioz.fax.fme.compose.accentRed
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
 
@@ -28,76 +28,74 @@ data class Event(
     val recurringType: Recurring = Recurring.UNDEFINED,
     val recurringUntil: String = "",
     val studyCode: String = "",
-)
+) {
 
-open class EventRealm : RealmObject {
-    @PrimaryKey
-    var id: String? = null
-    var name: String? = null
-    var shortName: String? = null
-    var colorId: Int? = null
-    var professor: String? = null
-    var eventType: String? = null
-    var groups: String? = null
-    var classroom: String? = null
-    var start: String? = null
-    var end: String? = null
-    var description: String? = null
-    var recurring: Boolean? = null
-    var recurringType: String? = null
-    var recurringUntil: String? = null
-    var studyCode: String? = null
-}
-
-enum class Recurring {
-    ONCE, WEEKLY, EVERY_TWO_WEEKS, MONTHLY, UNDEFINED
-}
-
-fun toRealmObject(event: Event): EventRealm {
-    return EventRealm().apply {
-        id = event.id
-        name = event.name
-        shortName = event.shortName
-        colorId = event.colorId
-        professor = event.professor
-        eventType = event.eventType.name
-        groups = event.groups
-        classroom = event.classroom
-        start = event.start.toString()
-        end = event.end.toString()
-        description = event.description
-        recurring = event.recurring
-        recurringType = event.recurringType.name
-        recurringUntil = event.recurringUntil
-        studyCode = event.studyCode
-    }
-}
-
-fun fromRealmObject(eventRealm: EventRealm): Event {
-    return Event(
-        id = eventRealm.id ?: "",
-        name = eventRealm.name ?: "",
-        shortName = eventRealm.shortName ?: "",
-        colorId = eventRealm.colorId ?: 0,
-        color = Color(eventRealm.colorId ?: 0),
-        professor = eventRealm.professor ?: "",
-        eventType = eventRealm.eventType?.let {
+    constructor(eventRoom: EventRoom) : this(
+        id = eventRoom.id,
+        name = eventRoom.name ?: "",
+        shortName = eventRoom.shortName ?: "",
+        colorId = eventRoom.colorId ?: 0,
+        color = Color(eventRoom.colorId ?: 0),
+        professor = eventRoom.professor ?: "",
+        eventType = eventRoom.eventType?.let {
             try {
                 TimetableType.valueOf(it)
             } catch (error: IllegalArgumentException) {
                 TimetableType.OTHER
             }
         } ?: TimetableType.OTHER,
-        groups = eventRealm.groups ?: "",
-        classroom = eventRealm.classroom ?: "",
-        start = LocalDateTime.parse(eventRealm.start),
-        end = LocalDateTime.parse(eventRealm.end),
-        description = eventRealm.description,
-        recurring = eventRealm.recurring ?: false,
-        recurringType = Recurring.valueOf(eventRealm.recurringType ?: ""),
-        recurringUntil = eventRealm.recurringUntil ?: "",
-        studyCode = eventRealm.studyCode ?: ""
+        groups = eventRoom.groups ?: "",
+        classroom = eventRoom.classroom ?: "",
+        start = LocalDateTime.parse(eventRoom.start),
+        end = LocalDateTime.parse(eventRoom.end),
+        description = eventRoom.description,
+        recurring = eventRoom.recurring == true,
+        recurringType = Recurring.valueOf(eventRoom.recurringType ?: ""),
+        recurringUntil = eventRoom.recurringUntil ?: "",
+        studyCode = eventRoom.studyCode ?: ""
     )
+}
+
+@Entity
+data class EventRoom(
+    @PrimaryKey
+    var id: String = "",
+    var name: String? = null,
+    var shortName: String? = null,
+    var colorId: Int? = null,
+    var professor: String? = null,
+    var eventType: String? = null,
+    var groups: String? = null,
+    var classroom: String? = null,
+    var start: String? = null,
+    var end: String? = null,
+    var description: String? = null,
+    var recurring: Boolean? = null,
+    var recurringType: String? = null,
+    var recurringUntil: String? = null,
+    var studyCode: String? = null,
+) {
+    constructor(event: Event) : this(
+        id = event.id,
+        name = event.name,
+        shortName = event.shortName,
+        colorId = event.colorId,
+        professor = event.professor,
+        eventType = event.eventType.value,
+        groups = event.groups,
+        classroom = event.classroom,
+        start = event.start.toString(),
+        end = event.end.toString(),
+        description = event.description,
+        recurring = event.recurring,
+        recurringType = event.recurringType.name,
+        recurringUntil = event.recurringUntil,
+        studyCode = event.studyCode
+    )
+}
+
+enum class Recurring {
+    ONCE, WEEKLY, EVERY_TWO_WEEKS, MONTHLY, UNDEFINED
 }
 
 enum class TimetableType(val value: String) {

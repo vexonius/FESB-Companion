@@ -12,7 +12,7 @@ class TimetableService(private val client: OkHttpClient) : TimetableServiceInter
     private val baseURL = "https://raspored.fesb.unist.hr"
 
     override suspend fun fetchTimeTable(params: HashMap<String, String>): NetworkServiceResult.TimeTableResult {
-        val endpointUrl  = "$baseURL/part/raspored/kalendar"
+        val endpointUrl = "$baseURL/part/raspored/kalendar"
         val urlBuilder = endpointUrl
             .toHttpUrl()
             .newBuilder()

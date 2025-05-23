@@ -11,4 +11,5 @@ data class Exam(
     var type: String = "",
     var description: String = "",
     var totalAttendances: String = "",
-    var attendancesThisYear: String = "")
+    var attendancesThisYear: String = ""
+)

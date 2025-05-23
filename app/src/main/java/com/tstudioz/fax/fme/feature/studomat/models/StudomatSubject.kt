@@ -1,8 +1,13 @@
 package com.tstudioz.fax.fme.feature.studomat.models
 
-import io.realm.kotlin.types.RealmObject
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-open class StudomatSubject(
+
+@Entity
+data class StudomatSubject(
+    @PrimaryKey
+    var id: String = "",
     var name: String = "",
     var electiveGroup: String = "",
     var semester: String = "",
@@ -14,11 +19,6 @@ open class StudomatSubject(
     var grade: String = "",
     var examDate: String = "",
     var year: String = "",
+    var course: String = "",
     var isPassed: Boolean = false
-) : RealmObject {
-    constructor() : this("", "", "", "", "", "", "", "", "", "", "", false)
-
-    override fun toString(): String {
-        return "StudomatSubject(name='$name', semester='$semester', lectures='$lectures', exercises='$exercises', ectsEnrolled='$ectsEnrolled', \nisTaken='$isTaken', status='$status', grade='$grade', examDate='$examDate', year='$year')\n"
-    }
-}
+)

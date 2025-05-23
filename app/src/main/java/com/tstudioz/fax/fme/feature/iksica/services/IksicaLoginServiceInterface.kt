@@ -8,6 +8,6 @@ interface IksicaLoginServiceInterface {
 
     suspend fun login(email: String, password: String): NetworkServiceResult.IksicaResult
 
-    suspend fun getAspNetSessionSAML() : NetworkServiceResult.IksicaResult
+    suspend fun getAspNetSessionSAML(): NetworkServiceResult.IksicaResult
 
 }

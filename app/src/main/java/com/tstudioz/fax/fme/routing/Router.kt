@@ -2,18 +2,20 @@ package com.tstudioz.fax.fme.routing
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getString
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.login.view.LoginActivity
 import com.tstudioz.fax.fme.feature.settings.SettingsActivity
 import com.tstudioz.fax.fme.feature.settings.model.EmailModalModel
+import com.tstudioz.fax.fme.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.util.SPKey
 import com.tstudioz.fax.fme.view.activities.MainActivity
 import java.lang.ref.WeakReference
 
-class Router: AppRouter, LoginRouter, HomeRouter, SettingsRouter {
+class Router(val sharedPreferences: SharedPreferences) : AppRouter, LoginRouter, HomeRouter, SettingsRouter {
 
     private var activity: WeakReference<Activity>? = null
 
@@ -25,7 +27,7 @@ class Router: AppRouter, LoginRouter, HomeRouter, SettingsRouter {
         val activity = activity?.get() ?: return
 
         val intent = Intent(activity, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         activity.startActivity(intent)
         activity.finish()
     }
@@ -33,8 +35,9 @@ class Router: AppRouter, LoginRouter, HomeRouter, SettingsRouter {
     override fun routeToLogin() {
         val activity = activity?.get() ?: return
 
+        sharedPreferences[SPKey.LOGGED_IN] = false
         val intent = Intent(activity, LoginActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         activity.startActivity(intent)
         activity.finish()
     }
@@ -61,7 +64,7 @@ class Router: AppRouter, LoginRouter, HomeRouter, SettingsRouter {
             .putExtra(Intent.EXTRA_TEXT, model.body)
             .setType("message/rfc822")
 
-        activity.startActivity(Intent.createChooser(intent, model.title));
+        activity.startActivity(Intent.createChooser(intent, model.title))
     }
 
     override fun openCustomTab(url: String) {
