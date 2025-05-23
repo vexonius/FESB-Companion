@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
@@ -47,6 +48,7 @@ fun NoteItem(
 ) {
     val isDone = remember { mutableStateOf(note.checked == true) }
     val noteItemState: MutableState<NoteItemState> = remember { mutableStateOf(Default) }
+    val iconSize = Dp(MaterialTheme.typography.bodyMedium.lineHeight.value)
 
     Row(
         verticalAlignment = Alignment.Top,
@@ -67,7 +69,7 @@ fun NoteItem(
                     painter = painterResource(id = R.drawable.note_delete),
                     contentDescription = stringResource(id = R.string.delete_note_desc),
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(iconSize)
                         .noRippleClickable {
                             noteItemState.value = noteItemState.value.switch()
                             delete()
@@ -80,7 +82,7 @@ fun NoteItem(
                     painter = painterResource(id = if (isDone.value) R.drawable.note_checkmark else R.drawable.note_circle),
                     contentDescription = stringResource(id = R.string.checkmark_note_desc),
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(iconSize)
                         .noRippleClickable {
                             isDone.value = !isDone.value
                             markDone(isDone.value)
@@ -93,7 +95,7 @@ fun NoteItem(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 20.dp)
+                .heightIn(min = iconSize)
         ) {
             Text(
                 text = note.noteTekst,
