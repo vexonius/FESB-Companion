@@ -14,10 +14,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
@@ -38,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -105,6 +110,30 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
     }
 
     BottomSheetScaffold(
+        topBar = {
+            Row(horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.background(Color.Transparent).fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.tab_timetable),
+                    style = MaterialTheme.typography.displayMedium,
+                    color = MaterialTheme.contentColors.primary,
+                    modifier = Modifier.padding(16.dp)
+                )
+                IconButton(
+                    onClick = { timetableViewModel.showWeekChooseMenu() },
+                    colors = IconButtonDefaults.iconButtonColors().copy(
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.timetable_date_select_icon),
+                        contentDescription = stringResource(id = R.string.change_week),
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+        },
         containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         sheetContent = {
@@ -336,7 +365,9 @@ fun EventCard(
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Start,
-            modifier = Modifier.weight(0.7f, fill = false).padding(bottom = 4.dp),
+            modifier = Modifier
+                .weight(0.7f, fill = false)
+                .padding(bottom = 4.dp),
         )
 
         Text(
