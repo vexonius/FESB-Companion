@@ -73,5 +73,3 @@ val eventCardBackground = Color(0xFF232323)
 val passGreen = Color(0xFF02b010)
 
 val notesContainer = Color(0xFF00263C)
-
-val noteTextColor = Color(0xFFFFFFFF)

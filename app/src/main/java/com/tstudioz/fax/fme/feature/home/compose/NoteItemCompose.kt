@@ -1,7 +1,6 @@
 package com.tstudioz.fax.fme.feature.home.compose
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,13 +9,16 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
-import com.tstudioz.fax.fme.compose.noteTextColor
 import com.tstudioz.fax.fme.database.models.Note
 import com.tstudioz.fax.fme.feature.home.compose.NoteItemState.Default
 import com.tstudioz.fax.fme.feature.home.compose.NoteItemState.Edit
@@ -45,14 +46,14 @@ fun NoteItem(
     delete: () -> Unit
 ) {
     val isDone = remember { mutableStateOf(note.checked == true) }
-    val noteItemState = remember { mutableStateOf(NoteItemState.Default) }
+    val noteItemState: MutableState<NoteItemState> = remember { mutableStateOf(Default) }
 
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
             .padding(vertical = 6.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(12.dp))
             .combinedClickable(onLongClick = {
                 noteItemState.value = noteItemState.value.switch()
             }) {}
@@ -62,7 +63,7 @@ fun NoteItem(
     ) {
         when (noteItemState.value) {
             Edit -> {
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.note_delete),
                     contentDescription = stringResource(id = R.string.delete_note_desc),
                     modifier = Modifier
@@ -75,8 +76,8 @@ fun NoteItem(
             }
 
             Default -> {
-                Image(
-                    painter = painterResource(id = if (isDone.value) R.drawable.note_checked else R.drawable.note_circle),
+                Icon(
+                    painter = painterResource(id = if (isDone.value) R.drawable.note_checkmark else R.drawable.note_circle),
                     contentDescription = stringResource(id = R.string.checkmark_note_desc),
                     modifier = Modifier
                         .size(20.dp)
@@ -87,13 +88,20 @@ fun NoteItem(
                 )
             }
         }
-        Text(
-            text = note.noteTekst,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 10.dp),
-            color = noteTextColor,
-            textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 20.dp)
+        ) {
+            Text(
+                text = note.noteTekst,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = 10.dp),
+                textDecoration = if (isDone.value) TextDecoration.LineThrough else TextDecoration.None
+            )
+        }
     }
 }
 
