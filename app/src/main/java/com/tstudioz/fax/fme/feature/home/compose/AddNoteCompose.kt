@@ -55,7 +55,7 @@ fun AddNoteCompose(insertNote: (note: Note) -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp)
+                .padding(vertical = 2.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .clickable { openDialog.value = true }
                 .padding(4.dp, 4.dp, 8.dp, 4.dp)) {
@@ -78,6 +78,7 @@ fun AddNoteCompose(insertNote: (note: Note) -> Unit) {
         fun submit() {
             message.value = editMessage.value
             openDialog.value = false
+            if (message.value.isEmpty()) return
             insertNote(
                 Note(
                     noteTekst = message.value,
@@ -90,7 +91,7 @@ fun AddNoteCompose(insertNote: (note: Note) -> Unit) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(top = 4.dp)
+                .padding(vertical = 4.dp)
                 .fillMaxWidth()
         ) {
             BasicTextField(

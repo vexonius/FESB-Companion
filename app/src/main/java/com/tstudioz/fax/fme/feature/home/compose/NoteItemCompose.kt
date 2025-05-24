@@ -54,7 +54,7 @@ fun NoteItem(
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .padding(vertical = 6.dp)
+            .padding(vertical = 2.dp)
             .clip(RoundedCornerShape(12.dp))
             .combinedClickable(onLongClick = {
                 noteItemState.value = noteItemState.value.switch()
