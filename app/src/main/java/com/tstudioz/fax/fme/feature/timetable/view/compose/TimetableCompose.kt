@@ -110,30 +110,7 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
     }
 
     BottomSheetScaffold(
-        topBar = {
-            Row(horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.background(Color.Transparent).fillMaxWidth()
-            ) {
-                Text(
-                    text = stringResource(id = R.string.tab_timetable),
-                    style = MaterialTheme.typography.displayMedium,
-                    color = MaterialTheme.contentColors.primary,
-                    modifier = Modifier.padding(16.dp)
-                )
-                IconButton(
-                    onClick = { timetableViewModel.showWeekChooseMenu() },
-                    colors = IconButtonDefaults.iconButtonColors().copy(
-                        contentColor = Color.White
-                    )
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.timetable_date_select_icon),
-                        contentDescription = stringResource(id = R.string.change_week),
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
-            }
-        },
+        topBar = { TopAppBarTimetable { timetableViewModel.showWeekChooseMenu() } },
         containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         sheetContent = {
@@ -202,6 +179,36 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
             minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
             maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
             onClick = { showEvent(it) })
+    }
+}
+
+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+@Composable
+fun TopAppBarTimetable(showWeekChooseMenu: () -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(id = R.string.tab_timetable),
+            style = MaterialTheme.typography.displayMedium,
+            color = MaterialTheme.contentColors.primary,
+            modifier = Modifier.padding(16.dp)
+        )
+        IconButton(
+            onClick = { showWeekChooseMenu() },
+            colors = IconButtonDefaults.iconButtonColors().copy(
+                contentColor = Color.White
+            )
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.timetable_date_select_icon),
+                contentDescription = stringResource(id = R.string.change_week),
+                modifier = Modifier.size(30.dp)
+            )
+        }
     }
 }
 
