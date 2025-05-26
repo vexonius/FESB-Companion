@@ -21,6 +21,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,6 +32,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -49,11 +53,14 @@ fun AddNoteCompose(insertNote: (note: Note) -> Unit) {
     val openDialog = remember { mutableStateOf(false) }
     val iconSize = Dp(MaterialTheme.typography.bodyMedium.lineHeight.value)
     val height = 28.dp
+    var measuredHeight: MutableIntState = remember { mutableIntStateOf(0) }
+
     Spacer(Modifier.height(8.dp))
     if (!openDialog.value) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
+                .onGloballyPositioned{ measuredHeight.intValue = it.size.height }
                 .fillMaxWidth()
                 .padding(vertical = 2.dp)
                 .clip(RoundedCornerShape(20.dp))
@@ -91,7 +98,7 @@ fun AddNoteCompose(insertNote: (note: Note) -> Unit) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(vertical = 4.dp)
+                .height(with(LocalDensity.current) { measuredHeight.intValue.toDp() })
                 .fillMaxWidth()
         ) {
             BasicTextField(

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +49,7 @@ fun TodayTimetableCompose(events: List<Event>) {
         Text(
             text = stringResource(id = R.string.todaysEvents),
             style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(12.dp, 0.dp),
         )
 

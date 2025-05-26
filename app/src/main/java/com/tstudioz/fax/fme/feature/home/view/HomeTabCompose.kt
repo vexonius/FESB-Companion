@@ -17,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
@@ -135,7 +137,6 @@ fun HomeTabCompose(
                     }
                     item {
                         TodayTimetableCompose(
-                            //testEvents
                             events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
                                 ?: emptyList()
                         )
@@ -170,5 +171,22 @@ fun WeatherCompose(
             ),
             style = MaterialTheme.typography.bodySmall,
         )
+    }
+}
+
+@Preview
+@Composable
+fun WeatherPreview() {
+    AppTheme {
+        Surface{
+            WeatherCompose(
+                weather = WeatherDisplay(
+                    location = "Split",
+                    temperature = 20.0,
+                    summary = "Clear"
+                ),
+                nameOfUser = "Marko"
+            )
+        }
     }
 }
