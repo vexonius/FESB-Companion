@@ -1,8 +1,8 @@
 package com.tstudioz.fax.fme.feature.home.repository
 
 import android.util.Log
-import com.tstudioz.fax.fme.feature.home.WeatherDisplay
-import com.tstudioz.fax.fme.feature.home.WeatherFeature
+import com.tstudioz.fax.fme.feature.home.models.WeatherDisplay
+import com.tstudioz.fax.fme.feature.home.models.WeatherFeature
 import com.tstudioz.fax.fme.feature.home.services.WeatherServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import kotlinx.serialization.ExperimentalSerializationApi

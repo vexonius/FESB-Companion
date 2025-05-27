@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.home
+package com.tstudioz.fax.fme.feature.home.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

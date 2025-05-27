@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.home
+package com.tstudioz.fax.fme.feature.home.utils
 
 
 import com.tstudioz.fax.fme.R
