@@ -24,11 +24,15 @@ class WeatherRepository(private val weatherNetworkService: WeatherServiceInterfa
                 val airTemperature =
                     weather.properties?.timeseries?.firstOrNull()
                         ?.data?.instant?.details?.airTemperature
-                        ?: 20.0
                 val summary =
                     weather.properties?.timeseries?.firstOrNull()
                         ?.data?.next1Hours?.summary?.symbolCode?.split("_")
-                        ?.firstOrNull() ?: ""
+                        ?.firstOrNull()
+
+                if (airTemperature == null || summary == null) {
+                    Log.e(this.javaClass.canonicalName, "Weather data is incomplete")
+                    return null
+                }
 
                 return WeatherDisplay(
                     "Split",

@@ -124,7 +124,7 @@ fun HomeTabCompose(
                     }
                     item {
                         WeatherCompose(
-                            weather.observeAsState().value ?: WeatherDisplay("Split", 20.0, ""),
+                            weather.observeAsState().value,
                             homeViewModel.nameOfUser.observeAsState().value ?: ""
                         )
                     }
@@ -150,7 +150,7 @@ fun HomeTabCompose(
 
 @Composable
 fun WeatherCompose(
-    weather: WeatherDisplay,
+    weather: WeatherDisplay?,
     nameOfUser: String
 ) {
     Column(
@@ -162,15 +162,17 @@ fun WeatherCompose(
             style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold
         )
-        Text(
-            text = stringResource(
-                R.string.weather_info,
-                weather.location,
-                stringResource(getWeatherText(weather.summary.lowercase(Locale.getDefault()))),
-                weather.temperature
-            ),
-            style = MaterialTheme.typography.bodySmall,
-        )
+        if (weather != null) {
+            Text(
+                text = stringResource(
+                    R.string.weather_info,
+                    weather.location,
+                    stringResource(getWeatherText(weather.summary.lowercase(Locale.getDefault()))),
+                    weather.temperature
+                ),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
     }
 }
 
@@ -183,7 +185,7 @@ fun WeatherPreview() {
                 weather = WeatherDisplay(
                     location = "Split",
                     temperature = 20.0,
-                    summary = "Clear"
+                    summary = "rain"
                 ),
                 nameOfUser = "Marko"
             )
