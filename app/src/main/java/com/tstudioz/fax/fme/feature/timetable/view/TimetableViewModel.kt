@@ -45,7 +45,7 @@ class TimetableViewModel(
     var events: LiveData<List<Event>> = _events
 
     val eventsGlowing: MutableLiveData<Boolean> = MutableLiveData(
-        sharedPreferences[SPKey.EVENTS_GLOW, true]
+        sharedPreferences[SPKey.EVENTS_GLOW, false]
     )
 
     private val _daysInPeriods = MutableLiveData<Map<LocalDate, TimeTableInfo>>(mutableMapOf())
@@ -82,7 +82,7 @@ class TimetableViewModel(
         }
         _mondayOfSelectedWeek.postValue(
             LocalDate.now().let { it.minusDays((it.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()) })
-        eventsGlowing.postValue(sharedPreferences[SPKey.EVENTS_GLOW, true])
+        eventsGlowing.postValue(sharedPreferences[SPKey.EVENTS_GLOW, false])
     }
 
     fun fetchUserTimetable() {

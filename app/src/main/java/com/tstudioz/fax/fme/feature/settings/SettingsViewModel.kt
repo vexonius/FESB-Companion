@@ -28,7 +28,7 @@ class SettingsViewModel(
     val displayLicences = MutableLiveData(false)
     val routeToLogin = MutableStateFlow(false)
     val eventsGlowing: MutableLiveData<Boolean> = MutableLiveData(
-        sharedPreferences[SPKey.EVENTS_GLOW, true]
+        sharedPreferences[SPKey.EVENTS_GLOW, false]
     )
 
     init {
