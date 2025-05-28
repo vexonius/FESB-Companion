@@ -66,8 +66,10 @@ val lust = Color(0xFFE1141B)
 val shadyBlue = Color(0xFF658393)
 
 // Screens background color
-val welcome2 = Color(0xFF20D2BB)
+val meniColor = Color(0xFF20D2BB)
 
 // Timetable
 val eventCardBackground = Color(0xFF232323)
 val passGreen = Color(0xFF02b010)
+
+val notesContainer = Color(0xFF00263C)

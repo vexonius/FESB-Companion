@@ -61,7 +61,7 @@ class FESBCompanion : Application() {
         scope.launch(Dispatchers.Main) {
             sessionDelegate.onUserDeleted
                 .collect {
-                    if (sharedPreferences[SPKey.LOGGED_IN, true]) {
+                    if (sharedPreferences[SPKey.LOGGED_IN, false]) {
                         router.routeToLogin()
                     }
                 }

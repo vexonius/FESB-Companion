@@ -5,7 +5,7 @@ import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
 
 interface UserRepositoryInterface {
 
-    suspend fun attemptLogin(user: User): UserRepositoryResult.LoginResult
+    suspend fun attemptLogin(username: String, password: String): UserRepositoryResult.LoginResult
 
     suspend fun getCurrentUserName(): String
 
