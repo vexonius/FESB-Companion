@@ -39,7 +39,7 @@ data class Event(
         professor = eventRoom.professor ?: "",
         eventType = eventRoom.eventType?.let {
             try {
-                TimetableType.valueOf(it)
+                TimetableType.setType(it)
             } catch (error: IllegalArgumentException) {
                 TimetableType.OTHER
             }
@@ -106,7 +106,12 @@ enum class TimetableType(val value: String) {
     KONSTRUKCIJSKA_VJEZBA("Konstrukcijske vježbe"),
     SEMINAR("Seminari"),
     ISPIT("Ispiti"),
-    OTHER("Other")
+    OTHER("Other");
+
+    companion object {
+        fun setType(typeValue: String): TimetableType = TimetableType
+            .entries.firstOrNull { it.value == typeValue } ?: TimetableType.OTHER
+    }
 }
 
 fun TimetableType.color(): Color {
@@ -121,4 +126,3 @@ fun TimetableType.color(): Color {
         TimetableType.OTHER -> accentBlue
     }
 }
-

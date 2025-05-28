@@ -52,8 +52,8 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
 import com.tstudioz.fax.fme.compose.contentColors
+import com.tstudioz.fax.fme.feature.home.compose.noRippleClickable
 import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
