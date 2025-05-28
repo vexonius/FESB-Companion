@@ -115,6 +115,9 @@
     <string name="report_bug_email_subject">[BUG REPORT] FESB Companion</string>
     <string name="report_bug">Prijavi bug</string>
     <string name="help_stabilize_app">Pomozi učiniti aplikaciju stabilnijom slanjem bug reporta</string>
+    <string name="make_events_glow">MakeEventsGlow</string>
+    <string name="make_event_glow_description">words word words</string>
+    <string name="customizations">Preference</string>
     <string name="about_app">O APLIKACIJI</string>
     <string name="version">Verzija</string>
     <string name="developers">Developeri</string>

@@ -178,7 +178,9 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
             maxTime = maxTime,
             minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
             maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
-            onClick = { showEvent(it) })
+            onClick = { showEvent(it) },
+            eventsGlowing = timetableViewModel.eventsGlowing.observeAsState().value == true
+        )
     }
 }
 

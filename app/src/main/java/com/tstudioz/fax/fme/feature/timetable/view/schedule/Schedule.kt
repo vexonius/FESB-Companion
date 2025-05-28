@@ -41,8 +41,9 @@ fun Schedule(
     maxDate: LocalDate = events.maxByOrNull(Event::end)?.end?.toLocalDate() ?: LocalDate.now(),
     minTime: LocalTime = LocalTime.MIN,
     maxTime: LocalTime = LocalTime.MAX,
-    daySize: ScheduleSize = ScheduleSize.Adaptive(64.dp),//FixedSize(64.dp),
+    daySize: ScheduleSize = ScheduleSize.Adaptive(64.dp),
     hourSize: ScheduleSize = ScheduleSize.Adaptive(44.dp),
+    eventsGlowing: Boolean = false
 ) {
     val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
@@ -106,7 +107,8 @@ fun Schedule(
                     modifier = Modifier
                         .weight(1f)
                         .verticalScroll(verticalScrollState)
-                        .horizontalScroll(horizontalScrollState)
+                        .horizontalScroll(horizontalScrollState),
+                    eventsGlowing = eventsGlowing
                 )
             }
         }

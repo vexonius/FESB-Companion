@@ -1,30 +1,35 @@
 package com.tstudioz.fax.fme.feature.settings
 
 import android.app.Application
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.feature.settings.model.EmailModalModel
+import com.tstudioz.fax.fme.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.util.PreferenceHelper.get
+import com.tstudioz.fax.fme.util.SPKey
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val application: Application,
     private val userRepository: UserRepositoryInterface,
+    private val sharedPreferences: SharedPreferences
 ) : AndroidViewModel(application) {
 
     val username: MutableLiveData<String> = MutableLiveData()
     val version: MutableLiveData<String> = MutableLiveData()
     val displayLicences = MutableLiveData(false)
     val routeToLogin = MutableStateFlow(false)
+    val eventsGlowing: MutableLiveData<Boolean> = MutableLiveData(
+        sharedPreferences[SPKey.EVENTS_GLOW, true]
+    )
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -43,6 +48,11 @@ class SettingsViewModel(
             userRepository.deleteAllUserData()
             routeToLogin.emit(true)
         }
+    }
+
+    fun makeEventsGlow(value: Boolean) {
+        sharedPreferences[SPKey.EVENTS_GLOW] = value
+        eventsGlowing.postValue(value)
     }
 
     private fun getBuildVersion(): String {

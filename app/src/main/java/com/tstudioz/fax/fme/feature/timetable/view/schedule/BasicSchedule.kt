@@ -33,6 +33,7 @@ fun BasicSchedule(
     maxDayTime: LocalTime = LocalTime.MAX,
     dayWidth: Dp,
     hourHeight: Dp,
+    eventsGlowing: Boolean = false
 ) {
     val numberOfDaysToShow = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
     val numberOfMinutesToShow = ChronoUnit.MINUTES.between(minDayTime, maxDayTime).toInt() + 1
@@ -57,22 +58,24 @@ fun BasicSchedule(
                         .padding(horizontal = 2.dp)
                         .drawBehind {
                             val canvasSize = size
-                            drawContext.canvas.nativeCanvas.apply {
-                                drawRoundRect(
-                                    0f,
-                                    0f,
-                                    canvasSize.width, canvasSize.height,
-                                    cornersRadius.toPx(), cornersRadius.toPx(),
-                                    Paint().apply {
-                                        isAntiAlias = true
-                                        setShadowLayer(
-                                            glowingRadius.toPx(),
-                                            0f,
-                                            0f,
-                                            positionedEvent.event.color.toArgb()
-                                        )
-                                    }
-                                )
+                            if (eventsGlowing) {
+                                drawContext.canvas.nativeCanvas.apply {
+                                    drawRoundRect(
+                                        0f,
+                                        0f,
+                                        canvasSize.width, canvasSize.height,
+                                        cornersRadius.toPx(), cornersRadius.toPx(),
+                                        Paint().apply {
+                                            isAntiAlias = true
+                                            setShadowLayer(
+                                                glowingRadius.toPx(),
+                                                0f,
+                                                0f,
+                                                positionedEvent.event.color.toArgb()
+                                            )
+                                        }
+                                    )
+                                }
                             }
                         }
                 )

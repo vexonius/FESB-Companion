@@ -24,11 +24,14 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import com.tstudioz.fax.fme.util.PreferenceHelper.get
+import com.tstudioz.fax.fme.util.PreferenceHelper.set
+import com.tstudioz.fax.fme.util.contains
 
 @InternalCoroutinesApi
 class FESBCompanion : Application() {
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    val sharedPreferences: SharedPreferences by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -51,12 +54,18 @@ class FESBCompanion : Application() {
         }
 
         observeUserDeleted()
+        setInitialGlowState()
+    }
+
+    private fun setInitialGlowState() {
+        if (!sharedPreferences.contains(SPKey.EVENTS_GLOW)) {
+            sharedPreferences[SPKey.EVENTS_GLOW] = false
+        }
     }
 
     private fun observeUserDeleted() {
         val sessionDelegate: SessionDelegateInterface by inject()
         val router: AppRouter by inject()
-        val sharedPreferences: SharedPreferences by inject()
 
         scope.launch(Dispatchers.Main) {
             sessionDelegate.onUserDeleted
