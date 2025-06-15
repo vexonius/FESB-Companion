@@ -64,10 +64,8 @@ import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
 import com.tbuonomo.viewpagerdotsindicator.compose.type.BalloonIndicatorType
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.menzaLocations
-import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
 import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.feature.home.compose.noRippleClickable
-import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -179,12 +177,12 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             )
 
             when (viewState) {
-                is IksicaViewState.Initial, is IksicaViewState.Empty -> EmptyIksicaView(iksicaViewModel)
+                is IksicaViewState.Initial, is IksicaViewState.Empty -> EmptyIksicaView{ iksicaViewModel.openMenza() }
                 is IksicaViewState.Success -> {
                     PopulatedIksicaView(
                         viewState.data,
                         listState,
-                        iksicaViewModel,
+                        { iksicaViewModel.openMenza() },
                         nestedSheetState,
                         onCardClick = { showPopup.value = true },
                         onItemClick = { iksicaViewModel.getReceiptDetails(it) }
@@ -195,7 +193,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                     PopulatedIksicaView(
                         viewState.data,
                         listState,
-                        iksicaViewModel,
+                        { iksicaViewModel.openMenza() },
                         nestedSheetState,
                         onCardClick = { showPopup.value = true },
                         onItemClick = { iksicaViewModel.getReceiptDetails(it) }
@@ -214,9 +212,9 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
 
 @OptIn(InternalCoroutinesApi::class)
 @Composable
-fun EmptyIksicaView(iksicaViewModel: IksicaViewModel) {
+fun EmptyIksicaView(openMenza : () -> Unit) {
     Column {
-        TopBarIksica { iksicaViewModel.openMenza() }
+        TopBarIksica(openMenza)
         Box(Modifier.fillMaxWidth()) {
             LazyColumn(
                 Modifier.fillMaxSize(),
@@ -235,7 +233,7 @@ fun EmptyIksicaView(iksicaViewModel: IksicaViewModel) {
 fun PopulatedIksicaView(
     model: IksicaData,
     listState: LazyListState,
-    iksicaViewModel: IksicaViewModel,
+    openMenza : () -> Unit,
     nestedSheetState: NestedSheetState,
     onCardClick: () -> Unit,
     onItemClick: (Receipt) -> Unit
@@ -276,7 +274,7 @@ fun PopulatedIksicaView(
                 sheetOffset.intValue = it.size.height
             }
         }) {
-            TopBarIksica { iksicaViewModel.openMenza() }
+            TopBarIksica(openMenza)
 
             Box(Modifier.fillMaxWidth()) {
                 ElevatedCardIksica(
@@ -312,9 +310,7 @@ fun PopulatedIksicaView(
 
 @OptIn(InternalCoroutinesApi::class)
 @Composable
-fun TopBarIksica(
-    openMenza : () -> Unit,
-) {
+fun TopBarIksica(openMenza : () -> Unit) {
     Row(
         modifier = Modifier
             .background(Color.Transparent)
