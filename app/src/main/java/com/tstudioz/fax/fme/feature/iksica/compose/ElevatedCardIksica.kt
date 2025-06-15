@@ -52,7 +52,8 @@ fun ElevatedCardIksica(
         .drawBehind {
             val canvasSize = size
             drawContext.canvas.nativeCanvas.apply {
-                drawRoundRect(0f,
+                drawRoundRect(
+                    0f,
                     0f,
                     canvasSize.width, canvasSize.height,
                     cornersRadius.toPx(), cornersRadius.toPx(),
@@ -60,7 +61,8 @@ fun ElevatedCardIksica(
                         isAntiAlias = true
                         setShadowLayer(glowingRadius.toPx(), 0f, 0f, glowingColor.toArgb())
                     })
-                drawRoundRect(0f,
+                drawRoundRect(
+                    0f,
                     0f,
                     canvasSize.width, canvasSize.height,
                     cornersRadius.toPx(), cornersRadius.toPx(),
