@@ -50,8 +50,8 @@ fun Schedule(
     val numHours = numMinutes.toFloat() / 60f
     val verticalScrollState = rememberScrollState()
     val horizontalScrollState = rememberScrollState()
-    var sidebarWidth by remember { mutableIntStateOf(95) }
-    var headerHeight by remember { mutableIntStateOf(83) }
+    var sidebarWidth by remember { mutableIntStateOf(31) }
+    var headerHeight by remember { mutableIntStateOf(49) }
     BoxWithConstraints(modifier) {
         val dayWidth: Dp = when (daySize) {
             is ScheduleSize.FixedSize -> daySize.size
