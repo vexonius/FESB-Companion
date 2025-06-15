@@ -1,6 +1,6 @@
 package com.tstudioz.fax.fme.networking.interceptors
 
-import com.tstudioz.fax.fme.feature.login.dao.UserDaoInterface
+import com.tstudioz.fax.fme.feature.login.dao.UserDao
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import kotlinx.coroutines.runBlocking
@@ -12,7 +12,7 @@ import java.io.IOException
 class FESBLoginInterceptor(
     private val cookieJar: MonsterCookieJar,
     private val userService: UserServiceInterface,
-    private val userDao: UserDaoInterface
+    private val userDao: UserDao
 ) : Interceptor {
 
     @Throws(IOException::class)

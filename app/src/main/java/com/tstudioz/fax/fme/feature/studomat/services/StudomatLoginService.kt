@@ -7,7 +7,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 
-class StudomatLoginService(private val client: OkHttpClient): StudomatLoginServiceInterface {
+class StudomatLoginService(private val client: OkHttpClient) : StudomatLoginServiceInterface {
 
     private var samlRequest = ""
     private var authState = ""

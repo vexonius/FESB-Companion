@@ -1,27 +1,27 @@
 package com.tstudioz.fax.fme.feature.iksica.dao
 
-import com.tstudioz.fax.fme.database.DatabaseManagerInterface
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
-import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.query
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.Companion.REPLACE
+import androidx.room.Query
+import com.tstudioz.fax.fme.feature.iksica.models.ReceiptRoom
+import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRoom
 
-class IksicaDao(private val dbManager: DatabaseManagerInterface) : IksicaDaoInterface {
 
-    override suspend fun insert(studentData: StudentDataRealm) {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
+@Dao
+interface IksicaDao {
+    @Query("DELETE FROM receiptroom")
+    fun deleteAll()
 
-        realm.write {
-            delete(StudentDataRealm::class)
-            copyToRealm(studentData, updatePolicy = UpdatePolicy.ALL)
-        }
-    }
+    @Insert(onConflict = REPLACE)
+    fun insert(studentData: StudentDataRoom)
 
-    override suspend fun read(): StudentDataRealm? {
-        val realm = Realm.open(dbManager.getDefaultConfiguration())
-        val model = realm.query<StudentDataRealm>().find().firstOrNull()
+    @Insert(onConflict = REPLACE)
+    fun insert(receipts: List<ReceiptRoom>)
 
-        return model
-    }
+    @Query("SELECT * FROM studentdataroom")
+    fun readData(): StudentDataRoom?
 
+    @Query("SELECT * FROM receiptroom")
+    fun readReceipts(): List<ReceiptRoom>?
 }

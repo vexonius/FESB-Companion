@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.accentGreen
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
 import com.tstudioz.fax.fme.feature.menza.models.Menu
 import com.tstudioz.fax.fme.feature.menza.models.Menza
@@ -48,7 +48,7 @@ fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = { menzaShow.value = false },
-        containerColor = colorResource(id = R.color.greenHighlight),
+        containerColor = accentGreen,
         contentColor = MaterialTheme.colorScheme.inverseOnSurface,
         dragHandle = {
             Column(
@@ -80,6 +80,7 @@ fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
                     text = stringResource(id = R.string.menza_no_data),
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
+                    color = Color.Black,
                     modifier = Modifier
                         .padding(20.dp)
                         .fillMaxWidth()
@@ -134,6 +135,7 @@ fun MeniCompose(meni: Menu) {
         text = meni.name,
         fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
+        color = Color.Black,
         modifier = Modifier.padding(vertical = 10.dp)
     )
     MeniText(meni.soupOrTea)
@@ -145,6 +147,7 @@ fun MeniCompose(meni: Menu) {
         text = stringResource(id = R.string.meni_price, meni.price),
         fontSize = 20.sp,
         textAlign = TextAlign.End,
+        color = Color.Black,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
@@ -157,6 +160,7 @@ fun MeniComposeChoose(meni: List<MeniSpecial>) {
         text = stringResource(id = R.string.meals_by_choice),
         fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
+        color = Color.Black,
         modifier = Modifier.padding(vertical = 10.dp)
     )
     meni.forEach {
@@ -169,11 +173,13 @@ fun MeniComposeChoose(meni: List<MeniSpecial>) {
             Text(
                 text = it.meal,
                 fontSize = 16.sp,
+                color = Color.Black,
                 modifier = Modifier.weight(0.8f)
             )
             Text(
                 text = stringResource(id = R.string.meni_price, it.price),
                 fontSize = 16.sp,
+                color = Color.Black,
                 textAlign = TextAlign.End,
                 modifier = Modifier.weight(0.2f)
             )
@@ -189,6 +195,7 @@ fun MeniText(text: String, divider: Boolean = true) {
         Text(
             text = text,
             fontSize = 16.sp,
+            color = Color.Black,
             modifier = Modifier.padding(vertical = 5.dp)
         )
         if (divider) {

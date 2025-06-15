@@ -1,8 +1,6 @@
 package com.tstudioz.fax.fme.view.activities
 
 import android.os.Bundle
-import android.view.WindowManager
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -32,7 +30,7 @@ class MainActivity : AppCompatActivity() {
                 else -> Home
             }
 
-            MainCompose(startDestination, router)
+            MainCompose(startDestination)
         }
     }
 

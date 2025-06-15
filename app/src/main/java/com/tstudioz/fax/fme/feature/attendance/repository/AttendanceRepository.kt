@@ -1,9 +1,9 @@
 package com.tstudioz.fax.fme.feature.attendance.repository
 
 import android.util.Log
-import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.ParseAttendance
-import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDaoInterface
+import com.tstudioz.fax.fme.feature.attendance.dao.AttendanceDao
+import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.services.AttendanceServiceInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
 import kotlinx.coroutines.async
@@ -12,7 +12,7 @@ import kotlinx.coroutines.runBlocking
 
 class AttendanceRepository(
     private val attendanceService: AttendanceServiceInterface,
-    private val attendanceDao: AttendanceDaoInterface,
+    private val attendanceDao: AttendanceDao,
     private val parseAttendance: ParseAttendance = ParseAttendance()
 ) : AttendanceRepositoryInterface {
 
@@ -38,7 +38,9 @@ class AttendanceRepository(
                             }
                         }
                     }
-                }.awaitAll()
+                }.awaitAll().filter { it.isNotEmpty() }
+
+
 
                 return if (attendanceList.isEmpty()) {
                     NetworkServiceResult.AttendanceParseResult.Failure(
@@ -47,9 +49,7 @@ class AttendanceRepository(
                 } else {
                     insertAttendance(attendanceList.flatten())
                     NetworkServiceResult.AttendanceParseResult.Success(
-                        attendanceList
-                            .sortedBy { it.first().`class` }
-                            .sortedBy { it.first().semester }
+                        attendanceList.sortedByClassAndSemester()
                     )
                 }
             }
@@ -63,11 +63,19 @@ class AttendanceRepository(
     }
 
     override suspend fun insertAttendance(attendance: List<AttendanceEntry>) {
+        attendanceDao.deleteAll()
         attendanceDao.insert(attendance)
     }
 
     override suspend fun readAttendance(): List<List<AttendanceEntry>> {
-        return attendanceDao.read()
+        val test = attendanceDao.read()
+            .groupBy { it.subject }.values
+            .toList()
+            .sortedByClassAndSemester()
+        return test
     }
 
 }
+
+fun List<List<AttendanceEntry>>.sortedByClassAndSemester() = sortedBy { it.firstOrNull()?.subject }
+    .sortedBy { it.firstOrNull()?.semester }

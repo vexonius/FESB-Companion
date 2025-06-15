@@ -1,21 +1,20 @@
 package com.tstudioz.fax.fme.Application
 
 import android.app.Application
-import android.content.Intent
-import com.tstudioz.fax.fme.feature.iksica.di.iksicaModule
-import com.tstudioz.fax.fme.feature.home.di.homeModule
-import com.tstudioz.fax.fme.feature.login.di.loginModule
-import com.tstudioz.fax.fme.feature.studomat.di.studomatModule
-import com.tstudioz.fax.fme.feature.menza.di.menzaModule
-import com.tstudioz.fax.fme.feature.timetable.di.timetableModule
+import android.content.SharedPreferences
 import com.tstudioz.fax.fme.di.module
 import com.tstudioz.fax.fme.feature.attendance.di.attendanceModule
-import com.tstudioz.fax.fme.feature.login.view.LoginActivity
+import com.tstudioz.fax.fme.feature.home.di.homeModule
+import com.tstudioz.fax.fme.feature.iksica.di.iksicaModule
+import com.tstudioz.fax.fme.feature.login.di.loginModule
+import com.tstudioz.fax.fme.feature.menza.di.menzaModule
+import com.tstudioz.fax.fme.feature.studomat.di.studomatModule
+import com.tstudioz.fax.fme.feature.timetable.di.timetableModule
 import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
 import com.tstudioz.fax.fme.routing.AppRouter
+import com.tstudioz.fax.fme.util.SPKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -24,6 +23,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
+import com.tstudioz.fax.fme.util.PreferenceHelper.get
 
 @InternalCoroutinesApi
 class FESBCompanion : Application() {
@@ -38,7 +38,16 @@ class FESBCompanion : Application() {
         startKoin {
             androidLogger(level = Level.ERROR)
             androidContext(this@FESBCompanion)
-            modules(module, attendanceModule, iksicaModule, loginModule, homeModule, menzaModule, timetableModule, studomatModule)
+            modules(
+                module,
+                attendanceModule,
+                iksicaModule,
+                loginModule,
+                homeModule,
+                menzaModule,
+                timetableModule,
+                studomatModule
+            )
         }
 
         observeUserDeleted()
@@ -47,11 +56,14 @@ class FESBCompanion : Application() {
     private fun observeUserDeleted() {
         val sessionDelegate: SessionDelegateInterface by inject()
         val router: AppRouter by inject()
+        val sharedPreferences: SharedPreferences by inject()
 
         scope.launch(Dispatchers.Main) {
             sessionDelegate.onUserDeleted
                 .collect {
-                    router.routeToLogin()
+                    if (sharedPreferences[SPKey.LOGGED_IN, false]) {
+                        router.routeToLogin()
+                    }
                 }
         }
     }
