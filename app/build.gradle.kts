@@ -1,9 +1,9 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("io.realm.kotlin") version libs.versions.realm
     kotlin("plugin.serialization") version libs.versions.kotlin
     alias(libs.plugins.compose.compiler)
 }
@@ -87,7 +87,7 @@ android {
 
 composeCompiler {
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
-    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
+    stabilityConfigurationFiles = listOf(rootProject.layout.projectDirectory.file("stability_config.conf"))
 }
 
 dependencies {
@@ -111,7 +111,6 @@ dependencies {
     implementation(libs.activity.ktx)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.library.base)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.ui.tooling.preview)
     debugImplementation(libs.androidx.ui.tooling)
@@ -123,8 +122,12 @@ dependencies {
     implementation(libs.kizitownose.calendar)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.gson)
-    //EncryptedSharedPreferences
     implementation(libs.androidx.security.crypto)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
+    implementation(libs.ui.text.google.fonts)
+    implementation(libs.dotsindicator)
 }
 
 configurations.all {
@@ -135,8 +138,8 @@ configurations.all {
 
 allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_17.toString()
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.LocalAutofillHighlightColor
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,13 +31,18 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,10 +52,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 import com.tstudioz.fax.fme.compose.theme_dark_errorContainer
 import com.tstudioz.fax.fme.compose.theme_dark_onErrorContainer
 import com.tstudioz.fax.fme.compose.theme_dark_onSurface
+import com.tstudioz.fax.fme.compose.theme_dark_secondaryContainer
 import com.tstudioz.fax.fme.feature.login.models.TextFieldModel
 
 @Composable
@@ -74,6 +80,7 @@ fun LoginCompose(
         text = username,
         label = stringResource(id = R.string.login_email_or_username),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+        contentType = ContentType.Username + ContentType.EmailAddress
     )
     val passwordModel = TextFieldModel(
         text = password,
@@ -91,7 +98,8 @@ fun LoginCompose(
                     modifier = Modifier.padding(7.dp)
                 )
             }
-        }
+        },
+        contentType = ContentType.Password
     )
 
     Scaffold(
@@ -149,18 +157,25 @@ fun CustomTextField(textFieldModel: TextFieldModel) {
     )
     val textFieldShape = RoundedCornerShape(10.dp)
 
-    OutlinedTextField(
-        value = textFieldModel.text.observeAsState().value ?: "",
-        onValueChange = { textFieldModel.text.value = it },
-        colors = textFieldColors,
-        shape = textFieldShape,
-        label = { Text(text = textFieldModel.label) },
-        keyboardOptions = textFieldModel.keyboardOptions,
-        keyboardActions = textFieldModel.keyboardActions,
-        visualTransformation = if (textFieldModel.textHidden?.observeAsState()?.value == true) PasswordVisualTransformation() else VisualTransformation.None,
-        trailingIcon = textFieldModel.trailingIcon,
-        modifier = Modifier.fillMaxWidth()
-    )
+    val customHighlightColor = Color.Transparent // removed color for autofill highlight because of a bad clip, can't clip properly because of the top letters
+    CompositionLocalProvider(LocalAutofillHighlightColor provides customHighlightColor) {
+        OutlinedTextField(
+            value = textFieldModel.text.observeAsState().value ?: "",
+            onValueChange = { textFieldModel.text.value = it },
+            colors = textFieldColors,
+            shape = textFieldShape,
+            label = { Text(text = textFieldModel.label) },
+            keyboardOptions = textFieldModel.keyboardOptions,
+            keyboardActions = textFieldModel.keyboardActions,
+            visualTransformation = if (textFieldModel.textHidden?.observeAsState()?.value == true) PasswordVisualTransformation() else VisualTransformation.None,
+            trailingIcon = textFieldModel.trailingIcon,
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics {
+                    contentType = textFieldModel.contentType
+                }
+        )
+    }
 }
 
 

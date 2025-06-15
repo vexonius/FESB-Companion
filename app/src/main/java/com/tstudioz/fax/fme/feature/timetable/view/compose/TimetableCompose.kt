@@ -129,7 +129,6 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
                     onDismissRequest = { showWeekChooseMenu(false) },
                     contentWindowInsets = { WindowInsets(0.dp) },
                     containerColor = MaterialTheme.colorScheme.surface,
-                    contentWindowInsets = { WindowInsets(0.dp) },
                     dragHandle = { },
                 ) {
                     val coroutineScope = rememberCoroutineScope()
