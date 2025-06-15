@@ -34,16 +34,15 @@ import com.tstudioz.fax.fme.feature.studomat.compose.StudomatCompose
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.compose.TimetableCompose
-import com.tstudioz.fax.fme.routing.HomeRouter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun MainCompose(startDestination: Any, router: HomeRouter) {
+fun MainCompose(startDestination: Any) {
     val navController = rememberNavController()
-    AppTheme { MainNavHost(navController = navController, router = router, startDestination = startDestination) }
+    AppTheme { MainNavHost(navController = navController, startDestination = startDestination) }
 }
 
 val topLevelRoutes = listOf(
@@ -58,7 +57,6 @@ val topLevelRoutes = listOf(
 @Composable
 fun MainNavHost(
     navController: NavHostController,
-    router: HomeRouter,
     startDestination: Any,
     iksicaViewModel: IksicaViewModel = koinViewModel(),
     studomatViewModel: StudomatViewModel = koinViewModel(),
@@ -67,13 +65,6 @@ fun MainNavHost(
     timetableViewModel: TimetableViewModel = koinViewModel()
 ) {
     Scaffold(
-        topBar = {
-            MainTopAppBar(
-                navController = navController,
-                timetableViewModel = timetableViewModel,
-                router = router
-            )
-        },
         bottomBar = {
             MainBottomBar(
                 navController = navController,

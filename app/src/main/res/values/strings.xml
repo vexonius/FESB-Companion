@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">FESB Companion</string>
     <string name="getRest">Odmori se, danas nemaš obaveza!</string>
-    <string name="todaysEvents">DANAŠNJA PREDAVANJA</string>
+    <string name="todaysEvents">Današnji raspored</string>
     <string name="prehrana">PREHRANA</string>
 
     // tabs
@@ -35,6 +35,8 @@
     <string name="login_safe_data">Tvoji podaci su sigurni i ne dijele se s trećim stranama.</string>
 
     <string name="weather_icon_desc">Ikona vremena</string>
+    <string name="hi_user">Bok %1$s</string>
+    <string name="weather_error">Došlo je do pogreške pri dohvaćanju vremenske prognoze</string>
 
     <string name="notes">PODSJETNICI</string>
 
@@ -119,13 +121,16 @@
     <string name="report_bug_email_subject">[BUG REPORT] FESB Companion</string>
     <string name="report_bug">Prijavi bug</string>
     <string name="help_stabilize_app">Pomozi učiniti aplikaciju stabilnijom slanjem bug reporta</string>
+    <string name="make_events_glow">Uključi event glow</string>
+    <string name="make_event_glow_description">Postavi glow iza termina u rasporedu</string>
+    <string name="customizations">Preference</string>
     <string name="about_app">O APLIKACIJI</string>
     <string name="version">Verzija</string>
     <string name="developers">Developeri</string>
     <string name="developer_names">Tino Emer i Stipe Jurković</string>
     <string name="data_privacy">Privatnost podataka</string>
     <string name="library_licenses">Licence korištenih biblioteka</string>
-    <string name="send_mail_using">Pošalji email pomoću...</string>
+    <string name="send_mail_using">Pošalji email pomoću…</string>
 
     // Iksica
     <string name="iksica_no_data">Nema podataka</string>
@@ -170,6 +175,51 @@
     <string name="group">Grupa</string>
     <string name="classroom">Učionica</string>
     <string name="time_range">%1$s - %2$s</string>
+
+    <string name="general_error">Došlo je do pogreške</string>
+
+    <string name="weather_info">U %1$su %2$s (%3$.1f°C)</string>
+    <string name="weather_clearsky">je trenutno vedro</string>
+    <string name="weather_fair">je trenutno pretežno vedro</string>
+    <string name="weather_partlycloudy">je trenutno djelomično oblačno</string>
+    <string name="weather_cloudy">je trenutno oblačno</string>
+    <string name="weather_rainshowers">su trenutno pljuskovi kiše</string>
+    <string name="weather_rainshowersandthunder">su trenutno pljuskovi kiše s grmljavinom</string>
+    <string name="weather_sleetshowers">su trenutno pljuskovi susnježice</string>
+    <string name="weather_snowshowers">su trenutno pljuskovi snijega</string>
+    <string name="weather_rain">je trenutno kiša</string>
+    <string name="weather_heavyrain">je trenutno jaka kiša</string>
+    <string name="weather_heavyrainandthunder">je trenutno jaka kiša s grmljavinom</string>
+    <string name="weather_sleet">je trenutno susnježica</string>
+    <string name="weather_snow">je trenutno snijeg</string>
+    <string name="weather_snowandthunder">je trenutno snijeg s grmljavinom</string>
+    <string name="weather_fog">je trenutno magla</string>
+    <string name="weather_sleetshowersandthunder">su trenutno pljuskovi susnježice s grmljavinom</string>
+    <string name="weather_snowshowersandthunder">su trenutno pljuskovi snijega s grmljavinom</string>
+    <string name="weather_rainandthunder">je trenutno kiša s grmljavinom</string>
+    <string name="weather_sleetandthunder">je trenutno susnježica s grmljavinom</string>
+    <string name="weather_lightrainshowersandthunder">su trenutno slabi pljuskovi kiše s grmljavinom</string>
+    <string name="weather_heavyrainshowersandthunder">su trenutno jaki pljuskovi kiše s grmljavinom</string>
+    <string name="weather_lightssleetshowersandthunder">su trenutno slabi pljuskovi susnježice s grmljavinom</string>
+    <string name="weather_heavysleetshowersandthunder">su trenutno jaki pljuskovi susnježice s grmljavinom</string>
+    <string name="weather_lightssnowshowersandthunder">su trenutno slabi pljuskovi snijega s grmljavinom</string>
+    <string name="weather_heavysnowshowersandthunder">su trenutno jaki pljuskovi snijega s grmljavinom</string>
+    <string name="weather_lightrainandthunder">je trenutno slaba kiša s grmljavinom</string>
+    <string name="weather_lightsleetandthunder">je trenutno slaba susnježica s grmljavinom</string>
+    <string name="weather_heavysleetandthunder">je trenutno jaka susnježica s grmljavinom</string>
+    <string name="weather_lightsnowandthunder">je trenutno slab snijeg s grmljavinom</string>
+    <string name="weather_heavysnowandthunder">je trenutno jak snijeg s grmljavinom</string>
+    <string name="weather_lightrainshowers">su trenutno slabi pljuskovi kiše</string>
+    <string name="weather_heavyrainshowers">su trenutno jaki pljuskovi kiše</string>
+    <string name="weather_lightsleetshowers">su trenutno slabi pljuskovi susnježice</string>
+    <string name="weather_heavysleetshowers">su trenutno jaki pljuskovi susnježice</string>
+    <string name="weather_lightsnowshowers">su trenutno slabi pljuskovi snijega</string>
+    <string name="weather_heavysnowshowers">su trenutno jaki pljuskovi snijega</string>
+    <string name="weather_lightrain">je trenutno slaba kiša</string>
+    <string name="weather_lightsleet">je trenutno slaba susnježica</string>
+    <string name="weather_heavysleet">je trenutno jaka susnježica</string>
+    <string name="weather_lightsnow">je trenutno slab snijeg</string>
+    <string name="weather_heavysnow">je trenutno jak snijeg</string>
 
     <string name="lunch_title">Ručak</string>
     <string name="dinner_title">Večera</string>

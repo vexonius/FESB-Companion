@@ -38,7 +38,9 @@ class AttendanceRepository(
                             }
                         }
                     }
-                }.awaitAll()
+                }.awaitAll().filter { it.isNotEmpty() }
+
+
 
                 return if (attendanceList.isEmpty()) {
                     NetworkServiceResult.AttendanceParseResult.Failure(
@@ -75,5 +77,5 @@ class AttendanceRepository(
 
 }
 
-fun List<List<AttendanceEntry>>.sortedByClassAndSemester() = sortedBy { it.first().subject }
-    .sortedBy { it.first().semester }
+fun List<List<AttendanceEntry>>.sortedByClassAndSemester() = sortedBy { it.firstOrNull()?.subject }
+    .sortedBy { it.firstOrNull()?.semester }

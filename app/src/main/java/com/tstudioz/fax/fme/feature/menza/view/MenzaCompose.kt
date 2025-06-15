@@ -81,6 +81,7 @@ fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
                     text = stringResource(id = R.string.menza_no_data),
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
+                    color = Color.Black,
                     modifier = Modifier
                         .padding(20.dp)
                         .fillMaxWidth()

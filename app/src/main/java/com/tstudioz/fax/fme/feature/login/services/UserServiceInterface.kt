@@ -5,7 +5,7 @@ import com.tstudioz.fax.fme.models.NetworkServiceResult
 
 interface UserServiceInterface {
 
-    suspend fun loginUser(user: User): NetworkServiceResult.LoginResult
+    suspend fun loginUser(username: String, password: String): NetworkServiceResult.LoginResult
 
 }
 
