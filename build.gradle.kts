@@ -11,6 +11,7 @@ buildscript {
         classpath(libs.gradle)
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin}")
 
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle.kts files
     }
@@ -27,10 +28,11 @@ allprojects {
 }
 
 tasks.register<Delete>("clean") {
-    delete(rootProject.buildDir)
+    delete(rootProject.layout.buildDirectory)
 }
 
 plugins {
     // Existing plugins
     alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.ksp) apply false
 }

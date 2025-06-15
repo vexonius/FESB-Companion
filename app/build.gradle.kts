@@ -5,6 +5,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     kotlin("plugin.serialization") version libs.versions.kotlin
+    alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -125,7 +126,7 @@ dependencies {
     implementation(libs.androidx.security.crypto)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
     implementation(libs.ui.text.google.fonts)
     implementation(libs.dotsindicator)
 }
