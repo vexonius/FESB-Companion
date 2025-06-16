@@ -5,8 +5,10 @@ data class Menza(
     val name: String,
     val datePosted: String,
     val dateFetched: String,
-    var menies: MutableList<Menu>,
-    var meniesSpecial: MutableList<MeniSpecial>,
+    var meniesLunch: MutableList<Menu>,
+    var meniesSpecialLunch: MutableList<MeniSpecial>,
+    var meniesDinner: MutableList<Menu>,
+    var meniesSpecialDinner: MutableList<MeniSpecial>,
 )
 
 data class Menu(

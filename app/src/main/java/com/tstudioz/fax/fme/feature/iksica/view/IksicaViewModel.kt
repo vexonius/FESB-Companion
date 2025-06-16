@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
+import com.tstudioz.fax.fme.feature.iksica.MenzaLocationType
 import com.tstudioz.fax.fme.feature.iksica.menzaLocations
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
@@ -154,7 +155,7 @@ class IksicaViewModel(
         val nowSecs = minuteAgo.second.div(5).times(5).toString().padStart(2, '0')
         val filename = minuteAgo.format(
             DateTimeFormatter.ofPattern(
-                if (location.meniName == "fesb_vrh") "yyyy-MM-dd_HH'i'mm'i$nowSecs.jpg'"
+                if (location.meniName == MenzaLocationType.FESB_VRH) "yyyy-MM-dd_HH'i'mm'i$nowSecs.jpg'"
                 else "yyyy-MM-dd_HH'i'mm'i00.jpg'"
             )
         )
@@ -179,7 +180,7 @@ class IksicaViewModel(
         _images.value = null
         updateUrlsJob?.cancel()
 
-        val interval = if (location.meniName == "fesb_vrh") 5 else 20
+        val interval = if (location.meniName == MenzaLocationType.FESB_VRH) 5 else 20
 
         updateUrlsJob = viewModelScope.launch {
             getImageUrlApproximately(location)

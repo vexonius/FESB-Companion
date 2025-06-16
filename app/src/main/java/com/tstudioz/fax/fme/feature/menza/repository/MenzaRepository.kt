@@ -1,6 +1,7 @@
 package com.tstudioz.fax.fme.feature.menza.repository
 
 import android.util.Log
+import com.tstudioz.fax.fme.feature.iksica.MenzaLocationType
 import com.tstudioz.fax.fme.feature.menza.MenzaResult
 import com.tstudioz.fax.fme.feature.menza.parseMenza
 import com.tstudioz.fax.fme.feature.menza.service.MenzaServiceInterface
@@ -9,8 +10,8 @@ import com.tstudioz.fax.fme.models.NetworkServiceResult
 class MenzaRepository(
     private val menzaNetworkService: MenzaServiceInterface,
 ) : MenzaRepositoryInterface {
-    override suspend fun fetchMenzaDetails(place: String, insert: Boolean): MenzaResult {
-        return when (val result = menzaNetworkService.fetchMenza(place)) {
+    override suspend fun fetchMenzaDetails(place: MenzaLocationType, insert: Boolean): MenzaResult {
+        return when (val result = menzaNetworkService.fetchMenza(place.string)) {
             is NetworkServiceResult.MenzaResult.Success -> {
                 val parsed = parseMenza(result.data)
                 if (parsed != null) {

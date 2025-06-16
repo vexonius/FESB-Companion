@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.accentGreen
-import com.tstudioz.fax.fme.feature.menza.models.MealTime
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
 import com.tstudioz.fax.fme.feature.menza.models.Menu
 import com.tstudioz.fax.fme.feature.menza.models.Menza
@@ -106,7 +105,7 @@ fun MenzaBottomSheet(menies: Menza?) {
             .background(Color.White)
             .padding(20.dp, 10.dp)
             .fillMaxWidth()
-        menies?.menies?.filter { it.mealTime == MealTime.LUNCH }?.forEach {
+        menies?.meniesLunch?.forEach {
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Top,
@@ -116,7 +115,7 @@ fun MenzaBottomSheet(menies: Menza?) {
             }
             Spacer(modifier = Modifier.height(10.dp))
         }
-        menies?.meniesSpecial?.filter { it.mealTime == MealTime.LUNCH }?.let {
+        menies?.meniesSpecialLunch?.let {
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Top,
@@ -126,7 +125,6 @@ fun MenzaBottomSheet(menies: Menza?) {
             }
             Spacer(modifier = Modifier.height(10.dp))
         }
-
     }
 }
 

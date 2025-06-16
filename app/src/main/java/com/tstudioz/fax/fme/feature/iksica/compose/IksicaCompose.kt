@@ -177,7 +177,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             )
 
             when (viewState) {
-                is IksicaViewState.Initial, is IksicaViewState.Empty -> EmptyIksicaView{ iksicaViewModel.openMenza() }
+                is IksicaViewState.Initial, is IksicaViewState.Empty -> EmptyIksicaView { iksicaViewModel.openMenza() }
                 is IksicaViewState.Success -> {
                     PopulatedIksicaView(
                         viewState.data,

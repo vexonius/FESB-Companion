@@ -92,7 +92,10 @@ fun MeniComposeIksica(meni: Pair<MenzaLocation, Menza?>?) {
 }
 
 @Composable
-fun MealTimeContent(menies: Menza, mealTime: MealTime) {
+fun MealTimeContent(menza: Menza, mealTime: MealTime) {
+
+    val menies = if (mealTime == MealTime.LUNCH) menza.meniesLunch else menza.meniesDinner
+    val meniesSpecial = if (mealTime == MealTime.LUNCH) menza.meniesSpecialLunch else menza.meniesSpecialDinner
 
     val glowingRadius = 20.dp
     val cornerRadius = 15.dp
@@ -117,20 +120,15 @@ fun MealTimeContent(menies: Menza, mealTime: MealTime) {
             modifier = Modifier.padding(vertical = 8.dp)
         )
     }
-    menies.menies.filter { it.mealTime == mealTime }.forEach {
-        MeniItem(it, mealModifier)
-    }
-    MeniSpecialIksica(menies.meniesSpecial.filter { it.mealTime == mealTime }, mealModifier)
+    menies.forEach { MeniItem(it, mealModifier) }
+    MeniSpecialIksica(meniesSpecial, mealModifier)
 }
 
 @Composable
 fun MeniItem(meni: Menu, modifier: Modifier) {
     Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top,
-        modifier = modifier
-    )
-    {
+        horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top, modifier = modifier
+    ) {
         Text(
             text = meni.name,
             style = MaterialTheme.typography.displaySmall,
@@ -160,9 +158,7 @@ fun MeniItem(meni: Menu, modifier: Modifier) {
 fun MeniSpecialIksica(meni: List<MeniSpecial>, modifier: Modifier) {
     if (meni.isNotEmpty()) {
         Column(
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Top,
-            modifier = modifier
+            horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top, modifier = modifier
         ) {
             Text(
                 text = stringResource(id = R.string.meals_by_choice),
@@ -207,9 +203,7 @@ fun MeniTextIksica(text: String, type: String, divider: Boolean = true) {
                 modifier = Modifier.padding(vertical = 5.dp)
             )
             Text(
-                text = text,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 5.dp)
+                text = text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom = 5.dp)
             )
         }
         if (divider) {
@@ -226,29 +220,17 @@ fun Modifier.glow(
     val canvasSize = size
     drawContext.canvas.nativeCanvas.apply {
         drawRoundRect(
-            0f,
-            0f,
-            canvasSize.width, canvasSize.height,
-            cornersRadius.toPx(), cornersRadius.toPx(),
-            Paint().apply {
+            0f, 0f, canvasSize.width, canvasSize.height, cornersRadius.toPx(), cornersRadius.toPx(), Paint().apply {
                 isAntiAlias = true
                 setShadowLayer(glowingRadius.toPx(), 0f, 0f, color.toArgb())
             })
         drawRoundRect(
-            0f,
-            0f,
-            canvasSize.width, canvasSize.height,
-            cornersRadius.toPx(), cornersRadius.toPx(),
-            Paint().apply {
+            0f, 0f, canvasSize.width, canvasSize.height, cornersRadius.toPx(), cornersRadius.toPx(), Paint().apply {
                 isAntiAlias = true
                 setShadowLayer((glowingRadius / 2).toPx(), 0f, 0f, color.toArgb())
             })
         drawRoundRect(
-            0f,
-            0f,
-            canvasSize.width, canvasSize.height,
-            cornersRadius.toPx(), cornersRadius.toPx(),
-            Paint().apply {
+            0f, 0f, canvasSize.width, canvasSize.height, cornersRadius.toPx(), cornersRadius.toPx(), Paint().apply {
                 isAntiAlias = true
                 setShadowLayer((glowingRadius / 4).toPx(), 0f, 0f, color.toArgb())
             })

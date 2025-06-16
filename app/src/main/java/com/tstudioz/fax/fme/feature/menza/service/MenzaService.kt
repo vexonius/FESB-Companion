@@ -8,7 +8,7 @@ import okhttp3.Response
 
 class MenzaService(private val client: OkHttpClient) : MenzaServiceInterface {
 
-    override suspend fun fetchMenza(place:String): NetworkServiceResult.MenzaResult {
+    override suspend fun fetchMenza(place: String): NetworkServiceResult.MenzaResult {
         val url = HttpUrl.Builder()
             .scheme("https")
             .host("sc.dbtouch.com")
