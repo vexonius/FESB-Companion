@@ -29,42 +29,39 @@ fun parseMenza(jsonString: String): Menza? {
             meniesSpecialDinner = mutableListOf(),
         )
         values?.forEach {
-            if (it.isEmpty()) {
-                return@forEach
-            } else if (it[0].contains("MENI") && it.size == 8) {
-                val type = it[0]
-                val price = checkAndFixPrice(it[7])
+            if (it.isEmpty()) return@forEach
+            val type = it.getOrNull(0) ?: return@forEach
+
+            if (type.contains("MENI")) {
+                val price = checkAndFixPrice(it.getOrNull(7) ?: "")
                 val mealTime = mealTimeTest(type)
                 val meni = Menu(
                     type = type,
                     mealTime = mealTime,
-                    name = it[1],
-                    soupOrTea = it[2],
-                    mainCourse = it[3],
-                    sideDish = it[4],
-                    salad = it[5],
-                    dessert = it[6],
+                    name = it.getOrNull(1) ?: "",
+                    soupOrTea = it.getOrNull(2) ?: "",
+                    mainCourse = it.getOrNull(3) ?: "",
+                    sideDish = it.getOrNull(4) ?: "",
+                    salad = it.getOrNull(5) ?: "",
+                    dessert = it.getOrNull(6) ?: "",
                     price = price
                 )
                 if (!meni.isNotEmpty()) return@forEach
-                if (mealTime == MealTime.LUNCH) {
-                    menza.meniesLunch.add(meni)
-                } else if (mealTime == MealTime.DINNER) {
-                    menza.meniesDinner.add(meni)
-                }
-            } else if (it[0].contains("JELO PO IZBORU") && it.size == 2) {
-                val type = it[0]
-                val name = it[1].split(Regex(" (?=\\d)")).firstOrNull() ?: ""
-                if (!name.isNotEmpty()) return@forEach
 
-                val price = checkAndFixPrice(it[1].split(" ").lastOrNull() ?: "")
-                val mealTime = mealTimeTest(type)
-                val meniSpecial = MeniSpecial(type = type, mealTime = mealTime, meal = name, price = price)
+                if (mealTime == MealTime.LUNCH) menza.meniesLunch.add(meni)
+                else if (mealTime == MealTime.DINNER) menza.meniesDinner.add(meni)
+            } else if (type.contains("JELO PO IZBORU") && it.size >= 2) {
+                for (i in 1 until it.size) {
+                    val item = it.getOrNull(i) ?: ""
+                    val name = item.split(Regex(" (?=\\d)")).firstOrNull() ?: ""
+                    if (!name.isNotEmpty()) return@forEach
 
-                if (mealTime == MealTime.LUNCH) {
-                    menza.meniesSpecialLunch.add(meniSpecial)
-                } else if (mealTime == MealTime.DINNER) {
-                    menza.meniesSpecialDinner.add(meniSpecial)
+                    val price = checkAndFixPrice(item.split(" ").lastOrNull() ?: "")
+                    val mealTime = mealTimeTest(type)
+                    val meniSpecial = MeniSpecial(type = type, mealTime = mealTime, meal = name, price = price)
+
+                    if (mealTime == MealTime.LUNCH) menza.meniesSpecialLunch.add(meniSpecial)
+                    else if (mealTime == MealTime.DINNER) menza.meniesSpecialDinner.add(meniSpecial)
                 }
             }
         }

@@ -97,6 +97,8 @@ fun MealTimeContent(menza: Menza, mealTime: MealTime) {
     val menies = if (mealTime == MealTime.LUNCH) menza.meniesLunch else menza.meniesDinner
     val meniesSpecial = if (mealTime == MealTime.LUNCH) menza.meniesSpecialLunch else menza.meniesSpecialDinner
 
+    if (menies.isEmpty() && meniesSpecial.isEmpty()) return
+
     val glowingRadius = 20.dp
     val cornerRadius = 15.dp
     val mealModifier = Modifier
@@ -143,14 +145,18 @@ fun MeniItem(meni: Menu, modifier: Modifier) {
         MeniTextIksica(meni.sideDish, stringResource(R.string.side_dish))
         MeniTextIksica(meni.salad, stringResource(R.string.salad))
         MeniTextIksica(meni.dessert, stringResource(R.string.dessert), false)
-        Text(
-            text = stringResource(id = R.string.meni_price, meni.price),
-            style = MaterialTheme.typography.displaySmall,
-            textAlign = TextAlign.End,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp)
-        )
+        if (meni.price != "") {
+            Text(
+                text = stringResource(id = R.string.meni_price, meni.price),
+                style = MaterialTheme.typography.displaySmall,
+                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp)
+            )
+        } else {
+            Spacer(Modifier.height(5.dp))
+        }
     }
 }
 

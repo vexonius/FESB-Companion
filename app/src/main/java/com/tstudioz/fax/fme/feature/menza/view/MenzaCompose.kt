@@ -142,15 +142,19 @@ fun MeniCompose(meni: Menu) {
     MeniText(meni.sideDish)
     MeniText(meni.salad)
     MeniText(meni.dessert, false)
-    Text(
-        text = stringResource(id = R.string.meni_price, meni.price),
-        fontSize = 20.sp,
-        textAlign = TextAlign.End,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 5.dp),
-        color = Color.Black
-    )
+    if (meni.price != "") {
+        Text(
+            text = stringResource(id = R.string.meni_price, meni.price),
+            fontSize = 20.sp,
+            textAlign = TextAlign.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp),
+            color = Color.Black
+        )
+    } else {
+        Spacer(Modifier.height(5.dp))
+    }
 }
 
 @Composable
