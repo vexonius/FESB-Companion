@@ -31,10 +31,9 @@ fun parseMenza(jsonString: String): Menza? {
         values?.forEach {
             if (it.isEmpty()) return@forEach
             val type = it.getOrNull(0) ?: return@forEach
+            val mealTime = mealTimeTest(type)
 
             if (type.contains("MENI")) {
-                val price = checkAndFixPrice(it.getOrNull(7) ?: "")
-                val mealTime = mealTimeTest(type)
                 val meni = Menu(
                     type = type,
                     mealTime = mealTime,
@@ -44,7 +43,7 @@ fun parseMenza(jsonString: String): Menza? {
                     sideDish = it.getOrNull(4) ?: "",
                     salad = it.getOrNull(5) ?: "",
                     dessert = it.getOrNull(6) ?: "",
-                    price = price
+                    price = checkAndFixPrice(it.getOrNull(7) ?: "")
                 )
                 if (!meni.isNotEmpty()) return@forEach
 
@@ -57,7 +56,6 @@ fun parseMenza(jsonString: String): Menza? {
                     if (!name.isNotEmpty()) return@forEach
 
                     val price = checkAndFixPrice(item.split(" ").lastOrNull() ?: "")
-                    val mealTime = mealTimeTest(type)
                     val meniSpecial = MeniSpecial(type = type, mealTime = mealTime, meal = name, price = price)
 
                     if (mealTime == MealTime.LUNCH) menza.meniesSpecialLunch.add(meniSpecial)
@@ -85,5 +83,7 @@ fun checkAndFixPrice(pricee: String): String {
     return price
 }
 
-fun mealTimeTest(title: String) =
-    if (title[0] == 'R') MealTime.LUNCH else if (title[0] == 'V') MealTime.DINNER else MealTime.LUNCH
+fun mealTimeTest(title: String) : MealTime {
+    val firstLetter = title.getOrNull(0) ?: return MealTime.LUNCH
+    return if (firstLetter == 'R') MealTime.LUNCH else if (firstLetter == 'V') MealTime.DINNER else MealTime.LUNCH
+}
