@@ -14,7 +14,7 @@ import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.MonthData
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.networking.InternetConnectionObserver
 import com.tstudioz.fax.fme.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.util.SPKey
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -32,11 +32,11 @@ import java.time.format.DateTimeFormatter
 class TimetableViewModel(
     private val timeTableRepository: TimeTableRepositoryInterface,
     private val userRepository: UserRepositoryInterface,
-    private val networkUtils: NetworkUtils,
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
     val snackbarHostState = SnackbarHostState()
+    val internetAvailable: LiveData<Boolean> = InternetConnectionObserver.get()
 
     private val _currentEventShown = MutableLiveData<Event?>(null)
     val currentEventShown: LiveData<Event?> = _currentEventShown
@@ -86,7 +86,7 @@ class TimetableViewModel(
     }
 
     fun fetchUserTimetable() {
-        if (networkUtils.isNetworkAvailable()) {
+        if (internetAvailable.value == true) {
             val today = LocalDate.now()
             val startDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
             val endDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
@@ -95,7 +95,7 @@ class TimetableViewModel(
     }
 
     fun fetchUserTimetable(date: LocalDate) {
-        if (networkUtils.isNetworkAvailable()) {
+        if (internetAvailable.value == true) {
             val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
             val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
             _mondayOfSelectedWeek.value = startDate
@@ -125,8 +125,10 @@ class TimetableViewModel(
         startDate: String = (LocalDate.now().year - 1).toString() + "-8-1",
         endDate: String = (LocalDate.now().year + 1).toString() + "-8-1"
     ) {
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            _daysInPeriods.postValue(timeTableRepository.fetchTimeTableCalendar(startDate, endDate))
+        if (internetAvailable.value == true) {
+            viewModelScope.launch(Dispatchers.IO + handler) {
+                _daysInPeriods.postValue(timeTableRepository.fetchTimeTableCalendar(startDate, endDate))
+            }
         }
     }
 

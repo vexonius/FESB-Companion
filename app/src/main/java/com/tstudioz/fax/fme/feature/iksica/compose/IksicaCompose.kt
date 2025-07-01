@@ -54,7 +54,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.feature.home.compose.noRippleClickable
-import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -237,7 +236,7 @@ fun PopulatedIksicaView(
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransactionsText()
-                LazyColumn(state = listState) {
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize() ) {
                     items(receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }

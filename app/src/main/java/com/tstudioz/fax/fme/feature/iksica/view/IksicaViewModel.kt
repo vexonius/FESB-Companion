@@ -13,6 +13,7 @@ import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
+import com.tstudioz.fax.fme.networking.InternetConnectionObserver
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -25,6 +26,7 @@ class IksicaViewModel(
 ) : ViewModel() {
 
     val snackbarHostState = SnackbarHostState()
+    val internetAvailable: LiveData<Boolean> = InternetConnectionObserver.get()
 
     private val _iksicaData = MutableLiveData<IksicaData?>(null)
     val iksicaData: LiveData<IksicaData?> = _iksicaData
@@ -61,21 +63,23 @@ class IksicaViewModel(
     }
 
     fun getReceipts() {
-        _iksicaData.value?.let { _viewState.value = IksicaViewState.Fetching(it) }
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            when (val result = repository.getCardDataAndReceipts()) {
-                is IksicaResult.CardAndReceiptsResult.Success -> {
-                    val model = result.data
+        if (internetAvailable.value == true) {
+            _iksicaData.value?.let { _viewState.value = IksicaViewState.Fetching(it) }
+            viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+                when (val result = repository.getCardDataAndReceipts()) {
+                    is IksicaResult.CardAndReceiptsResult.Success -> {
+                        val model = result.data
 
-                    _viewState.postValue(IksicaViewState.Success(model))
-                    _iksicaData.postValue(model)
-                }
+                        _viewState.postValue(IksicaViewState.Success(model))
+                        _iksicaData.postValue(model)
+                    }
 
-                is IksicaResult.CardAndReceiptsResult.Failure -> {
-                    snackbarHostState.showSnackbar(
-                        application.getString(R.string.error_fetching_receipts_iksica),
-                        duration = SnackbarDuration.Short
-                    )
+                    is IksicaResult.CardAndReceiptsResult.Failure -> {
+                        snackbarHostState.showSnackbar(
+                            application.getString(R.string.error_fetching_receipts_iksica),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
                 }
             }
         }
@@ -86,19 +90,21 @@ class IksicaViewModel(
             hideReceiptDetails()
             return
         }
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _receiptSelected.postValue(IksicaReceiptState.Fetching)
-            when (val details = repository.getReceipt(receipt.url)) {
-                is IksicaResult.ReceiptResult.Success -> {
-                    _receiptSelected.postValue(IksicaReceiptState.Success(receipt.copy(receiptDetails = details.data)))
-                }
+        if (internetAvailable.value == true) {
+            viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+                _receiptSelected.postValue(IksicaReceiptState.Fetching)
+                when (val details = repository.getReceipt(receipt.url)) {
+                    is IksicaResult.ReceiptResult.Success -> {
+                        _receiptSelected.postValue(IksicaReceiptState.Success(receipt.copy(receiptDetails = details.data)))
+                    }
 
-                is IksicaResult.ReceiptResult.Failure -> {
-                    _receiptSelected.postValue(IksicaReceiptState.Error(details.throwable.message.toString()))
-                    snackbarHostState.showSnackbar(
-                        application.getString(R.string.error_receipt_details_iksica),
-                        duration = SnackbarDuration.Short
-                    )
+                    is IksicaResult.ReceiptResult.Failure -> {
+                        _receiptSelected.postValue(IksicaReceiptState.Error(details.throwable.message.toString()))
+                        snackbarHostState.showSnackbar(
+                            application.getString(R.string.error_receipt_details_iksica),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
                 }
             }
         }

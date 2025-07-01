@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.feature.studomat.view
 import android.app.Application
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
@@ -12,7 +13,7 @@ import com.tstudioz.fax.fme.feature.studomat.models.StudomatYear
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import com.tstudioz.fax.fme.feature.studomat.repository.StudomatRepository
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.networking.InternetConnectionObserver
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -23,8 +24,10 @@ import kotlinx.coroutines.launch
 class StudomatViewModel(
     application: Application,
     private val repository: StudomatRepository,
-    private val networkUtils: NetworkUtils,
 ) : AndroidViewModel(application) {
+
+    val internetAvailable: LiveData<Boolean> = InternetConnectionObserver.get()
+
     /**
      * LiveData for refreshing state used for PullToRefresh
      */
@@ -59,7 +62,7 @@ class StudomatViewModel(
     fun getStudomatData(pulldownTriggered: Boolean = false, getSubjects: Boolean = true) {
 
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            if (networkUtils.isNetworkAvailable()) {
+            if (internetAvailable.value == true) {
                 if (pulldownTriggered) isRefreshing.postValue(true)
                 when (val result = repository.getStudomatDataAndYears()) {
                     is StudomatRepositoryResult.StudentAndYearsResult.Success -> {
@@ -72,9 +75,6 @@ class StudomatViewModel(
                         snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.studomar_error))
                     }
                 }
-            } else {
-                snackbarHostState.showSnackbar("Nema interneta")
-                return@launch
             }
         }
     }
@@ -88,7 +88,7 @@ class StudomatViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (pulldownTriggered) isRefreshing.postValue(true)
-            if (networkUtils.isNetworkAvailable()) {
+            if (internetAvailable.value == true) {
                 val allYearsTemp = mutableListOf<StudomatYear>()
                 freshYears.map { year ->
                     async {

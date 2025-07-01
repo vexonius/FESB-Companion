@@ -214,4 +214,6 @@
     <string name="weather_heavysleet">je trenutno jaka susnježica</string>
     <string name="weather_lightsnow">je trenutno slab snijeg</string>
     <string name="weather_heavysnow">je trenutno jak snijeg</string>
+
+    <string name="no_internet">Nemate pristup internetu</string>
 </resources>
