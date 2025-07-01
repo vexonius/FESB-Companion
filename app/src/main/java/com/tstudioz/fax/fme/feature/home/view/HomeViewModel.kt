@@ -74,7 +74,6 @@ class HomeViewModel(
                     snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.weather_error))
                 }
             }
-
         }
     }
 
