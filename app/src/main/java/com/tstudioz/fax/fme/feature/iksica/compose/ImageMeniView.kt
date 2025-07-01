@@ -92,7 +92,7 @@ fun ImageMeniView(
     }
 }
 
-fun formatTime(url: String): String? {
+private fun formatTime(url: String): String? {
     try {
         val time = LocalDateTime.parse(
             url.split("/").last().split(".").first(),
