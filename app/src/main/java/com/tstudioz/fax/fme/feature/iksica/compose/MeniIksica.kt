@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
-import android.graphics.Paint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,20 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.compose.meniBackground
-import com.tstudioz.fax.fme.compose.meniGlow
 import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
 import com.tstudioz.fax.fme.feature.menza.models.MealTime
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
@@ -52,7 +45,7 @@ fun MeniComposeIksica(meni: Pair<MenzaLocation, Menza?>?) {
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
             .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-            .background(meniBackground)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(16.dp)
             .heightIn(min = screenHeight.times(0.7f))
             .fillMaxWidth()
@@ -99,11 +92,9 @@ fun MealTimeContent(menza: Menza, mealTime: MealTime) {
 
     if (menies.isEmpty() && meniesSpecial.isEmpty()) return
 
-    val glowingRadius = 20.dp
     val cornerRadius = 15.dp
     val mealModifier = Modifier
         .padding(bottom = 16.dp)
-        .glow(meniGlow, cornerRadius, glowingRadius)
         .clip(RoundedCornerShape(cornerRadius))
         .background(MaterialTheme.colorScheme.background)
         .padding(24.dp, 8.dp)
@@ -215,30 +206,5 @@ fun MeniTextIksica(text: String, type: String, divider: Boolean = true) {
         if (divider) {
             HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
         }
-    }
-}
-
-fun Modifier.glow(
-    color: Color,
-    cornersRadius: Dp = 10.dp,
-    glowingRadius: Dp = 10.dp,
-): Modifier = drawBehind {
-    val canvasSize = size
-    drawContext.canvas.nativeCanvas.apply {
-        drawRoundRect(
-            0f, 0f, canvasSize.width, canvasSize.height, cornersRadius.toPx(), cornersRadius.toPx(), Paint().apply {
-                isAntiAlias = true
-                setShadowLayer(glowingRadius.toPx(), 0f, 0f, color.toArgb())
-            })
-        drawRoundRect(
-            0f, 0f, canvasSize.width, canvasSize.height, cornersRadius.toPx(), cornersRadius.toPx(), Paint().apply {
-                isAntiAlias = true
-                setShadowLayer((glowingRadius / 2).toPx(), 0f, 0f, color.toArgb())
-            })
-        drawRoundRect(
-            0f, 0f, canvasSize.width, canvasSize.height, cornersRadius.toPx(), cornersRadius.toPx(), Paint().apply {
-                isAntiAlias = true
-                setShadowLayer((glowingRadius / 4).toPx(), 0f, 0f, color.toArgb())
-            })
     }
 }

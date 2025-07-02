@@ -137,10 +137,10 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
                             balloonSizeFactor = 1.7f
                         ),
                         dotSpacing = 20.dp,
-                        pagerState = state
+                        pagerState = state,
                     )
                 }
-                HorizontalPager(state) {
+                HorizontalPager(state, pageSpacing = 16.dp) {
                     val meni = menzas?.get(it)
                     ImageMeniView(iksicaViewModel, imageUrl, meni)
                 }
