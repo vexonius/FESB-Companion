@@ -60,13 +60,11 @@ class StudomatViewModel(
      * Fetches student info and year names and the links for year pages from studomat
      */
     fun getStudomatData(pulldownTriggered: Boolean = false, getSubjects: Boolean = true) {
-
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (internetAvailable.value == true) {
                 if (pulldownTriggered) isRefreshing.postValue(true)
                 when (val result = repository.getStudomatDataAndYears()) {
                     is StudomatRepositoryResult.StudentAndYearsResult.Success -> {
-                        yearNames.postValue(result.data)
                         student.postValue(result.student)
                         if (getSubjects) fetchAllYears(result.data, pulldownTriggered)
                     }
