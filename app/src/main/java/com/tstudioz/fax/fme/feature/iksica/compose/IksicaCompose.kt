@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -54,7 +55,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.feature.home.compose.noRippleClickable
-import com.tstudioz.fax.fme.compose.theme_dark_surface
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -69,7 +69,7 @@ import kotlinx.coroutines.launch
     ExperimentalMaterialApi::class
 )
 @Composable
-fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
+fun IksicaCompose(iksicaViewModel: IksicaViewModel, innerPaddingValues: PaddingValues) {
 
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -112,7 +112,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             if (receiptSelected is IksicaReceiptState.Success)
                 BottomSheetIksica(receiptSelected.data) { iksicaViewModel.hideReceiptDetails() }
         }) {
-        Box(Modifier.fillMaxWidth()) {
+        Box(Modifier.fillMaxWidth().padding(innerPaddingValues)) {
             PullRefreshIndicator(
                 isRefreshing, pullRefreshState, Modifier
                     .align(Alignment.TopCenter)
@@ -237,7 +237,7 @@ fun PopulatedIksicaView(
                 EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransactionsText()
-                LazyColumn(state = listState) {
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
                     items(receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }

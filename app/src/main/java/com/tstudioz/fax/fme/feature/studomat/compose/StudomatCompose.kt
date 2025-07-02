@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,7 +27,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -35,10 +35,11 @@ import com.tstudioz.fax.fme.compose.studomatBlue
 import com.tstudioz.fax.fme.feature.studomat.view.StudomatViewModel
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import org.koin.compose.koinInject
+import androidx.lifecycle.compose.currentStateAsState
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun StudomatCompose(studomatViewModel: StudomatViewModel) {
+fun StudomatCompose(studomatViewModel: StudomatViewModel, innerPaddingValues: PaddingValues) {
 
     val studomatData = studomatViewModel.studomatData.observeAsState().value
     val snackbarHostState = remember { studomatViewModel.snackbarHostState }
@@ -49,7 +50,7 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
     val openedWebview = remember { mutableStateOf(false) }
     val cookieJar = koinInject<MonsterCookieJar>()
 
-    val lifecycleState = LocalLifecycleOwner.current.lifecycle.currentState
+    val lifecycleState = LocalLifecycleOwner.current.lifecycle.currentStateAsState().value
     LaunchedEffect(lifecycleState) {
         if (lifecycleState == Lifecycle.State.RESUMED) {
             studomatViewModel.getStudomatData()
@@ -70,8 +71,9 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .background(Brush.verticalGradient(listOf(studomatBlue, Color.Transparent))),
+                .background(Brush.verticalGradient(listOf(studomatBlue, Color.Transparent)))
+                .padding(innerPaddingValues)
+                .padding(innerPadding),
         ) {
             PullRefreshIndicator(
                 isRefreshing == true,

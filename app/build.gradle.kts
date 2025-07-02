@@ -129,6 +129,7 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.ui.text.google.fonts)
     implementation(libs.dotsindicator)
+    implementation(libs.accompanist.systemuicontroller)
 }
 
 configurations.all {

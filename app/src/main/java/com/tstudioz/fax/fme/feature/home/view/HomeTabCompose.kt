@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,14 +39,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
-import com.tstudioz.fax.fme.feature.home.models.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.compose.CardsCompose
 import com.tstudioz.fax.fme.feature.home.compose.NotesCompose
 import com.tstudioz.fax.fme.feature.home.compose.TodayTimetableCompose
+import com.tstudioz.fax.fme.feature.home.models.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.utils.getWeatherText
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
@@ -61,9 +64,10 @@ val sidePadding = 24.dp
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class)
 @Composable
 fun HomeTabCompose(
-    homeViewModel: HomeViewModel = koinViewModel(),
+    homeViewModel: HomeViewModel,
     menzaViewModel: MenzaViewModel = koinViewModel(),
     router: HomeRouter = koinInject<HomeRouter>(),
+    innerPaddingValues: PaddingValues
 ) {
 
     val weather: LiveData<WeatherDisplay> = homeViewModel.weatherDisplay
@@ -87,62 +91,67 @@ fun HomeTabCompose(
         }
     }
 
-    AppTheme {
-        BottomSheetScaffold(
-            snackbarHost = { SnackbarHost(hostState = homeViewModel.snackbarHostState) },
-            sheetPeekHeight = 0.dp,
-            sheetContent = {
-                if (menzaShow.value) {
-                    MenzaCompose(menza, menzaShow)
+    BottomSheetScaffold(
+        snackbarHost = { SnackbarHost(hostState = homeViewModel.snackbarHostState) },
+        sheetPeekHeight = 0.dp,
+        sheetContent = {
+            if (menzaShow.value) {
+                val systemUiController = rememberSystemUiController() //https://issuetracker.google.com/issues/362539765
+                systemUiController.statusBarDarkContentEnabled = false
+                systemUiController.setSystemBarsColor(
+                    color = Color.Transparent,
+                    darkIcons = false, isNavigationBarContrastEnforced = false, transformColorForLightContent = {it}
+                )
+
+                MenzaCompose(menza, menzaShow)
+            }
+        }) { paddingValues ->
+        Box(modifier = Modifier.fillMaxHeight()) {
+            LazyColumn(
+                Modifier.padding(innerPaddingValues)
+                    .padding(paddingValues)
+            ) {
+                item {
+                    Row(
+                        Modifier
+                            .height(54.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.settings_icon),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(top = 10.dp, end = 10.dp)
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .clickable {
+                                    router.routeToSettings()
+                                }
+                        )
+                    }
                 }
-            }) { paddingValues ->
-            Box(modifier = Modifier.fillMaxHeight()) {
-                LazyColumn(
-                    Modifier
-                        .padding(paddingValues)
-                ) {
-                    item {
-                        Row(
-                            Modifier
-                                .height(54.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.settings_icon),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(top = 10.dp, end = 10.dp)
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .clickable {
-                                        router.routeToSettings()
-                                    }
-                            )
-                        }
-                    }
-                    item {
-                        WeatherCompose(
-                            weather.observeAsState().value,
-                            homeViewModel.nameOfUser.observeAsState().value ?: ""
-                        )
-                    }
-                    item {
-                        NotesCompose(
-                            notes = notes.observeAsState().value ?: emptyList(),
-                            insertNote,
-                            deleteNote
-                        )
-                    }
-                    item {
-                        TodayTimetableCompose(
-                            events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
-                                ?: emptyList()
-                        )
-                    }
-                    item { CardsCompose(menzaShow, homeViewModel) }
+                item {
+                    WeatherCompose(
+                        weather.observeAsState().value,
+                        homeViewModel.nameOfUser.observeAsState().value ?: ""
+                    )
                 }
+                item {
+                    NotesCompose(
+                        notes = notes.observeAsState().value ?: emptyList(),
+                        insertNote,
+                        deleteNote
+                    )
+                }
+                item {
+                    TodayTimetableCompose(
+                        events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
+                            ?: emptyList()
+                    )
+                }
+                item { CardsCompose(menzaShow, homeViewModel) }
             }
         }
     }
@@ -180,7 +189,7 @@ fun WeatherCompose(
 @Composable
 fun WeatherPreview() {
     AppTheme {
-        Surface{
+        Surface {
             WeatherCompose(
                 weather = WeatherDisplay(
                     location = "Split",

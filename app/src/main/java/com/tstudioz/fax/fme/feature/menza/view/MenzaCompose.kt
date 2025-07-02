@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.accentGreen
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
@@ -66,6 +67,13 @@ fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
             }
         }
     ) {
+        val systemUiController = rememberSystemUiController() //https://issuetracker.google.com/issues/362539765
+        systemUiController.statusBarDarkContentEnabled = false
+        systemUiController.setSystemBarsColor(
+            color = Color.Transparent,
+            darkIcons = false
+        )
+
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
         if (menies?.dateFetched == menies?.datePosted && today == menies?.dateFetched) {
             MenzaBottomSheet(menies)
