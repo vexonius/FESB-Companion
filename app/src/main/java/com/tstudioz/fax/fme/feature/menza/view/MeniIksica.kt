@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.iksica.compose
+package com.tstudioz.fax.fme.feature.menza.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
+import com.tstudioz.fax.fme.feature.menza.models.MenzaLocation
 import com.tstudioz.fax.fme.feature.menza.models.MealTime
 import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
 import com.tstudioz.fax.fme.feature.menza.models.Menu
@@ -45,7 +45,7 @@ fun MeniComposeIksica(meni: Pair<MenzaLocation, Menza?>?) {
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
             .clip(RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(16.dp)
             .heightIn(min = screenHeight.times(0.7f))
             .fillMaxWidth()

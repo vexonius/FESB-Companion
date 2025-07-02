@@ -1,6 +1,6 @@
-package com.tstudioz.fax.fme.feature.iksica
+package com.tstudioz.fax.fme.feature.menza
 
-import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
+import com.tstudioz.fax.fme.feature.menza.models.MenzaLocation
 
 val menzaLocations = listOf(
     MenzaLocation(
@@ -69,5 +69,5 @@ enum class MenzaLocationType(val string: String) {
     EFST("efst"),
     FGAG("fgag"),
     FESB_VRH("fesb_vrh"),
-    FESB_STOP("fesb_stop"), // curently closed
+    // FESB_STOP("fesb_stop"), curently closed
 }

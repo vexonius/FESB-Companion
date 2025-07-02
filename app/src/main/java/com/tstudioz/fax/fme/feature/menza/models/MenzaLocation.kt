@@ -1,6 +1,6 @@
-package com.tstudioz.fax.fme.feature.iksica.models
+package com.tstudioz.fax.fme.feature.menza.models
 
-import com.tstudioz.fax.fme.feature.iksica.MenzaLocationType
+import com.tstudioz.fax.fme.feature.menza.MenzaLocationType
 
 data class MenzaLocation (
     val name: String,

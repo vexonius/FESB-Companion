@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.iksica.compose
+package com.tstudioz.fax.fme.feature.menza.view
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -23,8 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
-import com.tstudioz.fax.fme.feature.iksica.view.IksicaViewModel
+import com.tstudioz.fax.fme.feature.menza.models.MenzaLocation
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 import kotlinx.coroutines.InternalCoroutinesApi
 import okhttp3.HttpUrl
@@ -34,14 +33,14 @@ import java.time.format.DateTimeFormatter
 @OptIn(InternalCoroutinesApi::class)
 @Composable
 fun ImageMeniView(
-    iksicaViewModel: IksicaViewModel,
+    menzaViewModel: MenzaViewModel,
     imageUrl: Pair<MenzaLocation, HttpUrl?>?,
     menza: Pair<MenzaLocation, Menza?>?
 ) {
     val imgUrl = if (imageUrl?.second != null && imageUrl.first == menza?.first) imageUrl.second
     else null
     BackHandler {
-        iksicaViewModel.closeMenza()
+        menzaViewModel.closeMenza()
     }
     Column(
         modifier = Modifier
@@ -60,7 +59,6 @@ fun ImageMeniView(
                     imageUrl = imgUrl?.toString(),
                     contentDescription = "Menza"
                 )
-                //imageUrl?.let { RotatableZoomableImage(imageUrl = it, "Menza") }
                 imgUrl?.toString()?.let { url ->
                     formatTime(url)?.let {
                         Text(

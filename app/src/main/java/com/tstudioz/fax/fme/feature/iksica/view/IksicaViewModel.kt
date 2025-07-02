@@ -10,34 +10,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
-import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
-import com.tstudioz.fax.fme.feature.iksica.MenzaLocationType
-import com.tstudioz.fax.fme.feature.iksica.menzaLocations
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaResult
-import com.tstudioz.fax.fme.feature.iksica.models.MenzaLocation
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
-import com.tstudioz.fax.fme.feature.menza.MenzaResult
-import com.tstudioz.fax.fme.feature.menza.models.Menza
-import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import okhttp3.HttpUrl
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 @InternalCoroutinesApi
 class IksicaViewModel(
     private val repository: IksicaRepositoryInterface,
-    private val application: Application,
-    private val camerasRepository: CamerasRepositoryInterface,
-    private val menzaRepository: MenzaRepositoryInterface
+    private val application: Application
 ) : ViewModel() {
 
     val snackbarHostState = SnackbarHostState()
@@ -51,16 +35,6 @@ class IksicaViewModel(
     private val _viewState = MutableLiveData<IksicaViewState>(IksicaViewState.Initial)
     val viewState: LiveData<IksicaViewState> = _viewState
 
-    private val _images = MutableLiveData<Pair<MenzaLocation, HttpUrl?>?>(null)
-    val images: LiveData<Pair<MenzaLocation, HttpUrl?>?> = _images
-
-    private val _menza = MutableLiveData<List<Pair<MenzaLocation, Menza?>>>()
-    val menza: LiveData<List<Pair<MenzaLocation, Menza?>>> = _menza
-
-    val menzaOpened: MutableLiveData<Boolean> = MutableLiveData(false)
-
-    private var updateUrlsJob: Job? = null
-
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("Iksica", throwable.message.toString())
         viewModelScope.launch(Dispatchers.Main) {
@@ -70,7 +44,6 @@ class IksicaViewModel(
 
     init {
         loadReceiptsFromCache()
-        fetchMenza()
     }
 
     private fun loadReceiptsFromCache() {
@@ -129,84 +102,6 @@ class IksicaViewModel(
                 }
             }
         }
-    }
-
-    private fun fetchMenza() {
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _menza.postValue(menzaLocations.map {
-                it to when (val menza = menzaRepository.fetchMenzaDetails(it.meniName, false)) {
-                    is MenzaResult.Success -> {
-                        menza.data
-                    }
-
-                    is MenzaResult.Failure -> {
-                        snackbarHostState.showSnackbar("Greška prilikom dohvaćanja menze")
-                        null
-                    }
-                }
-            })
-            Log.d("Menza", "Menza fetched")
-        }
-    }
-
-
-    private fun getImageUrlApproximately(location: MenzaLocation) {
-        val minuteAgo = LocalDateTime.now().minusMinutes(1)
-        val nowSecs = minuteAgo.second.div(5).times(5).toString().padStart(2, '0')
-        val filename = minuteAgo.format(
-            DateTimeFormatter.ofPattern(
-                if (location.meniName == MenzaLocationType.FESB_VRH) "yyyy-MM-dd_HH'i'mm'i$nowSecs.jpg'"
-                else "yyyy-MM-dd_HH'i'mm'i00.jpg'"
-            )
-        )
-        _images.value =
-            location to HttpUrl.Builder()
-                .scheme("https")
-                .host("camerasfiles.dbtouch.com")
-                .addPathSegment("images")
-                .addPathSegment(location.cameraName)
-                .addPathSegment(filename)
-                .build()
-
-    }
-
-    private fun getImageUrl(location: MenzaLocation) {
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            _images.postValue(location to camerasRepository.getImages(location.cameraName))
-        }
-    }
-
-    fun updateMenzaUrl(location: MenzaLocation) {
-        _images.value = null
-        updateUrlsJob?.cancel()
-
-        val interval = if (location.meniName == MenzaLocationType.FESB_VRH) 5 else 20
-
-        updateUrlsJob = viewModelScope.launch {
-            getImageUrlApproximately(location)
-            getImageUrl(location)
-            while (isActive) {
-                if (LocalTime.now().second.mod(interval) == 4) {
-                    Log.d("images", "Fetching images " + location.name + " interval " + interval)
-                    getImageUrl(location)
-                }
-                delay(1000L)
-            }
-        }
-    }
-
-    private fun cancelUpdateUrlJob() {
-        updateUrlsJob?.cancel()
-    }
-
-    fun openMenza() {
-        menzaOpened.postValue(true)
-        fetchMenza()
-    }
-
-    fun closeMenza() {
-        cancelUpdateUrlJob()
-        menzaOpened.postValue(false)
     }
 
     fun hideReceiptDetails() {

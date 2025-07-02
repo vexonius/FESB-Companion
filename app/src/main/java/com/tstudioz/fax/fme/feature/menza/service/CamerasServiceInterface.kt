@@ -1,4 +1,6 @@
-package com.tstudioz.fax.fme.feature.cameras
+package com.tstudioz.fax.fme.feature.menza.service
+
+import com.tstudioz.fax.fme.feature.menza.CamerasResult
 
 interface CamerasServiceInterface{
 

@@ -1,10 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica.di
 
 import com.tstudioz.fax.fme.database.AppDatabase
-import com.tstudioz.fax.fme.feature.cameras.CamerasRepository
-import com.tstudioz.fax.fme.feature.cameras.CamerasRepositoryInterface
-import com.tstudioz.fax.fme.feature.cameras.CamerasService
-import com.tstudioz.fax.fme.feature.cameras.CamerasServiceInterface
 import com.tstudioz.fax.fme.feature.iksica.dao.IksicaDao
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepository
 import com.tstudioz.fax.fme.feature.iksica.repository.IksicaRepositoryInterface
@@ -29,10 +25,8 @@ val iksicaModule = module {
     single<OkHttpClient>(named("ISSPPortalClient")) { provideISSPPortalClient(get(), get()) }
     single<IksicaServiceInterface> { IksicaService(get(named("ISSPPortalClient"))) }
     single<IksicaRepositoryInterface> { IksicaRepository(get(), get()) }
-    single<CamerasServiceInterface> { CamerasService(get()) }
-    single<CamerasRepositoryInterface> { CamerasRepository(get()) }
     single<IksicaDao> { getIksicaDao(get()) }
-    viewModel { IksicaViewModel(get(), get(), get(), get()) }
+    viewModel { IksicaViewModel(get(), get()) }
 }
 
 fun provideISSPPortalClient(

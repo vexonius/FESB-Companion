@@ -1,4 +1,4 @@
-package com.tstudioz.fax.fme.feature.cameras
+package com.tstudioz.fax.fme.feature.menza.repository
 
 import okhttp3.HttpUrl
 

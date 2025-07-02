@@ -1,5 +1,6 @@
-package com.tstudioz.fax.fme.feature.cameras
+package com.tstudioz.fax.fme.feature.menza.service
 
+import com.tstudioz.fax.fme.feature.menza.CamerasResult
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request

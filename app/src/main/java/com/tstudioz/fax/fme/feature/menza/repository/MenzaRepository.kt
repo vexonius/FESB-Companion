@@ -1,7 +1,7 @@
 package com.tstudioz.fax.fme.feature.menza.repository
 
 import android.util.Log
-import com.tstudioz.fax.fme.feature.iksica.MenzaLocationType
+import com.tstudioz.fax.fme.feature.menza.MenzaLocationType
 import com.tstudioz.fax.fme.feature.menza.MenzaResult
 import com.tstudioz.fax.fme.feature.menza.parseMenza
 import com.tstudioz.fax.fme.feature.menza.service.MenzaServiceInterface

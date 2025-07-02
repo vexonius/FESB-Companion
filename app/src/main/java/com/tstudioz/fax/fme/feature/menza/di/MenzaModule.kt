@@ -1,5 +1,9 @@
 package com.tstudioz.fax.fme.feature.menza.di
 
+import com.tstudioz.fax.fme.feature.menza.repository.CamerasRepository
+import com.tstudioz.fax.fme.feature.menza.repository.CamerasRepositoryInterface
+import com.tstudioz.fax.fme.feature.menza.service.CamerasService
+import com.tstudioz.fax.fme.feature.menza.service.CamerasServiceInterface
 import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepository
 import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import com.tstudioz.fax.fme.feature.menza.service.MenzaService
@@ -13,6 +17,8 @@ import org.koin.dsl.module
 @OptIn(InternalCoroutinesApi::class)
 val menzaModule = module {
     single<MenzaServiceInterface> { MenzaService(get()) }
+    single<CamerasServiceInterface> { CamerasService(get()) }
     single<MenzaRepositoryInterface> { MenzaRepository(get()) }
-    viewModel { MenzaViewModel(androidApplication(), get()) }
+    single<CamerasRepositoryInterface> { CamerasRepository(get()) }
+    viewModel { MenzaViewModel(androidApplication(), get(), get()) }
 }
