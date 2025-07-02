@@ -1,18 +1,20 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
-
 plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version "2.0.0"
+    kotlin("plugin.serialization") version libs.versions.kotlin
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         applicationId = "com.tstudioz.fax.fme"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 26
         versionName = "3.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -82,82 +84,51 @@ android {
         buildConfig = true
         compose = true
     }
+}
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.9"
-    }
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    stabilityConfigurationFiles = listOf(rootProject.layout.projectDirectory.file("stability_config.conf"))
 }
 
 dependencies {
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.material3.android)
 
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.8")
-    val koinVersion = "4.0.0"
-    implementation("io.insert-koin:koin-android:$koinVersion")
-    implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
-    implementation("androidx.compose.material3:material3-android:1.2.1")
-
-    implementation("nl.joery.animatedbottombar:library:1.1.0")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.preference:preference:1.2.1")
-    implementation("androidx.legacy:legacy-preference-v14:1.0.0")
-    implementation("androidx.browser:browser:1.8.0")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("org.jsoup:jsoup:1.17.2")
-    implementation("com.github.doctoror.particlesdrawable:library:2.0.2")
-    implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    testImplementation("junit:junit:4.13.2")
-    implementation("androidx.fragment:fragment-ktx:1.6.2")
-    implementation("androidx.activity:activity-ktx:1.9.0")
-
-
-    val lifecycleVersion = "2.8.0"
-    implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-
-    // Android Studio Preview support
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-
-    implementation("androidx.compose.material:material:1.6.8")
-    val composeVersion = "1.6.7"
-
-    implementation("androidx.activity:activity-compose:1.9.0")
-
-    //compose livedata state
-    implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
-
-    //EncryptedSharedPreferences
-    implementation("androidx.security:security-crypto:1.0.0")
-
-    //pull to refresh compose
-    implementation("androidx.compose.material:material:$composeVersion")
-    implementation("androidx.compose.ui:ui-android:$composeVersion")
-    implementation("androidx.navigation:navigation-compose:2.8.2")
-
-    //choose calendar
-    implementation("com.kizitonwose.calendar:compose:2.6.0")
-
-    //weather deserialise
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("com.google.code.gson:gson:2.11.0")
-
-    //horizontal pager
-    implementation("com.tbuonomo:dotsindicator:5.1.0")
-
-    val room_version = "2.6.1"
-
-    implementation("androidx.room:room-runtime:$room_version")
-
-    // If this project only uses Java source, use the Java annotationProcessor
-    // No additional plugins are necessary
-    kapt("androidx.room:room-compiler:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
-    //glide
-    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.preference)
+    implementation(libs.legacy.preference.v14)
+    implementation(libs.browser)
+    implementation(libs.okhttp)
+    implementation(libs.jsoup)
+    implementation(libs.particlesdrawable.library)
+    implementation(libs.persistentcookiejar)
+    implementation(libs.constraintlayout)
+    testImplementation(libs.junit)
+    implementation(libs.fragment.ktx)
+    implementation(libs.activity.ktx)
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.ui.android)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kizitownose.calendar)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.gson)
+    implementation(libs.androidx.security.crypto)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation(libs.ui.text.google.fonts)
+    implementation(libs.dotsindicator)
 }
 
 configurations.all {
@@ -168,8 +139,8 @@ configurations.all {
 
 allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_17.toString()
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 }
