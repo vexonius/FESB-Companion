@@ -86,21 +86,19 @@ class TimetableViewModel(
     }
 
     fun fetchUserTimetable() {
-        if (internetAvailable.value == true) {
-            val today = LocalDate.now()
-            val startDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
-            val endDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
-            fetchUserTimetable(startDate, endDate, startDate, shouldCache = true)
-        }
+        if (internetAvailable.value == false) return
+        val today = LocalDate.now()
+        val startDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
+        val endDate: LocalDate = today.minusDays((today.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
+        fetchUserTimetable(startDate, endDate, startDate, shouldCache = true)
     }
 
     fun fetchUserTimetable(date: LocalDate) {
-        if (internetAvailable.value == true) {
-            val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
-            val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
-            _mondayOfSelectedWeek.value = startDate
-            fetchUserTimetable(startDate, endDate, startDate)
-        }
+        if (internetAvailable.value == false) return
+        val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
+        val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
+        _mondayOfSelectedWeek.value = startDate
+        fetchUserTimetable(startDate, endDate, startDate)
     }
 
     private fun fetchUserTimetable(
@@ -109,6 +107,7 @@ class TimetableViewModel(
         shownWeekMonday: LocalDate,
         shouldCache: Boolean = false
     ) {
+        if (internetAvailable.value == false) return
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
         val startDateFormated = dateFormatter.format(startDate)
         val endDateFormated = dateFormatter.format(endDate)
@@ -125,10 +124,9 @@ class TimetableViewModel(
         startDate: String = (LocalDate.now().year - 1).toString() + "-8-1",
         endDate: String = (LocalDate.now().year + 1).toString() + "-8-1"
     ) {
-        if (internetAvailable.value == true) {
-            viewModelScope.launch(Dispatchers.IO + handler) {
-                _daysInPeriods.postValue(timeTableRepository.fetchTimeTableCalendar(startDate, endDate))
-            }
+        if (internetAvailable.value == false) return
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            _daysInPeriods.postValue(timeTableRepository.fetchTimeTableCalendar(startDate, endDate))
         }
     }
 

@@ -60,20 +60,20 @@ class StudomatViewModel(
      * Fetches student info and year names and the links for year pages from studomat
      */
     fun getStudomatData(pulldownTriggered: Boolean = false, getSubjects: Boolean = true) {
+        if (internetAvailable.value == false) return
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            if (internetAvailable.value == true) {
-                if (pulldownTriggered) isRefreshing.postValue(true)
-                when (val result = repository.getStudomatDataAndYears()) {
-                    is StudomatRepositoryResult.StudentAndYearsResult.Success -> {
-                        student.postValue(result.student)
-                        if (getSubjects) fetchAllYears(result.data, pulldownTriggered)
-                    }
+            if (pulldownTriggered) isRefreshing.postValue(true)
+            when (val result = repository.getStudomatDataAndYears()) {
+                is StudomatRepositoryResult.StudentAndYearsResult.Success -> {
+                    student.postValue(result.student)
+                    if (getSubjects) fetchAllYears(result.data, pulldownTriggered)
+                }
 
-                    is StudomatRepositoryResult.StudentAndYearsResult.Failure -> {
-                        snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.studomar_error))
-                    }
+                is StudomatRepositoryResult.StudentAndYearsResult.Failure -> {
+                    snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.studomar_error))
                 }
             }
+
         }
     }
 
@@ -84,37 +84,36 @@ class StudomatViewModel(
         freshYears: List<StudomatYearInfo>,
         pulldownTriggered: Boolean = false
     ) {
+        if (internetAvailable.value == false) return
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             if (pulldownTriggered) isRefreshing.postValue(true)
-            if (internetAvailable.value == true) {
-                val allYearsTemp = mutableListOf<StudomatYear>()
-                freshYears.map { year ->
-                    async {
-                        when (val result = repository.getYear(year)) {
-                            is StudomatRepositoryResult.ChosenYearResult.Success -> {
-                                val populatedYear = StudomatYear(
-                                    result.data.first,
-                                    result.data.second.sortedByNameAndSemester()
-                                )
-                                allYearsTemp.add(populatedYear)
-                                launch { repository.insert(populatedYear) }
-                            }
+            val allYearsTemp = mutableListOf<StudomatYear>()
+            freshYears.map { year ->
+                async {
+                    when (val result = repository.getYear(year)) {
+                        is StudomatRepositoryResult.ChosenYearResult.Success -> {
+                            val populatedYear = StudomatYear(
+                                result.data.first,
+                                result.data.second.sortedByNameAndSemester()
+                            )
+                            allYearsTemp.add(populatedYear)
+                            launch { repository.insert(populatedYear) }
+                        }
 
-                            is StudomatRepositoryResult.ChosenYearResult.Failure -> {
-                                snackbarHostState.showSnackbar(
-                                    getApplication<Application>().applicationContext.getString(
-                                        R.string.studomar_error
-                                    )
+                        is StudomatRepositoryResult.ChosenYearResult.Failure -> {
+                            snackbarHostState.showSnackbar(
+                                getApplication<Application>().applicationContext.getString(
+                                    R.string.studomar_error
                                 )
-                            }
+                            )
                         }
                     }
-                }.awaitAll()
-                val allYearsSorted = allYearsTemp.sortedByDescending { it.yearInfo.academicYear }
-                val yearsInfo = allYearsSorted.map { it.yearInfo }
-                studomatData.postValue(allYearsSorted)
-                yearNames.postValue(yearsInfo)
-            }
+                }
+            }.awaitAll()
+            val allYearsSorted = allYearsTemp.sortedByDescending { it.yearInfo.academicYear }
+            val yearsInfo = allYearsSorted.map { it.yearInfo }
+            studomatData.postValue(allYearsSorted)
+            yearNames.postValue(yearsInfo)
             if (pulldownTriggered) isRefreshing.postValue(false)
         }
     }

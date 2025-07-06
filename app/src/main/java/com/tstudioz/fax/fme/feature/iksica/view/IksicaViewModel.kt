@@ -63,23 +63,22 @@ class IksicaViewModel(
     }
 
     fun getReceipts() {
-        if (internetAvailable.value == true) {
-            _iksicaData.value?.let { _viewState.value = IksicaViewState.Fetching(it) }
-            viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-                when (val result = repository.getCardDataAndReceipts()) {
-                    is IksicaResult.CardAndReceiptsResult.Success -> {
-                        val model = result.data
+        if (internetAvailable.value == false) return
+        _iksicaData.value?.let { _viewState.value = IksicaViewState.Fetching(it) }
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            when (val result = repository.getCardDataAndReceipts()) {
+                is IksicaResult.CardAndReceiptsResult.Success -> {
+                    val model = result.data
 
-                        _viewState.postValue(IksicaViewState.Success(model))
-                        _iksicaData.postValue(model)
-                    }
+                    _viewState.postValue(IksicaViewState.Success(model))
+                    _iksicaData.postValue(model)
+                }
 
-                    is IksicaResult.CardAndReceiptsResult.Failure -> {
-                        snackbarHostState.showSnackbar(
-                            application.getString(R.string.error_fetching_receipts_iksica),
-                            duration = SnackbarDuration.Short
-                        )
-                    }
+                is IksicaResult.CardAndReceiptsResult.Failure -> {
+                    snackbarHostState.showSnackbar(
+                        application.getString(R.string.error_fetching_receipts_iksica),
+                        duration = SnackbarDuration.Short
+                    )
                 }
             }
         }
@@ -90,21 +89,20 @@ class IksicaViewModel(
             hideReceiptDetails()
             return
         }
-        if (internetAvailable.value == true) {
-            viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-                _receiptSelected.postValue(IksicaReceiptState.Fetching)
-                when (val details = repository.getReceipt(receipt.url)) {
-                    is IksicaResult.ReceiptResult.Success -> {
-                        _receiptSelected.postValue(IksicaReceiptState.Success(receipt.copy(receiptDetails = details.data)))
-                    }
+        if (internetAvailable.value == false) return
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+            _receiptSelected.postValue(IksicaReceiptState.Fetching)
+            when (val details = repository.getReceipt(receipt.url)) {
+                is IksicaResult.ReceiptResult.Success -> {
+                    _receiptSelected.postValue(IksicaReceiptState.Success(receipt.copy(receiptDetails = details.data)))
+                }
 
-                    is IksicaResult.ReceiptResult.Failure -> {
-                        _receiptSelected.postValue(IksicaReceiptState.Error(details.throwable.message.toString()))
-                        snackbarHostState.showSnackbar(
-                            application.getString(R.string.error_receipt_details_iksica),
-                            duration = SnackbarDuration.Short
-                        )
-                    }
+                is IksicaResult.ReceiptResult.Failure -> {
+                    _receiptSelected.postValue(IksicaReceiptState.Error(details.throwable.message.toString()))
+                    snackbarHostState.showSnackbar(
+                        application.getString(R.string.error_receipt_details_iksica),
+                        duration = SnackbarDuration.Short
+                    )
                 }
             }
         }

@@ -26,21 +26,19 @@ class MenzaViewModel(
     val menza: LiveData<Menza?> = _menza
     val internetAvailable: LiveData<Boolean> = InternetConnectionObserver.get()
 
-
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("MenzaViewModel", "CoroutineExceptionHandler got $exception")
     }
 
     fun getMenza() {
-        if (internetAvailable.value == true) {
-            viewModelScope.launch(Dispatchers.IO + handler) {
-                when (val menza = repository.fetchMenzaDetails()) {
-                    is MenzaResult.Success -> {
-                        _menza.postValue(menza.data)
-                    }
+        if (internetAvailable.value == false) return
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            when (val menza = repository.fetchMenzaDetails()) {
+                is MenzaResult.Success -> {
+                    _menza.postValue(menza.data)
+                }
 
-                    is MenzaResult.Failure -> {
-                    }
+                is MenzaResult.Failure -> {
                 }
             }
         }
