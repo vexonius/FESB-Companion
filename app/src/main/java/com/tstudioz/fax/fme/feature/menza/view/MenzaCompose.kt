@@ -71,7 +71,8 @@ fun MenzaCompose(menzaViewModel: MenzaViewModel) {
             }
             HorizontalPager(state, pageSpacing = 16.dp) {
                 val meni = menzas?.get(it)
-                ImageMeniView(menzaViewModel, imageUrl, meni)
+                val imgUrl = if (imageUrl?.first == meni?.first) imageUrl?.second else null
+                ImageMeniView(menzaViewModel, imgUrl, meni)
             }
         }
     }

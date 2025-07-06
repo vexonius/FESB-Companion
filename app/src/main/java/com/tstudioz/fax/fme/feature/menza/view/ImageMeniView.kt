@@ -34,11 +34,9 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ImageMeniView(
     menzaViewModel: MenzaViewModel,
-    imageUrl: Pair<MenzaLocation, HttpUrl?>?,
+    imgUrl:HttpUrl?,
     menza: Pair<MenzaLocation, Menza?>?
 ) {
-    val imgUrl = if (imageUrl?.second != null && imageUrl.first == menza?.first) imageUrl.second
-    else null
     BackHandler {
         menzaViewModel.closeMenza()
     }

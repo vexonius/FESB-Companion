@@ -20,20 +20,18 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.FutureTarget
-import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
 @Composable
-fun GlideImage(model: String?, contentDescription: String, modifier: Modifier = Modifier) {
+fun GlideImage(url: String?, contentDescription: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
 
 
-    LaunchedEffect(model) {
-        if (model == null) {
+    LaunchedEffect(url) {
+        if (url == null) {
             return@LaunchedEffect
         }
         withContext(Dispatchers.IO) {
@@ -42,7 +40,7 @@ fun GlideImage(model: String?, contentDescription: String, modifier: Modifier = 
                 .asBitmap()
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
-                .load(model)
+                .load(url)
                 .submit()
             try {
                 bitmap = futureTarget.get()

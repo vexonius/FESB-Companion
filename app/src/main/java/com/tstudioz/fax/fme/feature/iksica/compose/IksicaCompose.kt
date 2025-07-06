@@ -236,7 +236,7 @@ fun PopulatedIksicaView(
                 EmptyIksicaContent(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransactionsText()
-                LazyColumn(state = listState) {
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
                     items(receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }

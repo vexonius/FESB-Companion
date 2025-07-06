@@ -53,7 +53,7 @@ fun Rotatable90Image(imageUrl: String?, contentDescription: String) {
         })
     }
 
-    GlideImage(model = imageUrl, contentDescription = contentDescription, modifier = Modifier
+    GlideImage(url = imageUrl, contentDescription = contentDescription, modifier = Modifier
         .aspectRatio(aspectRatio.floatValue.coerceIn(1 / ratio..ratio))
         .animateContentSize()
         .graphicsLayer(
