@@ -1,15 +1,23 @@
 package com.tstudioz.fax.fme.feature.menza.service
 
 import com.tstudioz.fax.fme.models.NetworkServiceResult
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 
 class MenzaService(private val client: OkHttpClient) : MenzaServiceInterface {
 
-    override suspend fun fetchMenza(): NetworkServiceResult.MenzaResult {
+    override suspend fun fetchMenza(place: String): NetworkServiceResult.MenzaResult {
+        val url = HttpUrl.Builder()
+            .scheme("https")
+            .host("sc.dbtouch.com")
+            .addPathSegment("menu")
+            .addPathSegment("api.php")
+            .addQueryParameter("place", place)
+            .build()
         val request: Request = Request.Builder()
-            .url("http://sc.dbtouch.com/menu/api.php/?place=fesb_vrh")
+            .url(url)
             .get()
             .build()
 
@@ -24,5 +32,4 @@ class MenzaService(private val client: OkHttpClient) : MenzaServiceInterface {
             NetworkServiceResult.MenzaResult.Success(data)
         }
     }
-
 }

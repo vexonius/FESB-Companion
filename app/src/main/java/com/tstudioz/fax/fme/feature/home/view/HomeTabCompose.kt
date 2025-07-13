@@ -5,17 +5,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,8 +26,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +46,6 @@ import com.tstudioz.fax.fme.feature.home.compose.CardsCompose
 import com.tstudioz.fax.fme.feature.home.compose.NotesCompose
 import com.tstudioz.fax.fme.feature.home.compose.TodayTimetableCompose
 import com.tstudioz.fax.fme.feature.home.utils.getWeatherText
-import com.tstudioz.fax.fme.feature.menza.models.Menza
 import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
 import com.tstudioz.fax.fme.routing.HomeRouter
@@ -69,10 +68,8 @@ fun HomeTabCompose(
     val weather: LiveData<WeatherDisplay> = homeViewModel.weatherDisplay
     val notes: LiveData<List<Note>> = homeViewModel.notes
     val events: LiveData<List<Event>> = homeViewModel.events
-    val menza: LiveData<Menza?> = menzaViewModel.menza
     val insertNote: (note: Note) -> Unit = homeViewModel::insert
     val deleteNote: (note: Note) -> Unit = homeViewModel::delete
-    val menzaShow = remember { mutableStateOf(false) }
 
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
 
@@ -80,7 +77,6 @@ fun HomeTabCompose(
         when (lifecycleState) {
             Lifecycle.State.RESUMED -> {
                 homeViewModel.fetchDailyTimetable()
-                menzaViewModel.getMenza()
             }
 
             else -> {}
@@ -88,15 +84,16 @@ fun HomeTabCompose(
     }
 
     AppTheme {
-        BottomSheetScaffold(
+        Scaffold(
             snackbarHost = { SnackbarHost(hostState = homeViewModel.snackbarHostState) },
-            sheetPeekHeight = 0.dp,
-            sheetContent = {
-                if (menzaShow.value) {
-                    MenzaCompose(menza, menzaShow)
-                }
-            }) { paddingValues ->
+            modifier = Modifier.fillMaxSize(),
+            contentWindowInsets = WindowInsets(0.dp)
+        ) { paddingValues ->
             Box(modifier = Modifier.fillMaxHeight()) {
+                if (menzaViewModel.menzaOpened.observeAsState().value == true) {
+                    MenzaCompose(menzaViewModel)
+                    return@Scaffold
+                }
                 LazyColumn(
                     Modifier
                         .padding(paddingValues)
@@ -141,7 +138,7 @@ fun HomeTabCompose(
                                 ?: emptyList()
                         )
                     }
-                    item { CardsCompose(menzaShow, homeViewModel) }
+                    item { CardsCompose({ menzaViewModel.openMenza() }, homeViewModel) }
                 }
             }
         }

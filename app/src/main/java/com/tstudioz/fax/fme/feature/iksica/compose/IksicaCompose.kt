@@ -99,7 +99,6 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             }
         }
     }
-
     BottomSheetScaffold(
         sheetPeekHeight = 0.dp,
         modifier = Modifier
@@ -150,6 +149,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     }
 }
 
+@OptIn(InternalCoroutinesApi::class)
 @Composable
 fun EmptyIksicaView() {
     Column {
@@ -160,13 +160,14 @@ fun EmptyIksicaView() {
                 verticalArrangement = Arrangement.Center
             ) {
                 item {
-                    EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
+                    EmptyIksicaContent(stringResource(id = R.string.iksica_no_data))
                 }
             }
         }
     }
 }
 
+@OptIn(InternalCoroutinesApi::class)
 @Composable
 fun PopulatedIksicaView(
     model: IksicaData,
@@ -175,7 +176,6 @@ fun PopulatedIksicaView(
     onCardClick: () -> Unit,
     onItemClick: (Receipt) -> Unit
 ) {
-
     val sheetOffset = nestedSheetState.sheetOffset
     val sheetTopPadding = nestedSheetState.sheetTopPadding
     val composableHeight = nestedSheetState.composableHeight
@@ -233,10 +233,10 @@ fun PopulatedIksicaView(
         ) {
             val receipts = model.receipts
             if (receipts.isNullOrEmpty()) {
-                EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
+                EmptyIksicaContent(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransactionsText()
-                LazyColumn(state = listState, modifier = Modifier.fillMaxSize() ) {
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
                     items(receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }
@@ -246,10 +246,15 @@ fun PopulatedIksicaView(
     }
 }
 
+@OptIn(InternalCoroutinesApi::class)
 @Composable
 fun TopBarIksica() {
     Row(
-        modifier = Modifier.background(Color.Transparent)
+        modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = stringResource(id = R.string.tab_iksica),
@@ -274,7 +279,7 @@ fun TransactionsText() {
 }
 
 @Composable
-fun EmptyIksicaView(text: String) {
+fun EmptyIksicaContent(text: String) {
     Row(
         modifier = Modifier
             .fillMaxSize()

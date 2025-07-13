@@ -103,6 +103,12 @@
     <string name="meni_price">%1$s €</string>
     <string name="meals_by_choice">JELA PO IZBORU</string>
     <string name="menza_no_data">Nije postavljen jelovnik za današnji dan.</string>
+    <string name="soup">Juha</string>
+    <string name="beverage">Napitak</string>
+    <string name="main_course">Glavno jelo</string>
+    <string name="side_dish">Prilog</string>
+    <string name="salad">Salata</string>
+    <string name="dessert">Desert</string>
 
     // Settings
     <string name="category_user">KORISNIK</string>
@@ -216,4 +222,7 @@
     <string name="weather_heavysnow">je trenutno jak snijeg</string>
 
     <string name="no_internet">Nemate pristup internetu</string>
+
+    <string name="lunch_title">Ručak</string>
+    <string name="dinner_title">Večera</string>
 </resources>
