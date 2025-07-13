@@ -2,212 +2,78 @@ package com.tstudioz.fax.fme.feature.menza.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.compose.accentGreen
-import com.tstudioz.fax.fme.feature.menza.models.MeniSpecial
-import com.tstudioz.fax.fme.feature.menza.models.Menu
-import com.tstudioz.fax.fme.feature.menza.models.Menza
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.currentStateAsState
+import com.tbuonomo.viewpagerdotsindicator.compose.DotsIndicator
+import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
+import com.tbuonomo.viewpagerdotsindicator.compose.type.BalloonIndicatorType
+import com.tstudioz.fax.fme.feature.menza.menzaLocations
+import kotlinx.coroutines.InternalCoroutinesApi
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class)
 @Composable
-fun MenzaCompose(meni: LiveData<Menza?>, menzaShow: MutableState<Boolean>) {
-    val menies = meni.observeAsState().value
-    val sheetState = rememberModalBottomSheetState()
+fun MenzaCompose(menzaViewModel: MenzaViewModel) {
 
-    ModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = { menzaShow.value = false },
-        containerColor = accentGreen,
-        contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-        dragHandle = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(10.dp)
+    val lifecycleState = LocalLifecycleOwner.current.lifecycle.currentStateAsState().value
+    val imageUrl = menzaViewModel.images.observeAsState().value
+    val menzas = menzaViewModel.menza.observeAsState().value
+
+    Surface(modifier = Modifier.fillMaxSize()) {
+        val pageCount = menzaLocations.size
+        val state = rememberPagerState(
+            initialPage = (pageCount.div(2)),
+            pageCount = { pageCount }
+        )
+        DisposableEffect(lifecycleState) {
+            onDispose {
+                menzaViewModel.closeMenza()
+            }
+        }
+        LaunchedEffect(state.settledPage) {
+            menzaViewModel.updateMenzaUrl(menzaLocations[state.settledPage])
+        }
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.Center, modifier = Modifier
                     .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(0.dp, 24.dp, 0.dp, 24.dp)
             ) {
-                Text(
-                    text = stringResource(id = R.string.menza_title),
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                DotsIndicator(
+                    dotCount = pageCount,
+                    type = BalloonIndicatorType(
+                        dotsGraphic = DotGraphic(
+                            color = Color.White,
+                            size = 6.dp
+                        ),
+                        balloonSizeFactor = 1.7f
+                    ),
+                    dotSpacing = 20.dp,
+                    pagerState = state,
                 )
             }
-        }
-    ) {
-        val systemUiController = rememberSystemUiController() //https://issuetracker.google.com/issues/362539765
-        systemUiController.statusBarDarkContentEnabled = false
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = false
-        )
-
-        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-        if (menies?.dateFetched == menies?.datePosted && today == menies?.dateFetched) {
-            MenzaBottomSheet(menies)
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp, 0.dp, 16.dp, 16.dp)
-                    .background(Color.White, RoundedCornerShape(15.dp))
-            ) {
-                Text(
-                    text = stringResource(id = R.string.menza_no_data),
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    color = Color.Black,
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth()
-                )
+            HorizontalPager(state, pageSpacing = 16.dp) {
+                val meni = menzas?.get(it)
+                val imgUrl = if (imageUrl?.first == meni?.first) imageUrl?.second else null
+                ImageMeniView(menzaViewModel, imgUrl, meni)
             }
-        }
-    }
-}
-
-@Composable
-fun MenzaBottomSheet(menies: Menza?) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier
-            .padding(16.dp, 0.dp, 16.dp, 16.dp)
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-    ) {
-        val mealModifier = Modifier
-            .clip(RoundedCornerShape(15.dp))
-            .background(Color.White)
-            .padding(20.dp, 10.dp)
-            .fillMaxWidth()
-        menies?.menies?.filter { it.mealTime == "RUČAK" }?.forEach {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Top,
-                modifier = mealModifier
-            ) {
-                MeniCompose(it)
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-        }
-        menies?.meniesSpecial?.filter { it.mealTime == "RUČAK" }?.let {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Top,
-                modifier = mealModifier
-            ) {
-                MeniComposeChoose(it)
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-        }
-
-    }
-}
-
-@Composable
-fun MeniCompose(meni: Menu) {
-    Text(
-        text = meni.name,
-        fontSize = 25.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.Black,
-        modifier = Modifier.padding(vertical = 10.dp)
-    )
-    MeniText(meni.soupOrTea)
-    MeniText(meni.mainCourse)
-    MeniText(meni.sideDish)
-    MeniText(meni.salad)
-    MeniText(meni.dessert, false)
-    Text(
-        text = stringResource(id = R.string.meni_price, meni.price),
-        fontSize = 20.sp,
-        textAlign = TextAlign.End,
-        color = Color.Black,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 5.dp)
-    )
-}
-
-@Composable
-fun MeniComposeChoose(meni: List<MeniSpecial>) {
-    Text(
-        text = stringResource(id = R.string.meals_by_choice),
-        fontSize = 25.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.Black,
-        modifier = Modifier.padding(vertical = 10.dp)
-    )
-    meni.forEach {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp)
-        ) {
-            Text(
-                text = it.meal,
-                fontSize = 16.sp,
-                color = Color.Black,
-                modifier = Modifier.weight(0.8f)
-            )
-            Text(
-                text = stringResource(id = R.string.meni_price, it.price),
-                fontSize = 16.sp,
-                color = Color.Black,
-                textAlign = TextAlign.End,
-                modifier = Modifier.weight(0.2f)
-            )
-        }
-        HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
-    }
-    Spacer(modifier = Modifier.height(10.dp))
-}
-
-@Composable
-fun MeniText(text: String, divider: Boolean = true) {
-    if (text.isNotEmpty()) {
-        Text(
-            text = text,
-            fontSize = 16.sp,
-            color = Color.Black,
-            modifier = Modifier.padding(vertical = 5.dp)
-        )
-        if (divider) {
-            HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
         }
     }
 }
