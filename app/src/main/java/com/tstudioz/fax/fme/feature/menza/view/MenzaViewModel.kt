@@ -14,7 +14,6 @@ import com.tstudioz.fax.fme.feature.menza.MenzaResult
 import com.tstudioz.fax.fme.feature.menza.models.Menza
 import com.tstudioz.fax.fme.feature.menza.repository.MenzaRepositoryInterface
 import com.tstudioz.fax.fme.networking.InternetConnectionObserver
-import com.tstudioz.fax.fme.networking.InternetConnectionObserver
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -56,7 +55,7 @@ class MenzaViewModel(
 
     private fun fetchMenza() {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            if (internetAvailable.value == false) return
+            if (internetAvailable.value == false) return@launch
             _menza.postValue(menzaLocations.map {
                 it to when (val menza = menzaRepository.fetchMenzaDetails(it.meniName, false)) {
                     is MenzaResult.Success -> {
