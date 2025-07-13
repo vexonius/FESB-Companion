@@ -66,9 +66,8 @@ class AttendanceViewModel(
 
     fun fetchAttendance() {
         viewModelScope.launch(context = Dispatchers.IO + handler) {
-            if (internetAvailable.value == false) {
-                return@launch
-            }
+            if (internetAvailable.value == false) return@launch
+
             if (!has60SecondPassed) return@launch
 
             lastFetch = System.currentTimeMillis()

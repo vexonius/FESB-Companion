@@ -66,13 +66,11 @@ class HomeViewModel(
 
     private fun getForecast() {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            if (internetAvailable.value == true) {
-                try {
-                    weatherRepository.fetchWeatherDetails()?.let { _weatherDisplay.postValue(it) }
-                } catch (e: Exception) {
-                    Log.d("HomeViewModel", "Caught $e")
-                    snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.weather_error))
-                }
+            if (internetAvailable.value == false) return@launch
+            try {
+                weatherRepository.fetchWeatherDetails()?.let { _weatherDisplay.postValue(it) }
+            } catch (e: Exception) {
+                snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.weather_error))
             }
         }
     }
@@ -100,12 +98,11 @@ class HomeViewModel(
     }
 
     fun fetchDailyTimetable() {
-        if (internetAvailable.value == true) {
-            val date = LocalDate.now()
-            val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
-            val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
-            fetchDailyTimetable(startDate, endDate)
-        }
+        if (internetAvailable.value == false) return
+        val date = LocalDate.now()
+        val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
+        val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
+        fetchDailyTimetable(startDate, endDate)
     }
 
     private fun getNotes() {
