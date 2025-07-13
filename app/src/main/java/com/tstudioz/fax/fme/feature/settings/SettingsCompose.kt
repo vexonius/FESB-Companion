@@ -4,12 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -45,99 +48,103 @@ val listItemStartPadding = 16.dp
 @Composable
 fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: SettingsRouter) {
     AppTheme {
-        BottomSheetScaffold(
-            containerColor = theme_dark_surface,
-            modifier = Modifier.fillMaxSize(),
-            sheetPeekHeight = 0.dp,
-            sheetContent = {
-                if (viewModel.displayLicences.observeAsState().value == true) {
-                    ModalBottomSheet(onDismissRequest = { viewModel.hideLicensesDialog() }) {
-                        LazyColumn {
-                            item {
-                                LicenceItem(
-                                    title = stringResource(id = R.string.ok_http_title),
-                                    supportText = stringResource(id = R.string.ok_http_desc)
-                                )
-                            }
-                            item {
-                                LicenceItem(
-                                    title = stringResource(id = R.string.jsoup_title),
-                                    supportText = stringResource(id = R.string.jsoup_desc)
-                                )
-                            }
-                            item {
-                                LicenceItem(
-                                    title = stringResource(id = R.string.privacy_policy_title),
-                                    supportText = stringResource(id = R.string.privacy_policy_desc)
-                                )
-                            }
+        Scaffold(
+            contentWindowInsets = WindowInsets.statusBars,
+        ) { contentPadding ->
+            BottomSheetScaffold(
+                containerColor = theme_dark_surface,
+                modifier = Modifier.fillMaxSize().padding(contentPadding),
+                sheetPeekHeight = 0.dp,
+                sheetContent = {
+                    if (viewModel.displayLicences.observeAsState().value == true) {
+                        ModalBottomSheet(onDismissRequest = { viewModel.hideLicensesDialog() }) {
+                            LazyColumn {
+                                item {
+                                    LicenceItem(
+                                        title = stringResource(id = R.string.ok_http_title),
+                                        supportText = stringResource(id = R.string.ok_http_desc)
+                                    )
+                                }
+                                item {
+                                    LicenceItem(
+                                        title = stringResource(id = R.string.jsoup_title),
+                                        supportText = stringResource(id = R.string.jsoup_desc)
+                                    )
+                                }
+                                item {
+                                    LicenceItem(
+                                        title = stringResource(id = R.string.privacy_policy_title),
+                                        supportText = stringResource(id = R.string.privacy_policy_desc)
+                                    )
+                                }
 
+                            }
                         }
                     }
+                })
+            {
+                Column(
+                    Modifier
+                        .padding(it)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    CategoryTitle(title = stringResource(id = R.string.category_user))
+                    SettingsItem(
+                        title = stringResource(id = R.string.logout),
+                        supportText = stringResource(
+                            id = R.string.logged_in_as,
+                            viewModel.username.observeAsState().value ?: ""
+                        ),
+                        onClick = {
+                            viewModel.logout()
+                        }
+                    )
+                    CategoryTitle(title = stringResource(id = R.string.contribute))
+                    SettingsItem(
+                        title = stringResource(id = R.string.send_feedback),
+                        supportText = stringResource(id = R.string.help_improve_app),
+                        onClick = {
+                            router.sendEmail(viewModel.getSupportEmailModalModel())
+                        }
+                    )
+                    SettingsItem(
+                        title = stringResource(id = R.string.report_bug),
+                        supportText = stringResource(id = R.string.help_stabilize_app),
+                        onClick = {
+                            router.sendEmail(viewModel.getBugReportEmailModalModel())
+                        }
+                    )
+                    CategoryTitle(title = stringResource(id = R.string.customizations))
+                    SettingsCheckbox(
+                        title = stringResource(id = R.string.make_events_glow),
+                        supportText = stringResource(id = R.string.make_event_glow_description),
+                        checked = viewModel.eventsGlowing.observeAsState().value == true,
+                        onCheckedChange = { viewModel.makeEventsGlow(it) },
+                    )
+                    CategoryTitle(title = stringResource(id = R.string.about_app))
+                    SettingsItem(
+                        title = stringResource(id = R.string.version),
+                        supportText = viewModel.version.observeAsState().value ?: ""
+                    )
+                    SettingsItem(
+                        title = stringResource(id = R.string.developers),
+                        supportText = stringResource(id = R.string.developer_names)
+                    )
+                    SettingsItem(
+                        title = stringResource(id = R.string.data_privacy),
+                        supportText = null,
+                        onClick = {
+                            router.openCustomTab(SettingsViewModel.pivacyUrl)
+                        }
+                    )
+                    SettingsItem(
+                        title = stringResource(id = R.string.library_licenses),
+                        supportText = null,
+                        onClick = {
+                            viewModel.displayLicensesDialog()
+                        }
+                    )
                 }
-            })
-        {
-            Column(
-                Modifier
-                    .padding(it)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                CategoryTitle(title = stringResource(id = R.string.category_user))
-                SettingsItem(
-                    title = stringResource(id = R.string.logout),
-                    supportText = stringResource(
-                        id = R.string.logged_in_as,
-                        viewModel.username.observeAsState().value ?: ""
-                    ),
-                    onClick = {
-                        viewModel.logout()
-                    }
-                )
-                CategoryTitle(title = stringResource(id = R.string.contribute))
-                SettingsItem(
-                    title = stringResource(id = R.string.send_feedback),
-                    supportText = stringResource(id = R.string.help_improve_app),
-                    onClick = {
-                        router.sendEmail(viewModel.getSupportEmailModalModel())
-                    }
-                )
-                SettingsItem(
-                    title = stringResource(id = R.string.report_bug),
-                    supportText = stringResource(id = R.string.help_stabilize_app),
-                    onClick = {
-                        router.sendEmail(viewModel.getBugReportEmailModalModel())
-                    }
-                )
-                CategoryTitle(title = stringResource(id = R.string.customizations))
-                SettingsCheckbox(
-                    title = stringResource(id = R.string.make_events_glow),
-                    supportText = stringResource(id = R.string.make_event_glow_description),
-                    checked = viewModel.eventsGlowing.observeAsState().value == true,
-                    onCheckedChange = { viewModel.makeEventsGlow(it) },
-                )
-                CategoryTitle(title = stringResource(id = R.string.about_app))
-                SettingsItem(
-                    title = stringResource(id = R.string.version),
-                    supportText = viewModel.version.observeAsState().value ?: ""
-                )
-                SettingsItem(
-                    title = stringResource(id = R.string.developers),
-                    supportText = stringResource(id = R.string.developer_names)
-                )
-                SettingsItem(
-                    title = stringResource(id = R.string.data_privacy),
-                    supportText = null,
-                    onClick = {
-                        router.openCustomTab(SettingsViewModel.pivacyUrl)
-                    }
-                )
-                SettingsItem(
-                    title = stringResource(id = R.string.library_licenses),
-                    supportText = null,
-                    onClick = {
-                        viewModel.displayLicensesDialog()
-                    }
-                )
             }
         }
     }

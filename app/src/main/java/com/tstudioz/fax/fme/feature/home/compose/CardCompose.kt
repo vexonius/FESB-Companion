@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -27,7 +26,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @OptIn(InternalCoroutinesApi::class)
 @Composable
-fun CardsCompose(menzaShow: MutableState<Boolean>, homeViewModel: HomeViewModel) {
+fun CardsCompose(openMenza: ()-> Unit, homeViewModel: HomeViewModel) {
     Row(Modifier.padding(horizontal = sidePadding)) {
         Box(
             Modifier
@@ -39,7 +38,7 @@ fun CardsCompose(menzaShow: MutableState<Boolean>, homeViewModel: HomeViewModel)
                 meniColor,
                 meniColor,
                 onClick = {
-                    menzaShow.value = true
+                    openMenza()
                 })
         }
         Box(
