@@ -8,14 +8,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +29,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
@@ -88,68 +84,62 @@ fun HomeTabCompose(
         }
     }
 
-    BottomSheetScaffold(
-            snackbarHost = { SnackbarHost(hostState = homeViewModel.snackbarHostState) },
-            sheetPeekHeight = 0.dp,
-        sheetContent = {
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = homeViewModel.snackbarHostState) },
+        contentWindowInsets = WindowInsets(0.dp),
+    ) { paddingValues ->
+        Box(modifier = Modifier.fillMaxHeight()) {
             if (menzaViewModel.menzaOpened.observeAsState().value == true) {
-                val systemUiController = rememberSystemUiController() //https://issuetracker.google.com/issues/362539765
-                systemUiController.statusBarDarkContentEnabled = false
-                systemUiController.setSystemBarsColor(
-                    color = Color.Transparent,
-                    darkIcons = false, isNavigationBarContrastEnforced = false, transformColorForLightContent = {it}
-                )
-                MenzaCompose(menzaViewModel)
+                MenzaCompose(menzaViewModel, innerPaddingValues)
+                return@Scaffold
             }
-        }
-        ) { paddingValues ->
-            Box(modifier = Modifier.fillMaxHeight()) {
-                LazyColumn(
-                    Modifier.padding(innerPaddingValues)
-                        .padding(paddingValues)
-                ) {
-                    item {
-                        Row(
-                            Modifier
-                                .height(54.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.settings_icon),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(top = 10.dp, end = 10.dp)
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .clickable {
-                                        router.routeToSettings()
-                                    }
-                            )
-                        }
-                    }
-                    item {
-                        WeatherCompose(
-                            weather.observeAsState().value,
-                            homeViewModel.nameOfUser.observeAsState().value ?: ""
+            LazyColumn(
+                Modifier
+                    .padding(innerPaddingValues)
+                    .padding(paddingValues)
+            ) {
+                item {
+                    Row(
+                        Modifier
+                            .height(54.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.settings_icon),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(top = 10.dp, end = 10.dp)
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .clickable {
+                                    router.routeToSettings()
+                                }
                         )
                     }
-                    item {
-                        NotesCompose(
-                            notes = notes.observeAsState().value ?: emptyList(),
-                            insertNote,
-                            deleteNote
-                        )
-                    }
-                    item {
-                        TodayTimetableCompose(
-                            events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
-                                ?: emptyList()
-                        )
-                    }
-                    item { CardsCompose({ menzaViewModel.openMenza() }, homeViewModel) }
                 }
+                item {
+                    WeatherCompose(
+                        weather.observeAsState().value,
+                        homeViewModel.nameOfUser.observeAsState().value ?: ""
+                    )
+                }
+                item {
+                    NotesCompose(
+                        notes = notes.observeAsState().value ?: emptyList(),
+                        insertNote,
+                        deleteNote
+                    )
+                }
+                item {
+                    TodayTimetableCompose(
+                        events.observeAsState().value?.filter { event -> event.start.toLocalDate() == LocalDate.now() }
+                            ?: emptyList()
+                    )
+                }
+                item { CardsCompose({ menzaViewModel.openMenza() }, homeViewModel) }
+            }
 
         }
     }

@@ -65,7 +65,6 @@ class MenzaViewModel(
                     }
                 }
             })
-            Log.d("Menza", "Menza fetched")
         }
     }
 
