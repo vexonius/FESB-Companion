@@ -65,8 +65,8 @@ class HomeViewModel(
     }
 
     private fun getForecast() {
+        if (internetAvailable.value == false) return
         viewModelScope.launch(Dispatchers.IO + handler) {
-            if (internetAvailable.value == false) return@launch
             try {
                 weatherRepository.fetchWeatherDetails()?.let { _weatherDisplay.postValue(it) }
             } catch (e: Exception) {

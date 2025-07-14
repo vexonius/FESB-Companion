@@ -54,8 +54,8 @@ class MenzaViewModel(
     }
 
     private fun fetchMenza() {
+        if (internetAvailable.value == false) return
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            if (internetAvailable.value == false) return@launch
             _menza.postValue(menzaLocations.map {
                 it to when (val menza = menzaRepository.fetchMenzaDetails(it.meniName, false)) {
                     is MenzaResult.Success -> {

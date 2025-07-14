@@ -65,11 +65,9 @@ class AttendanceViewModel(
     }
 
     fun fetchAttendance() {
+        if (internetAvailable.value == false) return
+        if (!has60SecondPassed) return
         viewModelScope.launch(context = Dispatchers.IO + handler) {
-            if (internetAvailable.value == false) return@launch
-
-            if (!has60SecondPassed) return@launch
-
             lastFetch = System.currentTimeMillis()
             when (val attendance = repository.fetchAttendance()) {
                 is NetworkServiceResult.AttendanceParseResult.Success -> {
