@@ -145,4 +145,10 @@ class HomeViewModel(
             })
         }
     }
+
+    fun showSnackbar(message: String) {
+        viewModelScope.launch(Dispatchers.Main + handler) {
+            snackbarHostState.showSnackbar(message)
+        }
+    }
 }
