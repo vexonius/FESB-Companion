@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.timetable.view
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
@@ -15,6 +16,8 @@ import com.tstudioz.fax.fme.database.models.TimeTableInfo
 import com.tstudioz.fax.fme.feature.timetable.MonthData
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.util.PreferenceHelper.get
+import com.tstudioz.fax.fme.util.SPKey
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,7 +33,8 @@ import java.time.format.DateTimeFormatter
 class TimetableViewModel(
     private val timeTableRepository: TimeTableRepositoryInterface,
     private val userRepository: UserRepositoryInterface,
-    private val networkUtils: NetworkUtils
+    private val networkUtils: NetworkUtils,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
     val snackbarHostState = SnackbarHostState()
@@ -42,6 +46,10 @@ class TimetableViewModel(
     var events: LiveData<List<Event>> = _events
 
     val displayEvents = MediatorLiveData<List<Event>>()
+
+    val eventsGlowing: MutableLiveData<Boolean> = MutableLiveData(
+        sharedPreferences[SPKey.EVENTS_GLOW, false]
+    )
 
     private val _daysInPeriods = MutableLiveData<Map<LocalDate, TimeTableInfo>>(mutableMapOf())
     val daysInPeriods: LiveData<Map<LocalDate, TimeTableInfo>> = _daysInPeriods
@@ -87,6 +95,7 @@ class TimetableViewModel(
     fun resetToCurrentWeek() {
         _mondayOfSelectedWeek.postValue(
             LocalDate.now().let { it.minusDays((it.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()) })
+        eventsGlowing.postValue(sharedPreferences[SPKey.EVENTS_GLOW, false])
     }
 
     fun fetchCurrentYearUserTimetable() {

@@ -6,13 +6,14 @@ import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.jsoup.Jsoup
 
 class UserService(private val client: OkHttpClient) : UserServiceInterface {
 
-    override suspend fun loginUser(user: User): NetworkServiceResult.LoginResult {
+    override suspend fun loginUser(username: String, password: String): NetworkServiceResult.LoginResult {
         val requestBody = FormBody.Builder()
-            .add("Username", user.username)
-            .add("Password", user.password)
+            .add("Username", username)
+            .add("Password", password)
             .add("IsRememberMeChecked", "true")
             .build()
 
@@ -23,11 +24,12 @@ class UserService(private val client: OkHttpClient) : UserServiceInterface {
 
         val response = client.newCall(request).execute()
         val url = response.request.url
+        val nameOfUser = Jsoup.parse(response.body?.string() ?: "").select(".welcomeBack h2").text()
 
         response.close()
 
         return if (url == targetUrl) {
-            NetworkServiceResult.LoginResult.Success(user)
+            NetworkServiceResult.LoginResult.Success(User(nameOfUser, username, password))
         } else {
             NetworkServiceResult.LoginResult.Failure(Throwable("Error during login"))
         }

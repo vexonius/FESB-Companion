@@ -2,7 +2,7 @@ package com.tstudioz.fax.fme.compose
 
 import androidx.compose.ui.graphics.Color
 
-val theme_dark_primary = Color(0xFF313030)
+val theme_dark_primary = Color(0xFF303031)
 val theme_dark_onPrimary = Color(0xFFffffff)
 val theme_dark_primaryContainer = Color(0xFF232323)
 val theme_dark_onPrimaryContainer = Color(0xFFffffff)
@@ -18,7 +18,7 @@ val theme_dark_error = Color(0xFFFFB3AE)
 val theme_dark_onError = Color(0xFF690005)
 val theme_dark_errorContainer = Color(0xff852221)
 val theme_dark_onErrorContainer = Color(0xffFFB3AE)
-val theme_dark_background = Color(0xFF141313)
+val theme_dark_background = Color(0xFF131314)
 val theme_dark_onBackground = Color(0xFFFFFFFF)
 val theme_dark_surface = Color(0xFF141313)
 val theme_dark_onSurface = Color(0xffffffff)
@@ -32,13 +32,13 @@ val theme_dark_shadow = Color(0xFF000000)
 val theme_dark_surfaceTint = Color(0xff0e0e0e)
 val theme_dark_outlineVariant = Color(0xFF006AFF)
 val theme_dark_scrim = Color(0xFF000000)
-val theme_dark_surfaceContainerHighestDark = Color(0xff3c3234)
-val theme_dark_surfaceDimDark = Color(0xff191113)
-val theme_dark_surfaceBrightDark = Color(0xff413738)
-val theme_dark_surfaceContainerLowestDark = Color(0xff140c0e)
-val theme_dark_surfaceContainerLowDark = Color(0xff22191b)
-val theme_dark_surfaceContainerDark = Color(0xff191113)
-val theme_dark_surfaceContainerHighDark = Color(0xff312829)
+val theme_dark_surfaceContainerHighestDark = Color(0xFF3C3C3C)
+val theme_dark_surfaceDimDark = Color(0xFF131313)
+val theme_dark_surfaceBrightDark = Color(0xFF373737)
+val theme_dark_surfaceContainerLowestDark = Color(0xFF0F0F0F)
+val theme_dark_surfaceContainerLowDark = Color(0xFF191919)
+val theme_dark_surfaceContainerDark = Color(0xFF141414)
+val theme_dark_surfaceContainerHighDark = Color(0xFF2B2B2B)
 
 val accentRed = Color(0xFFFF5252)
 val accentBlue = Color(0xFF29B6F6)
@@ -58,6 +58,7 @@ val gradientColors = listOf(
     Color(0xFFDD3742),
     Color(0xFFA344DE)
 )
+val studomatBlue = Color(0xFF0066cc)
 
 val lust = Color(0xFFE1141B)
 
@@ -65,7 +66,10 @@ val lust = Color(0xFFE1141B)
 val shadyBlue = Color(0xFF658393)
 
 // Screens background color
-val welcome2 = Color(0xFF20D2BB)
+val meniColor = Color(0xFF20D2BB)
 
 // Timetable
 val eventCardBackground = Color(0xFF232323)
+val passGreen = Color(0xFF02b010)
+
+val notesContainer = Color(0xFF00263C)

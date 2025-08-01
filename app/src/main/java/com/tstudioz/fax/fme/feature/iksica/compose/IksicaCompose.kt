@@ -52,9 +52,8 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tstudioz.fax.fme.R
-import com.tstudioz.fax.fme.feature.home.view.noRippleClickable
 import com.tstudioz.fax.fme.compose.contentColors
-import com.tstudioz.fax.fme.compose.theme_dark_surface
+import com.tstudioz.fax.fme.feature.home.compose.noRippleClickable
 import com.tstudioz.fax.fme.feature.iksica.models.IksicaData
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
 import com.tstudioz.fax.fme.feature.iksica.view.IksicaReceiptState
@@ -100,7 +99,6 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             }
         }
     }
-
     BottomSheetScaffold(
         sheetPeekHeight = 0.dp,
         modifier = Modifier
@@ -151,6 +149,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
     }
 }
 
+@OptIn(InternalCoroutinesApi::class)
 @Composable
 fun EmptyIksicaView() {
     Column {
@@ -161,13 +160,14 @@ fun EmptyIksicaView() {
                 verticalArrangement = Arrangement.Center
             ) {
                 item {
-                    EmptyIksicaView(stringResource(id = R.string.iksica_no_data))
+                    EmptyIksicaContent(stringResource(id = R.string.iksica_no_data))
                 }
             }
         }
     }
 }
 
+@OptIn(InternalCoroutinesApi::class)
 @Composable
 fun PopulatedIksicaView(
     model: IksicaData,
@@ -176,7 +176,6 @@ fun PopulatedIksicaView(
     onCardClick: () -> Unit,
     onItemClick: (Receipt) -> Unit
 ) {
-
     val sheetOffset = nestedSheetState.sheetOffset
     val sheetTopPadding = nestedSheetState.sheetTopPadding
     val composableHeight = nestedSheetState.composableHeight
@@ -234,10 +233,10 @@ fun PopulatedIksicaView(
         ) {
             val receipts = model.receipts
             if (receipts.isNullOrEmpty()) {
-                EmptyIksicaView(stringResource(id = R.string.iksica_no_receipts))
+                EmptyIksicaContent(stringResource(id = R.string.iksica_no_receipts))
             } else {
                 TransactionsText()
-                LazyColumn(state = listState) {
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
                     items(receipts) {
                         IksicaItem(it) { onItemClick(it) }
                     }
@@ -247,10 +246,15 @@ fun PopulatedIksicaView(
     }
 }
 
+@OptIn(InternalCoroutinesApi::class)
 @Composable
 fun TopBarIksica() {
     Row(
-        modifier = Modifier.background(Color.Transparent)
+        modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = stringResource(id = R.string.tab_iksica),
@@ -275,7 +279,7 @@ fun TransactionsText() {
 }
 
 @Composable
-fun EmptyIksicaView(text: String) {
+fun EmptyIksicaContent(text: String) {
     Row(
         modifier = Modifier
             .fillMaxSize()

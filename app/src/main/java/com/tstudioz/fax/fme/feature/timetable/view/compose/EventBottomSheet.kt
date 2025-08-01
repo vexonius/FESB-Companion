@@ -10,15 +10,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
+import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.util.testEvents
 
 @Composable
 fun EventBottomSheet(event: Event) {
@@ -30,19 +33,19 @@ fun EventBottomSheet(event: Event) {
     ) {
         Text(
             text = event.name,
-            fontSize = 28.sp,
-            modifier = Modifier.padding(0.dp, 15.dp, 15.dp, 15.dp)
+            style = MaterialTheme.typography.displaySmall,
+            modifier = Modifier.padding(0.dp, 15.dp, 15.dp, 8.dp)
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(0.dp, 0.dp, 15.dp, 15.dp)
+            modifier = Modifier.padding(bottom = 24.dp)
         ) {
-            val radius = 8.dp
+            val radius = 6.dp
             Canvas(modifier = Modifier.size(radius * 2)) { drawCircle(color = event.color, radius = radius.toPx()) }
-            Spacer(modifier = Modifier.size(10.dp))
-            Text(text = event.eventType.value, style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(text = event.eventType.value, style = MaterialTheme.typography.titleSmall)
         }
-        val modifier = Modifier.padding(bottom = 10.dp)
+        val modifier = Modifier.padding(bottom = 16.dp, end = 8.dp)
         Column(Modifier.fillMaxWidth()) {
             Row {
                 RowItem(
@@ -92,8 +95,25 @@ fun RowItem(
     Column(
         modifier = modifier
     ) {
-        Text(text = title, style = MaterialTheme.typography.bodyMedium)
-        Text(text = text, style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(bottom = 2.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(text = text, style = MaterialTheme.typography.labelSmall)
     }
 
+}
+
+@Preview
+@Composable
+fun EventBottomSheetPreview() {
+    AppTheme {
+        Surface {
+            EventBottomSheet(
+                event = testEvents.first()
+            )
+        }
+    }
 }

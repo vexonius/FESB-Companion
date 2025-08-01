@@ -55,7 +55,7 @@ class LoginViewModel(
         showLoading.value = true
 
         viewModelScope.launch(Dispatchers.IO + handler) {
-            when (repository.attemptLogin(User(username, password))) {
+            when (repository.attemptLogin(username, password)) {
                 is UserRepositoryResult.LoginResult.Success -> {
                     loggedIn.postValue(Unit)
                 }

@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalCoroutinesApi::class)
 @InternalCoroutinesApi
 val module = module {
-    single { Router() } binds arrayOf(LoginRouter::class, SettingsRouter::class, HomeRouter::class, AppRouter::class)
+    single { Router(get()) } binds arrayOf(LoginRouter::class, SettingsRouter::class, HomeRouter::class, AppRouter::class)
     single { NetworkUtils(androidContext()) }
     single { MonsterCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(androidContext())) }
     single<FESBLoginInterceptor>(named("FESBInterceptor")) { FESBLoginInterceptor(get(), get(), get()) }
@@ -42,8 +42,8 @@ val module = module {
     single<SessionDelegateInterface> { SessionDelegate(get(), get()) }
     factory<AppDatabase> { getRoomDatabase(get()) }
     single<SharedPreferences> { getSharedPreferences(androidContext()) }
-    viewModel { TimetableViewModel(get(), get(), get()) }
-    viewModel { SettingsViewModel(androidApplication(), get()) }
+    viewModel { TimetableViewModel(get(), get(), get(), get()) }
+    viewModel { SettingsViewModel(androidApplication(), get(), get()) }
 }
 
 fun getRoomDatabase(application: Application): AppDatabase {

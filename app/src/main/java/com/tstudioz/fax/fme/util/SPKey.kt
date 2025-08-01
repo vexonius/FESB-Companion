@@ -4,8 +4,5 @@ enum class SPKey {
 
     LOGGED_IN,
     FIRST_TIME,
-    SHOWN_WEEK,
-    LAST_FETCHED,
-    KEY
-
+    EVENTS_GLOW
 }

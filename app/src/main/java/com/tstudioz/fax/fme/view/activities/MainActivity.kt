@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
                 else -> Home
             }
 
-            MainCompose(startDestination, router)
+            MainCompose(startDestination)
         }
     }
 
