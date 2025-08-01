@@ -90,7 +90,7 @@ fun MainNavHost(
                 AttendanceCompose(attendanceViewModel)
             }
             composable<Home> {
-                HomeTabCompose(homeViewModel)
+                HomeTabCompose(homeViewModel, timetableViewModel)
             }
             composable<TimeTable> {
                 TimetableCompose(timetableViewModel)
