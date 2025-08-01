@@ -24,9 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @InternalCoroutinesApi
@@ -34,7 +31,7 @@ class HomeViewModel(
     application: Application,
     private val noteRepository: NoteRepositoryInterface,
     private val weatherRepository: WeatherRepositoryInterface,
-    private val timeTableRepository: TimeTableRepositoryInterface,
+    timeTableRepository: TimeTableRepositoryInterface,
     private val userRepository: UserRepositoryInterface,
 ) : AndroidViewModel(application) {
 
@@ -103,31 +100,10 @@ class HomeViewModel(
         }
     }
 
-    fun fetchDailyTimetable() {
-        val date = LocalDate.now()
-        val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
-        val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
-        fetchDailyTimetable(startDate, endDate)
-    }
-
     private fun getNotes() {
         viewModelScope.launch(Dispatchers.IO + handler) {
             val notes = noteRepository.getNotes()
             _notes.postValue(notes)
-        }
-    }
-
-    private fun fetchDailyTimetable(
-        startDate: LocalDate,
-        endDate: LocalDate
-    ) {
-        val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
-        val startDateFormated = dateFormatter.format(startDate)
-        val endDateFormated = dateFormatter.format(endDate)
-
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            val username = userRepository.getCurrentUserName()
-            timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, true)
         }
     }
 

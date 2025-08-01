@@ -48,7 +48,9 @@ import com.tstudioz.fax.fme.feature.home.compose.TodayTimetableCompose
 import com.tstudioz.fax.fme.feature.home.utils.getWeatherText
 import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
+import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
 import com.tstudioz.fax.fme.routing.HomeRouter
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -57,10 +59,11 @@ import java.util.Locale
 
 val sidePadding = 24.dp
 
-@OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class)
+@OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
 fun HomeTabCompose(
-    homeViewModel: HomeViewModel = koinViewModel(),
+    homeViewModel: HomeViewModel,
+    timeTableViewModel: TimetableViewModel,
     menzaViewModel: MenzaViewModel = koinViewModel(),
     router: HomeRouter = koinInject<HomeRouter>(),
 ) {
@@ -76,7 +79,7 @@ fun HomeTabCompose(
     LaunchedEffect(lifecycleState) {
         when (lifecycleState) {
             Lifecycle.State.RESUMED -> {
-                homeViewModel.fetchDailyTimetable()
+                timeTableViewModel.fetchCurrentYearUserTimetable()
             }
 
             else -> {}

@@ -47,9 +47,7 @@ class TimetableViewModel(
 
     val displayEvents = MediatorLiveData<List<Event>>()
 
-    val eventsGlowing: MutableLiveData<Boolean> = MutableLiveData(
-        sharedPreferences[SPKey.EVENTS_GLOW, false]
-    )
+    val eventsGlowing: MutableLiveData<Boolean> = MutableLiveData(sharedPreferences[SPKey.EVENTS_GLOW, false])
 
     private val _daysInPeriods = MutableLiveData<Map<LocalDate, TimeTableInfo>>(mutableMapOf())
     val daysInPeriods: LiveData<Map<LocalDate, TimeTableInfo>> = _daysInPeriods
