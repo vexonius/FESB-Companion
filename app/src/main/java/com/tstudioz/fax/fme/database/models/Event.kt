@@ -28,6 +28,7 @@ data class Event(
     val recurringType: Recurring = Recurring.UNDEFINED,
     val recurringUntil: String = "",
     val studyCode: String = "",
+    val timeFetched: LocalDateTime = LocalDateTime.now()
 ) {
 
     constructor(eventRoom: EventRoom) : this(
@@ -40,7 +41,7 @@ data class Event(
         eventType = eventRoom.eventType?.let {
             try {
                 TimetableType.setType(it)
-            } catch (error: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 TimetableType.OTHER
             }
         } ?: TimetableType.OTHER,
@@ -52,7 +53,8 @@ data class Event(
         recurring = eventRoom.recurring == true,
         recurringType = Recurring.valueOf(eventRoom.recurringType ?: ""),
         recurringUntil = eventRoom.recurringUntil ?: "",
-        studyCode = eventRoom.studyCode ?: ""
+        studyCode = eventRoom.studyCode ?: "",
+        timeFetched = LocalDateTime.parse(eventRoom.timeFetched)
     )
 }
 
@@ -74,6 +76,7 @@ data class EventRoom(
     var recurringType: String? = null,
     var recurringUntil: String? = null,
     var studyCode: String? = null,
+    var timeFetched: String? = null
 ) {
     constructor(event: Event) : this(
         id = event.id,
@@ -90,7 +93,8 @@ data class EventRoom(
         recurring = event.recurring,
         recurringType = event.recurringType.name,
         recurringUntil = event.recurringUntil,
-        studyCode = event.studyCode
+        studyCode = event.studyCode,
+        timeFetched = event.timeFetched.toString()
     )
 }
 
@@ -110,7 +114,7 @@ enum class TimetableType(val value: String) {
 
     companion object {
         fun setType(typeValue: String): TimetableType = TimetableType
-            .entries.firstOrNull { it.value == typeValue } ?: TimetableType.OTHER
+            .entries.firstOrNull { it.value == typeValue } ?: OTHER
     }
 }
 

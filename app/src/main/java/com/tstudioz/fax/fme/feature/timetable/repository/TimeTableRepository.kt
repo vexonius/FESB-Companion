@@ -86,17 +86,9 @@ class TimeTableRepository(
         }
     }
 
-    private suspend fun insert(classes: List<Event>) {
+    private fun insert(classes: List<Event>) {
         timeTableDao.deleteAll()
         timeTableDao.insert(classes.map { EventRoom(it) })
     }
 
-    companion object {
-        private val TAG = this.javaClass.canonicalName
-    }
-
-}
-
-private fun Long.hasPassedMoreThan(seconds: Long): Boolean {
-    return this + seconds * 1000 < System.currentTimeMillis()
 }

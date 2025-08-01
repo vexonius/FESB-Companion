@@ -42,7 +42,7 @@ class TimetableViewModel(
     private val _currentEventShown = MutableLiveData<Event?>(null)
     val currentEventShown: LiveData<Event?> = _currentEventShown
 
-    private var _events = MutableLiveData(timeTableRepository.events.asLiveData().value ?: emptyList())
+    private var _events = timeTableRepository.events.asLiveData()
     var events: LiveData<List<Event>> = _events
 
     val displayEvents = MediatorLiveData<List<Event>>()
@@ -104,11 +104,11 @@ class TimetableViewModel(
             if (today.isBefore(LocalDate.of(today.year, 9, 22))) {
                 val startDate: LocalDate = LocalDate.of(today.year - 1, 9, 22)
                 val endDate: LocalDate = LocalDate.of(today.year, 10, 1)
-                fetchUserTimetable(startDate, endDate,shouldCache = true)
+                fetchUserTimetable(startDate, endDate)
             } else {
                 val startDate: LocalDate = LocalDate.of(today.year, 9, 20)
                 val endDate: LocalDate = LocalDate.of(today.year + 1, 10, 1)
-                fetchUserTimetable(startDate, endDate, shouldCache = true)
+                fetchUserTimetable(startDate, endDate)
             }
         }
     }
@@ -116,7 +116,7 @@ class TimetableViewModel(
     private fun fetchUserTimetable(
         startDate: LocalDate,
         endDate: LocalDate,
-        shouldCache: Boolean = false
+        shouldCache: Boolean = true
     ) {
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
         val startDateFormated = dateFormatter.format(startDate)
@@ -124,8 +124,7 @@ class TimetableViewModel(
 
         viewModelScope.launch(Dispatchers.IO + handler) {
             val username = userRepository.getCurrentUserName()
-            val items = timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, shouldCache)
-            _events.postValue(items)
+            timeTableRepository.fetchTimetable(username, startDateFormated, endDateFormated, shouldCache)
         }
     }
 
