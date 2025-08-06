@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,7 +22,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.feature.attendance.compose.AttendanceCompose
@@ -67,13 +65,6 @@ fun MainNavHost(
     timetableViewModel: TimetableViewModel = koinViewModel()
 ) {
     val internetAvailable = homeViewModel.internetAvailable.observeAsState().value == true
-    //for always light color for systembar text
-    val systemUiController = rememberSystemUiController()
-    systemUiController.statusBarDarkContentEnabled = false
-    systemUiController.setSystemBarsColor(
-        color = Color.Transparent,
-        darkIcons = false
-    )
 
     Scaffold(
         bottomBar = {

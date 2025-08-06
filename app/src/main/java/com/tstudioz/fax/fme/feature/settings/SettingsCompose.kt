@@ -33,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.compose.theme_dark_outline
@@ -59,12 +58,7 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
                 sheetContent = {
                     if (viewModel.displayLicences.observeAsState().value == true) {
                         ModalBottomSheet(onDismissRequest = { viewModel.hideLicensesDialog() }) {
-                            val systemUiController = rememberSystemUiController() //https://issuetracker.google.com/issues/362539765
-                            systemUiController.statusBarDarkContentEnabled = false
-                            systemUiController.setSystemBarsColor(
-                                color = Color.Transparent,
-                                darkIcons = false
-                            )
+
                             LazyColumn {
                                 item {
                                     LicenceItem(

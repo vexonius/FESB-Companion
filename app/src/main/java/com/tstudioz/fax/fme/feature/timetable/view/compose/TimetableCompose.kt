@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -124,12 +123,6 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel, innerPaddingValues:
                         contentWindowInsets = { WindowInsets(0.dp) },
                         dragHandle = { },
                     ) {
-                        val systemUiController = rememberSystemUiController() //https://issuetracker.google.com/issues/362539765
-                        systemUiController.statusBarDarkContentEnabled = false
-                        systemUiController.setSystemBarsColor(
-                            color = Color.Transparent,
-                            darkIcons = false
-                        )
                         EventBottomSheet(event)
                     }
                 } else if (shownWeekChooseMenu) {
@@ -140,12 +133,6 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel, innerPaddingValues:
                         containerColor = MaterialTheme.colorScheme.surface,
                         dragHandle = { },
                     ) {
-                        val systemUiController = rememberSystemUiController() //https://issuetracker.google.com/issues/362539765
-                        systemUiController.statusBarDarkContentEnabled = false
-                        systemUiController.setSystemBarsColor(
-                            color = Color.Transparent,
-                            darkIcons = false
-                        )
                         val coroutineScope = rememberCoroutineScope()
                         monthData.value?.let {
                             BottomSheetCalendar(

@@ -1,6 +1,8 @@
 package com.tstudioz.fax.fme.view.activities
 
+import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
         router.register(this)
 
-        enableEdgeToEdge()
+        enableEdgeToEdge(SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT))
 
         setContent {
             val startDestination = when (intent.action.toString()) {

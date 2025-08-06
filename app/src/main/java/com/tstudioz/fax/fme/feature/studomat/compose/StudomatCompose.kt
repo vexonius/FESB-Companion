@@ -62,12 +62,6 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel, innerPaddingValues: Pa
         contentWindowInsets = WindowInsets(0.dp),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
-
-        if (openedWebview.value) {
-            BackHandler { openedWebview.value = false }
-            WebViewScreen(cookieJar)
-            return@Scaffold
-        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,6 +69,11 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel, innerPaddingValues: Pa
                 .padding(innerPaddingValues)
                 .padding(innerPadding),
         ) {
+            if (openedWebview.value) {
+                BackHandler { openedWebview.value = false }
+                WebViewScreen(cookieJar)
+                return@Scaffold
+            }
             PullRefreshIndicator(
                 isRefreshing == true,
                 pullRefreshState,

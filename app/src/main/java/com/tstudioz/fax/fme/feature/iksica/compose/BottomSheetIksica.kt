@@ -21,13 +21,11 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.contentColors
 import com.tstudioz.fax.fme.feature.iksica.models.Receipt
@@ -50,12 +48,6 @@ fun BottomSheetIksica(
         contentWindowInsets = { WindowInsets(0.dp) },
         dragHandle = { },
     ) {
-        val systemUiController = rememberSystemUiController() //https://issuetracker.google.com/issues/362539765
-        systemUiController.statusBarDarkContentEnabled = false
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = false
-        )
         IksicaReceiptDetailed(receipt)
     }
 }
