@@ -9,7 +9,6 @@ import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersisto
 import com.tstudioz.fax.fme.database.AppDatabase
 import com.tstudioz.fax.fme.feature.settings.SettingsViewModel
 import com.tstudioz.fax.fme.feature.timetable.view.TimetableViewModel
-import com.tstudioz.fax.fme.networking.NetworkUtils
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
 import com.tstudioz.fax.fme.networking.interceptors.FESBLoginInterceptor
 import com.tstudioz.fax.fme.networking.session.SessionDelegate
@@ -34,7 +33,6 @@ import java.util.concurrent.TimeUnit
 @InternalCoroutinesApi
 val module = module {
     single { Router(get()) } binds arrayOf(LoginRouter::class, SettingsRouter::class, HomeRouter::class, AppRouter::class)
-    single { NetworkUtils(androidContext()) }
     single { MonsterCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(androidContext())) }
     single<FESBLoginInterceptor>(named("FESBInterceptor")) { FESBLoginInterceptor(get(), get(), get()) }
     single<OkHttpClient> { provideOkHttpClient(get()) }
@@ -42,7 +40,7 @@ val module = module {
     single<SessionDelegateInterface> { SessionDelegate(get(), get()) }
     factory<AppDatabase> { getRoomDatabase(get()) }
     single<SharedPreferences> { getSharedPreferences(androidContext()) }
-    viewModel { TimetableViewModel(get(), get(), get(), get()) }
+    viewModel { TimetableViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(androidApplication(), get(), get()) }
 }
 

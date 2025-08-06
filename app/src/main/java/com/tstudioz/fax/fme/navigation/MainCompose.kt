@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,6 +65,7 @@ fun MainNavHost(
     attendanceViewModel: AttendanceViewModel = koinViewModel(),
     timetableViewModel: TimetableViewModel = koinViewModel()
 ) {
+    val internetAvailable = homeViewModel.internetAvailable.observeAsState().value == true
     Scaffold(
         bottomBar = {
             MainBottomBar(
@@ -71,6 +73,9 @@ fun MainNavHost(
                 topLevelRoutes = topLevelRoutes,
                 timetableViewModel = timetableViewModel
             )
+        },
+        floatingActionButton = {
+            if (!internetAvailable) NoInternetIcon()
         }
     ) { innerPadding ->
         NavHost(

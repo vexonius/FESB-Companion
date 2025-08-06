@@ -11,3 +11,4 @@ build/
 .cxx
 /buildSrc/build
 *.jks
+.kotlin

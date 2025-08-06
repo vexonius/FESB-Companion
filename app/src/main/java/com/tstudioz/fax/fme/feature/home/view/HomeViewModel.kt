@@ -18,12 +18,11 @@ import com.tstudioz.fax.fme.feature.home.models.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.repository.NoteRepositoryInterface
 import com.tstudioz.fax.fme.feature.home.repository.WeatherRepositoryInterface
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.networking.InternetConnectionObserver
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -38,7 +37,7 @@ class HomeViewModel(
     private val userRepository: UserRepositoryInterface,
 ) : AndroidViewModel(application) {
 
-    private val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
+    val internetAvailable: LiveData<Boolean> = InternetConnectionObserver.get()
 
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
     private val _weatherDisplay = MutableLiveData<WeatherDisplay>()
@@ -66,18 +65,13 @@ class HomeViewModel(
     }
 
     private fun getForecast() {
+        if (internetAvailable.value == false) return
         viewModelScope.launch(Dispatchers.IO + handler) {
-            if (!networkUtils.isNetworkAvailable()) {
-                snackbarHostState.showSnackbar("Niste povezani")
-                return@launch
-            }
             try {
                 weatherRepository.fetchWeatherDetails()?.let { _weatherDisplay.postValue(it) }
             } catch (e: Exception) {
-                Log.d("HomeViewModel", "Caught $e")
                 snackbarHostState.showSnackbar(getApplication<Application>().applicationContext.getString(R.string.weather_error))
             }
-
         }
     }
 
@@ -104,6 +98,7 @@ class HomeViewModel(
     }
 
     fun fetchDailyTimetable() {
+        if (internetAvailable.value == false) return
         val date = LocalDate.now()
         val startDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
         val endDate: LocalDate = date.minusDays((date.dayOfWeek.value - DayOfWeek.SATURDAY.value).toLong())
@@ -148,6 +143,12 @@ class HomeViewModel(
                 if (it.isLowerCase()) it.titlecase(Locale.getDefault())
                 else it.toString()
             })
+        }
+    }
+
+    fun showSnackbar(message: String) {
+        viewModelScope.launch(Dispatchers.Main + handler) {
+            snackbarHostState.showSnackbar(message)
         }
     }
 }

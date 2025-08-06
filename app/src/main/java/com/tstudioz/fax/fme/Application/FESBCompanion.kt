@@ -10,6 +10,7 @@ import com.tstudioz.fax.fme.feature.login.di.loginModule
 import com.tstudioz.fax.fme.feature.menza.di.menzaModule
 import com.tstudioz.fax.fme.feature.studomat.di.studomatModule
 import com.tstudioz.fax.fme.feature.timetable.di.timetableModule
+import com.tstudioz.fax.fme.networking.InternetConnectionObserver
 import com.tstudioz.fax.fme.networking.session.SessionDelegateInterface
 import com.tstudioz.fax.fme.routing.AppRouter
 import com.tstudioz.fax.fme.util.SPKey
@@ -32,7 +33,7 @@ class FESBCompanion : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
+        InternetConnectionObserver.init(this)
         instance = this
 
         startKoin {

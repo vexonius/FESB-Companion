@@ -32,13 +32,18 @@ fun CardsCompose(openMenza: ()-> Unit, homeViewModel: HomeViewModel) {
             Modifier
                 .weight(0.5f)
         ) {
+            val noInternetMenza = stringResource(R.string.no_internet_menza)
             CardCompose(
                 stringResource(id = R.string.menza_title),
                 stringResource(id = R.string.menza_desc),
                 meniColor,
                 meniColor,
                 onClick = {
-                    openMenza()
+                    if (homeViewModel.internetAvailable.value == true) {
+                        openMenza()
+                    } else {
+                        homeViewModel.showSnackbar(message = noInternetMenza)
+                    }
                 })
         }
         Box(
