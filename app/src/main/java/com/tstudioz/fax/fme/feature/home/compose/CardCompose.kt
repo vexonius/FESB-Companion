@@ -26,7 +26,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @OptIn(InternalCoroutinesApi::class)
 @Composable
-fun CardsCompose(openMenza: ()-> Unit, homeViewModel: HomeViewModel) {
+fun CardsCompose(openMenza: ()-> Unit, launchStudentskiUgovoriApp : () -> Unit) {
     Row(Modifier.padding(horizontal = sidePadding)) {
         Box(
             Modifier
@@ -51,7 +51,7 @@ fun CardsCompose(openMenza: ()-> Unit, homeViewModel: HomeViewModel) {
                 MaterialTheme.colorScheme.secondaryContainer,
                 lust,
                 onClick = {
-                    homeViewModel.launchStudentskiUgovoriApp()
+                    launchStudentskiUgovoriApp()
                 }
             )
         }

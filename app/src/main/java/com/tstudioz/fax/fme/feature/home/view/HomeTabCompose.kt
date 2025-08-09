@@ -138,7 +138,7 @@ fun HomeTabCompose(
                                 ?: emptyList()
                         )
                     }
-                    item { CardsCompose({ menzaViewModel.openMenza() }, homeViewModel) }
+                    item { CardsCompose({ menzaViewModel.openMenza() }, { homeViewModel.launchStudentskiUgovoriApp() }) }
                 }
             }
         }

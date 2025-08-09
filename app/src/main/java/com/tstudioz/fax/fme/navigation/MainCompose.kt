@@ -38,14 +38,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-@Composable
-fun MainCompose(startDestination: Any) {
-    val navController = rememberNavController()
-    AppTheme { MainNavHost(navController = navController, startDestination = startDestination) }
-}
-
-val topLevelRoutes = listOf(
+val topLevelRoutesFESB = listOf(
     TopLevelRoute(R.string.tab_iksica, Iksica, R.drawable.icon_iksica),
     TopLevelRoute(R.string.tab_attendance, Attendance, R.drawable.icon_attendance),
     TopLevelRoute(R.string.tab_home, Home, R.drawable.icon_home),
@@ -55,9 +48,18 @@ val topLevelRoutes = listOf(
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
+fun MainCompose(startDestination: Any, topLevelRoutes : List<TopLevelRoute<out Any>> = topLevelRoutesFESB) {
+    val navController = rememberNavController()
+    AppTheme { MainNavHost(navController = navController, startDestination = startDestination, topLevelRoutes= topLevelRoutes) }
+}
+
+
+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+@Composable
 fun MainNavHost(
     navController: NavHostController,
     startDestination: Any,
+    topLevelRoutes: List<TopLevelRoute<out Any>>,
     iksicaViewModel: IksicaViewModel = koinViewModel(),
     studomatViewModel: StudomatViewModel = koinViewModel(),
     homeViewModel: HomeViewModel = koinViewModel(),
@@ -110,7 +112,7 @@ fun NavbarPreview() {
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ) {
-            topLevelRoutes.forEach { topLevelRoute ->
+            topLevelRoutesFESB.forEach { topLevelRoute ->
                 NavigationBarItem(
                     icon = {
                         Icon(
