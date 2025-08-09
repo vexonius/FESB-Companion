@@ -91,10 +91,6 @@ class TimeTableRepository(
         timeTableDao.insert(classes.map { EventRoom(it) })
     }
 
-    companion object {
-        private val TAG = this.javaClass.canonicalName
-    }
-
 }
 
 private fun Long.hasPassedMoreThan(seconds: Long): Boolean {

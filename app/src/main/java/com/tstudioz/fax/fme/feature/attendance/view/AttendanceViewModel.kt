@@ -12,13 +12,12 @@ import com.tstudioz.fax.fme.feature.attendance.ShownSemester
 import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.networking.InternetConnectionObserver
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
@@ -26,7 +25,7 @@ class AttendanceViewModel(
     private val repository: AttendanceRepositoryInterface
 ) : ViewModel() {
 
-    private val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
+    val internetAvailable: LiveData<Boolean> = InternetConnectionObserver.get()
 
     private var lastFetch = 0L
     private val has60SecondPassed: Boolean
@@ -66,13 +65,9 @@ class AttendanceViewModel(
     }
 
     fun fetchAttendance() {
+        if (internetAvailable.value == false) return
+        if (!has60SecondPassed) return
         viewModelScope.launch(context = Dispatchers.IO + handler) {
-            if (!networkUtils.isNetworkAvailable()) {
-                snackbarHostState.showSnackbar("Niste povezani")
-                return@launch
-            }
-            if (!has60SecondPassed) return@launch
-
             lastFetch = System.currentTimeMillis()
             when (val attendance = repository.fetchAttendance()) {
                 is NetworkServiceResult.AttendanceParseResult.Success -> {
