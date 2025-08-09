@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.lust
 import com.tstudioz.fax.fme.compose.meniColor
@@ -26,7 +27,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @OptIn(InternalCoroutinesApi::class)
 @Composable
-fun CardsCompose(openMenza: ()-> Unit, launchStudentskiUgovoriApp : () -> Unit) {
+fun CardsCompose(openMenza: ()-> Unit, launchStudentskiUgovoriApp : () -> Unit, internetAvailable: LiveData<Boolean>, showSnackbar: (String) -> Unit) {
     Row(Modifier.padding(horizontal = sidePadding)) {
         Box(
             Modifier
@@ -39,10 +40,10 @@ fun CardsCompose(openMenza: ()-> Unit, launchStudentskiUgovoriApp : () -> Unit) 
                 meniColor,
                 meniColor,
                 onClick = {
-                    if (homeViewModel.internetAvailable.value == true) {
+                    if (internetAvailable.value == true) {
                         openMenza()
                     } else {
-                        homeViewModel.showSnackbar(message = noInternetMenza)
+                        showSnackbar(noInternetMenza)
                     }
                 })
         }

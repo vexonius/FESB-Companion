@@ -41,10 +41,10 @@ import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.Note
-import com.tstudioz.fax.fme.feature.home.models.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.compose.CardsCompose
 import com.tstudioz.fax.fme.feature.home.compose.NotesCompose
 import com.tstudioz.fax.fme.feature.home.compose.TodayTimetableCompose
+import com.tstudioz.fax.fme.feature.home.models.WeatherDisplay
 import com.tstudioz.fax.fme.feature.home.utils.getWeatherText
 import com.tstudioz.fax.fme.feature.menza.view.MenzaCompose
 import com.tstudioz.fax.fme.feature.menza.view.MenzaViewModel
@@ -138,7 +138,13 @@ fun HomeTabCompose(
                                 ?: emptyList()
                         )
                     }
-                    item { CardsCompose({ menzaViewModel.openMenza() }, { homeViewModel.launchStudentskiUgovoriApp() }) }
+                    item {
+                        CardsCompose(
+                            { menzaViewModel.openMenza() },
+                            { homeViewModel.launchStudentskiUgovoriApp() },
+                            internetAvailable = homeViewModel.internetAvailable,
+                            showSnackbar = { message -> homeViewModel.showSnackbar(message) })
+                    }
                 }
             }
         }
@@ -177,7 +183,7 @@ fun WeatherCompose(
 @Composable
 fun WeatherPreview() {
     AppTheme {
-        Surface{
+        Surface {
             WeatherCompose(
                 weather = WeatherDisplay(
                     location = "Split",
