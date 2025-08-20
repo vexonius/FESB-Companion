@@ -2,7 +2,6 @@ package com.tstudioz.fax.fme.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -60,12 +59,13 @@ fun MainNavHost(
     navController: NavHostController,
     startDestination: Any,
     iksicaViewModel: IksicaViewModel = koinViewModel(),
-    studomatViewModel: StudomatViewModel = koinViewModel(),
     homeViewModel: HomeViewModel = koinViewModel(),
     attendanceViewModel: AttendanceViewModel = koinViewModel(),
+    studomatViewModel: StudomatViewModel = koinViewModel(),
     timetableViewModel: TimetableViewModel = koinViewModel()
 ) {
     val internetAvailable = homeViewModel.internetAvailable.observeAsState().value == true
+
     Scaffold(
         bottomBar = {
             MainBottomBar(
@@ -81,7 +81,6 @@ fun MainNavHost(
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding),
             enterTransition = {
                 EnterTransition.None
             },
@@ -89,19 +88,19 @@ fun MainNavHost(
                 ExitTransition.None
             }) {
             composable<Iksica> {
-                IksicaCompose(iksicaViewModel)
+                IksicaCompose(iksicaViewModel, innerPaddingValues = innerPadding)
             }
             composable<Attendance> {
-                AttendanceCompose(attendanceViewModel)
+                AttendanceCompose(attendanceViewModel, innerPaddingValues = innerPadding)
             }
             composable<Home> {
-                HomeTabCompose(homeViewModel)
+                HomeTabCompose(homeViewModel, innerPaddingValues = innerPadding)
             }
             composable<TimeTable> {
-                TimetableCompose(timetableViewModel)
+                TimetableCompose(timetableViewModel, innerPaddingValues = innerPadding)
             }
             composable<Studomat> {
-                StudomatCompose(studomatViewModel)
+                StudomatCompose(studomatViewModel, innerPaddingValues = innerPadding)
             }
         }
     }

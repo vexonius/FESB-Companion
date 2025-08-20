@@ -58,6 +58,7 @@ fun SettingsCompose(viewModel: SettingsViewModel = koinViewModel(), router: Sett
                 sheetContent = {
                     if (viewModel.displayLicences.observeAsState().value == true) {
                         ModalBottomSheet(onDismissRequest = { viewModel.hideLicensesDialog() }) {
+
                             LazyColumn {
                                 item {
                                     LicenceItem(

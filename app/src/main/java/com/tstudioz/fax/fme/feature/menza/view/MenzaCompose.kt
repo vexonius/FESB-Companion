@@ -3,6 +3,7 @@ package com.tstudioz.fax.fme.feature.menza.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,13 +30,13 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class)
 @Composable
-fun MenzaCompose(menzaViewModel: MenzaViewModel) {
+fun MenzaCompose(menzaViewModel: MenzaViewModel, paddingValues: PaddingValues) {
 
     val lifecycleState = LocalLifecycleOwner.current.lifecycle.currentStateAsState().value
     val imageUrl = menzaViewModel.images.observeAsState().value
     val menzas = menzaViewModel.menza.observeAsState().value
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
         val pageCount = menzaLocations.size
         val state = rememberPagerState(
             initialPage = (pageCount.div(2)),
