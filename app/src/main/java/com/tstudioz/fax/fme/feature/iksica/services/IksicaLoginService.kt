@@ -53,7 +53,7 @@ class IksicaLoginService(
     }
 
     override suspend fun login(email: String, password: String): NetworkServiceResult.IksicaResult {
-        if (successfulAaieduLoginAlready) {
+        if (successfulAaieduLoginAlready || successfulIsspLoginAlready) {
             successfulAaieduLoginAlready = false
             return NetworkServiceResult.IksicaResult.Success("Success login")
         }
