@@ -14,7 +14,8 @@ class IksicaLoginService(
     private var sAMLResponse: String
 ) : IksicaLoginServiceInterface {
 
-    private var successfulLoginAlready: Boolean = false
+    private var successfulIsspLoginAlready: Boolean = false
+    private var successfulAaieduLoginAlready = false
 
     override suspend fun getAuthState(): NetworkServiceResult.IksicaResult {
         val request = Request.Builder()
@@ -26,14 +27,19 @@ class IksicaLoginService(
         val body = response.body?.string() ?: ""
         val doc = Jsoup.parse(body)
 
-        successfulLoginAlready =  doc.selectFirst("a[aria-label='povratak u sustav']")
+        successfulIsspLoginAlready =  doc.selectFirst("a[aria-label='povratak u sustav']")
             ?.text()?.contains("Povratak u sustav", true) == true
+        successfulAaieduLoginAlready = doc.selectFirst("div[class=onscript-msg]")
+            ?.text()?.contains("Uspješno ste autenticirani.", true) == true
 
         response.close()
 
-        if (successfulLoginAlready) {
+        if (successfulAaieduLoginAlready) {
             doc.select("input[name=SAMLResponse]").forEach { sAMLResponse = it.attr("value") }
-            return NetworkServiceResult.IksicaResult.Success("Success")
+            return NetworkServiceResult.IksicaResult.Success("Success early login to AAIEDU")
+        }
+        if (successfulIsspLoginAlready) {
+            return NetworkServiceResult.IksicaResult.Success("Success early login to ISSP")
         }
 
         if (!success || body.isEmpty()) {
@@ -47,8 +53,8 @@ class IksicaLoginService(
     }
 
     override suspend fun login(email: String, password: String): NetworkServiceResult.IksicaResult {
-        if (successfulLoginAlready) {
-            successfulLoginAlready = false
+        if (successfulAaieduLoginAlready) {
+            successfulAaieduLoginAlready = false
             return NetworkServiceResult.IksicaResult.Success("Success login")
         }
 
@@ -86,6 +92,10 @@ class IksicaLoginService(
     }
 
     override suspend fun getAspNetSessionSAML(): NetworkServiceResult.IksicaResult {
+        if (successfulIsspLoginAlready) {
+            successfulIsspLoginAlready = false
+            return NetworkServiceResult.IksicaResult.Success("Success login")
+        }
         val formBody = FormBody.Builder()
             .add("SAMLResponse", sAMLResponse)
             .add("Submit", "")
