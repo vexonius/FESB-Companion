@@ -1,7 +1,10 @@
 package com.tstudioz.fax.fme.view.activities
 
+import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.tstudioz.fax.fme.navigation.Attendance
 import com.tstudioz.fax.fme.navigation.Home
@@ -19,6 +22,8 @@ class MainActivity : AppCompatActivity() {
 
         router.register(this)
 
+        enableEdgeToEdge(SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT))
+
         setContent {
             val startDestination = when (intent.action.toString()) {
                 "raspored" -> TimeTable
@@ -27,7 +32,7 @@ class MainActivity : AppCompatActivity() {
                 else -> Home
             }
 
-            MainCompose(startDestination, router)
+            MainCompose(startDestination)
         }
     }
 

@@ -1,22 +1,21 @@
 package com.tstudioz.fax.fme.feature.home.repository
 
-import com.tstudioz.fax.fme.database.models.NoteRealm
-import com.tstudioz.fax.fme.feature.menza.dao.interfaces.NoteDaoInterface
+import com.tstudioz.fax.fme.database.models.Note
+import com.tstudioz.fax.fme.database.models.NoteRoom
+import com.tstudioz.fax.fme.feature.home.dao.NoteDao
 
-class NoteRepository(
-    private val noteDao: NoteDaoInterface,
-) : NoteRepositoryInterface {
+class NoteRepository(private val noteDao: NoteDao) : NoteRepositoryInterface {
 
-    override suspend fun getNotes(): List<NoteRealm> {
-        return noteDao.getNotes()
+    override suspend fun getNotes(): List<Note> {
+        return noteDao.getNotes().map { Note(it) }
     }
 
-    override suspend fun insert(note: NoteRealm) {
-        noteDao.insert(note)
+    override suspend fun insert(note: Note) {
+        noteDao.insert(NoteRoom(note))
     }
 
-    override suspend fun delete(note : NoteRealm) {
-        noteDao.delete(note)
+    override suspend fun delete(note: Note) {
+        noteDao.delete(NoteRoom(note))
     }
 
 }

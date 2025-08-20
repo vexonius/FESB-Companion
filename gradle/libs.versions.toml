@@ -1,0 +1,75 @@
+[versions]
+activityKtx = "1.10.1"
+appcompat = "1.7.1"
+browser = "1.8.0"
+compose = "2.6.0"
+composeVersion = "1.8.2"
+constraintlayout = "2.2.1"
+fragmentKtx = "1.8.8"
+gradle = "8.9.3"
+gson = "2.11.0"
+jsoup = "1.17.2"
+junit = "4.13.2"
+koinAndroid = "4.0.0"
+kotlin = "2.1.20"
+kotlinxCoroutinesCore = "1.10.2"
+kotlinxSerializationJson = "1.8.0"
+legacyPreferenceV14 = "1.0.0"
+libraryVersion = "2.0.2"
+lifecycleVersion = "2.9.1"
+material = "1.12.0"
+material3Android = "1.4.0-beta01"
+materialVersion = "1.8.2"
+navigationCompose = "2.9.0"
+okhttp = "4.12.0"
+persistentcookiejar = "v1.0.1"
+preference = "1.2.1"
+securityCrypto = "1.0.0"
+room = "2.7.1"
+dotsIndicator = "5.1.0"
+ksp = "2.1.20-2.0.1"
+glide = "4.16.0"
+
+[libraries]
+activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityKtx" }
+androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "composeVersion" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
+androidx-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "composeVersion" }
+androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+browser = { module = "androidx.browser:browser", version.ref = "browser" }
+kizitownose-calendar = { module = "com.kizitonwose.calendar:compose", version.ref = "compose" }
+constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
+gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+junit = { module = "junit:junit", version.ref = "junit" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndroid" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroid" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+legacy-preference-v14 = { module = "androidx.legacy:legacy-preference-v14", version.ref = "legacyPreferenceV14" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycleVersion" }
+lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleVersion" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+material3-android = { module = "androidx.compose.material3:material3-android", version.ref = "material3Android" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+particlesdrawable-library = { module = "com.github.doctoror.particlesdrawable:library", version.ref = "libraryVersion" }
+persistentcookiejar = { module = "com.github.franmontiel:PersistentCookieJar", version.ref = "persistentcookiejar" }
+preference = { module = "androidx.preference:preference", version.ref = "preference" }
+ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "composeVersion" }
+dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsIndicator" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+
+
+[plugins]
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

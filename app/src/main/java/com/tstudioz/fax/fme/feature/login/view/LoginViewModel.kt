@@ -2,11 +2,13 @@ package com.tstudioz.fax.fme.feature.login.view
 
 import android.app.Application
 import android.content.SharedPreferences
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
+import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
 import com.tstudioz.fax.fme.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
@@ -26,6 +28,9 @@ class LoginViewModel(
 
     var username = MutableLiveData("")
     var password = MutableLiveData("")
+    val showLoading = MutableLiveData(false)
+    val snackbarHostState: SnackbarHostState = SnackbarHostState()
+    var passwordHidden = MutableLiveData(true)
 
     var firstTimeInApp = MutableLiveData(false)
         private set
@@ -33,11 +38,8 @@ class LoginViewModel(
     var loggedIn = SingleLiveEvent<Unit>()
         private set
 
-    var errorMessage = MutableLiveData<String?>(null)
-        private set
-
     private val handler = CoroutineExceptionHandler { _, exception ->
-        errorMessage.postValue(application.getString(R.string.login_error_generic))
+        showSnackbar(application.getString(R.string.login_error_generic))
     }
 
     fun tryUserLogin() {
@@ -45,13 +47,12 @@ class LoginViewModel(
         val password = password.value?.trim()
 
         if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
-            errorMessage.postValue(application.getString(R.string.login_error_empty_credentials))
+            showSnackbar(application.getString(R.string.login_error_empty_credentials))
             return
         } else if (isEmailValid(username)) {
-            // If user inputted email, get only username,
-            // else continue
             username = username.substringBefore("@")
         }
+        showLoading.value = true
 
         viewModelScope.launch(Dispatchers.IO + handler) {
             when (repository.attemptLogin(username, password)) {
@@ -60,9 +61,16 @@ class LoginViewModel(
                 }
 
                 is UserRepositoryResult.LoginResult.Failure -> {
-                    errorMessage.postValue(application.getString(R.string.login_error_invalid_credentials))
+                    showSnackbar(application.getString(R.string.login_error_invalid_credentials))
                 }
             }
+            showLoading.postValue(false)
+        }
+    }
+
+    private fun showSnackbar(message: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            snackbarHostState.showSnackbar(message)
         }
     }
 

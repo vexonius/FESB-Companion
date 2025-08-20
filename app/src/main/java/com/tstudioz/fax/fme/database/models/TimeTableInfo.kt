@@ -3,15 +3,15 @@ package com.tstudioz.fax.fme.database.models
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDate
 
-data class TimeTableInfo (
+data class TimeTableInfo(
     @SerializedName("Id")
     var id: Int = 0,
     @SerializedName("Name")
     var name: String = "",
     @SerializedName("StartDate")
-    var startDate: LocalDate? = null,
+    var startDate: LocalDate,
     @SerializedName("EndDate")
-    var endDate: LocalDate?= null,
+    var endDate: LocalDate,
     @SerializedName("StartDateText")
     var startDateText: String = "",
     @SerializedName("EndDateText")

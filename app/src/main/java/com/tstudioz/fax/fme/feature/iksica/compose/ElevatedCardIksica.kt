@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.iksica.compose
 
+import android.graphics.Paint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,16 +20,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.glowingColor
+import com.tstudioz.fax.fme.compose.gradientColors
 import com.tstudioz.fax.fme.feature.iksica.models.StudentData
-import com.tstudioz.fax.fme.feature.iksica.models.StudentDataRealm
 import java.util.Locale
 
 @Preview
@@ -39,79 +42,92 @@ fun ElevatedCardIksica(
     balance: Double = 0.00,
     onClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1.586f)
-            .padding(25.dp)
-            .clip(shape = RoundedCornerShape(10.dp))
-            .angledGradientBackground(
-                colors = listOf(
-                    Color(0xFFfa2531),
-                    Color(0xFF0075B2)
-                ),
-                degrees = 45f,
-                halfHalf = true
-            )
+    val cornersRadius = 30.dp
+    val glowingRadius = 100.dp
+
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(24.dp, 30.dp, 24.dp, 50.dp)
+        .aspectRatio(1.586f)
+        .drawBehind {
+            val canvasSize = size
+            drawContext.canvas.nativeCanvas.apply {
+                drawRoundRect(
+                    0f,
+                    0f,
+                    canvasSize.width, canvasSize.height,
+                    cornersRadius.toPx(), cornersRadius.toPx(),
+                    Paint().apply {
+                        isAntiAlias = true
+                        setShadowLayer(glowingRadius.toPx(), 0f, 0f, glowingColor.toArgb())
+                    })
+                drawRoundRect(
+                    0f,
+                    0f,
+                    canvasSize.width, canvasSize.height,
+                    cornersRadius.toPx(), cornersRadius.toPx(),
+                    Paint().apply {
+                        isAntiAlias = true
+                        setShadowLayer((glowingRadius / 4).toPx(), 0f, 0f, glowingColor.toArgb())
+                    })
+            }
+        }
+        .clip(shape = RoundedCornerShape(cornersRadius))
+        .angledGradientBackground(colors = gradientColors, degrees = 32f)
     ) {
         Column(
-            Modifier
-                .fillMaxSize()
-                .clickable { onClick() },
+            Modifier.clickable { onClick() },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                Modifier
-                    .padding(25.dp, 25.dp, 0.dp, 0.dp)
-                    .weight(0.7f)
-            ) {
+            Column(Modifier
+                .padding(25.dp)
+                .weight(0.7f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(0.dp, 5.dp)
+                    horizontalArrangement = Arrangement.Start
                 ) {
-                    Text(
-                        text = name,
-                        fontSize = 25.sp,
-                    )
+                    val formattedNumber = buildList {
+                        add(iksicaNumber.take(6))
+                        add(iksicaNumber.drop(6).take(2))
+                        add(iksicaNumber.drop(8).take(10))
+                        add(iksicaNumber.takeLast(1))
+                    }.joinToString(" ")
+                    Column {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = formattedNumber,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.End,
                     modifier = Modifier
-                        .padding(0.dp, 5.dp)
-                        .fillMaxWidth()
+                        .weight(0.3f)
+                        .fillMaxSize()
                 ) {
                     Text(
-                        text = iksicaNumber,
-                        fontSize = 20.sp,
+                        text = stringResource(
+                            id = R.string.iksica_balance,
+                            String.format(Locale.getDefault(), "%.2f", balance)
+                        ),
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = FontWeight.ExtraBold,
                     )
                 }
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier
-                    .padding(0.dp, 0.dp, 25.dp, 25.dp)
-                    .weight(0.3f)
-                    .fillMaxSize()
-            ) {
-                Text(
-                    text = stringResource(
-                        id = R.string.iksica_balance, String.format(Locale.US, "%.2f", balance)
-                    ),
-                    fontSize = 25.sp,
-                    lineHeight = 25.sp,
-                    fontWeight = FontWeight.Bold
-                )
             }
         }
     }
 }
 
 @Composable
-fun CardIksicaPopupContent(model: StudentData) {
+fun CardIksicaPopupContent(studentInfo: StudentData) {
     AppTheme {
         Column(
             Modifier
@@ -119,21 +135,30 @@ fun CardIksicaPopupContent(model: StudentData) {
                 .background(MaterialTheme.colorScheme.background)
                 .width(300.dp)
         ) {
-            CardIksicaPopupRow(leftText = stringResource(R.string.name_label), rightText = model.nameSurname)
-            CardIksicaPopupRow(leftText = stringResource(R.string.rights_level_label), rightText = model.rightsLevel)
+            CardIksicaPopupRow(leftText = stringResource(R.string.name_label), rightText = studentInfo.nameSurname)
+            CardIksicaPopupRow(
+                leftText = stringResource(R.string.rights_level_label),
+                rightText = studentInfo.rightsLevel
+            )
             CardIksicaPopupRow(
                 leftText = stringResource(R.string.daily_support_label), rightText = stringResource(
-                    id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", model.dailySupport)
+                    id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", studentInfo.dailySupport)
                 )
             )
-            CardIksicaPopupRow(leftText = stringResource(R.string.oib_label), rightText = model.oib)
-            CardIksicaPopupRow(leftText = stringResource(R.string.jmbag_label), rightText = model.jmbag)
-            CardIksicaPopupRow(leftText = stringResource(R.string.card_number_label), rightText = model.cardNumber)
-            CardIksicaPopupRow(leftText = stringResource(R.string.rights_from_label), rightText = model.rightsFrom)
-            CardIksicaPopupRow(leftText = stringResource(R.string.right_until_label), rightText = model.rightsTo)
+            CardIksicaPopupRow(leftText = stringResource(R.string.oib_label), rightText = studentInfo.oib)
+            CardIksicaPopupRow(leftText = stringResource(R.string.jmbag_label), rightText = studentInfo.jmbag)
+            CardIksicaPopupRow(
+                leftText = stringResource(R.string.card_number_label),
+                rightText = studentInfo.cardNumber
+            )
+            CardIksicaPopupRow(
+                leftText = stringResource(R.string.rights_from_label),
+                rightText = studentInfo.rightsFrom
+            )
+            CardIksicaPopupRow(leftText = stringResource(R.string.right_until_label), rightText = studentInfo.rightsTo)
             CardIksicaPopupRow(
                 leftText = stringResource(R.string.card_balance_label), rightText = stringResource(
-                    id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", model.balance)
+                    id = R.string.iksica_balance, String.format(Locale.getDefault(), "%.2f", studentInfo.balance)
                 ), divider = false
             )
         }
@@ -142,9 +167,7 @@ fun CardIksicaPopupContent(model: StudentData) {
 
 @Composable
 fun CardIksicaPopupRow(
-    leftText: String,
-    rightText: String,
-    divider: Boolean = true
+    leftText: String, rightText: String, divider: Boolean = true
 ) {
     Row(
         Modifier
@@ -153,8 +176,8 @@ fun CardIksicaPopupRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = leftText, color = MaterialTheme.colorScheme.onSurface)
-        Text(text = rightText, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = leftText, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium)
+        Text(text = rightText, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium)
     }
     if (divider) {
         HorizontalDivider(

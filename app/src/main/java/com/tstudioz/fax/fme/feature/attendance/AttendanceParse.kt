@@ -1,12 +1,12 @@
 package com.tstudioz.fax.fme.feature.attendance
 
 import android.util.Log
-import com.tstudioz.fax.fme.database.models.AttendanceEntry
+import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.util.UUID
 
-class ParseAttendance{
+class ParseAttendance {
 
     fun parseAttendance(
         element: Element,
@@ -17,14 +17,16 @@ class ParseAttendance{
         Jsoup.parse(body).select(".courseCategories div.courseCategory").forEach { kat ->
             val mAttendanceEntry = AttendanceEntry()
             mAttendanceEntry.semester = semester
-            mAttendanceEntry.`class` = element.select(".cellContent").first()?.text()
-            mAttendanceEntry.type = kat.getElementsByClass("name").first()?.text()
-            mAttendanceEntry.attended = kat.select(".attended > span.num").first()?.text()?.toInt() ?: 99
-            mAttendanceEntry.absent = kat.select(".absent > span.num").first()?.text()?.toInt() ?: 99
-            mAttendanceEntry.required = kat.select(".required-attendance > span").first()?.text()
-            mAttendanceEntry.total = (mAttendanceEntry.required?.split("od")?.last()?.trim() ?: "99").toInt()
+            mAttendanceEntry.subject = element.select(".cellContent").first()?.text() ?: ""
+            mAttendanceEntry.type =
+                (kat.getElementsByClass("name").first()?.text() ?: "").replaceFirstChar { it.uppercase() }
+            mAttendanceEntry.attended = kat.select(".attended > span.num").first()?.text()?.toInt() ?: -1
+            mAttendanceEntry.absent = kat.select(".absent > span.num").first()?.text()?.toInt() ?: -1
+            val reqAttend = kat.select(".required-attendance > span").first()?.text()
+            mAttendanceEntry.required = (reqAttend?.split("od")?.firstOrNull()?.trim() ?: "").toIntOrNull() ?: -1
+            mAttendanceEntry.total = (reqAttend?.split("od")?.last()?.trim())?.toIntOrNull() ?: -1
             mAttendanceEntry.id = UUID.nameUUIDFromBytes(
-                ("${mAttendanceEntry.attended}${mAttendanceEntry.absent}${mAttendanceEntry.`class`}" +
+                ("${mAttendanceEntry.attended}${mAttendanceEntry.absent}${mAttendanceEntry.subject}" +
                         "${mAttendanceEntry.type}${mAttendanceEntry.required}${mAttendanceEntry.total}${mAttendanceEntry.semester}").toByteArray()
             )
                 .toString()

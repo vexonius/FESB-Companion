@@ -26,8 +26,8 @@ class IksicaLoginService(
         val body = response.body?.string() ?: ""
         val doc = Jsoup.parse(body)
 
-        successfulLoginAlready = doc.selectFirst("p[class=content_text]")
-                ?.text()?.contains("Uspješno ste autenticirani.", true) == true
+        successfulLoginAlready =  doc.selectFirst("a[aria-label='povratak u sustav']")
+            ?.text()?.contains("Povratak u sustav", true) == true
 
         response.close()
 
@@ -68,12 +68,12 @@ class IksicaLoginService(
         val doc = Jsoup.parse(response.body?.string() ?: "")
         sAMLResponse = doc.select("input[name=SAMLResponse]").attr("value")
 
-        val content = doc.selectFirst("p.content_text")?.text()
+        val content = doc.selectFirst("div.onscript-msg")?.text()
         val submit = doc.selectFirst("button[type=submit]")?.text()
         val error = doc.selectFirst("div.error")?.text()
 
         if (content != null && content.contains("Uspješno", true)
-            || submit != null && submit.contains("Da, nastavi", true)
+            || submit != null && submit.contains("Nastavak", true)
         ) {
             return NetworkServiceResult.IksicaResult.Success("Success login")
         }

@@ -6,6 +6,7 @@ import com.franmontiel.persistentcookiejar.persistence.CookiePersistor
 import com.tstudioz.fax.fme.feature.iksica.services.IksicaService
 import com.tstudioz.fax.fme.feature.login.services.UserService
 import com.tstudioz.fax.fme.feature.studomat.services.StudomatService
+import com.tstudioz.fax.fme.feature.studomat.services.StudomatService.Companion.targetUrl
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 
@@ -65,10 +66,18 @@ class MonsterCookieJar(
         return authCookies.isNotEmpty()
     }
 
-    fun clearCookiesForUrl(url: HttpUrl) {
-        val cookies = loadForRequest(url)
-        persistor.removeAll(cookies)
-        cache.removeAll { cookies.contains(it) }
+    fun clearISVUCookie() {
+        val cookie = persistor.loadAll().filter {
+            it.name == authCookieISVU
+        }
+        persistor.removeAll(cookie)
+        cache.removeAll { cookie.contains(it) }
+    }
+
+    fun getISVUCookieForWebView(): String? {
+        val cookie = loadForRequest(StudomatService.targetUrl).find { it.name == authCookieISVU }
+        return if (cookie != null) cookie.name + "=" + cookie.value
+        else null
     }
 
     companion object {

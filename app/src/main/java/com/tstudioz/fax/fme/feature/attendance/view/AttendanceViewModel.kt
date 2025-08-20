@@ -5,17 +5,19 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.tstudioz.fax.fme.database.models.AttendanceEntry
+import com.tstudioz.fax.fme.feature.attendance.ShownSemester
+import com.tstudioz.fax.fme.feature.attendance.models.AttendanceEntry
 import com.tstudioz.fax.fme.feature.attendance.repository.AttendanceRepositoryInterface
 import com.tstudioz.fax.fme.models.NetworkServiceResult
-import com.tstudioz.fax.fme.networking.NetworkUtils
+import com.tstudioz.fax.fme.networking.InternetConnectionObserver
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
@@ -23,14 +25,34 @@ class AttendanceViewModel(
     private val repository: AttendanceRepositoryInterface
 ) : ViewModel() {
 
-    private val networkUtils: NetworkUtils by inject(NetworkUtils::class.java)
+    val internetAvailable: LiveData<Boolean> = InternetConnectionObserver.get()
 
     private var lastFetch = 0L
+    private val has60SecondPassed: Boolean
+        get() = System.currentTimeMillis() - lastFetch > 60000
 
-    private var _attendanceList: MutableLiveData<List<List<AttendanceEntry>>> = MutableLiveData(emptyList())
-    val attendanceList: LiveData<List<List<AttendanceEntry>>> = _attendanceList
+    private var _attendanceListFull: MutableLiveData<List<List<AttendanceEntry>>> = MutableLiveData(emptyList())
+    val attendanceListFull: LiveData<List<List<AttendanceEntry>>> = _attendanceListFull
+
+    private val attendanceFirstSem = _attendanceListFull.map { list -> list.filter { it.firstOrNull()?.semester == 1 } }
+    private val attendanceSecondSem =
+        _attendanceListFull.map { list -> list.filter { it.firstOrNull()?.semester == 2 } }
+
+    private val _shownSemester: MutableLiveData<ShownSemester?> = MutableLiveData(null)
+    val shownSemester: MutableLiveData<ShownSemester?> = _shownSemester
+
+    private val _attendance: LiveData<List<List<AttendanceEntry>>> = _shownSemester.switchMap {
+        when (it) {
+            ShownSemester.FIRST -> attendanceFirstSem
+            ShownSemester.SECOND -> attendanceSecondSem
+            null -> _attendanceListFull
+        }
+    }
+
+    val attendance: LiveData<List<List<AttendanceEntry>>> = _attendance
 
     val snackbarHostState = SnackbarHostState()
+
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("Error attendance", exception.toString())
@@ -42,21 +64,15 @@ class AttendanceViewModel(
         fetchAttendance()
     }
 
-    private fun has60SecondsPassed(): Boolean =  System.currentTimeMillis() - lastFetch > 60000
-
     fun fetchAttendance() {
+        if (internetAvailable.value == false) return
+        if (!has60SecondPassed) return
         viewModelScope.launch(context = Dispatchers.IO + handler) {
-            if (!networkUtils.isNetworkAvailable()) {
-                snackbarHostState.showSnackbar("Niste povezani")
-                return@launch
-            }
-            if (!has60SecondsPassed()) { return@launch }
-
             lastFetch = System.currentTimeMillis()
             when (val attendance = repository.fetchAttendance()) {
                 is NetworkServiceResult.AttendanceParseResult.Success -> {
                     val data = attendance.data
-                    _attendanceList.postValue(data)
+                    _attendanceListFull.postValue(data)
                 }
 
                 is NetworkServiceResult.AttendanceParseResult.Failure -> {
@@ -68,9 +84,13 @@ class AttendanceViewModel(
 
     private fun loadFromDb() {
         viewModelScope.launch(context = Dispatchers.IO + handler) {
-            _attendanceList.postValue(repository.readAttendance())
+            _attendanceListFull.postValue(repository.readAttendance())
         }
     }
-}
 
+    fun showSemester(semester: ShownSemester) {
+        _shownSemester.value = if (_shownSemester.value == semester) null else semester
+    }
+
+}
 
