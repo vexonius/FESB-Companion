@@ -14,7 +14,7 @@ class IksicaLoginService(
     private var sAMLResponse: String
 ) : IksicaLoginServiceInterface {
 
-    private var successfulIsspLoginAlready: Boolean = false
+    private var successfulIsspLoginAlready = false
     private var successfulAaieduLoginAlready = false
 
     override suspend fun getAuthState(): NetworkServiceResult.IksicaResult {
