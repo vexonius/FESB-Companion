@@ -6,7 +6,6 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
 import com.tstudioz.fax.fme.di.getSharedPreferences
 import com.tstudioz.fax.fme.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.util.SPKey
@@ -16,6 +15,9 @@ class InternetConnectionLiveData(context: Context) : LiveData<Boolean>() {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+    val shPref = getSharedPreferences(context)
+    var testMode = shPref[SPKey.TEST_MODE, false]
+
     init {
         // Set initial value based on current network state
         val activeNetwork = connectivityManager.activeNetwork
@@ -24,16 +26,20 @@ class InternetConnectionLiveData(context: Context) : LiveData<Boolean>() {
         postValue(hasInternet)
     }
 
+
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
+            if (testMode) return
             postValue(true)
         }
 
         override fun onLost(network: Network) {
+            if (testMode) return
             postValue(false)
         }
 
         override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+            if (testMode) return
             val hasInternet = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             postValue(hasInternet)
         }
@@ -41,6 +47,11 @@ class InternetConnectionLiveData(context: Context) : LiveData<Boolean>() {
 
     override fun onActive() {
         super.onActive()
+        testMode = shPref[SPKey.TEST_MODE, false]
+        if (testMode) {
+            postValue(false)
+            return
+        }
         val request = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build()
@@ -49,27 +60,19 @@ class InternetConnectionLiveData(context: Context) : LiveData<Boolean>() {
 
     override fun onInactive() {
         super.onInactive()
+        if (testMode) return
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }
 
 object InternetConnectionObserver {
     private lateinit var internetLiveData: InternetConnectionLiveData
-    var testMode : Boolean = false
 
     fun init(context: Context) {
         internetLiveData = InternetConnectionLiveData(context.applicationContext)
-        val shPref = getSharedPreferences(context)
-        testMode = shPref[SPKey.TEST_MODE, false]
     }
 
     fun get(): LiveData<Boolean> {
-        if (testMode){
-            return liveData {
-                emit(false)
-            }
-        }
-
         return internetLiveData
     }
 }
