@@ -8,16 +8,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
-import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.common.user.models.UserRepositoryResult
+import com.tstudioz.fax.fme.database.AppDatabase
 import com.tstudioz.fax.fme.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.util.SPKey
 import com.tstudioz.fax.fme.util.SingleLiveEvent
+import com.tstudioz.fax.fme.util.eventsTestData
+import com.tstudioz.fax.fme.util.studomatSubjectTestData
+import com.tstudioz.fax.fme.util.studomatYearInfoTestData
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
+import kotlin.getValue
 
 @InternalCoroutinesApi
 class LoginViewModel(
@@ -42,9 +47,27 @@ class LoginViewModel(
         showSnackbar(application.getString(R.string.login_error_generic))
     }
 
+    private fun addTestData() {
+        val db : AppDatabase by inject(AppDatabase::class.java)
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            db.studomatDao().insert(studomatSubjectTestData)
+            db.studomatDao().insertYears(studomatYearInfoTestData)
+            db.timetableDao().insert(eventsTestData)
+        }
+    }
+
     fun tryUserLogin() {
         var username = username.value?.trim()?.lowercase()
         val password = password.value?.trim()
+
+        if (username == "admin" && password == "admin") {
+            setTestMode(true)
+            viewModelScope.launch(Dispatchers.IO + handler) {
+                repository.insertDummyUser()
+            }
+            addTestData()
+            loggedIn.postValue(Unit)
+        }
 
         if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
             showSnackbar(application.getString(R.string.login_error_empty_credentials))
@@ -72,6 +95,10 @@ class LoginViewModel(
         viewModelScope.launch(Dispatchers.Main) {
             snackbarHostState.showSnackbar(message)
         }
+    }
+
+    fun setTestMode(isTestUser: Boolean) {
+        sharedPreferences[SPKey.TEST_MODE] = isTestUser
     }
 
     fun checkIfFirstTimeInApp() {

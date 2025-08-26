@@ -6,6 +6,10 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
+import com.tstudioz.fax.fme.di.getSharedPreferences
+import com.tstudioz.fax.fme.util.PreferenceHelper.get
+import com.tstudioz.fax.fme.util.SPKey
 
 class InternetConnectionLiveData(context: Context) : LiveData<Boolean>() {
 
@@ -51,11 +55,23 @@ class InternetConnectionLiveData(context: Context) : LiveData<Boolean>() {
 
 object InternetConnectionObserver {
     private lateinit var internetLiveData: InternetConnectionLiveData
+    var testMode : Boolean = false
 
     fun init(context: Context) {
         internetLiveData = InternetConnectionLiveData(context.applicationContext)
+        val shPref = getSharedPreferences(context)
+        testMode = shPref[SPKey.TEST_MODE, false]
     }
 
-    fun get(): LiveData<Boolean> = internetLiveData
+    fun get(): LiveData<Boolean> {
+        if (testMode){
+            return liveData {
+                emit(false)
+            }
+        }
+
+        return internetLiveData
+    }
 }
+
 
