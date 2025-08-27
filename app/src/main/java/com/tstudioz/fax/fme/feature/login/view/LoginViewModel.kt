@@ -14,7 +14,10 @@ import com.tstudioz.fax.fme.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.util.SPKey
 import com.tstudioz.fax.fme.util.SingleLiveEvent
+import com.tstudioz.fax.fme.util.studentDataTestData
+import com.tstudioz.fax.fme.util.attendanceTestData
 import com.tstudioz.fax.fme.util.eventsTestData
+import com.tstudioz.fax.fme.util.receiptsTestData
 import com.tstudioz.fax.fme.util.studomatSubjectTestData
 import com.tstudioz.fax.fme.util.studomatYearInfoTestData
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -53,6 +56,9 @@ class LoginViewModel(
             db.studomatDao().insert(studomatSubjectTestData)
             db.studomatDao().insertYears(studomatYearInfoTestData)
             db.timetableDao().insert(eventsTestData)
+            db.attendanceDao().insert(attendanceTestData)
+            db.iksicaDao().insert(studentDataTestData)
+            db.iksicaDao().insert(receiptsTestData)
         }
     }
 
@@ -60,7 +66,7 @@ class LoginViewModel(
         var username = username.value?.trim()?.lowercase()
         val password = password.value?.trim()
 
-        if (username == "admin" && password == "admin") {
+        if (username == "test" && password == "testpassword12421") {
             setTestMode(true)
             viewModelScope.launch(Dispatchers.IO + handler) {
                 repository.insertDummyUser()
