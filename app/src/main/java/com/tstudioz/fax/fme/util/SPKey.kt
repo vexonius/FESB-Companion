@@ -4,5 +4,6 @@ enum class SPKey {
 
     LOGGED_IN,
     FIRST_TIME,
-    EVENTS_GLOW
+    EVENTS_GLOW,
+    TEST_MODE
 }
