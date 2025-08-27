@@ -15,8 +15,8 @@ android {
         applicationId = "com.tstudioz.fax.fme"
         minSdk = 26
         targetSdk = 35
-        versionCode = 31
-        versionName = "4.0.1"
+        versionCode = 32
+        versionName = "4.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
