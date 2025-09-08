@@ -16,6 +16,7 @@ import com.tstudioz.fax.fme.util.SPKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import androidx.core.content.edit
 
 class SettingsViewModel(
     private val application: Application,
@@ -47,6 +48,7 @@ class SettingsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             userRepository.deleteAllUserData()
             routeToLogin.emit(true)
+            sharedPreferences.edit { clear() }
         }
     }
 

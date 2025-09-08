@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -68,7 +69,7 @@ import kotlinx.coroutines.launch
     ExperimentalMaterialApi::class
 )
 @Composable
-fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
+fun IksicaCompose(iksicaViewModel: IksicaViewModel, innerPaddingValues: PaddingValues) {
 
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -110,7 +111,7 @@ fun IksicaCompose(iksicaViewModel: IksicaViewModel) {
             if (receiptSelected is IksicaReceiptState.Success)
                 BottomSheetIksica(receiptSelected.data) { iksicaViewModel.hideReceiptDetails() }
         }) {
-        Box(Modifier.fillMaxWidth()) {
+        Box(Modifier.fillMaxWidth().padding(innerPaddingValues)) {
             PullRefreshIndicator(
                 isRefreshing, pullRefreshState, Modifier
                     .align(Alignment.TopCenter)

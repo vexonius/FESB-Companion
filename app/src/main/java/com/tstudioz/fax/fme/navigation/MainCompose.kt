@@ -2,7 +2,6 @@ package com.tstudioz.fax.fme.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +38,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.compose.koinViewModel
 
-val topLevelRoutesFESB = listOf(
+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+@Composable
+fun MainCompose(startDestination: Any) {
+    val navController = rememberNavController()
+    AppTheme { MainNavHost(navController = navController, startDestination = startDestination) }
+}
+
+val topLevelRoutes = listOf(
     TopLevelRoute(R.string.tab_iksica, Iksica, R.drawable.icon_iksica),
     TopLevelRoute(R.string.tab_attendance, Attendance, R.drawable.icon_attendance),
     TopLevelRoute(R.string.tab_home, Home, R.drawable.icon_home),
@@ -49,25 +55,17 @@ val topLevelRoutesFESB = listOf(
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun MainCompose(startDestination: Any, topLevelRoutes : List<TopLevelRoute<out Any>> = topLevelRoutesFESB) {
-    val navController = rememberNavController()
-    AppTheme { MainNavHost(navController = navController, startDestination = startDestination, topLevelRoutes= topLevelRoutes) }
-}
-
-
-@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-@Composable
 fun MainNavHost(
     navController: NavHostController,
     startDestination: Any,
-    topLevelRoutes: List<TopLevelRoute<out Any>>,
     iksicaViewModel: IksicaViewModel = koinViewModel(),
-    studomatViewModel: StudomatViewModel = koinViewModel(),
     homeViewModel: HomeViewModel = koinViewModel(),
     attendanceViewModel: AttendanceViewModel = koinViewModel(),
+    studomatViewModel: StudomatViewModel = koinViewModel(),
     timetableViewModel: TimetableViewModel = koinViewModel()
 ) {
     val internetAvailable = homeViewModel.internetAvailable.observeAsState().value == true
+
     Scaffold(
         bottomBar = {
             MainBottomBar(
@@ -83,7 +81,6 @@ fun MainNavHost(
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding),
             enterTransition = {
                 EnterTransition.None
             },
@@ -91,19 +88,19 @@ fun MainNavHost(
                 ExitTransition.None
             }) {
             composable<Iksica> {
-                IksicaCompose(iksicaViewModel)
+                IksicaCompose(iksicaViewModel, innerPaddingValues = innerPadding)
             }
             composable<Attendance> {
-                AttendanceCompose(attendanceViewModel)
+                AttendanceCompose(attendanceViewModel, innerPaddingValues = innerPadding)
             }
             composable<Home> {
-                HomeTabCompose(homeViewModel)
+                HomeTabCompose(homeViewModel, innerPaddingValues = innerPadding)
             }
             composable<TimeTable> {
-                TimetableCompose(timetableViewModel)
+                TimetableCompose(timetableViewModel, innerPaddingValues = innerPadding)
             }
             composable<Studomat> {
-                StudomatCompose(studomatViewModel)
+                StudomatCompose(studomatViewModel, innerPaddingValues = innerPadding)
             }
         }
     }
@@ -117,7 +114,7 @@ fun NavbarPreview() {
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ) {
-            topLevelRoutesFESB.forEach { topLevelRoute ->
+            topLevelRoutes.forEach { topLevelRoute ->
                 NavigationBarItem(
                     icon = {
                         Icon(

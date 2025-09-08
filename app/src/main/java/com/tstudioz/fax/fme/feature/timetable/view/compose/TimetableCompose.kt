@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -79,7 +81,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun TimetableCompose(timetableViewModel: TimetableViewModel) {
+fun TimetableCompose(timetableViewModel: TimetableViewModel, innerPaddingValues: PaddingValues) {
 
     val showDayEvent = timetableViewModel.currentEventShown
     val shownWeekChooseMenu = timetableViewModel.shownWeekChooseMenu.observeAsState(initial = false).value
@@ -108,79 +110,80 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel) {
             else -> {}
         }
     }
-
-    BottomSheetScaffold(
-        topBar = { TopAppBarTimetable { timetableViewModel.showWeekChooseMenu() } },
-        containerColor = MaterialTheme.colorScheme.surface,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        sheetContent = {
-            if (event != null) {
-                ModalBottomSheet(
-                    sheetState = sheetStateEvent,
-                    onDismissRequest = { hideEvent() },
-                    contentWindowInsets = { WindowInsets(0.dp) },
-                    dragHandle = { },
-                ) {
-                    EventBottomSheet(event)
-                }
-            } else if (shownWeekChooseMenu) {
-                ModalBottomSheet(
-                    sheetState = sheetStateCalendar,
-                    onDismissRequest = { showWeekChooseMenu(false) },
-                    contentWindowInsets = { WindowInsets(0.dp) },
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    dragHandle = { },
-                ) {
-                    val coroutineScope = rememberCoroutineScope()
-                    monthData.value?.let {
-                        BottomSheetCalendar(
-                            monthData = it,
-                            daysInPeriods = daysInPeriods,
-                            fetchUserTimetable = fetchUserTimetable,
-                            coroutineScope = coroutineScope,
-                            hideSheet = {
-                                coroutineScope.launch {
-                                    sheetStateCalendar.hide()
-                                    showWeekChooseMenu(false)
+    Box(Modifier.padding(innerPaddingValues)) {
+        BottomSheetScaffold(
+            topBar = { TopAppBarTimetable { timetableViewModel.showWeekChooseMenu() } },
+            containerColor = MaterialTheme.colorScheme.surface,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            sheetContent = {
+                if (event != null) {
+                    ModalBottomSheet(
+                        sheetState = sheetStateEvent,
+                        onDismissRequest = { hideEvent() },
+                        contentWindowInsets = { WindowInsets(0.dp) },
+                        dragHandle = { },
+                    ) {
+                        EventBottomSheet(event)
+                    }
+                } else if (shownWeekChooseMenu) {
+                    ModalBottomSheet(
+                        sheetState = sheetStateCalendar,
+                        onDismissRequest = { showWeekChooseMenu(false) },
+                        contentWindowInsets = { WindowInsets(0.dp) },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        dragHandle = { },
+                    ) {
+                        val coroutineScope = rememberCoroutineScope()
+                        monthData.value?.let {
+                            BottomSheetCalendar(
+                                monthData = it,
+                                daysInPeriods = daysInPeriods,
+                                fetchUserTimetable = fetchUserTimetable,
+                                coroutineScope = coroutineScope,
+                                hideSheet = {
+                                    coroutineScope.launch {
+                                        sheetStateCalendar.hide()
+                                        showWeekChooseMenu(false)
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
-            }
-        },
-        sheetPeekHeight = 0.dp,
-    ) {
-        val mapped = lessonsToShow.observeAsState(emptyList()).value
-        val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
-        val eventBefore8AM = mapped.minByOrNull { it.start.toLocalTime() }
-        val eventExistsBefore8AM = eventBefore8AM?.start?.toLocalTime()?.isBefore(LocalTime.of(8, 0))
-        val eventAfter8PM = mapped.maxByOrNull { it.end.toLocalTime() }
-        val eventExistsAfter8PM = eventAfter8PM?.end?.toLocalTime()?.isAfter(LocalTime.of(20, 0))
-        val minTime = if (eventExistsBefore8AM == true) eventBefore8AM.start.toLocalTime() else LocalTime.of(8, 0)
-        val maxTime = if (eventExistsAfter8PM == true) eventAfter8PM.end.toLocalTime() else LocalTime.of(20, 0)
+            },
+            sheetPeekHeight = 0.dp,
+        ) {
+            val mapped = lessonsToShow.observeAsState(emptyList()).value
+            val subExists: Boolean = mapped.any { it.start.dayOfWeek.value == 6 }
+            val eventBefore8AM = mapped.minByOrNull { it.start.toLocalTime() }
+            val eventExistsBefore8AM = eventBefore8AM?.start?.toLocalTime()?.isBefore(LocalTime.of(8, 0))
+            val eventAfter8PM = mapped.maxByOrNull { it.end.toLocalTime() }
+            val eventExistsAfter8PM = eventAfter8PM?.end?.toLocalTime()?.isAfter(LocalTime.of(20, 0))
+            val minTime = if (eventExistsBefore8AM == true) eventBefore8AM.start.toLocalTime() else LocalTime.of(8, 0)
+            val maxTime = if (eventExistsAfter8PM == true) eventAfter8PM.end.toLocalTime() else LocalTime.of(20, 0)
 
-        Schedule(
-            events = mapped,
-            eventContent = { posEvent ->
-                EventCard(
-                    positionedEvent = posEvent,
-                    onClick = { showEvent(posEvent.event) }
-                )
-            },
-            dayHeader = { day ->
-                DayHeader(day)
-            },
-            timeLabel = { time ->
-                SidebarLabel(time)
-            },
-            minTime = minTime,
-            maxTime = maxTime,
-            minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
-            maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
-            onClick = { showEvent(it) },
-            eventsGlowing = timetableViewModel.eventsGlowing.observeAsState().value == true
-        )
+            Schedule(
+                events = mapped,
+                eventContent = { posEvent ->
+                    EventCard(
+                        positionedEvent = posEvent,
+                        onClick = { showEvent(posEvent.event) }
+                    )
+                },
+                dayHeader = { day ->
+                    DayHeader(day)
+                },
+                timeLabel = { time ->
+                    SidebarLabel(time)
+                },
+                minTime = minTime,
+                maxTime = maxTime,
+                minDate = shownWeek.observeAsState().value ?: LocalDate.now(),
+                maxDate = (shownWeek.observeAsState().value ?: LocalDate.now()).plusDays(if (subExists) 5 else 4),
+                onClick = { showEvent(it) },
+                eventsGlowing = timetableViewModel.eventsGlowing.observeAsState().value == true
+            )
+        }
     }
 }
 

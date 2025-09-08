@@ -35,9 +35,13 @@ class UserRepository(
             }
         }
     }
+    override suspend fun insertDummyUser() {
+        sharedPreferences[SPKey.LOGGED_IN] = true
+        userDao.insert(UserRoom(11, "Test user", "User", "User"))
+    }
 
     override suspend fun getCurrentUserName(): String {
-        return User(userDao.getUser()).username
+        return userDao.getUser().username
     }
 
     override suspend fun getCurrentUser(): User {

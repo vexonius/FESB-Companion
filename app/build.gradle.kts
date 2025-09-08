@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 plugins {
-    id("com.android.library")
+    id("com.android.application")
     kotlin("android")
     kotlin("kapt")
     kotlin("plugin.serialization") version libs.versions.kotlin
@@ -12,18 +12,54 @@ plugins {
 android {
     compileSdk = 35
     defaultConfig {
+        applicationId = "com.tstudioz.fax.fme"
         minSdk = 26
+        targetSdk = 35
+        versionCode = 33
+        versionName = "4.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    val localPropFileExists = File(rootDir, "local.properties").isFile
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("./../keystore.jks")
+            storePassword = System.getenv("RELEASE_SIGNING_PASSWORD")
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+        }
+        if (localPropFileExists) {
+            create("releaseDebug") {
+                val localProperties = Properties().apply { load(File(rootDir, "local.properties").inputStream()) }
+                storeFile = file("./../keystore.jks")
+                storePassword = localProperties.getProperty("RELEASE_SIGNING_PASSWORD")
+                keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+                keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
+        }
+
+        if (localPropFileExists) {
+            create("releaseDebug") {
+                isMinifyEnabled = true
+                proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+                signingConfig = signingConfigs.getByName("releaseDebug")
+            }
         }
 
         debug {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".debug"
+            isDebuggable = true
         }
     }
 
@@ -107,4 +143,16 @@ allprojects {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+}
+
+tasks.register("getBuildVersionNumber") {
+    println(android.defaultConfig.versionCode)
+}
+
+tasks.register("getNextBuildVersionNumber") {
+    println(android.defaultConfig.versionCode?.plus(1) ?: -1)
+}
+
+tasks.register("getAppVersionName") {
+    println(android.defaultConfig.versionName)
 }

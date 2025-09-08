@@ -8,13 +8,13 @@ data class UserRoom(
     @PrimaryKey
     var id: Int = ID,
     val fullName: String = "",
-    var email: String = "",
+    var username: String = "",
     var password: String = ""
 ) {
     constructor(user: User) : this(
         id = ID,
         fullName = user.fullName,
-        email = user.email,
+        username = user.username,
         password = user.password
     )
 
@@ -25,14 +25,14 @@ data class UserRoom(
 
 data class User(
     val fullName: String,
-    var email: String,
+    var username: String,
     var password: String
 ) {
 
-    constructor(userRoom: UserRoom) : this(userRoom.fullName, userRoom.email, userRoom.password)
+    constructor(userRoom: UserRoom) : this(userRoom.fullName, userRoom.username, userRoom.password)
 
-    val username: String
-        get() = email.split("@").firstOrNull() ?: ""
+    val email: String
+        get() = "$username@fesb.hr"
 
 }
 

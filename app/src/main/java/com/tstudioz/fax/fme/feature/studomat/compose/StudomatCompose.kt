@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -38,7 +39,7 @@ import androidx.lifecycle.compose.currentStateAsState
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun StudomatCompose(studomatViewModel: StudomatViewModel) {
+fun StudomatCompose(studomatViewModel: StudomatViewModel, innerPaddingValues: PaddingValues) {
 
     val studomatData = studomatViewModel.studomatData.observeAsState().value
     val snackbarHostState = remember { studomatViewModel.snackbarHostState }
@@ -61,18 +62,18 @@ fun StudomatCompose(studomatViewModel: StudomatViewModel) {
         contentWindowInsets = WindowInsets(0.dp),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
-
-        if (openedWebview.value) {
-            BackHandler { openedWebview.value = false }
-            WebViewScreen(cookieJar)
-            return@Scaffold
-        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .background(Brush.verticalGradient(listOf(studomatBlue, Color.Transparent))),
+                .background(Brush.verticalGradient(listOf(studomatBlue, Color.Transparent)))
+                .padding(innerPaddingValues)
+                .padding(innerPadding),
         ) {
+            if (openedWebview.value) {
+                BackHandler { openedWebview.value = false }
+                WebViewScreen(cookieJar)
+                return@Scaffold
+            }
             PullRefreshIndicator(
                 isRefreshing == true,
                 pullRefreshState,

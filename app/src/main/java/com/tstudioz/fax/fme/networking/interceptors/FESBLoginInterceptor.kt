@@ -1,6 +1,5 @@
 package com.tstudioz.fax.fme.networking.interceptors
 
-import com.tstudioz.fax.fme.common.user.models.User
 import com.tstudioz.fax.fme.feature.login.dao.UserDao
 import com.tstudioz.fax.fme.feature.login.services.UserServiceInterface
 import com.tstudioz.fax.fme.networking.cookies.MonsterCookieJar
@@ -33,7 +32,7 @@ class FESBLoginInterceptor(
     }
 
     private suspend fun refreshSession() {
-        val user = User(userDao.getUser())
+        val user = userDao.getUser()
         userService.loginUser(user.username, user.password)
     }
 

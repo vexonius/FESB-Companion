@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -47,7 +48,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @Composable
-fun AttendanceCompose(attendanceViewModel: AttendanceViewModel) {
+fun AttendanceCompose(attendanceViewModel: AttendanceViewModel, innerPaddingValues: PaddingValues) {
 
     val items = attendanceViewModel.attendanceListFull.observeAsState().value ?: emptyList()
 
@@ -64,10 +65,12 @@ fun AttendanceCompose(attendanceViewModel: AttendanceViewModel) {
         }
     }
 
-    if (items.isNotEmpty()) {
-        CreateAttendanceListView(attendanceViewModel, snackbarHostState)
-    } else {
-        EmptyView()
+    Box(Modifier.padding(innerPaddingValues)){
+        if (items.isNotEmpty()) {
+            CreateAttendanceListView(attendanceViewModel, snackbarHostState)
+        } else {
+            EmptyView()
+        }
     }
 }
 
