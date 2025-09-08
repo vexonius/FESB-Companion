@@ -41,7 +41,7 @@ class UserRepository(
     }
 
     override suspend fun getCurrentUserName(): String {
-        return userDao.getUser().username
+        return User(userDao.getUser()).username
     }
 
     override suspend fun getCurrentUser(): User {

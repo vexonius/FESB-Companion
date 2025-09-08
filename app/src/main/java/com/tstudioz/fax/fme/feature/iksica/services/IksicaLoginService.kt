@@ -108,9 +108,11 @@ class IksicaLoginService(
 
         val response = client.newCall(request).execute()
         val body = response.body?.string() ?: ""
-        response.close()
 
-        val error = Jsoup.parse(body).selectFirst(".alert-danger")?.text()
+        response.close()
+        val doc = Jsoup.parse(body)
+        val error = doc.selectFirst(".alert-danger")?.text()
+        val name = doc.selectFirst("h2.card-title")?.text() ?: ""
 
         if (error != null && error.contains("Greška", true)) {
             return NetworkServiceResult.IksicaResult.Failure(Throwable(error.substringAfter("error_outline ")))
@@ -120,6 +122,6 @@ class IksicaLoginService(
             return NetworkServiceResult.IksicaResult.Failure(Throwable("Failure getAspNetSessionSAML"))
         }
 
-        return NetworkServiceResult.IksicaResult.Success("Success")
+        return NetworkServiceResult.IksicaResult.Success(name)
     }
 }

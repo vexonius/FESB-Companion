@@ -65,6 +65,7 @@ fun LoginCompose(
     username: MutableLiveData<String>,
     password: MutableLiveData<String>,
     passwordHidden: MutableLiveData<Boolean>,
+    emailOrUsernameText: String = stringResource(id = R.string.login_email_or_username),
     tryUserLogin: () -> Unit
 ) {
 
@@ -78,7 +79,7 @@ fun LoginCompose(
 
     val usernameModel = TextFieldModel(
         text = username,
-        label = stringResource(id = R.string.login_email_or_username),
+        label = emailOrUsernameText,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
         contentType = ContentType.Username + ContentType.EmailAddress
     )
@@ -229,5 +230,5 @@ fun LoginComposePreview() {
         MutableLiveData(""),
         MutableLiveData(""),
         MutableLiveData(true),
-        {})
+        tryUserLogin = {})
 }

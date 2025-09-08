@@ -65,7 +65,6 @@ fun MainNavHost(
     timetableViewModel: TimetableViewModel = koinViewModel()
 ) {
     val internetAvailable = homeViewModel.internetAvailable.observeAsState().value == true
-
     Scaffold(
         bottomBar = {
             MainBottomBar(
