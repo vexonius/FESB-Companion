@@ -6,7 +6,6 @@ import com.tstudioz.fax.fme.feature.studomat.data.parseCurrentYear
 import com.tstudioz.fax.fme.feature.studomat.data.parseStudent
 import com.tstudioz.fax.fme.feature.studomat.data.parseYears
 import com.tstudioz.fax.fme.feature.studomat.data.sortedByNameAndSemester
-import com.tstudioz.fax.fme.feature.studomat.models.StudomatSubject
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYear
 import com.tstudioz.fax.fme.feature.studomat.models.StudomatYearInfo
 import com.tstudioz.fax.fme.feature.studomat.repository.models.StudomatRepositoryResult
@@ -24,8 +23,6 @@ class StudomatRepository(
         return when (val result = studomatService.getYearNames()) {
             is NetworkServiceResult.StudomatResult.Success -> {
                 val resultGetYears = parseYears(result.data)
-                studomatDao.deleteYears()
-                studomatDao.insertYears(resultGetYears)
                 Log.d("StudomatRepository", "getYears: $resultGetYears")
                 StudomatRepositoryResult.StudentAndYearsResult.Success(resultGetYears, student)
             }
