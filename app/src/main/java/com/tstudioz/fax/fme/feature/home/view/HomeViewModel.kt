@@ -46,6 +46,7 @@ class HomeViewModel(
     val weatherDisplay: LiveData<WeatherDisplay> = _weatherDisplay
     val notes: LiveData<List<Note>> = _notes
     val events: LiveData<List<Event>> = timeTableRepository.events.asLiveData()
+    val outlookVisible = MutableLiveData(false)
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         Log.d("HomeViewModel", "Caught $exception")

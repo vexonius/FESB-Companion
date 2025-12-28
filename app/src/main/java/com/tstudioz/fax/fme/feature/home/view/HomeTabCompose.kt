@@ -1,5 +1,9 @@
 package com.tstudioz.fax.fme.feature.home.view
 
+import android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+import android.webkit.WebView
+import android.widget.FrameLayout
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,11 +34,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -93,6 +100,36 @@ fun HomeTabCompose(
                 MenzaCompose(menzaViewModel, innerPaddingValues)
                 return@Scaffold
             }
+            if (homeViewModel.outlookVisible.observeAsState().value == true) {
+                Scaffold(
+                    contentWindowInsets = WindowInsets(0.dp),
+                ) { innerPadding1 ->
+                    val webview = WebView(LocalContext.current).apply {
+                        settings.javaScriptEnabled = true
+                        settings.loadWithOverviewMode = true
+                        settings.useWideViewPort = true
+                        settings.setSupportZoom(true)
+                        settings.domStorageEnabled = true
+                        settings.mixedContentMode = MIXED_CONTENT_ALWAYS_ALLOW
+                        settings.userAgentString =
+                            "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36"
+                    }
+                    AndroidView(
+                        factory = {
+                            FrameLayout(it).apply {
+                                webview.loadUrl("https://outlook.office.com/mail/0/")
+                                addView(webview)
+                            }
+                        },
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .fillMaxSize()
+                            .padding(innerPaddingValues)
+                            .padding(innerPadding1),
+                    )
+                }
+            return@Scaffold
+        }
             LazyColumn(
                 Modifier
                     .padding(innerPaddingValues)
