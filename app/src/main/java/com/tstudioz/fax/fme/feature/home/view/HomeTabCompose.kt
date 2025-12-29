@@ -1,8 +1,11 @@
 package com.tstudioz.fax.fme.feature.home.view
 
+import android.webkit.WebChromeClient
 import android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -85,6 +88,7 @@ fun HomeTabCompose(
         when (lifecycleState) {
             Lifecycle.State.RESUMED -> {
                 homeViewModel.fetchDailyTimetable()
+                homeViewModel.outlookVisible.value = false
             }
 
             else -> {}
@@ -106,6 +110,8 @@ fun HomeTabCompose(
                 ) { innerPadding1 ->
                     val webview = WebView(LocalContext.current).apply {
                         settings.javaScriptEnabled = true
+                        webChromeClient = WebChromeClient()
+                        webViewClient = WebViewClient()
                         settings.loadWithOverviewMode = true
                         settings.useWideViewPort = true
                         settings.setSupportZoom(true)
@@ -114,10 +120,17 @@ fun HomeTabCompose(
                         settings.userAgentString =
                             "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36"
                     }
+                    BackHandler() {
+                        if (webview.canGoBack()) {
+                            webview.goBack()
+                        } else {
+                            homeViewModel.outlookVisible.value = false
+                        }
+                    }
                     AndroidView(
                         factory = {
                             FrameLayout(it).apply {
-                                webview.loadUrl("https://outlook.office.com/mail/0/")
+                                webview.loadUrl("https://outlook.office.com/")
                                 addView(webview)
                             }
                         },
@@ -128,8 +141,8 @@ fun HomeTabCompose(
                             .padding(innerPadding1),
                     )
                 }
-            return@Scaffold
-        }
+                return@Scaffold
+            }
             LazyColumn(
                 Modifier
                     .padding(innerPaddingValues)
