@@ -1,5 +1,6 @@
 package com.tstudioz.fax.fme.feature.timetable.view.compose
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
@@ -26,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -95,7 +98,6 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel, innerPaddingValues:
     val hideEvent = { timetableViewModel.hideEvent() }
     val snackbarHostState = timetableViewModel.snackbarHostState
 
-    val sheetStateEvent = rememberModalBottomSheetState()
     val sheetStateCalendar = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val event = showDayEvent.observeAsState().value
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
@@ -117,13 +119,29 @@ fun TimetableCompose(timetableViewModel: TimetableViewModel, innerPaddingValues:
             snackbarHost = { SnackbarHost(snackbarHostState) },
             sheetContent = {
                 if (event != null) {
+                    val sheetStateEvent = rememberModalBottomSheetState()
+                    val sheetGesturesEnabled = remember { mutableStateOf(true) }
                     ModalBottomSheet(
                         sheetState = sheetStateEvent,
                         onDismissRequest = { hideEvent() },
-                        contentWindowInsets = { WindowInsets(0.dp) },
+                        contentWindowInsets = { WindowInsets.systemBars },
                         dragHandle = { },
+                        sheetGesturesEnabled = sheetGesturesEnabled.value,
+                        properties = ModalBottomSheetProperties(shouldDismissOnClickOutside = false)
                     ) {
-                        EventBottomSheet(event)
+                        Log.d(
+                            "test",
+                            "1 " + sheetStateEvent.currentValue.toString()
+                                    + " 2 " + sheetStateEvent.isAnimationRunning.toString()
+                                    + " 3 " + sheetStateEvent.isVisible.toString()
+                        )
+
+                        EventBottomSheet(
+                            event,
+                            timetableViewModel.attendedStudents.observeAsState().value,
+                            { sheetGesturesEnabled.value = it },
+                            sheetStateEvent
+                        )
                     }
                 } else if (shownWeekChooseMenu) {
                     ModalBottomSheet(

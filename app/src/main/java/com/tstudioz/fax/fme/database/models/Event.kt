@@ -1,13 +1,13 @@
 package com.tstudioz.fax.fme.database.models
 
 import androidx.compose.ui.graphics.Color
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.tstudioz.fax.fme.compose.accentBlue
 import com.tstudioz.fax.fme.compose.accentGreen
 import com.tstudioz.fax.fme.compose.accentGrey
 import com.tstudioz.fax.fme.compose.accentPurple
 import com.tstudioz.fax.fme.compose.accentRed
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
 
@@ -28,6 +28,7 @@ data class Event(
     val recurringType: Recurring = Recurring.UNDEFINED,
     val recurringUntil: String = "",
     val studyCode: String = "",
+    val detailsButtonExists: Boolean = false,
 ) {
 
     constructor(eventRoom: EventRoom) : this(
@@ -52,7 +53,8 @@ data class Event(
         recurring = eventRoom.recurring == true,
         recurringType = Recurring.valueOf(eventRoom.recurringType ?: ""),
         recurringUntil = eventRoom.recurringUntil ?: "",
-        studyCode = eventRoom.studyCode ?: ""
+        studyCode = eventRoom.studyCode ?: "",
+        detailsButtonExists = eventRoom.detailsButtonExists,
     )
 }
 
@@ -74,6 +76,7 @@ data class EventRoom(
     var recurringType: String? = null,
     var recurringUntil: String? = null,
     var studyCode: String? = null,
+    val detailsButtonExists: Boolean = false,
 ) {
     constructor(event: Event) : this(
         id = event.id,
@@ -90,7 +93,8 @@ data class EventRoom(
         recurring = event.recurring,
         recurringType = event.recurringType.name,
         recurringUntil = event.recurringUntil,
-        studyCode = event.studyCode
+        studyCode = event.studyCode,
+        detailsButtonExists = event.detailsButtonExists
     )
 }
 

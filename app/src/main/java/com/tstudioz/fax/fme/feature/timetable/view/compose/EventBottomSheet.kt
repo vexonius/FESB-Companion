@@ -2,17 +2,28 @@ package com.tstudioz.fax.fme.feature.timetable.view.compose
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -20,25 +31,41 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tstudioz.fax.fme.R
 import com.tstudioz.fax.fme.compose.AppTheme
+import com.tstudioz.fax.fme.compose.passGreen
 import com.tstudioz.fax.fme.database.models.Event
+import com.tstudioz.fax.fme.feature.timetable.AttendedStudent
 import com.tstudioz.fax.fme.util.testEvents
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventBottomSheet(event: Event) {
+fun EventBottomSheet(
+    event: Event,
+    attendedStudents: List<AttendedStudent>?,
+    sheetGesturesToggle: (Boolean) -> Unit = {},
+    sheetState: SheetState
+) {
+    val scrollState = rememberScrollState()
+    val scrollable = scrollState.value == 0
+    LaunchedEffect(scrollable) {
+        sheetGesturesToggle(scrollable)
+    }
     Column(
         Modifier
             .background(MaterialTheme.colorScheme.surface)
             .padding(20.dp, 5.dp, 15.dp, 20.dp)
             .fillMaxSize()
+            .verticalScroll(
+                scrollState,
+                enabled = !sheetState.isAnimationRunning && sheetState.currentValue == SheetValue.Expanded
+            )
     ) {
         Text(
             text = event.name,
             style = MaterialTheme.typography.displaySmall,
-            modifier = Modifier.padding(0.dp, 15.dp, 15.dp, 8.dp)
+            modifier = Modifier.padding(0.dp, 15.dp, 15.dp, 8.dp),
         )
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 24.dp)
+            verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 24.dp)
         ) {
             val radius = 6.dp
             Canvas(modifier = Modifier.size(radius * 2)) { drawCircle(color = event.color, radius = radius.toPx()) }
@@ -63,9 +90,7 @@ fun EventBottomSheet(event: Event) {
                 RowItem(
                     title = stringResource(id = R.string.time),
                     text = stringResource(
-                        id = R.string.time_range,
-                        event.start.toLocalTime(),
-                        event.end.toLocalTime()
+                        id = R.string.time_range, event.start.toLocalTime(), event.end.toLocalTime()
                     ),
                     modifier = modifier.weight(9.5f),
                 )
@@ -77,10 +102,33 @@ fun EventBottomSheet(event: Event) {
             }
             Row {
                 RowItem(
-                    title = stringResource(id = R.string.recurring),
-                    text = event.recurringUntil,
-                    modifier = modifier
+                    title = stringResource(id = R.string.recurring), text = event.recurringUntil, modifier = modifier
                 )
+            }
+        }
+        Column {
+            attendedStudents?.forEach { item ->
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        item.name, Modifier
+                            .weight(1f)
+                            .height(20.dp)
+                    )
+                    if (item.modifiable) {
+                        Checkbox(
+                            checked = item.presence == true,
+                            onCheckedChange = {},
+                            colors = CheckboxDefaults.colors(
+                                checkmarkColor = if (item.manualStatus == true) passGreen
+                                else CheckboxDefaults.colors().checkedCheckmarkColor
+                            )
+                        )
+                    }
+                }
             }
         }
     }
@@ -106,13 +154,72 @@ fun RowItem(
 
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun EventBottomSheetPreview() {
     AppTheme {
         Surface {
             EventBottomSheet(
-                event = testEvents.first()
+                event = testEvents.first(), listOf(
+                    AttendedStudent(
+                        "aaaaa00",
+                        username = "ivan ivić",
+                        presence = false,
+                        cardStatus = false,
+                        manualStatus = true,
+                        modifiable = true
+                    ),
+                    AttendedStudent(
+                        "aaaaa00",
+                        username = "ivan ivić",
+                        presence = false,
+                        cardStatus = false,
+                        manualStatus = true,
+                        modifiable = true
+                    ),
+                    AttendedStudent(
+                        "aaaaa00",
+                        username = "ivan ivić",
+                        presence = false,
+                        cardStatus = false,
+                        manualStatus = true,
+                        modifiable = true
+                    ),
+                    AttendedStudent(
+                        "aaaaa00",
+                        username = "ivan ivić",
+                        presence = true,
+                        cardStatus = true,
+                        manualStatus = false,
+                        modifiable = true
+                    ),
+                    AttendedStudent(
+                        "aaaaa00",
+                        username = "ivan ivić",
+                        presence = false,
+                        cardStatus = false,
+                        manualStatus = true,
+                        modifiable = true
+                    ),
+                    AttendedStudent(
+                        "ivan ivićaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                        username = "aaaaaaaaaaaaaa",
+                        presence = true,
+                        cardStatus = false,
+                        manualStatus = true,
+                        modifiable = true
+                    ),
+                    AttendedStudent(
+                        "aaaaa00",
+                        username = "ivan ivić",
+                        presence = true,
+                        cardStatus = false,
+                        manualStatus = true,
+                        modifiable = true
+                    ),
+                ), sheetState = rememberModalBottomSheetState()
             )
         }
     }

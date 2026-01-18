@@ -3,7 +3,9 @@ package com.tstudioz.fax.fme.feature.timetable.repository
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.EventRoom
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
+import com.tstudioz.fax.fme.feature.timetable.AttendedStudent
 import com.tstudioz.fax.fme.feature.timetable.dao.TimeTableDao
+import com.tstudioz.fax.fme.feature.timetable.parseTest
 import com.tstudioz.fax.fme.feature.timetable.parseTimetable
 import com.tstudioz.fax.fme.feature.timetable.parseTimetableInfo
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
@@ -60,7 +62,10 @@ class TimeTableRepository(
         }
     }
 
-    override suspend fun fetchTimeTableCalendar(startDate: String, endDate: String): Map<LocalDate, TimeTableInfo> {
+    override suspend fun fetchTimeTableCalendar(
+        startDate: String,
+        endDate: String
+    ): Map<LocalDate, TimeTableInfo> {
         val params: HashMap<String, String> = hashMapOf(
             "FromDate" to startDate,
             "ToDate" to endDate
@@ -76,6 +81,19 @@ class TimeTableRepository(
 
     override suspend fun getCachedEvents(): List<Event> {
         return timeTableDao.getEvents().map { Event(it) }
+    }
+
+    override suspend fun fetchTest(id: String): List<AttendedStudent> {
+        when (val result = timetableService.fetchTest(id)) {
+            is NetworkServiceResult.TimeTableResult.Success -> {
+                val test = parseTest(result.data)
+                return test
+            }
+
+            is NetworkServiceResult.TimeTableResult.Failure -> {
+                throw Exception("Timetable fetching error")
+            }
+        }
     }
 
     private fun observeEventsFromCache() {

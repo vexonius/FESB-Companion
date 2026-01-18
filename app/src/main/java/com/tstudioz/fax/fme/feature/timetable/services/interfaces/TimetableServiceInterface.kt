@@ -12,4 +12,7 @@ interface TimetableServiceInterface {
         params: HashMap<String, String>
     ): NetworkServiceResult.TimeTableResult
 
+    suspend fun fetchTest(
+        id: String
+    ): NetworkServiceResult.TimeTableResult
 }

@@ -38,17 +38,17 @@ val module = module {
     single<OkHttpClient> { provideOkHttpClient(get()) }
     single<OkHttpClient>(named("FESBPortalClient")) { provideFESBPortalClient(get(), get(named("FESBInterceptor"))) }
     single<SessionDelegateInterface> { SessionDelegate(get(), get()) }
-    factory<AppDatabase> { getRoomDatabase(get()) }
+    factory<AppDatabase> { getRoomDatabase(get(), DATABASE_NAME) }
     single<SharedPreferences> { getSharedPreferences(androidContext()) }
     viewModel { TimetableViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(androidApplication(), get(), get()) }
 }
 
-fun getRoomDatabase(application: Application): AppDatabase {
+fun getRoomDatabase(application: Application, databaseName: String): AppDatabase {
     return Room.databaseBuilder(
         application,
         AppDatabase::class.java,
-        DATABASE_NAME
+        databaseName
     ).build()
 }
 

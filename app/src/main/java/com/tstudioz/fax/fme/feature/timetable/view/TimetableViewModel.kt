@@ -12,6 +12,7 @@ import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.tstudioz.fax.fme.common.user.UserRepositoryInterface
 import com.tstudioz.fax.fme.database.models.Event
 import com.tstudioz.fax.fme.database.models.TimeTableInfo
+import com.tstudioz.fax.fme.feature.timetable.AttendedStudent
 import com.tstudioz.fax.fme.feature.timetable.MonthData
 import com.tstudioz.fax.fme.feature.timetable.repository.interfaces.TimeTableRepositoryInterface
 import com.tstudioz.fax.fme.networking.InternetConnectionObserver
@@ -54,6 +55,9 @@ class TimetableViewModel(
     private val _mondayOfSelectedWeek: MutableLiveData<LocalDate> = MutableLiveData<LocalDate>(
         LocalDate.now().let { it.minusDays((it.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong()) })
     val mondayOfSelectedWeek: LiveData<LocalDate> = _mondayOfSelectedWeek
+
+    private var _attendedStudents = MutableLiveData(emptyList<AttendedStudent>())
+    var attendedStudents: LiveData<List<AttendedStudent>> = _attendedStudents
 
     private val _showWeekChooseMenu = MutableLiveData(false)
     val shownWeekChooseMenu: LiveData<Boolean> = _showWeekChooseMenu
@@ -136,11 +140,16 @@ class TimetableViewModel(
 
     fun showEvent(event: Event) {
         _currentEventShown.value = event
+        if (event.detailsButtonExists){
+            viewModelScope.launch(Dispatchers.IO + handler) {
+                _attendedStudents.postValue(timeTableRepository.fetchTest(event.id))
+            }
+        }
     }
 
     fun hideEvent() {
         _currentEventShown.value = null
+        _attendedStudents.postValue(null)
     }
 
 }
-

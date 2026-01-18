@@ -65,4 +65,30 @@ class TimetableService(private val client: OkHttpClient) : TimetableServiceInter
         return NetworkServiceResult.TimeTableResult.Success(value)
     }
 
+    override suspend fun fetchTest(id: String): NetworkServiceResult.TimeTableResult {
+        val endpointUrl = "$baseURL/rezervacija/"
+        val urlBuilder = endpointUrl
+            .toHttpUrl()
+            .newBuilder()
+
+        urlBuilder.addPathSegment(id)
+
+
+        val request = Request.Builder()
+            .url(urlBuilder.build())
+            .build()
+
+        val response: Response = client.newCall(request).execute()
+        val value = response.body?.string()
+        val success = response.isSuccessful
+
+        response.close()
+
+        if (!success || value.isNullOrEmpty()) {
+            return NetworkServiceResult.TimeTableResult.Failure(Throwable("Failed to fetch schedule"))
+        }
+
+        return NetworkServiceResult.TimeTableResult.Success(value)
+    }
+
 }

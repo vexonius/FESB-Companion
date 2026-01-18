@@ -31,19 +31,25 @@ fun parseTimetable(body: String): List<Event> {
             val enddate = e.attr("data-endsdate").toString()
             val endh = e.attr("data-endshour").toInt()
             val endmin = e.attr("data-endsmin").toInt()
-            val type = TimetableType.setType(e.selectFirst("span.groupCategory")?.text()?.split(",")?.get(0) ?: "")
+            val type = TimetableType.setType(
+                e.selectFirst("span.groupCategory")?.text()?.split(",")?.get(0) ?: ""
+            )
             val name = e.selectFirst("span.name.normal")?.text()
-                ?: e.selectFirst("div.popup > div.eventContent > div.header > div > span.title")?.text()
+                ?: e.selectFirst("div.popup > div.eventContent > div.header > div > span.title")
+                    ?.text()
                 ?: ""
             val group = e.select("span.group.normal").first()?.text() ?: ""
             val studycode = e.selectFirst("span.studyCode")?.text() ?: ""
-            val room = e.selectFirst("div.eventContent > div.eventInfo > span.resource")?.text() ?: ""
+            val room =
+                e.selectFirst("div.eventContent > div.eventInfo > span.resource")?.text() ?: ""
             val detailTime = e.selectFirst("div.detailItem.datetime")?.text() ?: ""
             val professor = e.selectFirst("div.detailItem.user")?.text() ?: ""
             val repetsType = parseRecurring(e.selectFirst("div.recurring > span.type > span"))
             val isItRecurring = !(repetsType == Recurring.ONCE || repetsType == Recurring.UNDEFINED)
 
             val repeatsUntil = e.selectFirst("span.repeat")?.text() ?: ""
+
+            val detailsButtonExists = e.selectFirst("div.bottom-actions") != null
 
             events.add(
                 Event(
@@ -68,7 +74,8 @@ fun parseTimetable(body: String): List<Event> {
                     recurring = isItRecurring,
                     recurringType = repetsType,
                     recurringUntil = repeatsUntil,
-                    studyCode = studycode
+                    studyCode = studycode,
+                    detailsButtonExists = detailsButtonExists
                 )
             )
         }
@@ -136,4 +143,56 @@ private fun parseRecurring(element: Element?): Recurring {
         element.hasClass("monthly") -> Recurring.MONTHLY
         else -> Recurring.UNDEFINED
     }
+}
+
+data class AttendedStudent(
+    val name: String,
+    val username: String?,
+    val presence: Boolean?,
+    val cardStatus: Boolean?,
+    val manualStatus: Boolean?,
+    val modifiable: Boolean,
+)
+
+fun parseTest(body: String): List<AttendedStudent> {
+    val attendedStudents = mutableListOf<AttendedStudent>()
+
+    val doc = Jsoup.parse(body)
+    val listElements = doc.select("li.student")
+
+    listElements.let {
+        for (li in listElements) {
+
+            attendedStudents.add(
+                AttendedStudent(
+                    name = li.select("span.name").text().trim(),
+                    username = li.attr("data-username").trim(),
+                    presence = li.attr("data-presence").let {
+                        when (it) {
+                            "True" -> true
+                            "False" -> false
+                            else -> null
+                        }
+                    },
+                    cardStatus = li.attr("data-card-status").let {
+                        when (it) {
+                            "present" -> true
+                            "absent" -> false
+                            else -> null
+                        }
+                    },
+                    manualStatus = li.attr("data-manual-status").let {
+                        when (it) {
+                            "present" -> true
+                            "absent" -> false
+                            else -> null
+                        }
+                    },
+                    modifiable = doc.select("div.title").text().contains("EVIDENCIJA"),
+                )
+            )
+        }
+    }
+
+    return attendedStudents
 }
