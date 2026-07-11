@@ -14,10 +14,10 @@ import com.tstudioz.fax.fme.util.PreferenceHelper.get
 import com.tstudioz.fax.fme.util.PreferenceHelper.set
 import com.tstudioz.fax.fme.util.SPKey
 import com.tstudioz.fax.fme.util.SingleLiveEvent
-import com.tstudioz.fax.fme.util.studentDataTestData
 import com.tstudioz.fax.fme.util.attendanceTestData
 import com.tstudioz.fax.fme.util.eventsTestData
 import com.tstudioz.fax.fme.util.receiptsTestData
+import com.tstudioz.fax.fme.util.studentDataTestData
 import com.tstudioz.fax.fme.util.studomatSubjectTestData
 import com.tstudioz.fax.fme.util.studomatYearInfoTestData
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -25,7 +25,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
-import kotlin.getValue
 
 @InternalCoroutinesApi
 class LoginViewModel(
@@ -48,10 +47,11 @@ class LoginViewModel(
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         showSnackbar(application.getString(R.string.login_error_generic))
+        showLoading.postValue(false)
     }
 
     private fun addTestData() {
-        val db : AppDatabase by inject(AppDatabase::class.java)
+        val db: AppDatabase by inject(AppDatabase::class.java)
         viewModelScope.launch(Dispatchers.IO + handler) {
             db.studomatDao().insert(studomatSubjectTestData)
             db.studomatDao().insertYears(studomatYearInfoTestData)
